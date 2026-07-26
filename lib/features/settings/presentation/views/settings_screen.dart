@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
+
+/// Supported languages map.
+const Map<String, String> _supportedLanguages = {
+  'en': 'English',
+  'vi': 'Tiếng Việt',
+  'ja': '日本語',
+  'zh': '中文',
+};
 
 /// Profile & Settings View matching image3 design with Google AI Studio key configuration.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -36,6 +45,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
 
     // Keep controllers updated if settings change externally
     if (_apiKeyController.text != settings.geminiApiKey &&
@@ -49,9 +59,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Profile & Settings',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        title: Text(
+          loc.profileSettings,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: ListView(
@@ -108,7 +118,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 OutlinedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.edit_outlined, size: 16),
-                  label: const Text('Edit Profile'),
+                  label: Text(loc.editProfile),
                   style: OutlinedButton.styleFrom(
                     shape: const StadiumBorder(),
                     side: BorderSide(color: theme.dividerColor),
@@ -120,7 +130,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 24),
 
           // AI ENGINE SETTINGS SECTION
-          _buildSectionTitle(context, 'AI ENGINE SETTINGS'),
+          _buildSectionTitle(context, loc.aiEngineSettings),
           Card(
             elevation: 0,
             color: theme.colorScheme.surfaceContainerHighest
@@ -134,32 +144,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Icon(Icons.auto_awesome, color: Colors.amber),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Active AI Engine',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Text(
+                        loc.activeAiEngine,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       DropdownButton<String>(
                         value: settings.activeAiProvider,
                         underline: const SizedBox(),
-                        items: const [
+                        items: [
                           DropdownMenuItem(
                             value: 'gemini',
-                            child: Text('Google Gemini (Live)'),
+                            child: Text(loc.googleGeminiLive),
                           ),
                           DropdownMenuItem(
                             value: 'local',
-                            child: Text('Local LLM (Ollama)'),
+                            child: Text(loc.localLlmOllama),
                           ),
                           DropdownMenuItem(
                             value: 'mock',
-                            child: Text('Neural AI (Mock)'),
+                            child: Text(loc.neuralAiMock),
                           ),
                         ],
                         onChanged: (val) {
                           if (val != null) {
                             notifier.setAiProvider(val);
-                            // Auto-set first available model for selected provider
                             if (val == 'local') {
                               notifier.setAiModel('llama3');
                             } else if (val == 'gemini') {
@@ -174,9 +183,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                   // Display settings based on chosen AI engine
                   if (settings.activeAiProvider == 'local') ...[
-                    const Text(
-                      'Local LLM Endpoint (Ollama / LM Studio)',
-                      style: TextStyle(
+                    Text(
+                      loc.localEndpoint,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey,
@@ -201,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Stored in local database. Make sure Ollama/LM Studio is running.',
+                      loc.ollamaRunningNotice,
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.textTheme.bodySmall?.color
@@ -209,9 +218,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                   ] else if (settings.activeAiProvider == 'gemini') ...[
-                    const Text(
-                      'Google AI Studio API Key',
-                      style: TextStyle(
+                    Text(
+                      loc.geminiApiKey,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey,
@@ -225,7 +234,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         notifier.setGeminiApiKey(val);
                       },
                       decoration: InputDecoration(
-                        hintText: 'Paste AI Studio API Key',
+                        hintText: loc.pasteApiKey,
                         filled: true,
                         fillColor: theme.cardColor,
                         prefixIcon: const Icon(Icons.key, size: 20),
@@ -248,10 +257,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               icon: const Icon(Icons.save, color: Colors.green),
                               tooltip: 'Save Key',
                               onPressed: () {
-                                notifier.setGeminiApiKey(_apiKeyController.text);
+                                notifier
+                                    .setGeminiApiKey(_apiKeyController.text);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Gemini API Key saved to database!'),
+                                  SnackBar(
+                                    content: Text(loc.keySaved),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
@@ -267,7 +277,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Stored securely in local SQLite database for future sessions',
+                      loc.storedNotice,
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.textTheme.bodySmall?.color
@@ -276,7 +286,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ] else ...[
                     Text(
-                      'Mock mode does not require any endpoint configuration.',
+                      loc.noConfigRequired,
                       style: TextStyle(
                         fontSize: 12,
                         fontStyle: FontStyle.italic,
@@ -292,7 +302,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
 
           // APPEARANCE SECTION
-          _buildSectionTitle(context, 'APPEARANCE'),
+          _buildSectionTitle(context, loc.appearance),
           Card(
             elevation: 0,
             color: theme.colorScheme.surfaceContainerHighest
@@ -302,13 +312,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.palette_outlined, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.palette_outlined, size: 20),
+                      const SizedBox(width: 8),
                       Text(
-                        'Theme Selection',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        loc.themeSelection,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -358,7 +368,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
 
           // GENERAL SECTION
-          _buildSectionTitle(context, 'GENERAL'),
+          _buildSectionTitle(context, loc.general),
           Card(
             elevation: 0,
             color: theme.colorScheme.surfaceContainerHighest
@@ -367,20 +377,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Language'),
+                  title: Text(loc.language),
                   trailing: DropdownButton<String>(
                     value: settings.languageCode,
                     underline: const SizedBox(),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'en',
-                        child: Text('English'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'vi',
-                        child: Text('Tiếng Việt'),
-                      ),
-                    ],
+                    items: _supportedLanguages.entries.map((entry) {
+                      return DropdownMenuItem(
+                        value: entry.key,
+                        child: Text(entry.value),
+                      );
+                    }).toList(),
                     onChanged: (val) {
                       if (val != null) notifier.setLanguage(val);
                     },
@@ -392,17 +398,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: 16),
 
           // INFORMATION SECTION
-          _buildSectionTitle(context, 'INFORMATION'),
+          _buildSectionTitle(context, loc.information),
           Card(
             elevation: 0,
             color: theme.colorScheme.surfaceContainerHighest
                 .withValues(alpha: 0.3),
             child: Column(
               children: [
-                const ListTile(
-                  leading: Icon(Icons.info_outline),
-                  title: Text('About LotusConnect'),
-                  trailing: Text(
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(loc.about),
+                  trailing: const Text(
                     'v1.0.0',
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -410,9 +416,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text(
-                    'Log Out',
-                    style: TextStyle(color: Colors.red),
+                  title: Text(
+                    loc.logOut,
+                    style: const TextStyle(color: Colors.red),
                   ),
                   onTap: () {},
                 ),

@@ -60,7 +60,8 @@ class MessageBubble extends StatelessWidget {
                 Text(
                   timeStr,
                   style: TextStyle(
-                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                    color: theme.textTheme.bodySmall?.color
+                        ?.withValues(alpha: 0.6),
                     fontSize: 11,
                   ),
                 ),
@@ -68,7 +69,8 @@ class MessageBubble extends StatelessWidget {
                 Icon(
                   Icons.done_all_rounded,
                   size: 14,
-                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                  color:
+                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                 ),
               ],
             ),
@@ -120,7 +122,8 @@ class MessageBubble extends StatelessWidget {
               children: [
                 MarkdownMessageView(
                   content: message.content,
-                  textColor: chatTheme?.aiBubbleFg ?? theme.textTheme.bodyLarge!.color!,
+                  textColor: chatTheme?.aiBubbleFg ??
+                      theme.textTheme.bodyLarge!.color!,
                 ),
                 const SizedBox(height: 12),
                 Divider(
@@ -166,7 +169,8 @@ class MessageBubble extends StatelessWidget {
                     Text(
                       timeStr,
                       style: TextStyle(
-                        color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
+                        color: theme.textTheme.bodySmall?.color
+                            ?.withValues(alpha: 0.6),
                         fontSize: 11,
                       ),
                     ),

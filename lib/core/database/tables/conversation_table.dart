@@ -21,7 +21,8 @@ class ConversationTable extends Table {
   BoolColumn get isFavourite => boolean().withDefault(const Constant(false))();
 
   /// Selected AI model for this conversation.
-  TextColumn get modelName => text().withDefault(const Constant('gemini-1.5-pro'))();
+  TextColumn get modelName =>
+      text().withDefault(const Constant('gemini-1.5-pro'))();
 
   /// Unsaved draft message input text.
   TextColumn get draftMessage => text().nullable()();

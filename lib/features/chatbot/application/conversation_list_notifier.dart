@@ -5,7 +5,6 @@ import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart
 import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/rename_conversation_usecase.dart';
 
-/// State object for Conversation List.
 class ConversationListState {
   const ConversationListState({
     this.conversations = const [],
@@ -30,11 +29,9 @@ class ConversationListState {
         .toList();
   }
 
-  /// Returns pinned conversations.
   List<Conversation> get pinnedConversations =>
       filteredConversations.where((c) => c.isPinned).toList();
 
-  /// Returns unpinned conversations.
   List<Conversation> get unpinnedConversations =>
       filteredConversations.where((c) => !c.isPinned).toList();
 
@@ -123,7 +120,6 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
     );
   }
 
-  /// Renames a conversation.
   Future<void> renameConversation(String id, String newTitle) async {
     final renameUseCase = _ref.read(renameConversationUseCaseProvider);
     await renameUseCase(
@@ -131,25 +127,23 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
     );
   }
 
-  /// Deletes a conversation.
   Future<void> deleteConversation(String id) async {
     final deleteUseCase = _ref.read(deleteConversationUseCaseProvider);
     await deleteUseCase(id);
     if (state.selectedConversationId == id) {
       final remaining = state.conversations.where((c) => c.id != id).toList();
       state = state.copyWith(
-        selectedConversationId: remaining.isNotEmpty ? remaining.first.id : null,
+        selectedConversationId:
+            remaining.isNotEmpty ? remaining.first.id : null,
       );
     }
   }
 
-  /// Toggles pin status.
   Future<void> togglePin(String id) async {
     final togglePinUseCase = _ref.read(togglePinConversationUseCaseProvider);
     await togglePinUseCase(id);
   }
 
-  /// Toggles favourite status.
   Future<void> toggleFavourite(String id) async {
     final toggleFavUseCase =
         _ref.read(toggleFavouriteConversationUseCaseProvider);
@@ -157,8 +151,8 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
   }
 }
 
-/// Conversation list notifier provider.
 final conversationListProvider =
-    StateNotifierProvider<ConversationListNotifier, ConversationListState>((ref) {
+    StateNotifierProvider<ConversationListNotifier, ConversationListState>(
+        (ref) {
   return ConversationListNotifier(ref);
 });

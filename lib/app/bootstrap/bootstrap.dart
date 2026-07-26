@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:lotus_connect/app/router/app_router.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -42,6 +44,14 @@ class LotusConnectApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: activeTheme,
       routerConfig: AppRouter.router,
+      locale: Locale(settings.languageCode),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

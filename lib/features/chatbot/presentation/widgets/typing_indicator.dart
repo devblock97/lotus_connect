@@ -37,7 +37,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -48,9 +49,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
                   builder: (context, child) {
                     final delay = index * 0.2;
                     final value = (_controller.value - delay) % 1.0;
-                    final opacity = (value < 0.5)
-                        ? (value * 2.0)
-                        : (2.0 - (value * 2.0));
+                    final opacity =
+                        (value < 0.5) ? (value * 2.0) : (2.0 - (value * 2.0));
 
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 2),

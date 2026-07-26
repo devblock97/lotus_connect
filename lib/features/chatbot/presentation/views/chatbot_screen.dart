@@ -9,6 +9,7 @@ import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/message_bubble.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/typing_indicator.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Main Chatbot Screen view matching image1 design.
 class ChatbotScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
     final settings = ref.watch(settingsProvider);
     final aiProvider = ref.watch(activeAiProvider);
     final availableModels = aiProvider.availableModels;
+    final loc = AppLocalizations.of(context)!;
 
     // Auto-scroll when new content streams
     ref.listen<ActiveConversationState>(activeConversationProvider, (_, next) {
@@ -125,7 +127,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'ACTIVE SESSION (${aiProvider.displayName.split(" ").first})',
+                        '${loc.activeSession} (${aiProvider.displayName.split(" ").first})',
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -174,19 +176,20 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           // Banner Notice
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-            child: const Row(
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.4),
+            child: Row(
               children: [
-                Icon(Icons.push_pin_outlined, size: 14),
-                SizedBox(width: 8),
+                const Icon(Icons.push_pin_outlined, size: 14),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Project goals: Optimize latency by 100ms & guarantee offline cache',
-                    style: TextStyle(fontSize: 12),
+                    loc.projectGoals,
+                    style: const TextStyle(fontSize: 12),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.close, size: 14),
+                const Icon(Icons.close, size: 14),
               ],
             ),
           ),
@@ -209,9 +212,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                           .withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text(
-                      'TODAY',
-                      style: TextStyle(
+                    child: Text(
+                      loc.today,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -258,6 +261,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
             onStop: activeNotifier.stopGeneration,
             initialText: activeState.draftInput,
             onChanged: activeNotifier.updateDraft,
+            hintText: loc.messageInputHint,
           ),
         ],
       ),
