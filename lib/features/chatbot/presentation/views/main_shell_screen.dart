@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Navigation shell wrapping main application tabs matching provided image mocks.
-class MainShellScreen extends StatefulWidget {
+class MainShellScreen extends ConsumerStatefulWidget {
   const MainShellScreen({super.key});
 
   @override
-  State<MainShellScreen> createState() => _MainShellScreenState();
+  ConsumerState<MainShellScreen> createState() => _MainShellScreenState();
 }
 
-class _MainShellScreenState extends State<MainShellScreen> {
+class _MainShellScreenState extends ConsumerState<MainShellScreen> {
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     final pages = [
       const ChatbotScreen(),
@@ -27,8 +30,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
           });
         },
       ),
-      const PlaceholderTab(title: 'Calls', icon: Icons.call_outlined),
-      const PlaceholderTab(title: 'Alerts', icon: Icons.notifications_none_rounded),
+      PlaceholderTab(title: loc.tabCalls, icon: Icons.call_outlined),
+      PlaceholderTab(title: loc.tabAlerts, icon: Icons.notifications_none_rounded),
       const SettingsScreen(),
     ];
 
@@ -45,31 +48,31 @@ class _MainShellScreenState extends State<MainShellScreen> {
           });
         },
         indicatorColor: theme.colorScheme.primaryContainer,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.psychology_outlined),
-            selectedIcon: Icon(Icons.psychology),
-            label: 'AI',
+            icon: const Icon(Icons.psychology_outlined),
+            selectedIcon: const Icon(Icons.psychology),
+            label: loc.tabAi,
           ),
           NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
-            selectedIcon: Icon(Icons.chat_bubble),
-            label: 'Chats',
+            icon: const Icon(Icons.chat_bubble_outline),
+            selectedIcon: const Icon(Icons.chat_bubble),
+            label: loc.tabChats,
           ),
           NavigationDestination(
-            icon: Icon(Icons.call_outlined),
-            selectedIcon: Icon(Icons.call),
-            label: 'Calls',
+            icon: const Icon(Icons.call_outlined),
+            selectedIcon: const Icon(Icons.call),
+            label: loc.tabCalls,
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_none_rounded),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Alerts',
+            icon: const Icon(Icons.notifications_none_rounded),
+            selectedIcon: const Icon(Icons.notifications),
+            label: loc.tabAlerts,
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: loc.tabProfile,
           ),
         ],
       ),

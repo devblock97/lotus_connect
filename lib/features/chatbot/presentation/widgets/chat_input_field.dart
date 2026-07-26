@@ -8,6 +8,7 @@ class ChatInputField extends StatefulWidget {
     required this.onStop,
     this.initialText = '',
     this.onChanged,
+    this.hintText = 'Message Neural AI...',
     super.key,
   });
 
@@ -16,6 +17,7 @@ class ChatInputField extends StatefulWidget {
   final VoidCallback onStop;
   final String initialText;
   final ValueChanged<String>? onChanged;
+  final String hintText;
 
   @override
   State<ChatInputField> createState() => _ChatInputFieldState();
@@ -84,7 +86,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _handleSend(),
                       decoration: InputDecoration(
-                        hintText: 'Message Neural AI...',
+                        hintText: widget.hintText,
                         hintStyle: TextStyle(
                           color: theme.textTheme.bodyMedium?.color
                               ?.withValues(alpha: 0.5),
