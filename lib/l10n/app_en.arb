@@ -13,7 +13,7 @@
   "editProfile": "Edit Profile",
   "aiEngineSettings": "AI ENGINE SETTINGS",
   "activeAiEngine": "Active AI Engine",
-  "googleGeminiLive": "Google Gemini (Live)",
+  "googleGeminiLive": "Google Gemini",
   "localLlmOllama": "Local LLM (Ollama)",
   "neuralAiMock": "Neural AI (Mock)",
   "geminiApiKey": "Google AI Studio API Key",

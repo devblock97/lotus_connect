@@ -174,25 +174,25 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       body: Column(
         children: [
           // Banner Notice
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: theme.colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.4),
-            child: Row(
-              children: [
-                const Icon(Icons.push_pin_outlined, size: 14),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    loc.projectGoals,
-                    style: const TextStyle(fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const Icon(Icons.close, size: 14),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          //   color: theme.colorScheme.surfaceContainerHighest
+          //       .withValues(alpha: 0.4),
+          //   child: Row(
+          //     children: [
+          //       const Icon(Icons.push_pin_outlined, size: 14),
+          //       const SizedBox(width: 8),
+          //       Expanded(
+          //         child: Text(
+          //           loc.projectGoals,
+          //           style: const TextStyle(fontSize: 12),
+          //           overflow: TextOverflow.ellipsis,
+          //         ),
+          //       ),
+          //       const Icon(Icons.close, size: 14),
+          //     ],
+          //   ),
+          // ),
 
           // Message Feed
           Expanded(

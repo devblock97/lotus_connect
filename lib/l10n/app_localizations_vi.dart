@@ -52,7 +52,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get activeAiEngine => 'Công cụ AI kích hoạt';
 
   @override
-  String get googleGeminiLive => 'Google Gemini (Trực tiếp)';
+  String get googleGeminiLive => 'Google Gemini';
 
   @override
   String get localLlmOllama => 'LLM Nội bộ (Ollama)';

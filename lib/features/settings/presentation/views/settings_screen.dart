@@ -144,11 +144,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       const Icon(Icons.auto_awesome, color: Colors.amber),
                       const SizedBox(width: 8),
-                      Text(
-                        loc.activeAiEngine,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          loc.activeAiEngine,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       DropdownButton<String>(
                         value: settings.activeAiProvider,
                         underline: const SizedBox(),

@@ -13,7 +13,7 @@
   "editProfile": "プロフィール編集",
   "aiEngineSettings": "AIエンジン設定",
   "activeAiEngine": "有効なAIエンジン",
-  "googleGeminiLive": "Google Gemini (ライブ)",
+  "googleGeminiLive": "Google Gemini",
   "localLlmOllama": "ローカルLLM (Ollama)",
   "neuralAiMock": "モックAI",
   "geminiApiKey": "Google AI Studio APIキー",

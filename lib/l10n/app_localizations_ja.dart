@@ -51,7 +51,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get activeAiEngine => '有効なAIエンジン';
 
   @override
-  String get googleGeminiLive => 'Google Gemini (ライブ)';
+  String get googleGeminiLive => 'Google Gemini';
 
   @override
   String get localLlmOllama => 'ローカルLLM (Ollama)';

@@ -189,7 +189,7 @@ abstract class AppLocalizations {
   /// No description provided for @googleGeminiLive.
   ///
   /// In en, this message translates to:
-  /// **'Google Gemini (Live)'**
+  /// **'Google Gemini'**
   String get googleGeminiLive;
 
   /// No description provided for @localLlmOllama.

@@ -51,7 +51,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activeAiEngine => '活跃 AI 引擎';
 
   @override
-  String get googleGeminiLive => 'Google Gemini (在线)';
+  String get googleGeminiLive => 'Google Gemini';
 
   @override
   String get localLlmOllama => '本地 LLM (Ollama)';
