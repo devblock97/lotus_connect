@@ -47,7 +47,8 @@ class ActiveConversationState {
 /// Notifier managing active conversation chat messages & streaming state.
 class ActiveConversationNotifier
     extends StateNotifier<ActiveConversationState> {
-  ActiveConversationNotifier(this._ref) : super(const ActiveConversationState()) {
+  ActiveConversationNotifier(this._ref)
+      : super(const ActiveConversationState()) {
     _init();
   }
 
@@ -278,7 +279,8 @@ class ActiveConversationNotifier
 }
 
 /// Active conversation notifier provider.
-final activeConversationProvider = StateNotifierProvider<
-    ActiveConversationNotifier, ActiveConversationState>((ref) {
+final activeConversationProvider =
+    StateNotifierProvider<ActiveConversationNotifier, ActiveConversationState>(
+        (ref) {
   return ActiveConversationNotifier(ref);
 });

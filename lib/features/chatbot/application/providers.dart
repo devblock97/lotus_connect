@@ -54,7 +54,8 @@ final chatbotLocalDataSourceProvider = Provider<ChatbotLocalDataSource>((ref) {
 });
 
 /// Remote Data Source provider.
-final chatbotRemoteDataSourceProvider = Provider<ChatbotRemoteDataSource>((ref) {
+final chatbotRemoteDataSourceProvider =
+    Provider<ChatbotRemoteDataSource>((ref) {
   final provider = ref.watch(activeAiProvider);
   return ChatbotRemoteDataSourceImpl(provider);
 });
@@ -68,34 +69,42 @@ final chatbotRepositoryProvider = Provider<ChatbotRepository>((ref) {
 });
 
 // Use Cases Providers
-final getConversationsUseCaseProvider = Provider<GetConversationsUseCase>((ref) {
+final getConversationsUseCaseProvider =
+    Provider<GetConversationsUseCase>((ref) {
   return GetConversationsUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final createConversationUseCaseProvider = Provider<CreateConversationUseCase>((ref) {
+final createConversationUseCaseProvider =
+    Provider<CreateConversationUseCase>((ref) {
   return CreateConversationUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final deleteConversationUseCaseProvider = Provider<DeleteConversationUseCase>((ref) {
+final deleteConversationUseCaseProvider =
+    Provider<DeleteConversationUseCase>((ref) {
   return DeleteConversationUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final renameConversationUseCaseProvider = Provider<RenameConversationUseCase>((ref) {
+final renameConversationUseCaseProvider =
+    Provider<RenameConversationUseCase>((ref) {
   return RenameConversationUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final togglePinConversationUseCaseProvider = Provider<TogglePinConversationUseCase>((ref) {
+final togglePinConversationUseCaseProvider =
+    Provider<TogglePinConversationUseCase>((ref) {
   return TogglePinConversationUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final toggleFavouriteConversationUseCaseProvider = Provider<ToggleFavouriteConversationUseCase>((ref) {
-  return ToggleFavouriteConversationUseCase(ref.watch(chatbotRepositoryProvider));
+final toggleFavouriteConversationUseCaseProvider =
+    Provider<ToggleFavouriteConversationUseCase>((ref) {
+  return ToggleFavouriteConversationUseCase(
+      ref.watch(chatbotRepositoryProvider));
 });
 
 final saveDraftUseCaseProvider = Provider<SaveDraftUseCase>((ref) {
   return SaveDraftUseCase(ref.watch(chatbotRepositoryProvider));
 });
 
-final streamAiResponseUseCaseProvider = Provider<StreamAiResponseUseCase>((ref) {
+final streamAiResponseUseCaseProvider =
+    Provider<StreamAiResponseUseCase>((ref) {
   return StreamAiResponseUseCase(ref.watch(chatbotRepositoryProvider));
 });

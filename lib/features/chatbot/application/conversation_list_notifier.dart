@@ -133,7 +133,8 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
     if (state.selectedConversationId == id) {
       final remaining = state.conversations.where((c) => c.id != id).toList();
       state = state.copyWith(
-        selectedConversationId: remaining.isNotEmpty ? remaining.first.id : null,
+        selectedConversationId:
+            remaining.isNotEmpty ? remaining.first.id : null,
       );
     }
   }
@@ -151,6 +152,7 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
 }
 
 final conversationListProvider =
-    StateNotifierProvider<ConversationListNotifier, ConversationListState>((ref) {
+    StateNotifierProvider<ConversationListNotifier, ConversationListState>(
+        (ref) {
   return ConversationListNotifier(ref);
 });

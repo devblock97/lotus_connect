@@ -26,12 +26,14 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       ConversationListView(
         onSelectConversation: () {
           setState(() {
-            _currentIndex = 0; // Switch back to AI Chat when conversation is selected
+            _currentIndex =
+                0; // Switch back to AI Chat when conversation is selected
           });
         },
       ),
       PlaceholderTab(title: loc.tabCalls, icon: Icons.call_outlined),
-      PlaceholderTab(title: loc.tabAlerts, icon: Icons.notifications_none_rounded),
+      PlaceholderTab(
+          title: loc.tabAlerts, icon: Icons.notifications_none_rounded),
       const SettingsScreen(),
     ];
 

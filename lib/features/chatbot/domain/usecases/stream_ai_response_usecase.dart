@@ -19,8 +19,7 @@ class StreamAiParams {
 }
 
 /// Use case to stream incremental AI response tokens.
-class StreamAiResponseUseCase
-    implements StreamUseCase<String, StreamAiParams> {
+class StreamAiResponseUseCase implements StreamUseCase<String, StreamAiParams> {
   /// Constructor taking [ChatbotRepository].
   const StreamAiResponseUseCase(this._repository);
 

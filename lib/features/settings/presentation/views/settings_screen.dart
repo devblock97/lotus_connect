@@ -257,7 +257,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               icon: const Icon(Icons.save, color: Colors.green),
                               tooltip: 'Save Key',
                               onPressed: () {
-                                notifier.setGeminiApiKey(_apiKeyController.text);
+                                notifier
+                                    .setGeminiApiKey(_apiKeyController.text);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(loc.keySaved),

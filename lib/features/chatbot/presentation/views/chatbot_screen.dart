@@ -176,7 +176,8 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           // Banner Notice
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.4),
             child: Row(
               children: [
                 const Icon(Icons.push_pin_outlined, size: 14),

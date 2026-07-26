@@ -11,7 +11,8 @@ class LocalAiProvider implements AiProvider {
     required DioClient dioClient,
     String? baseUrl,
   })  : _dioClient = dioClient,
-        _baseUrl = baseUrl?.isNotEmpty == true ? baseUrl! : 'http://localhost:11434';
+        _baseUrl =
+            baseUrl?.isNotEmpty == true ? baseUrl! : 'http://localhost:11434';
 
   final DioClient _dioClient;
   final String _baseUrl;
