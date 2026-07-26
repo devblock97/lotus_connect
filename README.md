@@ -2,6 +2,11 @@
 
 A production-ready Flutter communication platform featuring clean architecture, reactive state management, and multi-engine LLM capabilities.
 
+## Chatbot Demo
+Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, optimistic UI bubble updates, and multi-engine AI support (live Gemini models & local Ollama models).
+
+<video src="assets/demo/lotus_connect_chatbot_demo.mov" controls width="100%"></video>
+
 ## Tech Stack
 - **Flutter** (Latest Stable)
 - **State Management & Dependency Injection**: Riverpod 3.x
