@@ -26,8 +26,21 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
-/// Dio client provider.
-final dioClientProvider = Provider<DioClient>((ref) => DioClient());
+/// Dio client provider configured dynamically with user settings and RTR support.
+final dioClientProvider = Provider<DioClient>((ref) {
+  final settings = ref.watch(settingsProvider);
+  return DioClient(
+    tokenGetter: () => settings.accessToken,
+    serverHostGetter: () => settings.serverHost,
+    refreshTokenGetter: () => settings.refreshToken,
+    onTokensRefreshed: (accessToken, refreshToken) async {
+      await ref.read(settingsProvider.notifier).setTokens(accessToken, refreshToken);
+    },
+    onRefreshFailed: () {
+      ref.read(settingsProvider.notifier).clearTokens();
+    },
+  );
+});
 
 /// Current active AI Provider dynamically bound to user settings.
 final activeAiProvider = Provider<AiProvider>((ref) {

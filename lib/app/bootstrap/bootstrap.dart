@@ -39,11 +39,13 @@ class LotusConnectApp extends ConsumerWidget {
         break;
     }
 
+    final router = ref.watch(routerProvider);
+
     return MaterialApp.router(
       title: 'Lotus Connect',
       debugShowCheckedModeBanner: false,
       theme: activeTheme,
-      routerConfig: AppRouter.router,
+      routerConfig: router,
       locale: Locale(settings.languageCode),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

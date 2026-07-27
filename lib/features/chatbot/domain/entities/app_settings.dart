@@ -13,6 +13,9 @@ class AppSettings {
     this.geminiApiKey = '',
     this.localLlmBaseUrl = 'http://localhost:11434',
     this.systemPrompt = 'You are a helpful, expert AI assistant.',
+    this.accessToken = '',
+    this.refreshToken = '',
+    this.serverHost = 'http://localhost:8080/api/v1',
   });
 
   /// Selected theme mode.
@@ -36,6 +39,15 @@ class AppSettings {
   /// Default system prompt.
   final String systemPrompt;
 
+  /// Access Token for backend calls.
+  final String accessToken;
+
+  /// Refresh Token for backend token updates.
+  final String refreshToken;
+
+  /// Server host base URL.
+  final String serverHost;
+
   /// Returns a copy of [AppSettings] with updated values.
   AppSettings copyWith({
     AppThemeMode? themeMode,
@@ -45,6 +57,9 @@ class AppSettings {
     String? geminiApiKey,
     String? localLlmBaseUrl,
     String? systemPrompt,
+    String? accessToken,
+    String? refreshToken,
+    String? serverHost,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
@@ -54,6 +69,9 @@ class AppSettings {
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
       localLlmBaseUrl: localLlmBaseUrl ?? this.localLlmBaseUrl,
       systemPrompt: systemPrompt ?? this.systemPrompt,
+      accessToken: accessToken ?? this.accessToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+      serverHost: serverHost ?? this.serverHost,
     );
   }
 
@@ -68,7 +86,10 @@ class AppSettings {
           activeAiModel == other.activeAiModel &&
           geminiApiKey == other.geminiApiKey &&
           localLlmBaseUrl == other.localLlmBaseUrl &&
-          systemPrompt == other.systemPrompt;
+          systemPrompt == other.systemPrompt &&
+          accessToken == other.accessToken &&
+          refreshToken == other.refreshToken &&
+          serverHost == other.serverHost;
 
   @override
   int get hashCode =>
@@ -78,5 +99,8 @@ class AppSettings {
       activeAiModel.hashCode ^
       geminiApiKey.hashCode ^
       localLlmBaseUrl.hashCode ^
-      systemPrompt.hashCode;
+      systemPrompt.hashCode ^
+      accessToken.hashCode ^
+      refreshToken.hashCode ^
+      serverHost.hashCode;
 }

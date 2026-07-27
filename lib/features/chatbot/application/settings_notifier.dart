@@ -68,6 +68,27 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     await localDataSource.updateSettings(state);
   }
+
+  /// Sets auth tokens.
+  Future<void> setTokens(String accessToken, String refreshToken) async {
+    state = state.copyWith(accessToken: accessToken, refreshToken: refreshToken);
+    final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
+    await localDataSource.updateSettings(state);
+  }
+
+  /// Sets server host.
+  Future<void> setServerHost(String host) async {
+    state = state.copyWith(serverHost: host.trim());
+    final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
+    await localDataSource.updateSettings(state);
+  }
+
+  /// Clears auth tokens (on logout).
+  Future<void> clearTokens() async {
+    state = state.copyWith(accessToken: '', refreshToken: '');
+    final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
+    await localDataSource.updateSettings(state);
+  }
 }
 
 /// Settings notifier provider.

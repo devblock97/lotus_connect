@@ -982,6 +982,30 @@ class $AppSettingsTableTable extends AppSettingsTable
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('You are a helpful, expert AI assistant.'));
+  static const VerificationMeta _accessTokenMeta =
+      const VerificationMeta('accessToken');
+  @override
+  late final GeneratedColumn<String> accessToken = GeneratedColumn<String>(
+      'access_token', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _refreshTokenMeta =
+      const VerificationMeta('refreshToken');
+  @override
+  late final GeneratedColumn<String> refreshToken = GeneratedColumn<String>(
+      'refresh_token', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _serverHostMeta =
+      const VerificationMeta('serverHost');
+  @override
+  late final GeneratedColumn<String> serverHost = GeneratedColumn<String>(
+      'server_host', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('http://localhost:8080/api/v1'));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -991,7 +1015,10 @@ class $AppSettingsTableTable extends AppSettingsTable
         activeAiModel,
         geminiApiKey,
         localLlmBaseUrl,
-        systemPrompt
+        systemPrompt,
+        accessToken,
+        refreshToken,
+        serverHost
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1049,6 +1076,24 @@ class $AppSettingsTableTable extends AppSettingsTable
           systemPrompt.isAcceptableOrUnknown(
               data['system_prompt']!, _systemPromptMeta));
     }
+    if (data.containsKey('access_token')) {
+      context.handle(
+          _accessTokenMeta,
+          accessToken.isAcceptableOrUnknown(
+              data['access_token']!, _accessTokenMeta));
+    }
+    if (data.containsKey('refresh_token')) {
+      context.handle(
+          _refreshTokenMeta,
+          refreshToken.isAcceptableOrUnknown(
+              data['refresh_token']!, _refreshTokenMeta));
+    }
+    if (data.containsKey('server_host')) {
+      context.handle(
+          _serverHostMeta,
+          serverHost.isAcceptableOrUnknown(
+              data['server_host']!, _serverHostMeta));
+    }
     return context;
   }
 
@@ -1074,6 +1119,12 @@ class $AppSettingsTableTable extends AppSettingsTable
           DriftSqlType.string, data['${effectivePrefix}local_llm_base_url'])!,
       systemPrompt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}system_prompt'])!,
+      accessToken: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}access_token'])!,
+      refreshToken: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}refresh_token'])!,
+      serverHost: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server_host'])!,
     );
   }
 
@@ -1108,6 +1159,15 @@ class AppSettingsTableData extends DataClass
 
   /// Default system prompt.
   final String systemPrompt;
+
+  /// Access Token for REST & WebSockets auth.
+  final String accessToken;
+
+  /// Refresh Token for RTR auth flow.
+  final String refreshToken;
+
+  /// Rust backend server host base URL.
+  final String serverHost;
   const AppSettingsTableData(
       {required this.id,
       required this.themeMode,
@@ -1116,7 +1176,10 @@ class AppSettingsTableData extends DataClass
       required this.activeAiModel,
       required this.geminiApiKey,
       required this.localLlmBaseUrl,
-      required this.systemPrompt});
+      required this.systemPrompt,
+      required this.accessToken,
+      required this.refreshToken,
+      required this.serverHost});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1128,6 +1191,9 @@ class AppSettingsTableData extends DataClass
     map['gemini_api_key'] = Variable<String>(geminiApiKey);
     map['local_llm_base_url'] = Variable<String>(localLlmBaseUrl);
     map['system_prompt'] = Variable<String>(systemPrompt);
+    map['access_token'] = Variable<String>(accessToken);
+    map['refresh_token'] = Variable<String>(refreshToken);
+    map['server_host'] = Variable<String>(serverHost);
     return map;
   }
 
@@ -1141,6 +1207,9 @@ class AppSettingsTableData extends DataClass
       geminiApiKey: Value(geminiApiKey),
       localLlmBaseUrl: Value(localLlmBaseUrl),
       systemPrompt: Value(systemPrompt),
+      accessToken: Value(accessToken),
+      refreshToken: Value(refreshToken),
+      serverHost: Value(serverHost),
     );
   }
 
@@ -1156,6 +1225,9 @@ class AppSettingsTableData extends DataClass
       geminiApiKey: serializer.fromJson<String>(json['geminiApiKey']),
       localLlmBaseUrl: serializer.fromJson<String>(json['localLlmBaseUrl']),
       systemPrompt: serializer.fromJson<String>(json['systemPrompt']),
+      accessToken: serializer.fromJson<String>(json['accessToken']),
+      refreshToken: serializer.fromJson<String>(json['refreshToken']),
+      serverHost: serializer.fromJson<String>(json['serverHost']),
     );
   }
   @override
@@ -1170,6 +1242,9 @@ class AppSettingsTableData extends DataClass
       'geminiApiKey': serializer.toJson<String>(geminiApiKey),
       'localLlmBaseUrl': serializer.toJson<String>(localLlmBaseUrl),
       'systemPrompt': serializer.toJson<String>(systemPrompt),
+      'accessToken': serializer.toJson<String>(accessToken),
+      'refreshToken': serializer.toJson<String>(refreshToken),
+      'serverHost': serializer.toJson<String>(serverHost),
     };
   }
 
@@ -1181,7 +1256,10 @@ class AppSettingsTableData extends DataClass
           String? activeAiModel,
           String? geminiApiKey,
           String? localLlmBaseUrl,
-          String? systemPrompt}) =>
+          String? systemPrompt,
+          String? accessToken,
+          String? refreshToken,
+          String? serverHost}) =>
       AppSettingsTableData(
         id: id ?? this.id,
         themeMode: themeMode ?? this.themeMode,
@@ -1191,6 +1269,9 @@ class AppSettingsTableData extends DataClass
         geminiApiKey: geminiApiKey ?? this.geminiApiKey,
         localLlmBaseUrl: localLlmBaseUrl ?? this.localLlmBaseUrl,
         systemPrompt: systemPrompt ?? this.systemPrompt,
+        accessToken: accessToken ?? this.accessToken,
+        refreshToken: refreshToken ?? this.refreshToken,
+        serverHost: serverHost ?? this.serverHost,
       );
   AppSettingsTableData copyWithCompanion(AppSettingsTableCompanion data) {
     return AppSettingsTableData(
@@ -1214,6 +1295,13 @@ class AppSettingsTableData extends DataClass
       systemPrompt: data.systemPrompt.present
           ? data.systemPrompt.value
           : this.systemPrompt,
+      accessToken:
+          data.accessToken.present ? data.accessToken.value : this.accessToken,
+      refreshToken: data.refreshToken.present
+          ? data.refreshToken.value
+          : this.refreshToken,
+      serverHost:
+          data.serverHost.present ? data.serverHost.value : this.serverHost,
     );
   }
 
@@ -1227,14 +1315,27 @@ class AppSettingsTableData extends DataClass
           ..write('activeAiModel: $activeAiModel, ')
           ..write('geminiApiKey: $geminiApiKey, ')
           ..write('localLlmBaseUrl: $localLlmBaseUrl, ')
-          ..write('systemPrompt: $systemPrompt')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('accessToken: $accessToken, ')
+          ..write('refreshToken: $refreshToken, ')
+          ..write('serverHost: $serverHost')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, themeMode, languageCode, activeAiProvider,
-      activeAiModel, geminiApiKey, localLlmBaseUrl, systemPrompt);
+  int get hashCode => Object.hash(
+      id,
+      themeMode,
+      languageCode,
+      activeAiProvider,
+      activeAiModel,
+      geminiApiKey,
+      localLlmBaseUrl,
+      systemPrompt,
+      accessToken,
+      refreshToken,
+      serverHost);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1246,7 +1347,10 @@ class AppSettingsTableData extends DataClass
           other.activeAiModel == this.activeAiModel &&
           other.geminiApiKey == this.geminiApiKey &&
           other.localLlmBaseUrl == this.localLlmBaseUrl &&
-          other.systemPrompt == this.systemPrompt);
+          other.systemPrompt == this.systemPrompt &&
+          other.accessToken == this.accessToken &&
+          other.refreshToken == this.refreshToken &&
+          other.serverHost == this.serverHost);
 }
 
 class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
@@ -1258,6 +1362,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
   final Value<String> geminiApiKey;
   final Value<String> localLlmBaseUrl;
   final Value<String> systemPrompt;
+  final Value<String> accessToken;
+  final Value<String> refreshToken;
+  final Value<String> serverHost;
   final Value<int> rowid;
   const AppSettingsTableCompanion({
     this.id = const Value.absent(),
@@ -1268,6 +1375,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.geminiApiKey = const Value.absent(),
     this.localLlmBaseUrl = const Value.absent(),
     this.systemPrompt = const Value.absent(),
+    this.accessToken = const Value.absent(),
+    this.refreshToken = const Value.absent(),
+    this.serverHost = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AppSettingsTableCompanion.insert({
@@ -1279,6 +1389,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.geminiApiKey = const Value.absent(),
     this.localLlmBaseUrl = const Value.absent(),
     this.systemPrompt = const Value.absent(),
+    this.accessToken = const Value.absent(),
+    this.refreshToken = const Value.absent(),
+    this.serverHost = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
   static Insertable<AppSettingsTableData> custom({
@@ -1290,6 +1403,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     Expression<String>? geminiApiKey,
     Expression<String>? localLlmBaseUrl,
     Expression<String>? systemPrompt,
+    Expression<String>? accessToken,
+    Expression<String>? refreshToken,
+    Expression<String>? serverHost,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1301,6 +1417,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       if (geminiApiKey != null) 'gemini_api_key': geminiApiKey,
       if (localLlmBaseUrl != null) 'local_llm_base_url': localLlmBaseUrl,
       if (systemPrompt != null) 'system_prompt': systemPrompt,
+      if (accessToken != null) 'access_token': accessToken,
+      if (refreshToken != null) 'refresh_token': refreshToken,
+      if (serverHost != null) 'server_host': serverHost,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1314,6 +1433,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       Value<String>? geminiApiKey,
       Value<String>? localLlmBaseUrl,
       Value<String>? systemPrompt,
+      Value<String>? accessToken,
+      Value<String>? refreshToken,
+      Value<String>? serverHost,
       Value<int>? rowid}) {
     return AppSettingsTableCompanion(
       id: id ?? this.id,
@@ -1324,6 +1446,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       geminiApiKey: geminiApiKey ?? this.geminiApiKey,
       localLlmBaseUrl: localLlmBaseUrl ?? this.localLlmBaseUrl,
       systemPrompt: systemPrompt ?? this.systemPrompt,
+      accessToken: accessToken ?? this.accessToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+      serverHost: serverHost ?? this.serverHost,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1355,6 +1480,15 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     if (systemPrompt.present) {
       map['system_prompt'] = Variable<String>(systemPrompt.value);
     }
+    if (accessToken.present) {
+      map['access_token'] = Variable<String>(accessToken.value);
+    }
+    if (refreshToken.present) {
+      map['refresh_token'] = Variable<String>(refreshToken.value);
+    }
+    if (serverHost.present) {
+      map['server_host'] = Variable<String>(serverHost.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1372,6 +1506,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
           ..write('geminiApiKey: $geminiApiKey, ')
           ..write('localLlmBaseUrl: $localLlmBaseUrl, ')
           ..write('systemPrompt: $systemPrompt, ')
+          ..write('accessToken: $accessToken, ')
+          ..write('refreshToken: $refreshToken, ')
+          ..write('serverHost: $serverHost, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2045,6 +2182,9 @@ typedef $$AppSettingsTableTableCreateCompanionBuilder
   Value<String> geminiApiKey,
   Value<String> localLlmBaseUrl,
   Value<String> systemPrompt,
+  Value<String> accessToken,
+  Value<String> refreshToken,
+  Value<String> serverHost,
   Value<int> rowid,
 });
 typedef $$AppSettingsTableTableUpdateCompanionBuilder
@@ -2057,6 +2197,9 @@ typedef $$AppSettingsTableTableUpdateCompanionBuilder
   Value<String> geminiApiKey,
   Value<String> localLlmBaseUrl,
   Value<String> systemPrompt,
+  Value<String> accessToken,
+  Value<String> refreshToken,
+  Value<String> serverHost,
   Value<int> rowid,
 });
 
@@ -2094,6 +2237,15 @@ class $$AppSettingsTableTableFilterComposer
 
   ColumnFilters<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get accessToken => $composableBuilder(
+      column: $table.accessToken, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get refreshToken => $composableBuilder(
+      column: $table.refreshToken, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get serverHost => $composableBuilder(
+      column: $table.serverHost, builder: (column) => ColumnFilters(column));
 }
 
 class $$AppSettingsTableTableOrderingComposer
@@ -2134,6 +2286,16 @@ class $$AppSettingsTableTableOrderingComposer
   ColumnOrderings<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get accessToken => $composableBuilder(
+      column: $table.accessToken, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get refreshToken => $composableBuilder(
+      column: $table.refreshToken,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get serverHost => $composableBuilder(
+      column: $table.serverHost, builder: (column) => ColumnOrderings(column));
 }
 
 class $$AppSettingsTableTableAnnotationComposer
@@ -2168,6 +2330,15 @@ class $$AppSettingsTableTableAnnotationComposer
 
   GeneratedColumn<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt, builder: (column) => column);
+
+  GeneratedColumn<String> get accessToken => $composableBuilder(
+      column: $table.accessToken, builder: (column) => column);
+
+  GeneratedColumn<String> get refreshToken => $composableBuilder(
+      column: $table.refreshToken, builder: (column) => column);
+
+  GeneratedColumn<String> get serverHost => $composableBuilder(
+      column: $table.serverHost, builder: (column) => column);
 }
 
 class $$AppSettingsTableTableTableManager extends RootTableManager<
@@ -2206,6 +2377,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> geminiApiKey = const Value.absent(),
             Value<String> localLlmBaseUrl = const Value.absent(),
             Value<String> systemPrompt = const Value.absent(),
+            Value<String> accessToken = const Value.absent(),
+            Value<String> refreshToken = const Value.absent(),
+            Value<String> serverHost = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AppSettingsTableCompanion(
@@ -2217,6 +2391,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             geminiApiKey: geminiApiKey,
             localLlmBaseUrl: localLlmBaseUrl,
             systemPrompt: systemPrompt,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            serverHost: serverHost,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2228,6 +2405,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> geminiApiKey = const Value.absent(),
             Value<String> localLlmBaseUrl = const Value.absent(),
             Value<String> systemPrompt = const Value.absent(),
+            Value<String> accessToken = const Value.absent(),
+            Value<String> refreshToken = const Value.absent(),
+            Value<String> serverHost = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AppSettingsTableCompanion.insert(
@@ -2239,6 +2419,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             geminiApiKey: geminiApiKey,
             localLlmBaseUrl: localLlmBaseUrl,
             systemPrompt: systemPrompt,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            serverHost: serverHost,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

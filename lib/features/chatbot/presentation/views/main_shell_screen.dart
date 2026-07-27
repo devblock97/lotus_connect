@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
+import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
@@ -17,23 +20,47 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
   int _currentIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final token = ref.read(settingsProvider).accessToken;
+      if (token.isNotEmpty) {
+        ref.read(webSocketServiceProvider).connect();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
+
+    // Listen to token changes to dynamically connect or disconnect WS
+    ref.listen<String>(
+      settingsProvider.select((s) => s.accessToken),
+      (prev, next) {
+        if (next.isNotEmpty) {
+          ref.read(webSocketServiceProvider).connect();
+        } else {
+          ref.read(webSocketServiceProvider).disconnect();
+        }
+      },
+    );
 
     final pages = [
       const ChatbotScreen(),
       ConversationListView(
         onSelectConversation: () {
           setState(() {
-            _currentIndex =
-                0; // Switch back to AI Chat when conversation is selected
+            _currentIndex = 0; // Switch back to AI Chat when conversation is selected
           });
         },
       ),
-      PlaceholderTab(title: loc.tabCalls, icon: Icons.call_outlined),
+      const CallsScreen(),
       PlaceholderTab(
-          title: loc.tabAlerts, icon: Icons.notifications_none_rounded),
+        title: loc.tabAlerts,
+        icon: Icons.notifications_none_rounded,
+      ),
       const SettingsScreen(),
     ];
 

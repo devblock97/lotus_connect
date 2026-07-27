@@ -225,6 +225,9 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
       geminiApiKey: row.geminiApiKey,
       localLlmBaseUrl: row.localLlmBaseUrl,
       systemPrompt: row.systemPrompt,
+      accessToken: row.accessToken,
+      refreshToken: row.refreshToken,
+      serverHost: row.serverHost,
     );
   }
 
@@ -240,6 +243,9 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
             geminiApiKey: Value(settings.geminiApiKey),
             localLlmBaseUrl: Value(settings.localLlmBaseUrl),
             systemPrompt: Value(settings.systemPrompt),
+            accessToken: Value(settings.accessToken),
+            refreshToken: Value(settings.refreshToken),
+            serverHost: Value(settings.serverHost),
           ),
         );
   }

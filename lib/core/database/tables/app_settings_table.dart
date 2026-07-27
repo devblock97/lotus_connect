@@ -31,6 +31,16 @@ class AppSettingsTable extends Table {
         const Constant('You are a helpful, expert AI assistant.'),
       )();
 
+  /// Access Token for REST & WebSockets auth.
+  TextColumn get accessToken => text().withDefault(const Constant(''))();
+
+  /// Refresh Token for RTR auth flow.
+  TextColumn get refreshToken => text().withDefault(const Constant(''))();
+
+  /// Rust backend server host base URL.
+  TextColumn get serverHost =>
+      text().withDefault(const Constant('http://localhost:8080/api/v1'))();
+
   @override
   Set<Column> get primaryKey => {id};
 }
