@@ -13,6 +13,7 @@ class AuthService {
   /// Registers a new user.
   Future<User> register({
     required String username,
+    String? fullName,
     required String email,
     required String password,
   }) async {
@@ -21,6 +22,7 @@ class AuthService {
         '/auth/register',
         data: {
           'username': username,
+          if (fullName != null) 'fullName': fullName,
           'email': email,
           'password': password,
         },

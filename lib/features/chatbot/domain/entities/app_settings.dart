@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:lotus_connect/app/config/app_config.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 
 /// Pure Dart entity representing app-wide user preferences.
@@ -15,8 +16,11 @@ class AppSettings {
     this.systemPrompt = 'You are a helpful, expert AI assistant.',
     this.accessToken = '',
     this.refreshToken = '',
-    this.serverHost = 'http://localhost:8080/api/v1',
-  });
+    String serverHost = '',
+    this.userId = '',
+    this.username = '',
+    this.email = '',
+  }) : _serverHost = serverHost;
 
   /// Selected theme mode.
   final AppThemeMode themeMode;
@@ -45,8 +49,32 @@ class AppSettings {
   /// Refresh Token for backend token updates.
   final String refreshToken;
 
-  /// Server host base URL.
-  final String serverHost;
+  /// Raw Server host base URL.
+  final String _serverHost;
+
+  /// Server host base URL, falling back to AppConfig.defaultServerHost.
+  String get serverHost {
+    var host = _serverHost.isNotEmpty
+        ? _serverHost
+        : AppConfig.defaultServerHost;
+    // Auto-migrate any legacy localhost or 10.0.2.2 hosts to the central ngrok tunnel domain
+    if (host == 'http://localhost:8080/api/v1' ||
+        host == 'http://10.0.2.2:8080/api/v1' ||
+        host.contains('localhost') ||
+        host.contains('10.0.2.2')) {
+      host = AppConfig.defaultServerHost;
+    }
+    return host;
+  }
+
+  /// Persisted User ID.
+  final String userId;
+
+  /// Persisted Username.
+  final String username;
+
+  /// Persisted Email.
+  final String email;
 
   /// Returns a copy of [AppSettings] with updated values.
   AppSettings copyWith({
@@ -60,6 +88,9 @@ class AppSettings {
     String? accessToken,
     String? refreshToken,
     String? serverHost,
+    String? userId,
+    String? username,
+    String? email,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
@@ -72,6 +103,9 @@ class AppSettings {
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
       serverHost: serverHost ?? this.serverHost,
+      userId: userId ?? this.userId,
+      username: username ?? this.username,
+      email: email ?? this.email,
     );
   }
 
@@ -89,7 +123,10 @@ class AppSettings {
           systemPrompt == other.systemPrompt &&
           accessToken == other.accessToken &&
           refreshToken == other.refreshToken &&
-          serverHost == other.serverHost;
+          serverHost == other.serverHost &&
+          userId == other.userId &&
+          username == other.username &&
+          email == other.email;
 
   @override
   int get hashCode =>
@@ -102,5 +139,8 @@ class AppSettings {
       systemPrompt.hashCode ^
       accessToken.hashCode ^
       refreshToken.hashCode ^
-      serverHost.hashCode;
+      serverHost.hashCode ^
+      userId.hashCode ^
+      username.hashCode ^
+      email.hashCode;
 }

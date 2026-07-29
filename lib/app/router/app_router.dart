@@ -6,6 +6,7 @@ import 'package:lotus_connect/features/chatbot/application/settings_notifier.dar
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/main_shell_screen.dart';
+import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 
 /// Central router configuration using GoRouter.
@@ -17,6 +18,7 @@ class AppRouter {
   static const String chat = '/chat';
   static const String conversations = '/conversations';
   static const String settings = '/settings';
+  static const String contacts = '/contacts';
 }
 
 /// Global provider exposing the reactive GoRouter configuration.
@@ -64,6 +66,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.settings,
         builder: (BuildContext context, GoRouterState state) =>
             const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.contacts,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ContactsScreen(),
       ),
     ],
   );

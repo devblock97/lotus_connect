@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:lotus_connect/app/config/app_config.dart';
 import 'package:lotus_connect/core/database/tables/app_settings_table.dart';
 import 'package:lotus_connect/core/database/tables/conversation_table.dart';
 import 'package:lotus_connect/core/database/tables/message_table.dart';
@@ -22,7 +23,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 4; // Incremented schema version to trigger migration
+  int get schemaVersion => 7; // Incremented schema version to trigger migration
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

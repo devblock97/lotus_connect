@@ -27,7 +27,6 @@ class AuthState {
   }
 }
 
-/// Riverpod state notifier to manage user registration, login and session lifecycle.
 class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._ref, this._authService) : super(const AuthState()) {
     _ref.listen<String>(
@@ -38,14 +37,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
         }
       },
     );
+    _initSession();
   }
 
   final Ref _ref;
   final AuthService _authService;
 
+  void _initSession() {
+    final settings = _ref.read(settingsProvider);
+    if (settings.accessToken.isNotEmpty && settings.username.isNotEmpty) {
+      state = AuthState(
+        user: User(
+          id: settings.userId,
+          username: settings.username,
+          email: settings.email,
+        ),
+      );
+    }
+  }
+
   /// Registration action.
   Future<bool> register({
     required String username,
+    String? fullName,
     required String email,
     required String password,
   }) async {
@@ -53,6 +67,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _authService.register(
         username: username,
+        fullName: fullName,
         email: email,
         password: password,
       );
@@ -79,9 +94,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final accessToken = credentials['accessToken'] as String;
       final refreshToken = credentials['refreshToken'] as String;
 
-      // Persist auth tokens securely in local SQLite settings database
+      // Persist auth session securely in local SQLite settings database
       final settingsNotifier = _ref.read(settingsProvider.notifier);
-      await settingsNotifier.setTokens(accessToken, refreshToken);
+      await settingsNotifier.setSession(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+      );
 
       state = AuthState(user: user);
       return true;

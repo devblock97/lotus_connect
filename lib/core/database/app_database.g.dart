@@ -74,6 +74,23 @@ class $ConversationTableTable extends ConversationTable
   late final GeneratedColumn<String> systemPrompt = GeneratedColumn<String>(
       'system_prompt', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isUserToUserMeta =
+      const VerificationMeta('isUserToUser');
+  @override
+  late final GeneratedColumn<bool> isUserToUser = GeneratedColumn<bool>(
+      'is_user_to_user', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_user_to_user" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _peerIdMeta = const VerificationMeta('peerId');
+  @override
+  late final GeneratedColumn<String> peerId = GeneratedColumn<String>(
+      'peer_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -84,7 +101,9 @@ class $ConversationTableTable extends ConversationTable
         isFavourite,
         modelName,
         draftMessage,
-        systemPrompt
+        systemPrompt,
+        isUserToUser,
+        peerId
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -146,6 +165,16 @@ class $ConversationTableTable extends ConversationTable
           systemPrompt.isAcceptableOrUnknown(
               data['system_prompt']!, _systemPromptMeta));
     }
+    if (data.containsKey('is_user_to_user')) {
+      context.handle(
+          _isUserToUserMeta,
+          isUserToUser.isAcceptableOrUnknown(
+              data['is_user_to_user']!, _isUserToUserMeta));
+    }
+    if (data.containsKey('peer_id')) {
+      context.handle(_peerIdMeta,
+          peerId.isAcceptableOrUnknown(data['peer_id']!, _peerIdMeta));
+    }
     return context;
   }
 
@@ -173,6 +202,10 @@ class $ConversationTableTable extends ConversationTable
           .read(DriftSqlType.string, data['${effectivePrefix}draft_message']),
       systemPrompt: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}system_prompt']),
+      isUserToUser: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_user_to_user'])!,
+      peerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}peer_id'])!,
     );
   }
 
@@ -210,6 +243,12 @@ class ConversationTableData extends DataClass
 
   /// Optional custom system prompt for this conversation.
   final String? systemPrompt;
+
+  /// Whether the conversation is a user-to-user private chat.
+  final bool isUserToUser;
+
+  /// Target peer user ID (UUID) if user-to-user.
+  final String peerId;
   const ConversationTableData(
       {required this.id,
       required this.title,
@@ -219,7 +258,9 @@ class ConversationTableData extends DataClass
       required this.isFavourite,
       required this.modelName,
       this.draftMessage,
-      this.systemPrompt});
+      this.systemPrompt,
+      required this.isUserToUser,
+      required this.peerId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -236,6 +277,8 @@ class ConversationTableData extends DataClass
     if (!nullToAbsent || systemPrompt != null) {
       map['system_prompt'] = Variable<String>(systemPrompt);
     }
+    map['is_user_to_user'] = Variable<bool>(isUserToUser);
+    map['peer_id'] = Variable<String>(peerId);
     return map;
   }
 
@@ -254,6 +297,8 @@ class ConversationTableData extends DataClass
       systemPrompt: systemPrompt == null && nullToAbsent
           ? const Value.absent()
           : Value(systemPrompt),
+      isUserToUser: Value(isUserToUser),
+      peerId: Value(peerId),
     );
   }
 
@@ -270,6 +315,8 @@ class ConversationTableData extends DataClass
       modelName: serializer.fromJson<String>(json['modelName']),
       draftMessage: serializer.fromJson<String?>(json['draftMessage']),
       systemPrompt: serializer.fromJson<String?>(json['systemPrompt']),
+      isUserToUser: serializer.fromJson<bool>(json['isUserToUser']),
+      peerId: serializer.fromJson<String>(json['peerId']),
     );
   }
   @override
@@ -285,6 +332,8 @@ class ConversationTableData extends DataClass
       'modelName': serializer.toJson<String>(modelName),
       'draftMessage': serializer.toJson<String?>(draftMessage),
       'systemPrompt': serializer.toJson<String?>(systemPrompt),
+      'isUserToUser': serializer.toJson<bool>(isUserToUser),
+      'peerId': serializer.toJson<String>(peerId),
     };
   }
 
@@ -297,7 +346,9 @@ class ConversationTableData extends DataClass
           bool? isFavourite,
           String? modelName,
           Value<String?> draftMessage = const Value.absent(),
-          Value<String?> systemPrompt = const Value.absent()}) =>
+          Value<String?> systemPrompt = const Value.absent(),
+          bool? isUserToUser,
+          String? peerId}) =>
       ConversationTableData(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -310,6 +361,8 @@ class ConversationTableData extends DataClass
             draftMessage.present ? draftMessage.value : this.draftMessage,
         systemPrompt:
             systemPrompt.present ? systemPrompt.value : this.systemPrompt,
+        isUserToUser: isUserToUser ?? this.isUserToUser,
+        peerId: peerId ?? this.peerId,
       );
   ConversationTableData copyWithCompanion(ConversationTableCompanion data) {
     return ConversationTableData(
@@ -327,6 +380,10 @@ class ConversationTableData extends DataClass
       systemPrompt: data.systemPrompt.present
           ? data.systemPrompt.value
           : this.systemPrompt,
+      isUserToUser: data.isUserToUser.present
+          ? data.isUserToUser.value
+          : this.isUserToUser,
+      peerId: data.peerId.present ? data.peerId.value : this.peerId,
     );
   }
 
@@ -341,14 +398,16 @@ class ConversationTableData extends DataClass
           ..write('isFavourite: $isFavourite, ')
           ..write('modelName: $modelName, ')
           ..write('draftMessage: $draftMessage, ')
-          ..write('systemPrompt: $systemPrompt')
+          ..write('systemPrompt: $systemPrompt, ')
+          ..write('isUserToUser: $isUserToUser, ')
+          ..write('peerId: $peerId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, title, createdAt, updatedAt, isPinned,
-      isFavourite, modelName, draftMessage, systemPrompt);
+      isFavourite, modelName, draftMessage, systemPrompt, isUserToUser, peerId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -361,7 +420,9 @@ class ConversationTableData extends DataClass
           other.isFavourite == this.isFavourite &&
           other.modelName == this.modelName &&
           other.draftMessage == this.draftMessage &&
-          other.systemPrompt == this.systemPrompt);
+          other.systemPrompt == this.systemPrompt &&
+          other.isUserToUser == this.isUserToUser &&
+          other.peerId == this.peerId);
 }
 
 class ConversationTableCompanion
@@ -375,6 +436,8 @@ class ConversationTableCompanion
   final Value<String> modelName;
   final Value<String?> draftMessage;
   final Value<String?> systemPrompt;
+  final Value<bool> isUserToUser;
+  final Value<String> peerId;
   final Value<int> rowid;
   const ConversationTableCompanion({
     this.id = const Value.absent(),
@@ -386,6 +449,8 @@ class ConversationTableCompanion
     this.modelName = const Value.absent(),
     this.draftMessage = const Value.absent(),
     this.systemPrompt = const Value.absent(),
+    this.isUserToUser = const Value.absent(),
+    this.peerId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ConversationTableCompanion.insert({
@@ -398,6 +463,8 @@ class ConversationTableCompanion
     this.modelName = const Value.absent(),
     this.draftMessage = const Value.absent(),
     this.systemPrompt = const Value.absent(),
+    this.isUserToUser = const Value.absent(),
+    this.peerId = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         title = Value(title),
@@ -413,6 +480,8 @@ class ConversationTableCompanion
     Expression<String>? modelName,
     Expression<String>? draftMessage,
     Expression<String>? systemPrompt,
+    Expression<bool>? isUserToUser,
+    Expression<String>? peerId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -425,6 +494,8 @@ class ConversationTableCompanion
       if (modelName != null) 'model_name': modelName,
       if (draftMessage != null) 'draft_message': draftMessage,
       if (systemPrompt != null) 'system_prompt': systemPrompt,
+      if (isUserToUser != null) 'is_user_to_user': isUserToUser,
+      if (peerId != null) 'peer_id': peerId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -439,6 +510,8 @@ class ConversationTableCompanion
       Value<String>? modelName,
       Value<String?>? draftMessage,
       Value<String?>? systemPrompt,
+      Value<bool>? isUserToUser,
+      Value<String>? peerId,
       Value<int>? rowid}) {
     return ConversationTableCompanion(
       id: id ?? this.id,
@@ -450,6 +523,8 @@ class ConversationTableCompanion
       modelName: modelName ?? this.modelName,
       draftMessage: draftMessage ?? this.draftMessage,
       systemPrompt: systemPrompt ?? this.systemPrompt,
+      isUserToUser: isUserToUser ?? this.isUserToUser,
+      peerId: peerId ?? this.peerId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -484,6 +559,12 @@ class ConversationTableCompanion
     if (systemPrompt.present) {
       map['system_prompt'] = Variable<String>(systemPrompt.value);
     }
+    if (isUserToUser.present) {
+      map['is_user_to_user'] = Variable<bool>(isUserToUser.value);
+    }
+    if (peerId.present) {
+      map['peer_id'] = Variable<String>(peerId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -502,6 +583,8 @@ class ConversationTableCompanion
           ..write('modelName: $modelName, ')
           ..write('draftMessage: $draftMessage, ')
           ..write('systemPrompt: $systemPrompt, ')
+          ..write('isUserToUser: $isUserToUser, ')
+          ..write('peerId: $peerId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1005,7 +1088,29 @@ class $AppSettingsTableTable extends AppSettingsTable
       'server_host', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
-      defaultValue: const Constant('http://localhost:8080/api/v1'));
+      defaultValue: const Constant(AppConfig.defaultServerHost));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _usernameMeta =
+      const VerificationMeta('username');
+  @override
+  late final GeneratedColumn<String> username = GeneratedColumn<String>(
+      'username', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+      'email', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1018,7 +1123,10 @@ class $AppSettingsTableTable extends AppSettingsTable
         systemPrompt,
         accessToken,
         refreshToken,
-        serverHost
+        serverHost,
+        userId,
+        username,
+        email
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1094,6 +1202,18 @@ class $AppSettingsTableTable extends AppSettingsTable
           serverHost.isAcceptableOrUnknown(
               data['server_host']!, _serverHostMeta));
     }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    }
+    if (data.containsKey('username')) {
+      context.handle(_usernameMeta,
+          username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
+    }
+    if (data.containsKey('email')) {
+      context.handle(
+          _emailMeta, email.isAcceptableOrUnknown(data['email']!, _emailMeta));
+    }
     return context;
   }
 
@@ -1125,6 +1245,12 @@ class $AppSettingsTableTable extends AppSettingsTable
           .read(DriftSqlType.string, data['${effectivePrefix}refresh_token'])!,
       serverHost: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}server_host'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      username: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
+      email: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
     );
   }
 
@@ -1168,6 +1294,15 @@ class AppSettingsTableData extends DataClass
 
   /// Rust backend server host base URL.
   final String serverHost;
+
+  /// Persistent logged-in user ID.
+  final String userId;
+
+  /// Persistent logged-in username.
+  final String username;
+
+  /// Persistent logged-in email.
+  final String email;
   const AppSettingsTableData(
       {required this.id,
       required this.themeMode,
@@ -1179,7 +1314,10 @@ class AppSettingsTableData extends DataClass
       required this.systemPrompt,
       required this.accessToken,
       required this.refreshToken,
-      required this.serverHost});
+      required this.serverHost,
+      required this.userId,
+      required this.username,
+      required this.email});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1194,6 +1332,9 @@ class AppSettingsTableData extends DataClass
     map['access_token'] = Variable<String>(accessToken);
     map['refresh_token'] = Variable<String>(refreshToken);
     map['server_host'] = Variable<String>(serverHost);
+    map['user_id'] = Variable<String>(userId);
+    map['username'] = Variable<String>(username);
+    map['email'] = Variable<String>(email);
     return map;
   }
 
@@ -1210,6 +1351,9 @@ class AppSettingsTableData extends DataClass
       accessToken: Value(accessToken),
       refreshToken: Value(refreshToken),
       serverHost: Value(serverHost),
+      userId: Value(userId),
+      username: Value(username),
+      email: Value(email),
     );
   }
 
@@ -1228,6 +1372,9 @@ class AppSettingsTableData extends DataClass
       accessToken: serializer.fromJson<String>(json['accessToken']),
       refreshToken: serializer.fromJson<String>(json['refreshToken']),
       serverHost: serializer.fromJson<String>(json['serverHost']),
+      userId: serializer.fromJson<String>(json['userId']),
+      username: serializer.fromJson<String>(json['username']),
+      email: serializer.fromJson<String>(json['email']),
     );
   }
   @override
@@ -1245,6 +1392,9 @@ class AppSettingsTableData extends DataClass
       'accessToken': serializer.toJson<String>(accessToken),
       'refreshToken': serializer.toJson<String>(refreshToken),
       'serverHost': serializer.toJson<String>(serverHost),
+      'userId': serializer.toJson<String>(userId),
+      'username': serializer.toJson<String>(username),
+      'email': serializer.toJson<String>(email),
     };
   }
 
@@ -1259,7 +1409,10 @@ class AppSettingsTableData extends DataClass
           String? systemPrompt,
           String? accessToken,
           String? refreshToken,
-          String? serverHost}) =>
+          String? serverHost,
+          String? userId,
+          String? username,
+          String? email}) =>
       AppSettingsTableData(
         id: id ?? this.id,
         themeMode: themeMode ?? this.themeMode,
@@ -1272,6 +1425,9 @@ class AppSettingsTableData extends DataClass
         accessToken: accessToken ?? this.accessToken,
         refreshToken: refreshToken ?? this.refreshToken,
         serverHost: serverHost ?? this.serverHost,
+        userId: userId ?? this.userId,
+        username: username ?? this.username,
+        email: email ?? this.email,
       );
   AppSettingsTableData copyWithCompanion(AppSettingsTableCompanion data) {
     return AppSettingsTableData(
@@ -1302,6 +1458,9 @@ class AppSettingsTableData extends DataClass
           : this.refreshToken,
       serverHost:
           data.serverHost.present ? data.serverHost.value : this.serverHost,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      username: data.username.present ? data.username.value : this.username,
+      email: data.email.present ? data.email.value : this.email,
     );
   }
 
@@ -1318,7 +1477,10 @@ class AppSettingsTableData extends DataClass
           ..write('systemPrompt: $systemPrompt, ')
           ..write('accessToken: $accessToken, ')
           ..write('refreshToken: $refreshToken, ')
-          ..write('serverHost: $serverHost')
+          ..write('serverHost: $serverHost, ')
+          ..write('userId: $userId, ')
+          ..write('username: $username, ')
+          ..write('email: $email')
           ..write(')'))
         .toString();
   }
@@ -1335,7 +1497,10 @@ class AppSettingsTableData extends DataClass
       systemPrompt,
       accessToken,
       refreshToken,
-      serverHost);
+      serverHost,
+      userId,
+      username,
+      email);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1350,7 +1515,10 @@ class AppSettingsTableData extends DataClass
           other.systemPrompt == this.systemPrompt &&
           other.accessToken == this.accessToken &&
           other.refreshToken == this.refreshToken &&
-          other.serverHost == this.serverHost);
+          other.serverHost == this.serverHost &&
+          other.userId == this.userId &&
+          other.username == this.username &&
+          other.email == this.email);
 }
 
 class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
@@ -1365,6 +1533,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
   final Value<String> accessToken;
   final Value<String> refreshToken;
   final Value<String> serverHost;
+  final Value<String> userId;
+  final Value<String> username;
+  final Value<String> email;
   final Value<int> rowid;
   const AppSettingsTableCompanion({
     this.id = const Value.absent(),
@@ -1378,6 +1549,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.accessToken = const Value.absent(),
     this.refreshToken = const Value.absent(),
     this.serverHost = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.username = const Value.absent(),
+    this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   AppSettingsTableCompanion.insert({
@@ -1392,6 +1566,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.accessToken = const Value.absent(),
     this.refreshToken = const Value.absent(),
     this.serverHost = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.username = const Value.absent(),
+    this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
   static Insertable<AppSettingsTableData> custom({
@@ -1406,6 +1583,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     Expression<String>? accessToken,
     Expression<String>? refreshToken,
     Expression<String>? serverHost,
+    Expression<String>? userId,
+    Expression<String>? username,
+    Expression<String>? email,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1420,6 +1600,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       if (accessToken != null) 'access_token': accessToken,
       if (refreshToken != null) 'refresh_token': refreshToken,
       if (serverHost != null) 'server_host': serverHost,
+      if (userId != null) 'user_id': userId,
+      if (username != null) 'username': username,
+      if (email != null) 'email': email,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1436,6 +1619,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       Value<String>? accessToken,
       Value<String>? refreshToken,
       Value<String>? serverHost,
+      Value<String>? userId,
+      Value<String>? username,
+      Value<String>? email,
       Value<int>? rowid}) {
     return AppSettingsTableCompanion(
       id: id ?? this.id,
@@ -1449,6 +1635,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
       serverHost: serverHost ?? this.serverHost,
+      userId: userId ?? this.userId,
+      username: username ?? this.username,
+      email: email ?? this.email,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1489,6 +1678,15 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     if (serverHost.present) {
       map['server_host'] = Variable<String>(serverHost.value);
     }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (username.present) {
+      map['username'] = Variable<String>(username.value);
+    }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1509,6 +1707,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
           ..write('accessToken: $accessToken, ')
           ..write('refreshToken: $refreshToken, ')
           ..write('serverHost: $serverHost, ')
+          ..write('userId: $userId, ')
+          ..write('username: $username, ')
+          ..write('email: $email, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1554,6 +1755,8 @@ typedef $$ConversationTableTableCreateCompanionBuilder
   Value<String> modelName,
   Value<String?> draftMessage,
   Value<String?> systemPrompt,
+  Value<bool> isUserToUser,
+  Value<String> peerId,
   Value<int> rowid,
 });
 typedef $$ConversationTableTableUpdateCompanionBuilder
@@ -1567,6 +1770,8 @@ typedef $$ConversationTableTableUpdateCompanionBuilder
   Value<String> modelName,
   Value<String?> draftMessage,
   Value<String?> systemPrompt,
+  Value<bool> isUserToUser,
+  Value<String> peerId,
   Value<int> rowid,
 });
 
@@ -1628,6 +1833,12 @@ class $$ConversationTableTableFilterComposer
   ColumnFilters<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<bool> get isUserToUser => $composableBuilder(
+      column: $table.isUserToUser, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get peerId => $composableBuilder(
+      column: $table.peerId, builder: (column) => ColumnFilters(column));
+
   Expression<bool> messageTableRefs(
       Expression<bool> Function($$MessageTableTableFilterComposer f) f) {
     final $$MessageTableTableFilterComposer composer = $composerBuilder(
@@ -1687,6 +1898,13 @@ class $$ConversationTableTableOrderingComposer
   ColumnOrderings<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isUserToUser => $composableBuilder(
+      column: $table.isUserToUser,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get peerId => $composableBuilder(
+      column: $table.peerId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ConversationTableTableAnnotationComposer
@@ -1724,6 +1942,12 @@ class $$ConversationTableTableAnnotationComposer
 
   GeneratedColumn<String> get systemPrompt => $composableBuilder(
       column: $table.systemPrompt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isUserToUser => $composableBuilder(
+      column: $table.isUserToUser, builder: (column) => column);
+
+  GeneratedColumn<String> get peerId =>
+      $composableBuilder(column: $table.peerId, builder: (column) => column);
 
   Expression<T> messageTableRefs<T extends Object>(
       Expression<T> Function($$MessageTableTableAnnotationComposer a) f) {
@@ -1781,6 +2005,8 @@ class $$ConversationTableTableTableManager extends RootTableManager<
             Value<String> modelName = const Value.absent(),
             Value<String?> draftMessage = const Value.absent(),
             Value<String?> systemPrompt = const Value.absent(),
+            Value<bool> isUserToUser = const Value.absent(),
+            Value<String> peerId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ConversationTableCompanion(
@@ -1793,6 +2019,8 @@ class $$ConversationTableTableTableManager extends RootTableManager<
             modelName: modelName,
             draftMessage: draftMessage,
             systemPrompt: systemPrompt,
+            isUserToUser: isUserToUser,
+            peerId: peerId,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -1805,6 +2033,8 @@ class $$ConversationTableTableTableManager extends RootTableManager<
             Value<String> modelName = const Value.absent(),
             Value<String?> draftMessage = const Value.absent(),
             Value<String?> systemPrompt = const Value.absent(),
+            Value<bool> isUserToUser = const Value.absent(),
+            Value<String> peerId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ConversationTableCompanion.insert(
@@ -1817,6 +2047,8 @@ class $$ConversationTableTableTableManager extends RootTableManager<
             modelName: modelName,
             draftMessage: draftMessage,
             systemPrompt: systemPrompt,
+            isUserToUser: isUserToUser,
+            peerId: peerId,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -2185,6 +2417,9 @@ typedef $$AppSettingsTableTableCreateCompanionBuilder
   Value<String> accessToken,
   Value<String> refreshToken,
   Value<String> serverHost,
+  Value<String> userId,
+  Value<String> username,
+  Value<String> email,
   Value<int> rowid,
 });
 typedef $$AppSettingsTableTableUpdateCompanionBuilder
@@ -2200,6 +2435,9 @@ typedef $$AppSettingsTableTableUpdateCompanionBuilder
   Value<String> accessToken,
   Value<String> refreshToken,
   Value<String> serverHost,
+  Value<String> userId,
+  Value<String> username,
+  Value<String> email,
   Value<int> rowid,
 });
 
@@ -2246,6 +2484,15 @@ class $$AppSettingsTableTableFilterComposer
 
   ColumnFilters<String> get serverHost => $composableBuilder(
       column: $table.serverHost, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnFilters(column));
 }
 
 class $$AppSettingsTableTableOrderingComposer
@@ -2296,6 +2543,15 @@ class $$AppSettingsTableTableOrderingComposer
 
   ColumnOrderings<String> get serverHost => $composableBuilder(
       column: $table.serverHost, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get username => $composableBuilder(
+      column: $table.username, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get email => $composableBuilder(
+      column: $table.email, builder: (column) => ColumnOrderings(column));
 }
 
 class $$AppSettingsTableTableAnnotationComposer
@@ -2339,6 +2595,15 @@ class $$AppSettingsTableTableAnnotationComposer
 
   GeneratedColumn<String> get serverHost => $composableBuilder(
       column: $table.serverHost, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get username =>
+      $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
 }
 
 class $$AppSettingsTableTableTableManager extends RootTableManager<
@@ -2380,6 +2645,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> accessToken = const Value.absent(),
             Value<String> refreshToken = const Value.absent(),
             Value<String> serverHost = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String> username = const Value.absent(),
+            Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AppSettingsTableCompanion(
@@ -2394,6 +2662,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             accessToken: accessToken,
             refreshToken: refreshToken,
             serverHost: serverHost,
+            userId: userId,
+            username: username,
+            email: email,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2408,6 +2679,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> accessToken = const Value.absent(),
             Value<String> refreshToken = const Value.absent(),
             Value<String> serverHost = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String> username = const Value.absent(),
+            Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               AppSettingsTableCompanion.insert(
@@ -2422,6 +2696,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             accessToken: accessToken,
             refreshToken: refreshToken,
             serverHost: serverHost,
+            userId: userId,
+            username: username,
+            email: email,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

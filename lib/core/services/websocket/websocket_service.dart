@@ -45,7 +45,7 @@ class WebSocketService {
 
     try {
       _socket = await WebSocket.connect(wsUrl).timeout(const Duration(seconds: 10));
-      _reconnectDelaySeconds = 2; // Reset reconnect backoff
+      _reconnectDelaySeconds = 2;
       debugPrint('WS Connected successfully');
 
       // Start listening and heartbeat loop
@@ -63,7 +63,6 @@ class WebSocketService {
     }
   }
 
-  /// Disconnects from the current socket session.
   void disconnect() {
     _socket?.close();
     _socket = null;
@@ -72,7 +71,6 @@ class WebSocketService {
     debugPrint('WS Disconnected');
   }
 
-  /// Sends a raw frame envelope over the channel.
   void send(String event, Map<String, dynamic> payload) {
     if (!isConnected) {
       debugPrint('WS Send aborted: Socket is not open');
@@ -87,7 +85,6 @@ class WebSocketService {
     _socket!.add(jsonStr);
   }
 
-  /// Helper: Send typing indicator.
   void sendTyping({
     required String recipientId,
     required String conversationId,
@@ -100,7 +97,6 @@ class WebSocketService {
     });
   }
 
-  /// Helper: Send chat message.
   void sendChatMessage({
     required String conversationId,
     required String content,
@@ -113,7 +109,6 @@ class WebSocketService {
     });
   }
 
-  /// Helper: Send read receipt.
   void sendReadReceipt(String messageId) {
     send('chat:read', {
       'messageId': messageId,
@@ -164,7 +159,7 @@ class WebSocketService {
 
     debugPrint('WS Reconnecting in $_reconnectDelaySeconds seconds...');
     _reconnectTimer = Timer(Duration(seconds: _reconnectDelaySeconds), () {
-      _reconnectDelaySeconds = (_reconnectDelaySeconds * 2).clamp(2, 60); // Exponential backoff
+      _reconnectDelaySeconds = (_reconnectDelaySeconds * 2).clamp(2, 60);
       connect();
     });
   }

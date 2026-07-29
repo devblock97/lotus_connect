@@ -34,12 +34,14 @@ class WebRTCSignalingService {
   final _endController = StreamController<Map<String, dynamic>>.broadcast();
   final _sdpController = StreamController<Map<String, dynamic>>.broadcast();
   final _iceController = StreamController<Map<String, dynamic>>.broadcast();
+  final _inviteAckController = StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<WebRTCCallInvitation> get invitationStream => _invitationController.stream;
   Stream<Map<String, dynamic>> get acceptStream => _acceptController.stream;
   Stream<Map<String, dynamic>> get endStream => _endController.stream;
   Stream<Map<String, dynamic>> get sdpStream => _sdpController.stream;
   Stream<Map<String, dynamic>> get iceStream => _iceController.stream;
+  Stream<Map<String, dynamic>> get inviteAckStream => _inviteAckController.stream;
 
   void _subscribeToWebSocket() {
     _subscription = webSocketService.eventStream.listen((eventFrame) {
@@ -60,6 +62,9 @@ class WebRTCSignalingService {
           break;
         case 'call:accept':
           _acceptController.add(payload);
+          break;
+        case 'call:invite_ack':
+          _inviteAckController.add(payload);
           break;
         case 'call:ended':
           _endController.add(payload);
@@ -156,6 +161,7 @@ class WebRTCSignalingService {
     _endController.close();
     _sdpController.close();
     _iceController.close();
+    _inviteAckController.close();
   }
 }
 

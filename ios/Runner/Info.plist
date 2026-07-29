@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Lotus Connect needs access to your camera for video calling.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Lotus Connect needs access to your microphone for voice and video calling.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

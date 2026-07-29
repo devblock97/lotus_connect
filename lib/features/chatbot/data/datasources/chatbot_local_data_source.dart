@@ -10,8 +10,13 @@ abstract class ChatbotLocalDataSource {
   Stream<List<Conversation>> watchConversations();
   Future<List<Conversation>> getConversations();
   Stream<List<Message>> watchMessages(String conversationId);
-  Future<Conversation> createConversation(
-      {required String title, String? modelName});
+  Future<Conversation> createConversation({
+    required String title,
+    String? modelName,
+    bool isUserToUser = false,
+    String peerId = '',
+    String? id,
+  });
   Future<void> renameConversation(String conversationId, String newTitle);
   Future<void> deleteConversation(String conversationId);
   Future<void> togglePinConversation(String conversationId);
@@ -31,22 +36,24 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
   @override
   Stream<List<Conversation>> watchConversations() {
     return _db.select(_db.conversationTable).watch().map(
-          (rows) => rows
-              .map(
-                (row) => Conversation(
-                  id: row.id,
-                  title: row.title,
-                  createdAt: row.createdAt,
-                  updatedAt: row.updatedAt,
-                  isPinned: row.isPinned,
-                  isFavourite: row.isFavourite,
-                  modelName: row.modelName,
-                  draftMessage: row.draftMessage,
-                  systemPrompt: row.systemPrompt,
-                ),
-              )
-              .toList(),
-        );
+      (rows) => rows
+        .map(
+          (row) => Conversation(
+            id: row.id,
+            title: row.title,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+            isPinned: row.isPinned,
+            isFavourite: row.isFavourite,
+            modelName: row.modelName,
+            draftMessage: row.draftMessage,
+            systemPrompt: row.systemPrompt,
+            isUserToUser: row.isUserToUser,
+            peerId: row.peerId,
+          ),
+        )
+        .toList(),
+    );
   }
 
   @override
@@ -64,6 +71,8 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
             modelName: row.modelName,
             draftMessage: row.draftMessage,
             systemPrompt: row.systemPrompt,
+            isUserToUser: row.isUserToUser,
+            peerId: row.peerId,
           ),
         )
         .toList();
@@ -101,15 +110,20 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
   Future<Conversation> createConversation({
     required String title,
     String? modelName,
+    bool isUserToUser = false,
+    String peerId = '',
+    String? id,
   }) async {
     final now = DateTime.now();
-    final id = now.millisecondsSinceEpoch.toString();
+    final conversationId = id ?? now.millisecondsSinceEpoch.toString();
     final conversation = Conversation(
-      id: id,
+      id: conversationId,
       title: title,
       createdAt: now,
       updatedAt: now,
       modelName: modelName ?? 'gemini-1.5-flash',
+      isUserToUser: isUserToUser,
+      peerId: peerId,
     );
 
     await _db.into(_db.conversationTable).insert(
@@ -119,6 +133,8 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
             createdAt: conversation.createdAt,
             updatedAt: conversation.updatedAt,
             modelName: Value(conversation.modelName),
+            isUserToUser: Value(conversation.isUserToUser),
+            peerId: Value(conversation.peerId),
           ),
         );
     return conversation;
@@ -228,6 +244,9 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
       accessToken: row.accessToken,
       refreshToken: row.refreshToken,
       serverHost: row.serverHost,
+      userId: row.userId,
+      username: row.username,
+      email: row.email,
     );
   }
 
@@ -246,6 +265,9 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
             accessToken: Value(settings.accessToken),
             refreshToken: Value(settings.refreshToken),
             serverHost: Value(settings.serverHost),
+            userId: Value(settings.userId),
+            username: Value(settings.username),
+            email: Value(settings.email),
           ),
         );
   }

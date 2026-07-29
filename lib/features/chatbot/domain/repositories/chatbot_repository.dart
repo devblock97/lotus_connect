@@ -19,6 +19,12 @@ abstract class ChatbotRepository {
     String? modelName,
   });
 
+  /// Creates a new user-to-user private chat conversation.
+  FutureResult<Conversation> createPrivateChat({
+    required String friendId,
+    required String title,
+  });
+
   /// Renames an existing conversation.
   FutureResult<void> renameConversation(
     String conversationId,

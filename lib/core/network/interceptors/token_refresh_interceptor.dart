@@ -53,8 +53,18 @@ class TokenRefreshInterceptor extends Interceptor {
           ),
         );
 
+        var baseUrl = err.requestOptions.path;
+        if (baseUrl.contains('/api/v1')) {
+          baseUrl = baseUrl.substring(0, baseUrl.indexOf('/api/v1') + 7);
+        } else if (err.requestOptions.baseUrl.isNotEmpty) {
+          baseUrl = err.requestOptions.baseUrl;
+        }
+        if (baseUrl.endsWith('/')) {
+          baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+        }
+
         final response = await dio.post(
-          '/auth/refresh',
+          '$baseUrl/auth/refresh',
           data: {'refreshToken': refreshToken},
         );
 

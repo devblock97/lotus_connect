@@ -6,6 +6,7 @@ import 'package:lotus_connect/features/chatbot/application/settings_notifier.dar
 import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
+import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 
 /// UI state for active conversation chat window.
 class ActiveConversationState {
@@ -123,6 +124,18 @@ class ActiveConversationNotifier
       if (newConv == null) return;
       convId = newConv.id;
       _subscribeToConversation(convId);
+    } else {
+      final conversations = _ref.read(conversationListProvider).conversations;
+      final conversation = conversations.where((item) => item.id == convId);
+      if (conversation.isNotEmpty &&
+          conversation.first.title == 'New Conversation') {
+        final title = trimmedText.length > 25
+            ? '${trimmedText.substring(0, 25)}...'
+            : trimmedText;
+        await _ref
+            .read(conversationListProvider.notifier)
+            .renameConversation(convId, title);
+      }
     }
 
     final repository = _ref.read(chatbotRepositoryProvider);
@@ -146,6 +159,18 @@ class ActiveConversationNotifier
     await _ref.read(saveDraftUseCaseProvider)(
       SaveDraftParams(conversationId: convId, draft: ''),
     );
+
+    // If it is user-to-user chat, send message over WebSocket and do NOT trigger AI
+    final conversations = _ref.read(conversationListProvider).conversations;
+    final isUserToUser =
+        conversations.any((c) => c.id == convId && c.isUserToUser);
+    if (isUserToUser) {
+      _ref.read(webSocketServiceProvider).sendChatMessage(
+            conversationId: convId,
+            content: trimmedText,
+          );
+      return;
+    }
 
     // Trigger AI response streaming
     await _startAiStreaming(convId, userMessage.content);
@@ -239,7 +264,6 @@ class ActiveConversationNotifier
     state = state.copyWith(isGenerating: false, streamingContent: '');
   }
 
-  /// Regenerates last AI response.
   Future<void> regenerateResponse() async {
     final convId = state.conversationId;
     if (convId == null || state.messages.isEmpty) return;
@@ -252,7 +276,6 @@ class ActiveConversationNotifier
     await _startAiStreaming(convId, lastUserMsg.content);
   }
 
-  /// Retries a failed message.
   Future<void> retryMessage(Message message) async {
     if (message.role == MessageRole.user) {
       await sendMessage(message.content);
@@ -261,7 +284,6 @@ class ActiveConversationNotifier
     }
   }
 
-  /// Saves unsent draft text input.
   Future<void> updateDraft(String draft) async {
     final convId = state.conversationId;
     if (convId == null) return;

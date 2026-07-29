@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
+import 'package:lotus_connect/features/auth/application/auth_state.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -97,15 +99,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Alex Chen',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  settings.username.isNotEmpty ? settings.username : 'Alex Chen',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Senior Product Designer & AI enthusiast. Exploring neural networks.',
+                    settings.email.isNotEmpty ? settings.email : 'Senior Product Designer & AI enthusiast. Exploring neural networks.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -114,6 +116,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                 ),
+                if (settings.userId.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: settings.userId));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('User ID copied to clipboard!')),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.copy, size: 12, color: theme.colorScheme.primary),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ID: ${settings.userId}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   onPressed: () {},
@@ -423,7 +455,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     loc.logOut,
                     style: const TextStyle(color: Colors.red),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    ref.read(authStateProvider.notifier).logout();
+                  },
                 ),
               ],
             ),

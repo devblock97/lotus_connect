@@ -7,6 +7,7 @@ import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_remote_d
 import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
+import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
 
 /// Repository implementation fulfilling [ChatbotRepository] contract.
@@ -14,11 +15,14 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
   ChatbotRepositoryImpl({
     required ChatbotLocalDataSource localDataSource,
     required ChatbotRemoteDataSource remoteDataSource,
+    required ChatApiService chatApiService,
   })  : _localDataSource = localDataSource,
-        _remoteDataSource = remoteDataSource;
+        _remoteDataSource = remoteDataSource,
+        _chatApiService = chatApiService;
 
   final ChatbotLocalDataSource _localDataSource;
   final ChatbotRemoteDataSource _remoteDataSource;
+  final ChatApiService _chatApiService;
 
   @override
   StreamResult<List<Conversation>> watchConversations() {
@@ -67,6 +71,27 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
       return Right(conversation);
     } catch (e) {
       return Left(DatabaseFailure('Failed to create conversation: $e', e));
+    }
+  }
+
+  @override
+  FutureResult<Conversation> createPrivateChat({
+    required String friendId,
+    required String title,
+  }) async {
+    try {
+      final chatData = await _chatApiService.createPrivateChat(friendId);
+      final id = chatData['id'] as String;
+
+      final conversation = await _localDataSource.createConversation(
+        title: title,
+        isUserToUser: true,
+        peerId: friendId,
+        id: id,
+      );
+      return Right(conversation);
+    } catch (e) {
+      return Left(DatabaseFailure('Failed to create private chat: $e', e));
     }
   }
 

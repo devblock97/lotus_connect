@@ -19,6 +19,7 @@ dependencies:
   flutter_highlighter: ^0.1.1
   flutter_markdown: ^0.7.6+1
   flutter_riverpod: ^2.6.1
+  flutter_webrtc: ^0.12.1
   fpdart: ^1.1.0
   go_router: ^14.8.0
   google_fonts: ^6.2.1

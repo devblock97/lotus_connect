@@ -6,18 +6,27 @@ class User {
   const User({
     required this.id,
     required this.username,
+    this.fullName,
     required this.email,
+    this.friendshipStatus,
+    this.friendshipSenderId,
   });
 
   final String id;
   final String username;
+  final String? fullName;
   final String email;
+  final String? friendshipStatus;
+  final String? friendshipSenderId;
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as String,
       username: json['username'] as String,
+      fullName: json['fullName'] as String?,
       email: json['email'] as String,
+      friendshipStatus: json['friendshipStatus'] as String?,
+      friendshipSenderId: json['friendshipSenderId'] as String?,
     );
   }
 
@@ -25,7 +34,10 @@ class User {
     return {
       'id': id,
       'username': username,
+      if (fullName != null) 'fullName': fullName,
       'email': email,
+      if (friendshipStatus != null) 'friendshipStatus': friendshipStatus,
+      if (friendshipSenderId != null) 'friendshipSenderId': friendshipSenderId,
     };
   }
 

@@ -120,6 +120,27 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
     );
   }
 
+  Future<Conversation?> createNewPrivateChat({
+    required String friendId,
+    required String title,
+  }) async {
+    final repository = _ref.read(chatbotRepositoryProvider);
+    final result = await repository.createPrivateChat(
+      friendId: friendId,
+      title: title,
+    );
+    return result.fold(
+      (failure) {
+        state = state.copyWith(errorMessage: failure.message);
+        return null;
+      },
+      (conversation) {
+        selectConversation(conversation.id);
+        return conversation;
+      },
+    );
+  }
+
   Future<void> renameConversation(String id, String newTitle) async {
     final renameUseCase = _ref.read(renameConversationUseCaseProvider);
     await renameUseCase(

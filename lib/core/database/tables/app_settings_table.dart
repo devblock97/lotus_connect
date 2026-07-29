@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:lotus_connect/app/config/app_config.dart';
 
 /// Drift table schema for app preferences and user settings.
 class AppSettingsTable extends Table {
@@ -39,7 +40,16 @@ class AppSettingsTable extends Table {
 
   /// Rust backend server host base URL.
   TextColumn get serverHost =>
-      text().withDefault(const Constant('http://localhost:8080/api/v1'))();
+      text().withDefault(const Constant(AppConfig.defaultServerHost))();
+
+  /// Persistent logged-in user ID.
+  TextColumn get userId => text().withDefault(const Constant(''))();
+
+  /// Persistent logged-in username.
+  TextColumn get username => text().withDefault(const Constant(''))();
+
+  /// Persistent logged-in email.
+  TextColumn get email => text().withDefault(const Constant(''))();
 
   @override
   Set<Column> get primaryKey => {id};

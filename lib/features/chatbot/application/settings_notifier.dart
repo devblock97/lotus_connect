@@ -76,6 +76,25 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await localDataSource.updateSettings(state);
   }
 
+  /// Sets auth session including user info.
+  Future<void> setSession({
+    required String accessToken,
+    required String refreshToken,
+    required String userId,
+    required String username,
+    required String email,
+  }) async {
+    state = state.copyWith(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      userId: userId,
+      username: username,
+      email: email,
+    );
+    final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
+    await localDataSource.updateSettings(state);
+  }
+
   /// Sets server host.
   Future<void> setServerHost(String host) async {
     state = state.copyWith(serverHost: host.trim());
@@ -85,7 +104,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   /// Clears auth tokens (on logout).
   Future<void> clearTokens() async {
-    state = state.copyWith(accessToken: '', refreshToken: '');
+    state = state.copyWith(
+      accessToken: '',
+      refreshToken: '',
+      userId: '',
+      username: '',
+      email: '',
+    );
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     await localDataSource.updateSettings(state);
   }

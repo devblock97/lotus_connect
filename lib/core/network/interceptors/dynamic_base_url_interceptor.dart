@@ -10,8 +10,22 @@ class DynamicBaseUrlInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // Override the request base URL with the dynamic server host from preferences
-    options.baseUrl = getServerHost();
+    var path = options.path;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      options.baseUrl = '';
+      handler.next(options);
+      return;
+    }
+
+    var host = getServerHost();
+    if (host.endsWith('/')) {
+      host = host.substring(0, host.length - 1);
+    }
+    if (!path.startsWith('/')) {
+      path = '/$path';
+    }
+    options.path = '$host$path';
+    options.baseUrl = '';
     handler.next(options);
   }
 }
