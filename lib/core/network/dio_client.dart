@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/interceptors/auth_interceptor.dart';
+import 'package:lotus_connect/core/network/interceptors/dynamic_base_url_interceptor.dart';
 import 'package:lotus_connect/core/network/interceptors/logging_interceptor.dart';
 import 'package:lotus_connect/core/network/interceptors/retry_interceptor.dart';
+import 'package:lotus_connect/core/network/interceptors/token_refresh_interceptor.dart';
 
 /// Customized Dio HTTP client for network operations.
 class DioClient {
@@ -11,6 +14,11 @@ class DioClient {
   DioClient({
     String? baseUrl,
     String? Function()? tokenGetter,
+    String Function()? serverHostGetter,
+    String Function()? refreshTokenGetter,
+    Future<void> Function(String accessToken, String refreshToken)?
+        onTokensRefreshed,
+    VoidCallback? onRefreshFailed,
   }) : _dio = Dio(
           BaseOptions(
             baseUrl: baseUrl ?? ApiConstants.baseUrl,
@@ -21,7 +29,17 @@ class DioClient {
         ) {
     _dio.interceptors.addAll([
       LoggingInterceptor(),
+      if (serverHostGetter != null)
+        DynamicBaseUrlInterceptor(getServerHost: serverHostGetter),
       if (tokenGetter != null) AuthInterceptor(getToken: tokenGetter),
+      if (refreshTokenGetter != null &&
+          onTokensRefreshed != null &&
+          onRefreshFailed != null)
+        TokenRefreshInterceptor(
+          getRefreshToken: refreshTokenGetter,
+          onTokensRefreshed: onTokensRefreshed,
+          onRefreshFailed: onRefreshFailed,
+        ),
       RetryInterceptor(dio: _dio),
     ]);
   }

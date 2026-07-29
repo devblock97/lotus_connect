@@ -81,10 +81,13 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       }
     });
 
-    final currentConversation = convListState.conversations.firstWhere(
+    final aiConversations = convListState.conversations
+        .where((conversation) => !conversation.isUserToUser)
+        .toList();
+    final currentConversation = aiConversations.firstWhere(
       (c) => c.id == activeState.conversationId,
-      orElse: () => convListState.conversations.isNotEmpty
-          ? convListState.conversations.first
+      orElse: () => aiConversations.isNotEmpty
+          ? aiConversations.first
           : Conversation(
               id: '',
               title: 'Neural AI Chat',
@@ -92,6 +95,15 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
               updatedAt: DateTime.now(),
             ),
     );
+
+    if (activeState.conversationId != currentConversation.id &&
+        currentConversation.id.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(conversationListProvider.notifier)
+            .selectConversation(currentConversation.id);
+      });
+    }
 
     final selectedModel = availableModels.contains(settings.activeAiModel)
         ? settings.activeAiModel
@@ -127,7 +139,7 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${loc.activeSession} (${aiProvider.displayName.split(" ").first})',
+                        '${loc.activeSession} (${aiProvider.displayName.split(' ').first})',
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -174,25 +186,25 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
       body: Column(
         children: [
           // Banner Notice
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: theme.colorScheme.surfaceContainerHighest
-                .withValues(alpha: 0.4),
-            child: Row(
-              children: [
-                const Icon(Icons.push_pin_outlined, size: 14),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    loc.projectGoals,
-                    style: const TextStyle(fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const Icon(Icons.close, size: 14),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          //   color: theme.colorScheme.surfaceContainerHighest
+          //       .withValues(alpha: 0.4),
+          //   child: Row(
+          //     children: [
+          //       const Icon(Icons.push_pin_outlined, size: 14),
+          //       const SizedBox(width: 8),
+          //       Expanded(
+          //         child: Text(
+          //           loc.projectGoals,
+          //           style: const TextStyle(fontSize: 12),
+          //           overflow: TextOverflow.ellipsis,
+          //         ),
+          //       ),
+          //       const Icon(Icons.close, size: 14),
+          //     ],
+          //   ),
+          // ),
 
           // Message Feed
           Expanded(

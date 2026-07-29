@@ -13,7 +13,7 @@
   "editProfile": "编辑资料",
   "aiEngineSettings": "AI 引擎设置",
   "activeAiEngine": "活跃 AI 引擎",
-  "googleGeminiLive": "Google Gemini (在线)",
+  "googleGeminiLive": "Google Gemini",
   "localLlmOllama": "本地 LLM (Ollama)",
   "neuralAiMock": "模拟 AI (Mock)",
   "geminiApiKey": "Google AI Studio API 密钥",

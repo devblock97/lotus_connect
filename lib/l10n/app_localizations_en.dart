@@ -52,7 +52,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activeAiEngine => 'Active AI Engine';
 
   @override
-  String get googleGeminiLive => 'Google Gemini (Live)';
+  String get googleGeminiLive => 'Google Gemini';
 
   @override
   String get localLlmOllama => 'Local LLM (Ollama)';

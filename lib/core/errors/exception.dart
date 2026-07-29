@@ -37,3 +37,9 @@ class AiProviderException extends AppException {
   /// Creates an [AiProviderException].
   const AiProviderException(super.message, [super.cause]);
 }
+
+/// Exception thrown when remote server returns error code or fails.
+class ServerException extends AppException {
+  /// Creates a [ServerException].
+  const ServerException(super.message, [super.cause]);
+}

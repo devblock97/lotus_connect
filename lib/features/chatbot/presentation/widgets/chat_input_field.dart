@@ -9,6 +9,7 @@ class ChatInputField extends StatefulWidget {
     this.initialText = '',
     this.onChanged,
     this.hintText = 'Message Neural AI...',
+    this.showAiDisclaimer = true,
     super.key,
   });
 
@@ -18,6 +19,7 @@ class ChatInputField extends StatefulWidget {
   final String initialText;
   final ValueChanged<String>? onChanged;
   final String hintText;
+  final bool showAiDisclaimer;
 
   @override
   State<ChatInputField> createState() => _ChatInputFieldState();
@@ -146,16 +148,19 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.4),
+            if (widget.showAiDisclaimer) ...[
+              const SizedBox(height: 6),
+              Text(
+                'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                  color:
+                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.4),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

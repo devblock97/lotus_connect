@@ -30,6 +30,12 @@ class ConversationTable extends Table {
   /// Optional custom system prompt for this conversation.
   TextColumn get systemPrompt => text().nullable()();
 
+  /// Whether the conversation is a user-to-user private chat.
+  BoolColumn get isUserToUser => boolean().withDefault(const Constant(false))();
+
+  /// Target peer user ID (UUID) if user-to-user.
+  TextColumn get peerId => text().withDefault(const Constant(''))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

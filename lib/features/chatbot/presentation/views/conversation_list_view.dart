@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
+import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 
 /// Conversation history list view drawer / tab matching image2 mock.
 class ConversationListView extends ConsumerWidget {
@@ -18,6 +22,13 @@ class ConversationListView extends ConsumerWidget {
     final theme = Theme.of(context);
     final state = ref.watch(conversationListProvider);
     final notifier = ref.read(conversationListProvider.notifier);
+    final conversations = state.filteredConversations
+        .where((conversation) => conversation.isUserToUser)
+        .toList();
+    final pinnedConversations =
+        conversations.where((conversation) => conversation.isPinned).toList();
+    final unpinnedConversations =
+        conversations.where((conversation) => !conversation.isPinned).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -26,22 +37,47 @@ class ConversationListView extends ConsumerWidget {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: theme.colorScheme.surfaceContainerHighest,
-              child: const Icon(Icons.person, size: 18),
-            ),
+          IconButton(
+            icon: const Icon(Icons.contacts_outlined),
+            onPressed: () => context.push('/contacts'),
+            tooltip: 'Contacts & Friends',
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final conv = await notifier.createNewConversation();
-          if (conv != null) {
-            onSelectConversation?.call();
-          }
+        onPressed: () {
+          showModalBottomSheet<void>(
+            context: context,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (context) {
+              return SafeArea(
+                child: Wrap(
+                  children: [
+                    ListTile(
+                      leading:
+                          const Icon(Icons.person_outline, color: Colors.green),
+                      title: const Text('Start Chat with User (UUID)'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showStartPrivateChatDialog(context, ref, notifier);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.contacts_outlined,
+                          color: Colors.amber),
+                      title: const Text('View Contacts & Friends'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        context.push('/contacts');
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
         backgroundColor: Colors.black,
         child: const Icon(Icons.add, color: Colors.white),
@@ -73,9 +109,9 @@ class ConversationListView extends ConsumerWidget {
                 : ListView(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     children: [
-                      if (state.pinnedConversations.isNotEmpty) ...[
+                      if (pinnedConversations.isNotEmpty) ...[
                         _buildSectionHeader(context, 'PINNED'),
-                        ...state.pinnedConversations.map(
+                        ...pinnedConversations.map(
                           (c) => _buildConversationTile(
                             context,
                             ref,
@@ -84,10 +120,10 @@ class ConversationListView extends ConsumerWidget {
                           ),
                         ),
                       ],
-                      if (state.unpinnedConversations.isNotEmpty) ...[
-                        if (state.pinnedConversations.isNotEmpty)
+                      if (unpinnedConversations.isNotEmpty) ...[
+                        if (pinnedConversations.isNotEmpty)
                           _buildSectionHeader(context, 'RECENT'),
-                        ...state.unpinnedConversations.map(
+                        ...unpinnedConversations.map(
                           (c) => _buildConversationTile(
                             context,
                             ref,
@@ -96,12 +132,12 @@ class ConversationListView extends ConsumerWidget {
                           ),
                         ),
                       ],
-                      if (state.conversations.isEmpty)
+                      if (conversations.isEmpty)
                         const Padding(
                           padding: EdgeInsets.all(32),
                           child: Center(
                             child: Text(
-                              'No conversations found.\nTap + to start a new chat!',
+                              'No private chats found.\nTap + to start a chat!',
                               textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.grey),
                             ),
@@ -157,6 +193,10 @@ class ConversationListView extends ConsumerWidget {
     final theme = Theme.of(context);
     final notifier = ref.read(conversationListProvider.notifier);
     final timeStr = DateFormat('h:mm a').format(conversation.updatedAt);
+    final displayTitle = _displayTitle(
+      conversation,
+      ref.watch(contactsProvider).friends,
+    );
 
     return Dismissible(
       key: Key(conversation.id),
@@ -177,9 +217,7 @@ class ConversationListView extends ConsumerWidget {
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.surfaceContainerHighest,
           child: Text(
-            conversation.title.isNotEmpty
-                ? conversation.title[0].toUpperCase()
-                : 'C',
+            displayTitle.isNotEmpty ? displayTitle[0].toUpperCase() : 'C',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -187,7 +225,7 @@ class ConversationListView extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
-                conversation.title,
+                displayTitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontWeight: FontWeight.w600),
@@ -221,9 +259,109 @@ class ConversationListView extends ConsumerWidget {
         ),
         onTap: () {
           notifier.selectConversation(conversation.id);
-          onSelectConversation?.call();
+          if (conversation.isUserToUser) {
+            Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                builder: (_) => ChatScreen(conversationId: conversation.id),
+              ),
+            );
+          } else {
+            onSelectConversation?.call();
+          }
         },
       ),
+    );
+  }
+
+  String _displayTitle(Conversation conversation, List<User> friends) {
+    if (!conversation.isUserToUser) return conversation.title;
+
+    for (final friend in friends) {
+      if (friend.id == conversation.peerId) {
+        final fullName = friend.fullName;
+        return fullName != null && fullName.trim().isNotEmpty
+            ? fullName
+            : friend.username;
+      }
+    }
+    return conversation.title;
+  }
+
+  void _showStartPrivateChatDialog(
+    BuildContext context,
+    WidgetRef ref,
+    ConversationListNotifier notifier,
+  ) {
+    final friendIdController = TextEditingController();
+    final titleController = TextEditingController();
+    final screenContext = context;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('New User-to-User Chat'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: friendIdController,
+                decoration: const InputDecoration(
+                  labelText: 'Recipient User UUID',
+                  hintText: 'e.g. friend-uuid-v7',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Conversation Title',
+                  hintText: 'e.g. Secret Chat',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final friendId = friendIdController.text.trim();
+                final title = titleController.text.trim();
+                if (friendId.isEmpty || title.isEmpty) return;
+
+                Navigator.pop(dialogContext);
+                final conv = await notifier.createNewPrivateChat(
+                  friendId: friendId,
+                  title: title,
+                );
+                if (conv != null && screenContext.mounted) {
+                  Navigator.of(screenContext).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ChatScreen(conversationId: conv.id),
+                    ),
+                  );
+                } else {
+                  final err = ref.read(conversationListProvider).errorMessage;
+                  if (screenContext.mounted) {
+                    ScaffoldMessenger.of(screenContext).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text(err ?? 'Failed to start chat with user')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Start'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

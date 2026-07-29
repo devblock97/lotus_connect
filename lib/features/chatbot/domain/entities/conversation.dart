@@ -14,6 +14,8 @@ class Conversation {
     this.modelName = 'gpt-4o',
     this.draftMessage,
     this.systemPrompt,
+    this.isUserToUser = false,
+    this.peerId = '',
   });
 
   /// Unique conversation identifier.
@@ -43,6 +45,12 @@ class Conversation {
   /// System prompt override.
   final String? systemPrompt;
 
+  /// Whether the conversation is a user-to-user private chat.
+  final bool isUserToUser;
+
+  /// Target peer user ID (UUID) if user-to-user.
+  final String peerId;
+
   /// Returns a copy of [Conversation] with updated fields.
   Conversation copyWith({
     String? id,
@@ -54,6 +62,8 @@ class Conversation {
     String? modelName,
     String? draftMessage,
     String? systemPrompt,
+    bool? isUserToUser,
+    String? peerId,
   }) {
     return Conversation(
       id: id ?? this.id,
@@ -65,6 +75,8 @@ class Conversation {
       modelName: modelName ?? this.modelName,
       draftMessage: draftMessage ?? this.draftMessage,
       systemPrompt: systemPrompt ?? this.systemPrompt,
+      isUserToUser: isUserToUser ?? this.isUserToUser,
+      peerId: peerId ?? this.peerId,
     );
   }
 
@@ -81,7 +93,9 @@ class Conversation {
           isFavourite == other.isFavourite &&
           modelName == other.modelName &&
           draftMessage == other.draftMessage &&
-          systemPrompt == other.systemPrompt;
+          systemPrompt == other.systemPrompt &&
+          isUserToUser == other.isUserToUser &&
+          peerId == other.peerId;
 
   @override
   int get hashCode =>
@@ -93,5 +107,7 @@ class Conversation {
       isFavourite.hashCode ^
       modelName.hashCode ^
       draftMessage.hashCode ^
-      systemPrompt.hashCode;
+      systemPrompt.hashCode ^
+      isUserToUser.hashCode ^
+      peerId.hashCode;
 }

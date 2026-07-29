@@ -13,7 +13,7 @@
   "editProfile": "Chỉnh sửa cá nhân",
   "aiEngineSettings": "CÀI ĐẶT CÔNG CỤ AI",
   "activeAiEngine": "Công cụ AI kích hoạt",
-  "googleGeminiLive": "Google Gemini (Trực tiếp)",
+  "googleGeminiLive": "Google Gemini",
   "localLlmOllama": "LLM Nội bộ (Ollama)",
   "neuralAiMock": "AI Mô phỏng (Mock)",
   "geminiApiKey": "Google AI Studio API Key",

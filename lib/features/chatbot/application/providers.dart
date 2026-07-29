@@ -18,6 +18,9 @@ import 'package:lotus_connect/features/chatbot/domain/usecases/save_draft_usecas
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/toggle_favourite_conversation_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/toggle_pin_conversation_usecase.dart';
+import 'package:lotus_connect/core/services/api/chat_api_service.dart';
+
+import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 
 /// Database singleton provider.
 final databaseProvider = Provider<AppDatabase>((ref) {
@@ -26,8 +29,20 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
-/// Dio client provider.
-final dioClientProvider = Provider<DioClient>((ref) => DioClient());
+/// Dio client provider configured dynamically with user settings and RTR support.
+final dioClientProvider = Provider<DioClient>((ref) {
+  return DioClient(
+    tokenGetter: () => ref.read(settingsProvider).accessToken,
+    serverHostGetter: () => ref.read(settingsProvider).serverHost,
+    refreshTokenGetter: () => ref.read(settingsProvider).refreshToken,
+    onTokensRefreshed: (accessToken, refreshToken) async {
+      await ref.read(settingsProvider.notifier).setTokens(accessToken, refreshToken);
+    },
+    onRefreshFailed: () {
+      ref.read(settingsProvider.notifier).clearTokens();
+    },
+  );
+});
 
 /// Current active AI Provider dynamically bound to user settings.
 final activeAiProvider = Provider<AiProvider>((ref) {
@@ -65,6 +80,7 @@ final chatbotRepositoryProvider = Provider<ChatbotRepository>((ref) {
   return ChatbotRepositoryImpl(
     localDataSource: ref.watch(chatbotLocalDataSourceProvider),
     remoteDataSource: ref.watch(chatbotRemoteDataSourceProvider),
+    chatApiService: ref.watch(chatApiServiceProvider),
   );
 });
 
@@ -107,4 +123,23 @@ final saveDraftUseCaseProvider = Provider<SaveDraftUseCase>((ref) {
 final streamAiResponseUseCaseProvider =
     Provider<StreamAiResponseUseCase>((ref) {
   return StreamAiResponseUseCase(ref.watch(chatbotRepositoryProvider));
+});
+
+/// StateProvider managing the active tab index inside MainShellScreen.
+final shellIndexProvider = StateProvider<int>((ref) => 0);
+
+/// Data model representing a request to start a call from other screens.
+class CallRequest {
+  const CallRequest({required this.recipientId, required this.isVideo});
+  final String recipientId;
+  final bool isVideo;
+}
+
+/// Global provider for cross-screen call requests.
+final callRequestProvider = StateProvider<CallRequest?>((ref) => null);
+
+/// StreamProvider yielding incoming call invitations.
+final incomingCallProvider = StreamProvider<WebRTCCallInvitation>((ref) {
+  final signaling = ref.watch(webrtcSignalingServiceProvider);
+  return signaling.invitationStream;
 });
