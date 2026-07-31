@@ -6,24 +6,28 @@ import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 class ContactsState {
   const ContactsState({
     this.friends = const [],
+    this.requests = const [],
     this.searchResults = const [],
     this.isLoading = false,
     this.errorMessage,
   });
 
   final List<User> friends;
+  final List<User> requests;
   final List<User> searchResults;
   final bool isLoading;
   final String? errorMessage;
 
   ContactsState copyWith({
     List<User>? friends,
+    List<User>? requests,
     List<User>? searchResults,
     bool? isLoading,
     String? errorMessage,
   }) {
     return ContactsState(
       friends: friends ?? this.friends,
+      requests: requests ?? this.requests,
       searchResults: searchResults ?? this.searchResults,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
@@ -44,7 +48,13 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     state = state.copyWith(isLoading: true);
     try {
       final friendsList = await _chatApiService.getFriends();
-      state = state.copyWith(friends: friendsList, isLoading: false);
+      final requestsList = await _chatApiService.getFriendRequests();
+      print('DEBUG: requestsList loaded: ${requestsList.length} items. Contents: ${requestsList.map((e) => e.username).toList()}');
+      state = state.copyWith(
+        friends: friendsList,
+        requests: requestsList,
+        isLoading: false,
+      );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

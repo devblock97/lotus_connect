@@ -58,6 +58,17 @@ class ChatApiService {
     }
   }
 
+  /// Fetches the pending friend requests.
+  Future<List<User>> getFriendRequests() async {
+    try {
+      final response = await dioClient.get('/users/friends/requests');
+      final list = response.data as List<dynamic>;
+      return list.map((item) => User.fromJson(item as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw ServerException('Failed to get friend requests: $e');
+    }
+  }
+
   /// Searches users by username, email, or full name.
   Future<List<User>> searchUsers(String query) async {
     try {

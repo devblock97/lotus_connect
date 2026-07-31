@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,6 +135,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   @override
   void dispose() {
     _stopTimer();
+    try {
+      FlutterRingtonePlayer().stop();
+    } catch (_) {}
     _inviteSub?.cancel();
     _acceptSub?.cancel();
     _endSub?.cancel();
@@ -153,6 +157,26 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       setState(() {
         _consoleLogs.insert(0, '${DateTime.now().toIso8601String().split('T').last.substring(0, 8)} | $text');
       });
+    }
+  }
+
+  void _updateStatus(CallStatus newStatus) {
+    if (!mounted) return;
+    setState(() {
+      _status = newStatus;
+    });
+
+    if (newStatus == CallStatus.ringingIn) {
+      _log('Starting incoming call ringtone...');
+      try {
+        FlutterRingtonePlayer().playRingtone(looping: true);
+      } catch (e) {
+        _log('Error playing ringtone: $e');
+      }
+    } else {
+      try {
+        FlutterRingtonePlayer().stop();
+      } catch (_) {}
     }
   }
 
@@ -183,20 +207,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final signaling = ref.read(webrtcSignalingServiceProvider);
 
     _inviteSub = signaling.invitationStream.listen((invite) {
-      _log('☎️ Incoming call invite! ID: ${invite.callId} from Peer: ${invite.senderId}');
+      _log('Incoming call invite! ID: ${invite.callId} from Peer: ${invite.senderId}');
       setState(() {
-        _status = CallStatus.ringingIn;
         _activeCallId = invite.callId;
         _activePeerId = invite.senderId;
         _isVideo = invite.isVideo;
       });
+      _updateStatus(CallStatus.ringingIn);
     });
 
     _acceptSub = signaling.acceptStream.listen((payload) async {
-      _log('✅ Call accepted by peer: ${payload['senderId']}');
-      setState(() {
-        _status = CallStatus.connected;
-      });
+      _log('Call accepted by peer: ${payload['senderId']}');
+      _updateStatus(CallStatus.connected);
       _startTimer();
 
       // We are the caller (host). Let's establish peer connection and send offer.
@@ -216,13 +238,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     });
 
     _endSub = signaling.endStream.listen((payload) {
-      _log('❌ Call ended/rejected by peer');
+      _log('Call ended/rejected by peer');
       _resetCallState();
     });
 
     _inviteAckSub = signaling.inviteAckStream.listen((payload) {
       final ackCallId = payload['callId'] as String?;
-      _log('☎️ Call invite acknowledged. Assigned Server UUID: $ackCallId');
+      _log('Call invite acknowledged. Assigned Server UUID: $ackCallId');
       if (mounted) {
         setState(() {
           _activeCallId = ackCallId;
@@ -234,7 +256,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       try {
         final type = payload['type'] as String;
         final sdp = payload['sdp'] as String;
-        _log('📡 WebRTC SDP $type received from Peer: ${payload['senderId']}');
+        _log('WebRTC SDP $type received from Peer: ${payload['senderId']}');
 
         if (type == 'offer') {
           _remoteOfferDescription = RTCSessionDescription(sdp, type);
@@ -276,7 +298,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           }
         }
       } catch (e) {
-        _log('⚠️ Error in _sdpSub: $e');
+        _log('Error in _sdpSub: $e');
       }
     });
 
@@ -288,7 +310,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           candidateData['sdpMid'] as String? ?? '0',
           candidateData['sdpMLineIndex'] as int? ?? 0,
         );
-        _log('❄️ ICE Candidate received: ...${cand.candidate?.split(' ').first}');
+        _log('ICE Candidate received: ...${cand.candidate?.split(' ').first}');
 
         if (_peerConnection != null && await _peerConnection!.getRemoteDescription() != null) {
           await _peerConnection!.addCandidate(cand);
@@ -316,17 +338,49 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Future<void> _createPeerConnection() async {
     if (_peerConnection != null) return;
-    _log('📡 Creating RTCPeerConnection...');
+    _log('Initializing audio session...');
+    try {
+      await Helper.ensureAudioSession();
+      _isSpeakerOn = _isVideo;
+      await Helper.setSpeakerphoneOn(_isSpeakerOn);
+    } catch (e) {
+      _log('Audio session initialization failed: $e');
+    }
+
+    _log('Creating RTCPeerConnection...');
     final pc = await createPeerConnection({
       'iceServers': [
         {'url': 'stun:stun.l.google.com:19302'},
         {'url': 'stun:stun1.l.google.com:19302'},
         {'url': 'stun:stun2.l.google.com:19302'},
+        {
+          'url': 'turn:openrelay.metered.ca:80',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'url': 'turn:openrelay.metered.ca:443',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
+        {
+          'url': 'turn:openrelay.metered.ca:443?transport=tcp',
+          'username': 'openrelayproject',
+          'credential': 'openrelayproject',
+        },
       ],
     }, {
       'mandatory': {},
       'optional': [{'DtlsSrtpKeyAgreement': true}],
     });
+
+    pc.onIceConnectionState = (state) {
+      _log('ICE Connection State: ${state.toString()}');
+    };
+
+    pc.onSignalingState = (state) {
+      _log('Signaling State: ${state.toString()}');
+    };
 
     pc.onIceCandidate = (candidate) {
       if (candidate.candidate != null && _activePeerId != null) {
@@ -340,7 +394,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     };
 
     pc.onTrack = (event) {
-      _log('📡 Remote track received');
+      _log('Remote track received');
       if (event.streams.isNotEmpty) {
         setState(() {
           _remoteRenderer.srcObject = event.streams[0];
@@ -349,7 +403,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     };
 
     pc.onAddStream = (stream) {
-      _log('📡 Remote stream received (legacy)');
+      _log('Remote stream received (legacy)');
       setState(() {
         _remoteRenderer.srcObject = stream;
       });
@@ -367,7 +421,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     };
 
     try {
-      _log('📹 Accessing user media devices...');
+      _log('Accessing user media devices...');
       final stream = await navigator.mediaDevices.getUserMedia(constraints);
       _localStream = stream;
       setState(() {
@@ -378,7 +432,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         pc.addTrack(track, stream);
       });
     } catch (e) {
-      _log('⚠️ User media failed: $e');
+      _log('User media failed: $e');
     }
 
     _peerConnection = pc;
@@ -388,10 +442,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _stopTimer();
     _cleanWebRTC();
     setState(() {
-      _status = CallStatus.idle;
       _activeCallId = null;
       _activePeerId = null;
     });
+    _updateStatus(CallStatus.idle);
   }
 
   Future<void> _startCall({required bool isVideo}) async {
@@ -404,14 +458,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
 
     final channelId = 'room-${DateTime.now().millisecondsSinceEpoch}';
-    _log('📞 Ringing peer: $peerId over channel: $channelId');
+    _log('Ringing peer: $peerId over channel: $channelId');
 
     setState(() {
-      _status = CallStatus.ringingOut;
       _activePeerId = peerId;
       _activeCallId = 'call-${DateTime.now().millisecondsSinceEpoch}';
       _isVideo = isVideo;
     });
+    _updateStatus(CallStatus.ringingOut);
 
     ref.read(webrtcSignalingServiceProvider).sendInvite(
           recipientId: peerId,
@@ -422,10 +476,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Future<void> _acceptIncomingCall() async {
     if (_activeCallId == null || _activePeerId == null) return;
-    _log('👍 Accepting call: $_activeCallId');
-    setState(() {
-      _status = CallStatus.connected;
-    });
+    _log('Accepting call: $_activeCallId');
+    _updateStatus(CallStatus.connected);
     _startTimer();
 
     ref.read(webrtcSignalingServiceProvider).acceptCall(
@@ -460,13 +512,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         }
       }
     } catch (e) {
-      _log('⚠️ Error during call acceptance: $e');
+      _log('Error during call acceptance: $e');
     }
   }
 
   void _declineCall() {
     if (_activeCallId == null || _activePeerId == null) return;
-    _log('👎 Declining call: $_activeCallId');
+    _log('Declining call: $_activeCallId');
 
     ref.read(webrtcSignalingServiceProvider).endCall(
           callId: _activeCallId!,
@@ -477,7 +529,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   void _hangUp() {
     if (_activeCallId == null || _activePeerId == null) return;
-    _log('☎️ Hanging up call');
+    _log('Hanging up call');
 
     ref.read(webrtcSignalingServiceProvider).endCall(
           callId: _activeCallId!,
@@ -1339,6 +1391,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
     return Scaffold(
       body: Container(
+        width: double.maxFinite,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
