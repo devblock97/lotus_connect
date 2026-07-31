@@ -180,15 +180,52 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             Expanded(
               child: state.isLoading &&
                       state.friends.isEmpty &&
+                      state.requests.isEmpty &&
                       state.searchResults.isEmpty
                   ? const Center(child: CircularProgressIndicator())
-                  : (_searchQuery.isEmpty && filteredFriends.isEmpty)
+                  : (_searchQuery.isEmpty && filteredFriends.isEmpty && state.requests.isEmpty)
                       ? _buildEmptyState(theme)
                       : ListView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 8.0),
                           children: [
+                            if (_searchQuery.isEmpty && state.requests.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 8.0),
+                                child: Text(
+                                  'FRIEND REQUESTS (${state.requests.length})',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                              ...state.requests.take(3).map(
+                                  (req) => _buildRequestItem(theme, req)),
+                              if (state.requests.length > 3)
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const AllFriendRequestsScreen(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('View more'),
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(height: 16),
+                            ],
                             if (_searchQuery.isNotEmpty &&
                                 filteredFriends.isNotEmpty) ...[
                               Padding(
@@ -208,6 +245,19 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                                   (friend) => _buildFriendItem(theme, friend)),
                               const SizedBox(height: 16),
                             ] else if (_searchQuery.isEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 8.0),
+                                child: Text(
+                                  'ALL FRIENDS',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade600,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
                               ...filteredFriends.map(
                                   (friend) => _buildFriendItem(theme, friend)),
                             ],
@@ -411,5 +461,261 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         CallRequest(recipientId: friendId, isVideo: isVideo);
     ref.read(shellIndexProvider.notifier).state = 2; // Switch to Calls tab
     context.pop(); // Pop back to main shell
+  }
+
+  Widget _buildRequestItem(ThemeData theme, User requestUser) {
+    final displayName = requestUser.fullName ?? requestUser.username;
+    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
+    final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      leading: CircleAvatar(
+        backgroundColor: avatarColor.withValues(alpha: 0.15),
+        child: Text(
+          initials,
+          style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
+        ),
+      ),
+      title: Text(
+        displayName,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+      ),
+      subtitle: Text(
+        '@${requestUser.username}',
+        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.redAccent),
+            onPressed: () async {
+              final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(requestUser.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? 'Declined friend request from @${requestUser.username}' : 'Failed to reject request'),
+                    backgroundColor: success ? Colors.orange : Colors.red,
+                  ),
+                );
+              }
+            },
+            tooltip: 'Decline',
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            onPressed: () async {
+              final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(requestUser.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? 'Accepted friend request from @${requestUser.username}' : 'Failed to accept request'),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            tooltip: 'Accept',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AllFriendRequestsScreen extends ConsumerWidget {
+  const AllFriendRequestsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final state = ref.watch(contactsProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Friend Requests', style: TextStyle(fontWeight: FontWeight.bold)),
+        elevation: 0,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(contactsProvider.notifier).loadFriends(),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          children: [
+            if (state.requests.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                child: Text(
+                  'PENDING REQUESTS (${state.requests.length})',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ),
+              ...state.requests.map((req) => _buildRequestItem(context, ref, req)),
+              const SizedBox(height: 24),
+            ] else
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32.0),
+                child: Center(
+                  child: Text('No pending requests', style: TextStyle(color: Colors.grey)),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+              child: Text(
+                'MY FRIENDS (${state.friends.length})',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade600,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ),
+            if (state.friends.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32.0),
+                child: Center(
+                  child: Text('No friends yet', style: TextStyle(color: Colors.grey)),
+                ),
+              )
+            else
+              ...state.friends.map((friend) => _buildFriendItem(context, ref, theme, friend)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequestItem(BuildContext context, WidgetRef ref, User requestUser) {
+    final displayName = requestUser.fullName ?? requestUser.username;
+    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
+    final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      leading: CircleAvatar(
+        backgroundColor: avatarColor.withValues(alpha: 0.15),
+        child: Text(
+          initials,
+          style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
+        ),
+      ),
+      title: Text(
+        displayName,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+      ),
+      subtitle: Text(
+        '@${requestUser.username}',
+        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.redAccent),
+            onPressed: () async {
+              final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(requestUser.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? 'Declined friend request from @${requestUser.username}' : 'Failed to reject request'),
+                    backgroundColor: success ? Colors.orange : Colors.red,
+                  ),
+                );
+              }
+            },
+            tooltip: 'Decline',
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            onPressed: () async {
+              final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(requestUser.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success ? 'Accepted friend request from @${requestUser.username}' : 'Failed to accept request'),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            tooltip: 'Accept',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendItem(BuildContext context, WidgetRef ref, ThemeData theme, User friend) {
+    final displayName = friend.fullName ?? friend.username;
+    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
+    final avatarColor = Colors.primaries[friend.username.hashCode % Colors.primaries.length];
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      leading: CircleAvatar(
+        backgroundColor: avatarColor.withValues(alpha: 0.15),
+        child: Text(
+          initials,
+          style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
+        ),
+      ),
+      title: Text(
+        displayName,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+      ),
+      subtitle: Text(
+        '@${friend.username}',
+        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
+            onPressed: () => _startPrivateChat(context, ref, friend),
+            tooltip: 'Chat',
+          ),
+          IconButton(
+            icon: const Icon(Icons.phone_outlined, color: Colors.blue),
+            onPressed: () => _startCall(context, ref, friend.id, isVideo: false),
+            tooltip: 'Voice Call',
+          ),
+          IconButton(
+            icon: const Icon(Icons.videocam_outlined, color: Colors.green),
+            onPressed: () => _startCall(context, ref, friend.id, isVideo: true),
+            tooltip: 'Video Call',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startPrivateChat(BuildContext context, WidgetRef ref, User friend) async {
+    final currentContext = context;
+    final conv = await ref.read(conversationListProvider.notifier).createNewPrivateChat(
+          friendId: friend.id,
+          title: friend.fullName ?? friend.username,
+        );
+
+    if (conv != null && currentContext.mounted) {
+      Navigator.of(currentContext).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ChatScreen(conversationId: conv.id),
+        ),
+      );
+    }
+  }
+
+  void _startCall(BuildContext context, WidgetRef ref, String friendId, {required bool isVideo}) {
+    ref.read(callRequestProvider.notifier).state = CallRequest(recipientId: friendId, isVideo: isVideo);
+    ref.read(shellIndexProvider.notifier).state = 2; // Switch to Calls tab
+    Navigator.of(context).popUntil((route) => route.isFirst); // Pop back to main shell
   }
 }
