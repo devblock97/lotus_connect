@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -22,11 +22,9 @@ class ConversationListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final state = ref.watch(conversationListProvider);
-    final notifier = ref.read(conversationListProvider.notifier);
-    final conversations = state.filteredConversations
-        .where((conversation) => conversation.isUserToUser)
-        .toList();
+    final state = ref.watch(privateConversationListProvider);
+    final notifier = ref.read(privateConversationListProvider.notifier);
+    final conversations = state.filteredConversations;
     final pinnedConversations =
         conversations.where((conversation) => conversation.isPinned).toList();
     final unpinnedConversations =
@@ -193,7 +191,7 @@ class ConversationListView extends ConsumerWidget {
     bool isSelected,
   ) {
     final theme = Theme.of(context);
-    final notifier = ref.read(conversationListProvider.notifier);
+    final notifier = ref.read(privateConversationListProvider.notifier);
     final timeStr = DateFormat('h:mm a').format(conversation.updatedAt);
     final displayTitle = _displayTitle(
       conversation,
@@ -293,7 +291,7 @@ class ConversationListView extends ConsumerWidget {
   void _showStartPrivateChatDialog(
     BuildContext context,
     WidgetRef ref,
-    ConversationListNotifier notifier,
+    PrivateConversationListNotifier notifier,
   ) {
     final loc = AppLocalizations.of(context)!;
     final friendIdController = TextEditingController();
@@ -350,7 +348,7 @@ class ConversationListView extends ConsumerWidget {
                     ),
                   );
                 } else {
-                  final err = ref.read(conversationListProvider).errorMessage;
+                  final err = ref.read(privateConversationListProvider).errorMessage;
                   if (screenContext.mounted) {
                     ScaffoldMessenger.of(screenContext).showSnackBar(
                       SnackBar(

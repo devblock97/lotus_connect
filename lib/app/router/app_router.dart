@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/presentation/views/login_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/main_shell_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';

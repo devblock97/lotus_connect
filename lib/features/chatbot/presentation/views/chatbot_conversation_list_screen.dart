@@ -4,8 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
 
 /// List of AI conversations. Titles are conversation summaries and subtitles
@@ -98,7 +99,7 @@ class _AiConversationTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final repository = ref.watch(chatbotRepositoryProvider);
+    final repository = ref.watch(chatCoreRepositoryProvider);
 
     return StreamBuilder<Result<List<Message>>>(
       stream: repository.watchMessages(conversation.id),

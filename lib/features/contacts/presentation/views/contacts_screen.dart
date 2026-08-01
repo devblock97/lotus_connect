@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -506,7 +507,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   Future<void> _startPrivateChat(User friend) async {
     final currentContext = context;
     final conv =
-        await ref.read(conversationListProvider.notifier).createNewPrivateChat(
+        await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
               friendId: friend.id,
               title: friend.fullName ?? friend.username,
             );
@@ -767,7 +768,7 @@ class AllFriendRequestsScreen extends ConsumerWidget {
 
   Future<void> _startPrivateChat(BuildContext context, WidgetRef ref, User friend) async {
     final currentContext = context;
-    final conv = await ref.read(conversationListProvider.notifier).createNewPrivateChat(
+    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
           friendId: friend.id,
           title: friend.fullName ?? friend.username,
         );

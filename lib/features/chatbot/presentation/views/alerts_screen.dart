@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
 
 class AlertsScreen extends ConsumerWidget {
@@ -88,7 +89,7 @@ class AlertsScreen extends ConsumerWidget {
               final conversationId = data['conversationId'] as String?;
               if (conversationId != null) {
                 // Select conversation and route to it
-                ref.read(conversationListProvider.notifier).selectConversation(conversationId);
+                ref.read(privateConversationListProvider.notifier).selectConversation(conversationId);
                 ref.read(shellIndexProvider.notifier).state = 1; // Switch bottom tab to Chats
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(

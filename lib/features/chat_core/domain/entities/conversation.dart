@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-/// Pure Dart entity representing a Chatbot Conversation.
+/// Pure Dart entity representing a Chat Conversation.
 @immutable
 class Conversation {
   /// Creates a [Conversation].
@@ -11,7 +11,7 @@ class Conversation {
     required this.updatedAt,
     this.isPinned = false,
     this.isFavourite = false,
-    this.modelName = 'gpt-4o',
+    this.modelName = 'gemini-1.5-flash',
     this.draftMessage,
     this.systemPrompt,
     this.isUserToUser = false,

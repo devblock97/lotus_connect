@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/person_message_bubble.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/active_conversation_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -30,7 +30,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         ref
-            .read(conversationListProvider.notifier)
+            .read(privateConversationListProvider.notifier)
             .selectConversation(widget.conversationId);
         ref
             .read(webSocketServiceProvider)
@@ -67,7 +67,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final conversations = ref.watch(conversationListProvider).conversations;
+    final conversations = ref.watch(privateConversationListProvider).conversations;
     Conversation? conversation;
     for (final item in conversations) {
       if (item.id == widget.conversationId) {
@@ -75,11 +75,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         break;
       }
     }
-    final activeState = ref.watch(activeConversationProvider);
-    final activeNotifier = ref.read(activeConversationProvider.notifier);
+    final activeState = ref.watch(privateActiveConversationProvider);
+    final activeNotifier = ref.read(privateActiveConversationProvider.notifier);
     final friends = ref.watch(contactsProvider).friends;
 
-    ref.listen<ActiveConversationState>(activeConversationProvider, (_, next) {
+    ref.listen<PrivateActiveConversationState>(privateActiveConversationProvider, (_, next) {
       if (next.conversationId == widget.conversationId &&
           next.messages.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
@@ -89,14 +89,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (conversation == null || !conversation.isUserToUser) {
       return const Scaffold(
         body: Center(
-            child: Text('This private conversation is no longer available.')),
+          child: Text('This private conversation is no longer available.'),
+        ),
       );
     }
     final privateConversation = conversation;
     User? friend;
-    for (final item in friends) {
-      if (item.id == privateConversation.peerId) {
-        friend = item;
+    for (final f in friends) {
+      if (f.id == privateConversation.peerId) {
+        friend = f;
         break;
       }
     }
@@ -104,7 +105,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 0,
         title: Row(
           children: [
             CircleAvatar(
@@ -121,7 +121,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    loc.privateConversation,
+                    'Private conversation',
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).textTheme.bodySmall?.color,

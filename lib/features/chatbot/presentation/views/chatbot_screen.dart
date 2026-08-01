@@ -4,8 +4,8 @@ import 'package:lotus_connect/features/chatbot/application/active_conversation_n
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/message_bubble.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/typing_indicator.dart';

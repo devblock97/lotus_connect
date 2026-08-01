@@ -8,9 +8,10 @@ import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dar
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/alerts_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -85,7 +86,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           return;
         }
 
-        final localDataSource = ref.read(chatbotLocalDataSourceProvider);
+        final localDataSource = ref.read(chatCoreLocalDataSourceProvider);
 
         var peerDisplayName = _nameFromMessagePayload(payload);
         if (peerDisplayName == null && senderId.isNotEmpty) {

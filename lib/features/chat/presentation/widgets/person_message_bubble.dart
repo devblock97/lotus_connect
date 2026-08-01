@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 /// Compact, conversational bubble used only for person-to-person messages.
 class PersonMessageBubble extends StatelessWidget {
