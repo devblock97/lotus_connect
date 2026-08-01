@@ -100,4 +100,61 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noConfigRequired => 'モックモードはエンドポイント設定不要です。';
+
+  @override
+  String get voiceCall => '音声通話';
+
+  @override
+  String get videoCall => 'ビデオ通話';
+
+  @override
+  String get privateConversation => 'プライベートチャット';
+
+  @override
+  String get contactsAndFriends => '連絡先と友達';
+
+  @override
+  String get startChatWithUserUuid => 'ユーザー(UUID)とチャットを開始';
+
+  @override
+  String get viewContactsAndFriends => '連絡先と友達を表示';
+
+  @override
+  String get addFriend => '友達を追加';
+
+  @override
+  String get enterUsernameToSendRequest => '友達リクエストを送信するユーザーのユーザー名を入力してください：';
+
+  @override
+  String get cancel => 'キャンセル';
+
+  @override
+  String get sendRequest => 'リクエストを送信';
+
+  @override
+  String get contacts => '連絡先';
+
+  @override
+  String get refreshContacts => '連絡先を更新';
+
+  @override
+  String get viewMore => 'もっと見る';
+
+  @override
+  String get add => '追加';
+
+  @override
+  String get friendRequests => '友達リクエスト';
+
+  @override
+  String get accept => '承諾';
+
+  @override
+  String get reject => '拒否';
+
+  @override
+  String get decline => '辞退';
+
+  @override
+  String get chat => 'チャット';
 }

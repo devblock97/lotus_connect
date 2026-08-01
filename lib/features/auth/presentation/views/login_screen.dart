@@ -111,7 +111,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showServerConfigDialog() {
     final settings = ref.read(settingsProvider);
-    _serverHostController.text = 'https://6efb-2001-ee0-1b35-c5cc-bc4a-743c-f92d-1969.ngrok-free.app/api/v1';
+    _serverHostController.text = 'https://be10-2001-ee0-1b38-2b4c-2838-129a-ce08-7508.ngrok-free.app/api/v1';
 
     showDialog(
       context: context,

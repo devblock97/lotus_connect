@@ -103,4 +103,62 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get noConfigRequired => 'Chế độ mô phỏng không yêu cầu cấu hình mạng.';
+
+  @override
+  String get voiceCall => 'Cuộc gọi thoại';
+
+  @override
+  String get videoCall => 'Cuộc gọi video';
+
+  @override
+  String get privateConversation => 'Trò chuyện riêng tư';
+
+  @override
+  String get contactsAndFriends => 'Danh bạ & Bạn bè';
+
+  @override
+  String get startChatWithUserUuid => 'Bắt đầu trò chuyện bằng UUID';
+
+  @override
+  String get viewContactsAndFriends => 'Xem Danh bạ & Bạn bè';
+
+  @override
+  String get addFriend => 'Thêm bạn bè';
+
+  @override
+  String get enterUsernameToSendRequest =>
+      'Nhập tên đăng nhập của người dùng để gửi lời mời kết bạn:';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get sendRequest => 'Gửi yêu cầu';
+
+  @override
+  String get contacts => 'Danh bạ';
+
+  @override
+  String get refreshContacts => 'Làm mới danh bạ';
+
+  @override
+  String get viewMore => 'Xem thêm';
+
+  @override
+  String get add => 'Thêm';
+
+  @override
+  String get friendRequests => 'Lời mời kết bạn';
+
+  @override
+  String get accept => 'Chấp nhận';
+
+  @override
+  String get reject => 'Từ chối';
+
+  @override
+  String get decline => 'Từ chối';
+
+  @override
+  String get chat => 'Trò chuyện';
 }

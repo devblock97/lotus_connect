@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Interceptor to log outgoing requests, responses, and errors.
 class LoggingInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (kDebugMode) {
-      debugPrint('--> ${options.method} ${options.uri}');
-      debugPrint('Headers: ${options.headers}');
+      AppLogger.debug('--> ${options.method} ${options.uri}');
+      AppLogger.debug('Headers: ${options.headers}');
       if (options.data != null) {
-        debugPrint('Body: ${options.data}');
+        AppLogger.debug('Body: ${options.data}');
       }
     }
     handler.next(options);
@@ -21,7 +22,7 @@ class LoggingInterceptor extends Interceptor {
     ResponseInterceptorHandler handler,
   ) {
     if (kDebugMode) {
-      debugPrint(
+      AppLogger.debug(
         '<-- ${response.statusCode} ${response.requestOptions.uri}',
       );
     }
@@ -31,7 +32,7 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (kDebugMode) {
-      debugPrint(
+      AppLogger.error(
         '<-- ERROR ${err.response?.statusCode} ${err.requestOptions.uri}: ${err.message}',
       );
     }

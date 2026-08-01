@@ -1967,26 +1967,66 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 if (!isFriend) ...[
-                  _buildActionButton(
-                    icon: Icons.person_add_alt_1,
-                    label: user.friendshipStatus == 'pending' ? 'Accept' : 'Add Friend',
-                    color: theme.colorScheme.primary,
-                    onTap: () async {
-                      if (user.friendshipStatus == 'pending') {
-                        await ref.read(contactsProvider.notifier).acceptFriendRequest(user.friendshipSenderId!);
-                        return;
-                      }
-                      final success = await ref.read(contactsProvider.notifier).sendFriendRequest(user.username);
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(success ? 'Friend request sent to @${user.username}' : 'Failed to send request'),
-                            backgroundColor: success ? Colors.green : Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                  if (user.friendshipStatus == 'pending') ...[
+                    if (user.friendshipSenderId == ref.watch(settingsProvider).userId)
+                      _buildActionButton(
+                        icon: Icons.hourglass_empty_outlined,
+                        label: 'Requested',
+                        color: Colors.amber.shade800,
+                        onTap: () {},
+                      )
+                    else ...[
+                      _buildActionButton(
+                        icon: Icons.check,
+                        label: 'Accept',
+                        color: Colors.green,
+                        onTap: () async {
+                          final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(user.id);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(success ? 'Friend request accepted!' : 'Failed to accept request'),
+                                backgroundColor: success ? Colors.green : Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      _buildActionButton(
+                        icon: Icons.close,
+                        label: 'Reject',
+                        color: Colors.red,
+                        onTap: () async {
+                          final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(user.id);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(success ? 'Friend request rejected!' : 'Failed to reject request'),
+                                backgroundColor: success ? Colors.green : Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ] else ...[
+                    _buildActionButton(
+                      icon: Icons.person_add_alt_1,
+                      label: 'Add Friend',
+                      color: theme.colorScheme.primary,
+                      onTap: () async {
+                        final success = await ref.read(contactsProvider.notifier).sendFriendRequest(user.username);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(success ? 'Friend request sent to @${user.username}' : 'Failed to send request'),
+                              backgroundColor: success ? Colors.green : Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ],
                 // Send Message Action
                 _buildActionButton(

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Service managing dynamic, resilient WebSocket connections to the Rust gateway.
 class WebSocketService {
@@ -36,17 +37,17 @@ class WebSocketService {
     final serverHost = settings.serverHost;
 
     if (token.isEmpty) {
-      debugPrint('WS Connection aborted: Access Token is empty');
+      AppLogger.warning('WS Connection aborted: Access Token is empty');
       return;
     }
 
     final wsUrl = _buildWsUrl(serverHost, token);
-    debugPrint('WS Connecting to: $wsUrl');
+    AppLogger.info('WS Connecting to: $wsUrl');
 
     try {
       _socket = await WebSocket.connect(wsUrl).timeout(const Duration(seconds: 10));
       _reconnectDelaySeconds = 2;
-      debugPrint('WS Connected successfully');
+      AppLogger.info('WS Connected successfully');
 
       // Start listening and heartbeat loop
       _socket!.listen(
@@ -58,7 +59,7 @@ class WebSocketService {
 
       _startHeartbeat();
     } catch (e) {
-      debugPrint('WS Connection failed: $e');
+      AppLogger.error('WS Connection failed: $e');
       _scheduleReconnect();
     }
   }
@@ -68,12 +69,12 @@ class WebSocketService {
     _socket = null;
     _stopHeartbeat();
     _cancelReconnect();
-    debugPrint('WS Disconnected');
+    AppLogger.info('WS Disconnected');
   }
 
   void send(String event, Map<String, dynamic> payload) {
     if (!isConnected) {
-      debugPrint('WS Send aborted: Socket is not open');
+      AppLogger.warning('WS Send aborted: Socket is not open');
       return;
     }
 
@@ -120,17 +121,17 @@ class WebSocketService {
       final decoded = json.decode(message.toString()) as Map<String, dynamic>;
       _eventStreamController.add(decoded);
     } catch (e) {
-      debugPrint('WS Parsing error on frame: $message, error: $e');
+      AppLogger.error('WS Parsing error on frame: $message, error: $e');
     }
   }
 
   void _onConnectionError(dynamic error) {
-    debugPrint('WS Socket error encountered: $error');
+    AppLogger.error('WS Socket error encountered: $error');
     _scheduleReconnect();
   }
 
   void _onConnectionClosed() {
-    debugPrint('WS Connection closed by host');
+    AppLogger.warning('WS Connection closed by host');
     _socket = null;
     _stopHeartbeat();
     _scheduleReconnect();
@@ -157,7 +158,7 @@ class WebSocketService {
     _stopHeartbeat();
     _reconnectTimer?.cancel();
 
-    debugPrint('WS Reconnecting in $_reconnectDelaySeconds seconds...');
+    AppLogger.info('WS Reconnecting in $_reconnectDelaySeconds seconds...');
     _reconnectTimer = Timer(Duration(seconds: _reconnectDelaySeconds), () {
       _reconnectDelaySeconds = (_reconnectDelaySeconds * 2).clamp(2, 60);
       connect();

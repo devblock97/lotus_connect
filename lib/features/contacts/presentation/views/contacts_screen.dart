@@ -5,7 +5,9 @@ import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
+import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Premium, high-fidelity screen displaying friends lists and contacts actions.
 class ContactsScreen extends ConsumerStatefulWidget {
@@ -28,17 +30,18 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   }
 
   void _showAddFriendDialog(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Friend'),
+        title: Text(loc.addFriend),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Enter the username of the user you want to add:',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              loc.enterUsernameToSendRequest,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -54,7 +57,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -86,7 +89,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 }
               }
             },
-            child: const Text('Send Request'),
+            child: Text(loc.sendRequest),
           ),
         ],
       ),
@@ -95,6 +98,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final state = ref.watch(contactsProvider);
 
@@ -113,19 +117,19 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contacts',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(loc.contacts,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add_alt_1),
             onPressed: () => _showAddFriendDialog(context),
-            tooltip: 'Add Friend',
+            tooltip: loc.addFriend,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(contactsProvider.notifier).loadFriends(),
-            tooltip: 'Refresh Contacts',
+            tooltip: loc.refreshContacts,
           ),
         ],
       ),
@@ -220,7 +224,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                                           ),
                                         );
                                       },
-                                      child: const Text('View more'),
+                                      child: Text(loc.viewMore),
                                     ),
                                   ),
                                 ),
@@ -297,12 +301,98 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   }
 
   Widget _buildGlobalUserItem(ThemeData theme, User user) {
+    final loc = AppLocalizations.of(context)!;
     final displayName = user.fullName ?? user.username;
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
         : '?';
     final avatarColor =
         Colors.primaries[user.username.hashCode % Colors.primaries.length];
+    final currentUserId = ref.watch(settingsProvider).userId;
+
+    Widget trailingWidget;
+
+    if (user.friendshipStatus == 'pending') {
+      if (user.friendshipSenderId == currentUserId) {
+        trailingWidget = Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.amber.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.amber.shade200),
+          ),
+          child: Text(
+            'Requested',
+            style: TextStyle(color: Colors.amber.shade800, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        );
+      } else {
+        trailingWidget = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () async {
+                final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(user.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(success ? 'Friend request accepted!' : 'Failed to accept request'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              },
+              tooltip: loc.accept,
+            ),
+            IconButton(
+              icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+              onPressed: () async {
+                final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(user.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(success ? 'Friend request rejected!' : 'Failed to reject request'),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              },
+              tooltip: loc.reject,
+            ),
+          ],
+        );
+      }
+    } else {
+      trailingWidget = ElevatedButton.icon(
+        onPressed: () async {
+          final success = await ref
+              .read(contactsProvider.notifier)
+              .sendFriendRequest(user.username);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(success
+                    ? 'Friend request sent to @${user.username}'
+                    : 'Failed to send request'),
+                backgroundColor: success ? Colors.green : Colors.red,
+              ),
+            );
+          }
+        },
+        icon: const Icon(Icons.person_add_alt_1, size: 16),
+        label: Text(loc.add, style: const TextStyle(fontSize: 12)),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }
 
     return ListTile(
       contentPadding:
@@ -322,38 +412,12 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         '@${user.username}',
         style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
       ),
-      trailing: ElevatedButton.icon(
-        onPressed: () async {
-          final success = await ref
-              .read(contactsProvider.notifier)
-              .sendFriendRequest(user.username);
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(success
-                    ? 'Friend request sent to @${user.username}'
-                    : 'Failed to send request'),
-                backgroundColor: success ? Colors.green : Colors.red,
-              ),
-            );
-          }
-        },
-        icon: const Icon(Icons.person_add_alt_1, size: 16),
-        label: const Text('Add', style: TextStyle(fontSize: 12)),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
+      trailing: trailingWidget,
     );
   }
 
   Widget _buildFriendItem(ThemeData theme, User friend) {
+    final loc = AppLocalizations.of(context)!;
     final displayName = friend.fullName ?? friend.username;
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
@@ -389,19 +453,19 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             icon: Icon(Icons.chat_bubble_outline,
                 color: theme.colorScheme.primary),
             onPressed: () => _startPrivateChat(friend),
-            tooltip: 'Chat',
+            tooltip: loc.chat,
           ),
           // Voice Call Button
           IconButton(
             icon: const Icon(Icons.phone_outlined, color: Colors.blue),
             onPressed: () => _startCall(friend.id, isVideo: false),
-            tooltip: 'Voice Call',
+            tooltip: loc.voiceCall,
           ),
           // Video Call Button
           IconButton(
             icon: const Icon(Icons.videocam_outlined, color: Colors.green),
             onPressed: () => _startCall(friend.id, isVideo: true),
-            tooltip: 'Video Call',
+            tooltip: loc.videoCall,
           ),
         ],
       ),
@@ -464,6 +528,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   }
 
   Widget _buildRequestItem(ThemeData theme, User requestUser) {
+    final loc = AppLocalizations.of(context)!;
     final displayName = requestUser.fullName ?? requestUser.username;
     final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
     final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
@@ -501,7 +566,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 );
               }
             },
-            tooltip: 'Decline',
+            tooltip: loc.decline,
           ),
           IconButton(
             icon: const Icon(Icons.check, color: Colors.green),
@@ -516,7 +581,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 );
               }
             },
-            tooltip: 'Accept',
+            tooltip: loc.accept,
           ),
         ],
       ),
@@ -529,12 +594,13 @@ class AllFriendRequestsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final state = ref.watch(contactsProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Friend Requests', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(loc.friendRequests, style: const TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
       ),
       body: RefreshIndicator(
@@ -593,6 +659,7 @@ class AllFriendRequestsScreen extends ConsumerWidget {
   }
 
   Widget _buildRequestItem(BuildContext context, WidgetRef ref, User requestUser) {
+    final loc = AppLocalizations.of(context)!;
     final displayName = requestUser.fullName ?? requestUser.username;
     final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
     final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
@@ -630,7 +697,7 @@ class AllFriendRequestsScreen extends ConsumerWidget {
                 );
               }
             },
-            tooltip: 'Decline',
+            tooltip: loc.decline,
           ),
           IconButton(
             icon: const Icon(Icons.check, color: Colors.green),
@@ -645,7 +712,7 @@ class AllFriendRequestsScreen extends ConsumerWidget {
                 );
               }
             },
-            tooltip: 'Accept',
+            tooltip: loc.accept,
           ),
         ],
       ),
@@ -653,6 +720,7 @@ class AllFriendRequestsScreen extends ConsumerWidget {
   }
 
   Widget _buildFriendItem(BuildContext context, WidgetRef ref, ThemeData theme, User friend) {
+    final loc = AppLocalizations.of(context)!;
     final displayName = friend.fullName ?? friend.username;
     final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
     final avatarColor = Colors.primaries[friend.username.hashCode % Colors.primaries.length];
@@ -680,17 +748,17 @@ class AllFriendRequestsScreen extends ConsumerWidget {
           IconButton(
             icon: Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
             onPressed: () => _startPrivateChat(context, ref, friend),
-            tooltip: 'Chat',
+            tooltip: loc.chat,
           ),
           IconButton(
             icon: const Icon(Icons.phone_outlined, color: Colors.blue),
             onPressed: () => _startCall(context, ref, friend.id, isVideo: false),
-            tooltip: 'Voice Call',
+            tooltip: loc.voiceCall,
           ),
           IconButton(
             icon: const Icon(Icons.videocam_outlined, color: Colors.green),
             onPressed: () => _startCall(context, ref, friend.id, isVideo: true),
-            tooltip: 'Video Call',
+            tooltip: loc.videoCall,
           ),
         ],
       ),
