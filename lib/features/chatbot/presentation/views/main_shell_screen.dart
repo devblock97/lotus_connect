@@ -11,9 +11,12 @@ import 'package:lotus_connect/features/chatbot/application/settings_notifier.dar
 import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chatbot/presentation/views/alerts_screen.dart';
+import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 class MainShellScreen extends ConsumerStatefulWidget {
   const MainShellScreen({super.key});
@@ -43,7 +46,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         .read(webSocketServiceProvider)
         .eventStream
         .listen((eventFrame) async {
-      debugPrint('WS Event received: $eventFrame');
+      AppLogger.debug('WS Event received: $eventFrame');
       final event = eventFrame['event'] as String?;
       final payload = eventFrame['payload'] as Map<String, dynamic>? ?? {};
 
@@ -62,23 +65,23 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
             : DateTime.now();
 
-        debugPrint(
+        AppLogger.debug(
             'WS message parsed - id: $messageId, conv: $conversationId, sender: $senderId, content: $content');
 
         if (conversationId.isEmpty) {
-          debugPrint('WS message ignored: empty conversationId');
+          AppLogger.warning('WS message ignored: empty conversationId');
           return;
         }
 
         final currentUserId = ref.read(settingsProvider).userId;
         final isFromSelf = senderId.isNotEmpty && senderId == currentUserId;
 
-        debugPrint(
+        AppLogger.debug(
             'WS check self - currentUserId: $currentUserId, isFromSelf: $isFromSelf');
 
         // Sender already saved their message locally upon tapping send. Ignore self echo frames.
         if (isFromSelf) {
-          debugPrint('WS Ignoring self echo frame');
+          AppLogger.debug('WS Ignoring self echo frame');
           return;
         }
 
@@ -114,7 +117,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             isUserToUser: true,
             peerId: senderId,
           );
-          debugPrint(
+          AppLogger.info(
               'WS Auto-created conversation $conversationId for peer $senderId');
         } else if (existingConversation.title == _fallbackPeerName(senderId)) {
           await localDataSource.renameConversation(
@@ -134,7 +137,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         );
 
         await localDataSource.saveMessage(message);
-        debugPrint('WS Saved incoming message to SQLite');
+        AppLogger.info('WS Saved incoming message to SQLite');
+      } else if (event == 'notification:new') {
+        ref.read(notificationsProvider.notifier).loadNotifications();
       }
     });
   }
@@ -209,10 +214,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         },
       ),
       const CallsScreen(),
-      PlaceholderTab(
-        title: loc.tabAlerts,
-        icon: Icons.notifications_none_rounded,
-      ),
+      const AlertsScreen(),
       const SettingsScreen(),
     ];
 

@@ -7,6 +7,9 @@ import 'package:lotus_connect/features/chatbot/application/active_conversation_n
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
+import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Dedicated screen for private, person-to-person conversations.
 class ChatScreen extends ConsumerStatefulWidget {
@@ -25,14 +28,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(conversationListProvider.notifier)
-          .selectConversation(widget.conversationId);
+      try {
+        ref
+            .read(conversationListProvider.notifier)
+            .selectConversation(widget.conversationId);
+        ref
+            .read(webSocketServiceProvider)
+            .send('chat:focus', {'conversationId': widget.conversationId});
+      } catch (e) {
+        AppLogger.error('Error in ChatScreen initState callback: $e');
+      }
     });
   }
 
   @override
   void dispose() {
+    try {
+      ref
+          .read(webSocketServiceProvider)
+          .send('chat:focus', {'conversationId': null});
+    } catch (e) {
+      AppLogger.error('Error in ChatScreen dispose callback: $e');
+    }
     _scrollController.dispose();
     super.dispose();
   }
@@ -49,6 +66,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final conversations = ref.watch(conversationListProvider).conversations;
     Conversation? conversation;
     for (final item in conversations) {
@@ -103,7 +121,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'Private conversation',
+                    loc.privateConversation,
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).textTheme.bodySmall?.color,
@@ -118,11 +136,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           IconButton(
               icon: const Icon(Icons.call_outlined),
               onPressed: () {},
-              tooltip: 'Voice call'),
+              tooltip: loc.voiceCall),
           IconButton(
               icon: const Icon(Icons.videocam_outlined),
               onPressed: () {},
-              tooltip: 'Video call'),
+              tooltip: loc.videoCall),
         ],
       ),
       body: Column(

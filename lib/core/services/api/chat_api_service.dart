@@ -166,6 +166,26 @@ class ChatApiService {
       throw ServerException('Failed to fetch call history: $e');
     }
   }
+
+  /// Fetches the user's notification list.
+  Future<List<Map<String, dynamic>>> getNotifications() async {
+    try {
+      final response = await dioClient.get('/users/notifications');
+      final list = response.data as List<dynamic>;
+      return list.map((item) => item as Map<String, dynamic>).toList();
+    } catch (e) {
+      throw ServerException('Failed to get notifications: $e');
+    }
+  }
+
+  /// Marks all notifications as read.
+  Future<void> markNotificationsRead() async {
+    try {
+      await dioClient.post('/users/notifications/read');
+    } catch (e) {
+      throw ServerException('Failed to mark notifications as read: $e');
+    }
+  }
 }
 
 /// Global provider for ChatApiService REST client.

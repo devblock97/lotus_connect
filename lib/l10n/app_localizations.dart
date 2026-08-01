@@ -287,6 +287,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mock mode does not require any endpoint configuration.'**
   String get noConfigRequired;
+
+  /// No description provided for @voiceCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice call'**
+  String get voiceCall;
+
+  /// No description provided for @videoCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Video call'**
+  String get videoCall;
+
+  /// No description provided for @privateConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Private conversation'**
+  String get privateConversation;
+
+  /// No description provided for @contactsAndFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts & Friends'**
+  String get contactsAndFriends;
+
+  /// No description provided for @startChatWithUserUuid.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Chat with User (UUID)'**
+  String get startChatWithUserUuid;
+
+  /// No description provided for @viewContactsAndFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'View Contacts & Friends'**
+  String get viewContactsAndFriends;
+
+  /// No description provided for @addFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Friend'**
+  String get addFriend;
+
+  /// No description provided for @enterUsernameToSendRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter username of the user to send a friend request to:'**
+  String get enterUsernameToSendRequest;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @sendRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Request'**
+  String get sendRequest;
+
+  /// No description provided for @contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get contacts;
+
+  /// No description provided for @refreshContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Contacts'**
+  String get refreshContacts;
+
+  /// No description provided for @viewMore.
+  ///
+  /// In en, this message translates to:
+  /// **'View more'**
+  String get viewMore;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @friendRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend Requests'**
+  String get friendRequests;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
+
+  /// No description provided for @decline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
+  /// No description provided for @chat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chat;
 }
 
 class _AppLocalizationsDelegate

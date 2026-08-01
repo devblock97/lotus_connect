@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -7,6 +8,7 @@ import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// UI state for active conversation chat window.
 class ActiveConversationState {
@@ -102,6 +104,41 @@ class ActiveConversationNotifier
           },
         );
       });
+      _syncRemoteMessages(conversationId);
+    }
+  }
+
+  Future<void> _syncRemoteMessages(String conversationId) async {
+    try {
+      final apiService = _ref.read(chatApiServiceProvider);
+      final remoteMsgs = await apiService.getMessages(conversationId: conversationId);
+      final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
+
+      for (final raw in remoteMsgs) {
+        final currentUserId = _ref.read(settingsProvider).userId;
+        final senderId = (raw['senderId'] ?? raw['sender_id']) as String? ?? '';
+        final role = senderId == currentUserId
+            ? MessageRole.user
+            : MessageRole.assistant;
+
+        final timestampStr = raw['createdAt'] ?? raw['created_at'];
+        final timestamp = timestampStr != null
+            ? DateTime.tryParse(timestampStr as String) ?? DateTime.now()
+            : DateTime.now();
+
+        final message = Message(
+          id: raw['id'] as String,
+          conversationId: conversationId,
+          role: role,
+          content: raw['content'] as String? ?? '',
+          timestamp: timestamp,
+          isError: false,
+          status: MessageStatus.sent,
+        );
+        await localDataSource.saveMessage(message);
+      }
+    } catch (e) {
+      AppLogger.error('failed to sync remote messages: $e');
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Conversation history list view drawer / tab matching image2 mock.
 class ConversationListView extends ConsumerWidget {
@@ -19,6 +20,7 @@ class ConversationListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final state = ref.watch(conversationListProvider);
     final notifier = ref.read(conversationListProvider.notifier);
@@ -32,15 +34,15 @@ class ConversationListView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Chats',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        title: Text(
+          loc.tabChats,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.contacts_outlined),
             onPressed: () => context.push('/contacts'),
-            tooltip: 'Contacts & Friends',
+            tooltip: loc.contactsAndFriends,
           ),
         ],
       ),
@@ -58,7 +60,7 @@ class ConversationListView extends ConsumerWidget {
                     ListTile(
                       leading:
                           const Icon(Icons.person_outline, color: Colors.green),
-                      title: const Text('Start Chat with User (UUID)'),
+                      title: Text(loc.startChatWithUserUuid),
                       onTap: () {
                         Navigator.pop(context);
                         _showStartPrivateChatDialog(context, ref, notifier);
@@ -67,7 +69,7 @@ class ConversationListView extends ConsumerWidget {
                     ListTile(
                       leading: const Icon(Icons.contacts_outlined,
                           color: Colors.amber),
-                      title: const Text('View Contacts & Friends'),
+                      title: Text(loc.viewContactsAndFriends),
                       onTap: () {
                         Navigator.pop(context);
                         context.push('/contacts');
@@ -293,6 +295,7 @@ class ConversationListView extends ConsumerWidget {
     WidgetRef ref,
     ConversationListNotifier notifier,
   ) {
+    final loc = AppLocalizations.of(context)!;
     final friendIdController = TextEditingController();
     final titleController = TextEditingController();
     final screenContext = context;
@@ -327,7 +330,7 @@ class ConversationListView extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
+              child: Text(loc.cancel),
             ),
             ElevatedButton(
               onPressed: () async {

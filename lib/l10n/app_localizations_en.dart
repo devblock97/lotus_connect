@@ -104,4 +104,62 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noConfigRequired =>
       'Mock mode does not require any endpoint configuration.';
+
+  @override
+  String get voiceCall => 'Voice call';
+
+  @override
+  String get videoCall => 'Video call';
+
+  @override
+  String get privateConversation => 'Private conversation';
+
+  @override
+  String get contactsAndFriends => 'Contacts & Friends';
+
+  @override
+  String get startChatWithUserUuid => 'Start Chat with User (UUID)';
+
+  @override
+  String get viewContactsAndFriends => 'View Contacts & Friends';
+
+  @override
+  String get addFriend => 'Add Friend';
+
+  @override
+  String get enterUsernameToSendRequest =>
+      'Enter username of the user to send a friend request to:';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get sendRequest => 'Send Request';
+
+  @override
+  String get contacts => 'Contacts';
+
+  @override
+  String get refreshContacts => 'Refresh Contacts';
+
+  @override
+  String get viewMore => 'View more';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get friendRequests => 'Friend Requests';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get reject => 'Reject';
+
+  @override
+  String get decline => 'Decline';
+
+  @override
+  String get chat => 'Chat';
 }

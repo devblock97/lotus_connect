@@ -100,4 +100,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noConfigRequired => '模拟模式无需配置任何终结点。';
+
+  @override
+  String get voiceCall => '语音通话';
+
+  @override
+  String get videoCall => '视频通话';
+
+  @override
+  String get privateConversation => '私密对话';
+
+  @override
+  String get contactsAndFriends => '联系人与好友';
+
+  @override
+  String get startChatWithUserUuid => '与用户(UUID)开始聊天';
+
+  @override
+  String get viewContactsAndFriends => '查看联系人与好友';
+
+  @override
+  String get addFriend => '添加好友';
+
+  @override
+  String get enterUsernameToSendRequest => '输入要发送好友请求的用户的用户名：';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get sendRequest => '发送请求';
+
+  @override
+  String get contacts => '联系人';
+
+  @override
+  String get refreshContacts => '刷新联系人';
+
+  @override
+  String get viewMore => '查看更多';
+
+  @override
+  String get add => '添加';
+
+  @override
+  String get friendRequests => '好友请求';
+
+  @override
+  String get accept => '接受';
+
+  @override
+  String get reject => '拒绝';
+
+  @override
+  String get decline => '谢绝';
+
+  @override
+  String get chat => '聊天';
 }
