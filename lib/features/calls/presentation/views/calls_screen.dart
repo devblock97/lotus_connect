@@ -11,6 +11,7 @@ import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -1223,13 +1224,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Future<void> _startPrivateChat(User friend) async {
-    final conv = await ref.read(conversationListProvider.notifier).createNewPrivateChat(
+    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
           friendId: friend.id,
           title: friend.fullName ?? friend.username,
         );
 
     if (conv != null) {
-      ref.read(shellIndexProvider.notifier).state = 0; // Switch to Chats/chatbot view
+      ref.read(shellIndexProvider.notifier).state = 1; // Switch to Chats tab
     }
   }
 
@@ -2035,12 +2036,12 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                   color: Colors.grey.shade700,
                   onTap: () async {
                     final currentContext = context;
-                    final conv = await ref.read(conversationListProvider.notifier).createNewPrivateChat(
+                    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
                           friendId: user.id,
                           title: user.fullName ?? user.username,
                         );
                     if (conv != null && currentContext.mounted) {
-                      ref.read(shellIndexProvider.notifier).state = 0; // Switch to Chats tab
+                      ref.read(shellIndexProvider.notifier).state = 1; // Switch to Chats tab
                       Navigator.of(currentContext).popUntil((route) => route.isFirst);
                     }
                   },

@@ -4,12 +4,11 @@ import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
-import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 
-/// UI state for conversation history list.
-class ConversationListState {
-  const ConversationListState({
+/// UI state for private human-to-human conversation history list.
+class PrivateConversationListState {
+  const PrivateConversationListState({
     this.conversations = const [],
     this.selectedConversationId,
     this.searchQuery = '',
@@ -23,7 +22,7 @@ class ConversationListState {
   final bool isLoading;
   final String? errorMessage;
 
-  /// Returns only the conversations matching the search query filter.
+  /// Returns only the conversations filtered by title.
   List<Conversation> get filteredConversations {
     final query = searchQuery.trim().toLowerCase();
     if (query.isEmpty) return conversations;
@@ -32,14 +31,14 @@ class ConversationListState {
         .toList();
   }
 
-  ConversationListState copyWith({
+  PrivateConversationListState copyWith({
     List<Conversation>? conversations,
     String? selectedConversationId,
     String? searchQuery,
     bool? isLoading,
     String? errorMessage,
   }) {
-    return ConversationListState(
+    return PrivateConversationListState(
       conversations: conversations ?? this.conversations,
       selectedConversationId:
           selectedConversationId ?? this.selectedConversationId,
@@ -50,9 +49,11 @@ class ConversationListState {
   }
 }
 
-/// Notifier managing AI chatbot conversation lists and search state.
-class ConversationListNotifier extends StateNotifier<ConversationListState> {
-  ConversationListNotifier(this._ref) : super(const ConversationListState()) {
+/// Notifier managing private conversation list and search state.
+class PrivateConversationListNotifier
+    extends StateNotifier<PrivateConversationListState> {
+  PrivateConversationListNotifier(this._ref)
+      : super(const PrivateConversationListState()) {
     _initStream();
   }
 
@@ -67,9 +68,9 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
           errorMessage: failure.message,
         ),
         (conversations) {
-          // Filter to AI conversations only
-          final aiConversations = conversations.where((c) => !c.isUserToUser);
-          final sorted = List<Conversation>.from(aiConversations)
+          // Filter to user conversations only
+          final userConversations = conversations.where((c) => c.isUserToUser);
+          final sorted = List<Conversation>.from(userConversations)
             ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
           String? currentSelected = state.selectedConversationId;
@@ -97,16 +98,17 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
     state = state.copyWith(selectedConversationId: conversationId);
   }
 
-  /// Creates a new AI conversation.
-  Future<Conversation?> createNewConversation({
-    String title = 'New Conversation',
-    String? modelName,
+  /// Creates a new private conversation with a friend.
+  Future<Conversation?> createNewPrivateChat({
+    required String friendId,
+    required String title,
   }) async {
-    final createUseCase = _ref.read(createConversationUseCaseProvider);
-    final result = await createUseCase(
-      CreateConversationParams(title: title, modelName: modelName),
+    final repository = _ref.read(privateChatRepositoryProvider);
+    final result = await repository.createPrivateChat(
+      friendId: friendId,
+      title: title,
     );
-    return result.fold<Conversation?>(
+    return result.fold(
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
         return null;
@@ -137,9 +139,8 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
   }
 }
 
-/// Provider for ConversationListNotifier.
-final conversationListProvider =
-    StateNotifierProvider<ConversationListNotifier, ConversationListState>(
-        (ref) {
-  return ConversationListNotifier(ref);
+/// Provider for PrivateConversationListNotifier.
+final privateConversationListProvider = StateNotifierProvider<
+    PrivateConversationListNotifier, PrivateConversationListState>((ref) {
+  return PrivateConversationListNotifier(ref);
 });

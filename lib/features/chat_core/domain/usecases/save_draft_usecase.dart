@@ -1,8 +1,8 @@
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
+import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
 
-/// Parameters for saving draft messages.
+/// Params for saving conversation draft input text.
 class SaveDraftParams {
   const SaveDraftParams({
     required this.conversationId,
@@ -13,15 +13,18 @@ class SaveDraftParams {
   final String draft;
 }
 
-/// Use case to save unsent message drafts.
+/// Use case to save unsubmitted draft text inputs.
 class SaveDraftUseCase implements UseCase<void, SaveDraftParams> {
-  /// Constructor taking [ChatbotRepository].
+  /// Constructor taking [ChatCoreRepository].
   const SaveDraftUseCase(this._repository);
 
-  final ChatbotRepository _repository;
+  final ChatCoreRepository _repository;
 
   @override
   FutureResult<void> call(SaveDraftParams params) {
-    return _repository.saveDraftMessage(params.conversationId, params.draft);
+    return _repository.saveDraftMessage(
+      params.conversationId,
+      params.draft,
+    );
   }
 }

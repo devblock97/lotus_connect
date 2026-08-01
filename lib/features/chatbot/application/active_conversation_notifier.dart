@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/message.dart';
-import 'package:lotus_connect/features/chatbot/domain/usecases/save_draft_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
-import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 
-/// UI state for active conversation chat window.
+/// UI state for active chatbot window.
 class ActiveConversationState {
   const ActiveConversationState({
     this.conversationId,
@@ -47,7 +45,7 @@ class ActiveConversationState {
   }
 }
 
-/// Notifier managing active conversation chat messages & streaming state.
+/// Notifier managing active chatbot conversation messages & streaming state.
 class ActiveConversationNotifier
     extends StateNotifier<ActiveConversationState> {
   ActiveConversationNotifier(this._ref)
@@ -83,7 +81,7 @@ class ActiveConversationNotifier
     state = ActiveConversationState(conversationId: conversationId);
 
     if (conversationId != null) {
-      final repository = _ref.read(chatbotRepositoryProvider);
+      final repository = _ref.read(chatCoreRepositoryProvider);
       _messageSubscription =
           repository.watchMessages(conversationId).listen((result) {
         result.fold(
@@ -104,41 +102,6 @@ class ActiveConversationNotifier
           },
         );
       });
-      _syncRemoteMessages(conversationId);
-    }
-  }
-
-  Future<void> _syncRemoteMessages(String conversationId) async {
-    try {
-      final apiService = _ref.read(chatApiServiceProvider);
-      final remoteMsgs = await apiService.getMessages(conversationId: conversationId);
-      final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
-
-      for (final raw in remoteMsgs) {
-        final currentUserId = _ref.read(settingsProvider).userId;
-        final senderId = (raw['senderId'] ?? raw['sender_id']) as String? ?? '';
-        final role = senderId == currentUserId
-            ? MessageRole.user
-            : MessageRole.assistant;
-
-        final timestampStr = raw['createdAt'] ?? raw['created_at'];
-        final timestamp = timestampStr != null
-            ? DateTime.tryParse(timestampStr as String) ?? DateTime.now()
-            : DateTime.now();
-
-        final message = Message(
-          id: raw['id'] as String,
-          conversationId: conversationId,
-          role: role,
-          content: raw['content'] as String? ?? '',
-          timestamp: timestamp,
-          isError: false,
-          status: MessageStatus.sent,
-        );
-        await localDataSource.saveMessage(message);
-      }
-    } catch (e) {
-      AppLogger.error('failed to sync remote messages: $e');
     }
   }
 
@@ -175,7 +138,7 @@ class ActiveConversationNotifier
       }
     }
 
-    final repository = _ref.read(chatbotRepositoryProvider);
+    final repository = _ref.read(chatCoreRepositoryProvider);
     final userMessageId = DateTime.now().millisecondsSinceEpoch.toString();
     final userMessage = Message(
       id: userMessageId,
@@ -185,7 +148,7 @@ class ActiveConversationNotifier
       timestamp: DateTime.now(),
     );
 
-    // Update UI IMMEDIATELY so the message bubble shows instantly!
+    // Update UI IMMEDIATELY
     final updatedMessages = [...state.messages, userMessage];
     state = state.copyWith(messages: updatedMessages);
 
@@ -193,21 +156,7 @@ class ActiveConversationNotifier
     await repository.saveMessage(userMessage);
 
     // Clear draft
-    await _ref.read(saveDraftUseCaseProvider)(
-      SaveDraftParams(conversationId: convId, draft: ''),
-    );
-
-    // If it is user-to-user chat, send message over WebSocket and do NOT trigger AI
-    final conversations = _ref.read(conversationListProvider).conversations;
-    final isUserToUser =
-        conversations.any((c) => c.id == convId && c.isUserToUser);
-    if (isUserToUser) {
-      _ref.read(webSocketServiceProvider).sendChatMessage(
-            conversationId: convId,
-            content: trimmedText,
-          );
-      return;
-    }
+    await repository.saveDraftMessage(convId, '');
 
     // Trigger AI response streaming
     await _startAiStreaming(convId, userMessage.content);
@@ -215,7 +164,7 @@ class ActiveConversationNotifier
 
   Future<void> _startAiStreaming(String convId, String userPrompt) async {
     final streamUseCase = _ref.read(streamAiResponseUseCaseProvider);
-    final repository = _ref.read(chatbotRepositoryProvider);
+    final repository = _ref.read(chatCoreRepositoryProvider);
 
     state = state.copyWith(isGenerating: true, streamingContent: '');
 
@@ -283,10 +232,11 @@ class ActiveConversationNotifier
   /// Cancels in-flight generation.
   Future<void> stopGeneration() async {
     await _aiStreamSubscription?.cancel();
-    final repository = _ref.read(chatbotRepositoryProvider);
-    await repository.cancelAiGeneration();
+    final chatbotRepo = _ref.read(chatbotRepositoryProvider);
+    await chatbotRepo.cancelAiGeneration();
 
     if (state.streamingContent.isNotEmpty && state.conversationId != null) {
+      final repository = _ref.read(chatCoreRepositoryProvider);
       final aiMessage = Message(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         conversationId: state.conversationId!,
@@ -325,8 +275,7 @@ class ActiveConversationNotifier
     final convId = state.conversationId;
     if (convId == null) return;
     state = state.copyWith(draftInput: draft);
-    final saveDraft = _ref.read(saveDraftUseCaseProvider);
-    await saveDraft(SaveDraftParams(conversationId: convId, draft: draft));
+    await _ref.read(chatCoreRepositoryProvider).saveDraftMessage(convId, draft);
   }
 
   @override

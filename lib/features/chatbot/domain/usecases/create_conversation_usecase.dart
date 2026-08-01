@@ -1,6 +1,6 @@
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
 
 /// Parameters for creating a new conversation.
