@@ -30,6 +30,7 @@ class ChatbotConversationListScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () async {
           final conversation = await notifier.createNewConversation();
           if (conversation != null && context.mounted) {

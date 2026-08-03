@@ -1,20 +1,21 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
-import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
+import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
-import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 class PrivateChatRepositoryImpl implements PrivateChatRepository {
   PrivateChatRepositoryImpl({
-    required ChatApiService chatApiService,
-    required ChatCoreRepository chatCoreRepository,
-  })  : _chatApiService = chatApiService,
-        _chatCoreRepository = chatCoreRepository;
+    required PrivateChatRemoteDataSource remoteDataSource,
+    required PrivateChatLocalDataSource localDataSource,
+  })  : _remoteDataSource = remoteDataSource,
+        _localDataSource = localDataSource;
 
-  final ChatApiService _chatApiService;
-  final ChatCoreRepository _chatCoreRepository;
+  final PrivateChatRemoteDataSource _remoteDataSource;
+  final PrivateChatLocalDataSource _localDataSource;
 
   @override
   FutureResult<Conversation> createPrivateChat({
@@ -22,18 +23,34 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
     required String title,
   }) async {
     try {
-      final chatData = await _chatApiService.createPrivateChat(friendId);
+      final chatData = await _remoteDataSource.createPrivateChat(friendId);
       final id = chatData['id'] as String;
 
-      final result = await _chatCoreRepository.createLocalConversation(
+      final conversation = await _localDataSource.saveLocalConversation(
         title: title,
         isUserToUser: true,
         peerId: friendId,
         id: id,
       );
-      return result;
+      return Right(conversation);
     } catch (e) {
       return Left(DatabaseFailure('Failed to create private chat: $e', e));
+    }
+  }
+
+  @override
+  FutureResult<Message> sendMessage({
+    required String conversationId,
+    required String content,
+  }) async {
+    try {
+      final remoteMessage = await _remoteDataSource.sendMessage(
+          conversationId: conversationId,
+          content: content,
+      );
+      return Right(remoteMessage);
+    } catch (e) {
+      return Left(ServerFailure('Failed to send message: $e', e));
     }
   }
 }

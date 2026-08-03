@@ -1,5 +1,6 @@
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 abstract class PrivateChatRepository {
   /// Calls remote REST endpoint to create private chat conversation,
@@ -8,4 +9,9 @@ abstract class PrivateChatRepository {
     required String friendId,
     required String title,
   });
+
+  FutureResult<Message> sendMessage({
+    required String conversationId,
+    required String content,
+  }) => throw UnimplementedError('Stub');
 }

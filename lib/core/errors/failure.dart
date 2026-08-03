@@ -81,3 +81,7 @@ class UnknownFailure extends Failure {
   /// Creates an [UnknownFailure].
   const UnknownFailure(super.message, [super.cause]);
 }
+
+class ServerFailure extends Failure {
+  const ServerFailure(super.message, [super.cause]);
+}

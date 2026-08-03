@@ -119,4 +119,14 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
       return Left(DatabaseFailure('Failed to create local conversation: $e', e));
     }
   }
+
+  @override
+  FutureResult<void> deleteMessage(String id) async {
+    try {
+      await _localDataSource.deleteMessage(id);
+      return const Right(null);
+    } catch (e) {
+      return Left(DatabaseFailure('Failed to delete message: $e', e));
+    }
+  }
 }
