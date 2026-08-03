@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
+import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';

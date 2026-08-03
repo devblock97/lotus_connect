@@ -20,6 +20,7 @@ abstract class ChatCoreLocalDataSource {
   Future<void> toggleFavouriteConversation(String conversationId);
   Future<void> saveDraftMessage(String conversationId, String draft);
   Future<void> saveMessage(Message message);
+  Future<void> deleteMessage(String messageId);
 }
 
 class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
@@ -212,5 +213,11 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             status: Value(message.status.name),
           ),
         );
+  }
+
+  @override
+  Future<void> deleteMessage(String messageId) async {
+    await (_db.delete(_db.messageTable)
+      ..where((t) => t.id.equals(messageId))).go();
   }
 }

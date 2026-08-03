@@ -5,6 +5,7 @@ import 'package:lotus_connect/features/chat_core/domain/entities/conversation.da
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
 
 /// UI state for private human-to-human conversation history list.
 class PrivateConversationListState {
@@ -103,10 +104,12 @@ class PrivateConversationListNotifier
     required String friendId,
     required String title,
   }) async {
-    final repository = _ref.read(privateChatRepositoryProvider);
-    final result = await repository.createPrivateChat(
-      friendId: friendId,
-      title: title,
+    final useCase = _ref.read(createPrivateChatUseCaseProvider);
+    final result = await useCase(
+      CreatePrivateChatParams(
+        friendId: friendId,
+        title: title,
+      ),
     );
     return result.fold(
       (failure) {

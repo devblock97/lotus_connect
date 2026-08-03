@@ -89,6 +89,27 @@ class DioClient {
     }
   }
 
+  /// Executes a POST request.
+  Future<Response<T>> delete<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+      }) async {
+    try {
+      return await _dio.post<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
   NetworkException _handleDioException(DioException e) {
     return NetworkException(
       e.message ?? 'Network error occurred',

@@ -23,18 +23,18 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _scrollController = ScrollController();
+  late final WebSocketService _webSocketService;
 
   @override
   void initState() {
     super.initState();
+    _webSocketService = ref.read(webSocketServiceProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         ref
             .read(privateConversationListProvider.notifier)
             .selectConversation(widget.conversationId);
-        ref
-            .read(webSocketServiceProvider)
-            .send('chat:focus', {'conversationId': widget.conversationId});
+        _webSocketService.send('chat:focus', {'conversationId': widget.conversationId});
       } catch (e) {
         AppLogger.error('Error in ChatScreen initState callback: $e');
       }
@@ -44,9 +44,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void dispose() {
     try {
-      ref
-          .read(webSocketServiceProvider)
-          .send('chat:focus', {'conversationId': null});
+      _webSocketService.send('chat:focus', {'conversationId': null});
     } catch (e) {
       AppLogger.error('Error in ChatScreen dispose callback: $e');
     }

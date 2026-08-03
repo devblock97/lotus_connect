@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
-import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 
 /// State representing the active user-to-user conversation message stream.
 class PrivateActiveConversationState {
@@ -86,10 +87,8 @@ class PrivateActiveConversationNotifier
     final convId = state.conversationId;
     if (convId == null) return;
 
-    final repository = _ref.read(chatCoreRepositoryProvider);
-    final userMessageId = DateTime.now().millisecondsSinceEpoch.toString();
     final userMessage = Message(
-      id: userMessageId,
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
       conversationId: convId,
       role: MessageRole.user,
       content: trimmedText,
@@ -99,17 +98,29 @@ class PrivateActiveConversationNotifier
     // Update UI immediately
     state = state.copyWith(messages: [...state.messages, userMessage]);
 
-    // Save message locally
-    await repository.saveMessage(userMessage);
+    final useCase = _ref.read(sendMessageUseCaseProvider);
+    final result = await useCase(
+      SendMessageParams(
+        conversationId: convId,
+        text: trimmedText,
+      ),
+    );
 
-    // Clear draft locally
-    await repository.saveDraftMessage(convId, '');
+    await result.fold(
+      (failure) {
+        state = state.copyWith(errorMessage: failure.message);
+      },
+      (_) async {
+        // Clear draft locally
+        // await _chatCoreRepository.saveDraftMessage(params.conversationId, '');
 
-    // Send over WebSocket
-    _ref.read(webSocketServiceProvider).sendChatMessage(
-          conversationId: convId,
-          content: trimmedText,
-        );
+        // Send over WebSocket
+        // _webSocketService.sendChatMessage(
+        //   conversationId: params.conversationId,
+        //   content: trimmedText,
+        // );
+      },
+    );
   }
 
   /// Updates local draft typing content.

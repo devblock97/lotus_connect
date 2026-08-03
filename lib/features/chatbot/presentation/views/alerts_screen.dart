@@ -5,7 +5,7 @@ import 'package:lotus_connect/features/chatbot/application/conversation_list_not
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chat/presentation/view/chat_screen.dart';
+import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 
 class AlertsScreen extends ConsumerWidget {
   const AlertsScreen({super.key});

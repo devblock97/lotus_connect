@@ -41,4 +41,6 @@ abstract class ChatCoreRepository {
     String peerId = '',
     String? id,
   });
+
+  FutureResult<void> deleteMessage(String id);
 }

@@ -117,6 +117,36 @@ class ChatApiService {
     }
   }
 
+  Future<Map<String, dynamic>> sendMessage({
+    required String conversationId,
+    required String content,
+    String? replyToId,
+  }) async {
+      try {
+        final response = await dioClient.post(
+          'chats/$conversationId/messages',
+          data: {
+            'content': content,
+            if (replyToId != null) 'replyToId': replyToId,
+          },
+        );
+        return response.data as Map<String, dynamic>;
+      } catch (e) {
+        throw ServerException('Failed to send message: $e');
+      }
+  }
+
+  Future<Map<String, dynamic>> deleteMessage({required String messageId}) async {
+    try {
+      final response = await dioClient.delete(
+        '/chats/messages/$messageId',
+      );
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw ServerException('Failed to delete message: $e');
+    }
+  }
+
   /// Uploads binary files using multipart/form-data.
   Future<String> uploadFile({
     required String filePath,

@@ -946,6 +946,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: _showStartNewCallManualDialog,
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
