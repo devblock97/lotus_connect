@@ -50,5 +50,7 @@
   "decline": "谢绝",
   "chat": "聊天",
   "deleteMessage": "删除消息",
-  "deleteMessageConfirm": "您确定要删除这条消息吗？"
+  "deleteMessageConfirm": "您确定要删除这条消息吗？",
+  "editMessage": "编辑消息",
+  "save": "保存"
 }

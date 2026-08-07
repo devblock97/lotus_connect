@@ -50,5 +50,7 @@
   "decline": "Từ chối",
   "chat": "Trò chuyện",
   "deleteMessage": "Xóa tin nhắn",
-  "deleteMessageConfirm": "Bạn có chắc chắn muốn xóa tin nhắn này không?"
+  "deleteMessageConfirm": "Bạn có chắc chắn muốn xóa tin nhắn này không?",
+  "editMessage": "Sửa tin nhắn",
+  "save": "Lưu"
 }

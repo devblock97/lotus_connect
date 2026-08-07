@@ -24,8 +24,8 @@ class DynamicBaseUrlInterceptor extends Interceptor {
     if (!path.startsWith('/')) {
       path = '/$path';
     }
-    options.path = '$host$path';
-    options.baseUrl = '';
+    options..path = '$host$path'
+    ..baseUrl = '';
     handler.next(options);
   }
 }

@@ -16,4 +16,14 @@ abstract class PrivateChatRepository {
   }) => throw UnimplementedError('Stub');
 
   FutureResult<void> deleteMessage(String messageId);
+
+  FutureResult<void> updateMessage({
+    required String messageId,
+    required String content,
+  }) => throw UnimplementedError('Stub');
+
+  FutureResult<List<Message>> fetchRemoteMessages({
+    required String conversationId,
+    required String currentUserId,
+  });
 }

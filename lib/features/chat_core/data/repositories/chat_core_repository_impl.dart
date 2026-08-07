@@ -129,4 +129,24 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
       return Left(DatabaseFailure('Failed to delete message: $e', e));
     }
   }
+
+  @override
+  FutureResult<List<Message>> getMessages(String conversationId) async {
+    try {
+      final messages = await _localDataSource.getMessages(conversationId);
+      return Right(messages);
+    } catch (e) {
+      return Left(DatabaseFailure('Failed to get messages: $e', e));
+    }
+  }
+
+  @override
+  FutureResult<Message?> getMessage(String messageId) async {
+    try {
+      final message = await _localDataSource.getMessage(messageId);
+      return Right(message);
+    } catch (e) {
+      return Left(DatabaseFailure('Failed to get message: $e', e));
+    }
+  }
 }

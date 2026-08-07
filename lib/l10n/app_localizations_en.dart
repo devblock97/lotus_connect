@@ -169,4 +169,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteMessageConfirm =>
       'Are you sure you want to delete this message?';
+
+  @override
+  String get editMessage => 'Edit Message';
+
+  @override
+  String get save => 'Save';
 }

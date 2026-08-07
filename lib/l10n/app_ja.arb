@@ -50,5 +50,7 @@
   "decline": "辞退",
   "chat": "チャット",
   "deleteMessage": "メッセージを削除",
-  "deleteMessageConfirm": "このメッセージを削除してもよろしいですか？"
+  "deleteMessageConfirm": "このメッセージを削除してもよろしいですか？",
+  "editMessage": "メッセージを編集",
+  "save": "保存"
 }

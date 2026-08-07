@@ -110,6 +110,27 @@ class DioClient {
     }
   }
 
+  /// Executes a PUT request.
+  Future<Response<T>> put<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+      }) async {
+    try {
+      return await _dio.put<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+    } on DioException catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
   NetworkException _handleDioException(DioException e) {
     return NetworkException(
       e.message ?? 'Network error occurred',
