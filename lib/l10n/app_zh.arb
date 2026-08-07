@@ -48,5 +48,7 @@
   "accept": "接受",
   "reject": "拒绝",
   "decline": "谢绝",
-  "chat": "聊天"
+  "chat": "聊天",
+  "deleteMessage": "删除消息",
+  "deleteMessageConfirm": "您确定要删除这条消息吗？"
 }

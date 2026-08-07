@@ -157,4 +157,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chat => 'チャット';
+
+  @override
+  String get deleteMessage => 'メッセージを削除';
+
+  @override
+  String get deleteMessageConfirm => 'このメッセージを削除してもよろしいですか？';
 }

@@ -5,7 +5,9 @@ abstract class PrivateChatRemoteDataSource {
   Future<Map<String, dynamic>> createPrivateChat(String friendId);
   Future<Message> sendMessage({
     required String conversationId,
-    required String content, });
+    required String content,
+  });
+  Future<void> deleteMessage(String messageId);
 }
 
 class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
@@ -42,6 +44,15 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         timestamp: timestamp,
         status: MessageStatus.sent,
       );
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> deleteMessage(String messageId) async {
+    try {
+      await _apiService.deleteMessage(messageId: messageId);
     } catch (e) {
       throw Exception(e);
     }

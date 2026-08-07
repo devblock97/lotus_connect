@@ -48,5 +48,7 @@
   "accept": "Chấp nhận",
   "reject": "Từ chối",
   "decline": "Từ chối",
-  "chat": "Trò chuyện"
+  "chat": "Trò chuyện",
+  "deleteMessage": "Xóa tin nhắn",
+  "deleteMessageConfirm": "Bạn có chắc chắn muốn xóa tin nhắn này không?"
 }

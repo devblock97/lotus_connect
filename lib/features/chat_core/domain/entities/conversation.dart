@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-/// Pure Dart entity representing a Chat Conversation.
 @immutable
 class Conversation {
-  /// Creates a [Conversation].
   const Conversation({
     required this.id,
     required this.title,
@@ -18,40 +16,18 @@ class Conversation {
     this.peerId = '',
   });
 
-  /// Unique conversation identifier.
   final String id;
-
-  /// Conversation title.
   final String title;
-
-  /// Creation timestamp.
   final DateTime createdAt;
-
-  /// Last updated timestamp.
   final DateTime updatedAt;
-
-  /// Pinned status flag.
   final bool isPinned;
-
-  /// Favourite status flag.
   final bool isFavourite;
-
-  /// Active AI model name for conversation.
   final String modelName;
-
-  /// Draft unsent input message.
   final String? draftMessage;
-
-  /// System prompt override.
   final String? systemPrompt;
-
-  /// Whether the conversation is a user-to-user private chat.
   final bool isUserToUser;
-
-  /// Target peer user ID (UUID) if user-to-user.
   final String peerId;
 
-  /// Returns a copy of [Conversation] with updated fields.
   Conversation copyWith({
     String? id,
     String? title,

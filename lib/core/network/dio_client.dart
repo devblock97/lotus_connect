@@ -98,7 +98,7 @@ class DioClient {
         CancelToken? cancelToken,
       }) async {
     try {
-      return await _dio.post<T>(
+      return await _dio.delete<T>(
         path,
         data: data,
         queryParameters: queryParameters,

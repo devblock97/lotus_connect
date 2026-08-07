@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
-import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/delete_message_usecase.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 /// State representing the active user-to-user conversation message stream.
 class PrivateActiveConversationState {
@@ -129,6 +129,20 @@ class PrivateActiveConversationNotifier
     if (convId == null) return;
     state = state.copyWith(draftInput: draft);
     await _ref.read(chatCoreRepositoryProvider).saveDraftMessage(convId, draft);
+  }
+
+  /// Deletes a message by its ID.
+  Future<void> deleteMessage(String messageId) async {
+    final useCase = _ref.read(deleteMessageUseCaseProvider);
+    final result = await useCase(messageId);
+    result.fold(
+      (failure) {
+        state = state.copyWith(errorMessage: failure.message);
+      },
+      (_) {
+        // State updates reactively via the watched SQLite query stream.
+      },
+    );
   }
 
   @override

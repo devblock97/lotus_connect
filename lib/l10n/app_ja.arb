@@ -48,5 +48,7 @@
   "accept": "承諾",
   "reject": "拒否",
   "decline": "辞退",
-  "chat": "チャット"
+  "chat": "チャット",
+  "deleteMessage": "メッセージを削除",
+  "deleteMessageConfirm": "このメッセージを削除してもよろしいですか？"
 }
