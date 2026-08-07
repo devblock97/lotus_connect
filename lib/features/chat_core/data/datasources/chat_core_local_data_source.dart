@@ -21,6 +21,8 @@ abstract class ChatCoreLocalDataSource {
   Future<void> saveDraftMessage(String conversationId, String draft);
   Future<void> saveMessage(Message message);
   Future<void> deleteMessage(String messageId);
+  Future<List<Message>> getMessages(String conversationId);
+  Future<Message?> getMessage(String messageId);
 }
 
 class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
@@ -219,5 +221,55 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
   Future<void> deleteMessage(String messageId) async {
     await (_db.delete(_db.messageTable)
       ..where((t) => t.id.equals(messageId))).go();
+  }
+
+  @override
+  Future<List<Message>> getMessages(String conversationId) async {
+    final query = _db.select(_db.messageTable)
+      ..where((tbl) => tbl.conversationId.equals(conversationId))
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.timestamp)]);
+    final rows = await query.get();
+    return rows
+        .map(
+          (row) => Message(
+            id: row.id,
+            conversationId: row.conversationId,
+            role: MessageRole.values.firstWhere(
+              (e) => e.name == row.senderRole,
+              orElse: () => MessageRole.assistant,
+            ),
+            content: row.content,
+            timestamp: row.timestamp,
+            isError: row.isError,
+            status: MessageStatus.values.firstWhere(
+              (e) => e.name == row.status,
+              orElse: () => MessageStatus.sent,
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<Message?> getMessage(String messageId) async {
+    final query = _db.select(_db.messageTable)
+      ..where((tbl) => tbl.id.equals(messageId));
+    final row = await query.getSingleOrNull();
+    if (row == null) return null;
+    return Message(
+      id: row.id,
+      conversationId: row.conversationId,
+      role: MessageRole.values.firstWhere(
+        (e) => e.name == row.senderRole,
+        orElse: () => MessageRole.assistant,
+      ),
+      content: row.content,
+      timestamp: row.timestamp,
+      isError: row.isError,
+      status: MessageStatus.values.firstWhere(
+        (e) => e.name == row.status,
+        orElse: () => MessageStatus.sent,
+      ),
+    );
   }
 }

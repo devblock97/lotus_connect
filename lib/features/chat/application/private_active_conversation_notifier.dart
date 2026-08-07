@@ -1,11 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/delete_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
 /// State representing the active user-to-user conversation message stream.
 class PrivateActiveConversationState {
@@ -76,6 +78,80 @@ class PrivateActiveConversationNotifier
           (messages) => state = state.copyWith(messages: messages),
         );
       });
+      _syncMessages(conversationId);
+    }
+  }
+
+  Future<void> _syncMessages(String conversationId) async {
+    try {
+      final currentUserId = _ref.read(settingsProvider).userId;
+      if (currentUserId.isEmpty) return;
+
+      final remoteRepository = _ref.read(privateChatRepositoryProvider);
+      final localRepository = _ref.read(chatCoreRepositoryProvider);
+
+      final remoteResult = await remoteRepository.fetchRemoteMessages(
+        conversationId: conversationId,
+        currentUserId: currentUserId,
+      );
+
+      await remoteResult.fold(
+        (failure) async {
+          // Keep local messages if network/fetch fails
+        },
+        (remoteMessages) async {
+          // 1. Save all remote messages locally
+          for (final msg in remoteMessages) {
+            await localRepository.saveMessage(msg);
+          }
+
+          // 2. Reconcile deleted messages
+          final localResult = await localRepository.getMessages(conversationId);
+          await localResult.fold(
+            (failure) async {},
+            (localMessages) async {
+              final uuidRegex = RegExp(
+                r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+              );
+
+              final remoteIds = remoteMessages.map((m) => m.id).toSet();
+
+              if (remoteMessages.length < 100) {
+                // If remote returned fewer than 100 messages, we have fetched the complete history.
+                // Any local message with a UUID not in remoteMessages must have been deleted.
+                for (final msg in localMessages) {
+                  if (uuidRegex.hasMatch(msg.id) && !remoteIds.contains(msg.id)) {
+                    await localRepository.deleteMessage(msg.id);
+                  }
+                }
+              } else {
+                // Reconcile within the window of fetched remote messages.
+                // Subtract 5 seconds to account for precision loss in DB or clock skew.
+                DateTime? minTimestamp;
+                for (final msg in remoteMessages) {
+                  if (minTimestamp == null || msg.timestamp.isBefore(minTimestamp)) {
+                    minTimestamp = msg.timestamp;
+                  }
+                }
+
+                if (minTimestamp != null) {
+                  final adjustedMin = minTimestamp.subtract(const Duration(seconds: 5));
+                  for (final msg in localMessages) {
+                    if (uuidRegex.hasMatch(msg.id) &&
+                        (msg.timestamp.isAfter(adjustedMin) || msg.timestamp.isAtSameMomentAs(adjustedMin))) {
+                      if (!remoteIds.contains(msg.id)) {
+                        await localRepository.deleteMessage(msg.id);
+                      }
+                    }
+                  }
+                }
+              }
+            },
+          );
+        },
+      );
+    } catch (_) {
+      // Ignore background sync errors
     }
   }
 
@@ -141,6 +217,20 @@ class PrivateActiveConversationNotifier
       },
       (_) {
         // State updates reactively via the watched SQLite query stream.
+      },
+    );
+  }
+
+  Future<void> updateMessage(String messageId, String content) async {
+    final useCase = _ref.read(updateMessageUseCaseProvider);
+    final params = UpdateMessageParam(messageId: messageId, content: content);
+    final result = await useCase(params);
+    result.fold(
+      (failure) {
+        state = state.copyWith(errorMessage: failure.message);
+      },
+      (_) {
+        // State updates reactively via watched database query streams
       },
     );
   }

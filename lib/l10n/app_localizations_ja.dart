@@ -163,4 +163,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteMessageConfirm => 'このメッセージを削除してもよろしいですか？';
+
+  @override
+  String get editMessage => 'メッセージを編集';
+
+  @override
+  String get save => '保存';
 }

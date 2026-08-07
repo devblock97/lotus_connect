@@ -168,4 +168,10 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get deleteMessageConfirm =>
       'Bạn có chắc chắn muốn xóa tin nhắn này không?';
+
+  @override
+  String get editMessage => 'Sửa tin nhắn';
+
+  @override
+  String get save => 'Lưu';
 }

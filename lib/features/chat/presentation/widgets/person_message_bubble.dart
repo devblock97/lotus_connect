@@ -47,6 +47,95 @@ class PersonMessageBubble extends ConsumerWidget {
     );
   }
 
+  void _showOptionsDialog(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text(loc.chat),
+          children: [
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showEditDialog(context, ref);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.edit_rounded, size: 20),
+                  const SizedBox(width: 12),
+                  Text(loc.editMessage),
+                ],
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showDeleteConfirmation(context, ref);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.delete_rounded,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    loc.deleteMessage,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditDialog(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
+    final controller = TextEditingController(text: message.content);
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(loc.editMessage),
+          content: TextField(
+            controller: controller,
+            maxLines: null,
+            autofocus: true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(loc.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final newContent = controller.text.trim();
+                if (newContent.isNotEmpty && newContent != message.content) {
+                  ref
+                      .read(privateActiveConversationProvider.notifier)
+                      .updateMessage(message.id, newContent);
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text(loc.save),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -79,7 +168,7 @@ class PersonMessageBubble extends ConsumerWidget {
             ),
           ],
           GestureDetector(
-            onLongPress: isMine ? () => _showDeleteConfirmation(context, ref) : null,
+            onLongPress: isMine ? () => _showOptionsDialog(context, ref) : null,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(

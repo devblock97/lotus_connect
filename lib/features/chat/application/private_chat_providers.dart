@@ -8,6 +8,7 @@ import 'package:lotus_connect/features/chat/domain/repositories/private_chat_rep
 import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 
 /// Provider for PrivateChatRemoteDataSource.
@@ -55,3 +56,11 @@ final deleteMessageUseCaseProvider = Provider<DeleteMessageUseCase>((ref) {
   );
 });
 
+
+/// Provider for UpdateMessageUseCase.
+final updateMessageUseCaseProvider = Provider<UpdateMessageUseCase>((ref) {
+  return UpdateMessageUseCase(
+    chatCoreRepository: ref.watch(chatCoreRepositoryProvider),
+    privateChatRepository: ref.watch(privateChatRepositoryProvider),
+  );
+});

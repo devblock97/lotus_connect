@@ -8,6 +8,11 @@ abstract class PrivateChatRemoteDataSource {
     required String content,
   });
   Future<void> deleteMessage(String messageId);
+  Future<void> updateMessage(String messageId, String content);
+  Future<List<Message>> fetchRemoteMessages({
+    required String conversationId,
+    required String currentUserId,
+  });
 }
 
 class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
@@ -31,7 +36,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         content: content,
       );
       final messageId = data['id'] as String? ?? '';
-      final createdAtStr = (data['createdAt'] ?? data['createdAt']) as String?;
+      final createdAtStr = (data['created_at'] ?? data['createdAt']) as String?;
       final timestamp = createdAtStr != null
         ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
         : DateTime.now();
@@ -50,9 +55,51 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   }
 
   @override
+  Future<List<Message>> fetchRemoteMessages({
+    required String conversationId,
+    required String currentUserId,
+  }) async {
+    try {
+      final list = await _apiService.getMessages(
+        conversationId: conversationId,
+        limit: 100,
+      );
+      return list.map((item) {
+        final id = item['id'] as String? ?? '';
+        final senderId = (item['sender_id'] ?? item['senderId']) as String? ?? '';
+        final content = item['content'] as String? ?? '';
+        final createdAtStr = (item['created_at'] ?? item['createdAt']) as String?;
+        final timestamp = createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now();
+
+        return Message(
+          id: id,
+          conversationId: conversationId,
+          role: senderId == currentUserId ? MessageRole.user : MessageRole.assistant,
+          content: content,
+          timestamp: timestamp,
+          status: MessageStatus.sent,
+        );
+      }).toList();
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
   Future<void> deleteMessage(String messageId) async {
     try {
       await _apiService.deleteMessage(messageId: messageId);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<void> updateMessage(String messageId, String content) async {
+    try {
+      await _apiService.updateMessage(messageId: messageId, content: content);
     } catch (e) {
       throw Exception(e);
     }

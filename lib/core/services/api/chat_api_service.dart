@@ -147,6 +147,23 @@ class ChatApiService {
     }
   }
 
+  Future<Map<String, dynamic>> updateMessage({
+    required String messageId,
+    required String content,
+  }) async {
+    try {
+      final response = await dioClient.put(
+        '/chats/messages/$messageId',
+        data: {
+          'content': content,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw ServerException('Failed to update message: $e');
+    }
+  }
+
   /// Uploads binary files using multipart/form-data.
   Future<String> uploadFile({
     required String filePath,

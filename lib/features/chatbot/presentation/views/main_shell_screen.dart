@@ -146,6 +146,18 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           await localDataSource.deleteMessage(messageId);
           AppLogger.info('WS Deleted message $messageId from SQLite');
         }
+      } else if (event == 'chat:edit') {
+        final messageId = payload['messageId'] as String? ?? '';
+        final content = payload['content'] as String? ?? '';
+        if (messageId.isNotEmpty) {
+          final localDataSource = ref.read(chatCoreLocalDataSourceProvider);
+          final existing = await localDataSource.getMessage(messageId);
+          if (existing != null) {
+            final updated = existing.copyWith(content: content);
+            await localDataSource.saveMessage(updated);
+            AppLogger.info('WS Edited message $messageId in SQLite');
+          }
+        }
       } else if (event == 'notification:new') {
         ref.read(notificationsProvider.notifier).loadNotifications();
       }

@@ -63,4 +63,33 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
       return Left(ServerFailure('Failed to delete message: $e', e));
     }
   }
+
+  @override
+  FutureResult<void> updateMessage({
+    required String messageId,
+    required String content,
+  }) async {
+    try {
+      await _remoteDataSource.updateMessage(messageId, content);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure('Failed to update message: $e', e));
+    }
+  }
+
+  @override
+  FutureResult<List<Message>> fetchRemoteMessages({
+    required String conversationId,
+    required String currentUserId,
+  }) async {
+    try {
+      final remoteMessages = await _remoteDataSource.fetchRemoteMessages(
+        conversationId: conversationId,
+        currentUserId: currentUserId,
+      );
+      return Right(remoteMessages);
+    } catch (e) {
+      return Left(ServerFailure('Failed to fetch remote messages: $e', e));
+    }
+  }
 }

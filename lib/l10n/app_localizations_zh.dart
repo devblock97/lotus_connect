@@ -163,4 +163,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteMessageConfirm => '您确定要删除这条消息吗？';
+
+  @override
+  String get editMessage => '编辑消息';
+
+  @override
+  String get save => '保存';
 }
