@@ -161,4 +161,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get chat => 'Trò chuyện';
+
+  @override
+  String get deleteMessage => 'Xóa tin nhắn';
+
+  @override
+  String get deleteMessageConfirm =>
+      'Bạn có chắc chắn muốn xóa tin nhắn này không?';
 }

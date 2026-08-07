@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Role of message sender.
 enum MessageRole {
   user,
   assistant,
@@ -11,7 +10,6 @@ enum MessageRole {
   bool get isSystem => this == MessageRole.system;
 }
 
-/// Delivery / generation status of message.
 enum MessageStatus {
   sending,
   sent,
@@ -19,10 +17,8 @@ enum MessageStatus {
   error,
 }
 
-/// Pure Dart entity representing a Chat Message.
 @immutable
 class Message {
-  /// Creates a [Message].
   const Message({
     required this.id,
     required this.conversationId,
@@ -33,28 +29,14 @@ class Message {
     this.status = MessageStatus.sent,
   });
 
-  /// Unique message ID.
   final String id;
-
-  /// Belongs to conversation.
   final String conversationId;
-
-  /// Sender role.
   final MessageRole role;
-
-  /// Message body text.
   final String content;
-
-  /// Timestamp.
   final DateTime timestamp;
-
-  /// Indicates if this message failed to transmit or generate.
   final bool isError;
-
-  /// Message status.
   final MessageStatus status;
 
-  /// Returns a copy of [Message] with updated properties.
   Message copyWith({
     String? id,
     String? conversationId,

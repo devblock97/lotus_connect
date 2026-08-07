@@ -53,4 +53,14 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
       return Left(ServerFailure('Failed to send message: $e', e));
     }
   }
+
+  @override
+  FutureResult<void> deleteMessage(String messageId) async {
+    try {
+      await _remoteDataSource.deleteMessage(messageId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure('Failed to delete message: $e', e));
+    }
+  }
 }

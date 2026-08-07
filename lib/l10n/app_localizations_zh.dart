@@ -157,4 +157,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get chat => '聊天';
+
+  @override
+  String get deleteMessage => '删除消息';
+
+  @override
+  String get deleteMessageConfirm => '您确定要删除这条消息吗？';
 }

@@ -35,9 +35,8 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
     }
 
     final optimisticId = DateTime.now().millisecondsSinceEpoch.toString();
-    final userMessageId = DateTime.now().millisecondsSinceEpoch.toString();
     final userMessage = Message(
-      id: userMessageId,
+      id: optimisticId,
       conversationId: params.conversationId,
       role: MessageRole.user,
       content: trimmedText,
