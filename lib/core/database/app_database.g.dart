@@ -646,9 +646,23 @@ class $MessageTableTable extends MessageTable
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('sent'));
+  static const VerificationMeta _replyToIdMeta =
+      const VerificationMeta('replyToId');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, conversationId, senderRole, content, timestamp, isError, status];
+  late final GeneratedColumn<String> replyToId = GeneratedColumn<String>(
+      'reply_to_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        conversationId,
+        senderRole,
+        content,
+        timestamp,
+        isError,
+        status,
+        replyToId
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -700,6 +714,12 @@ class $MessageTableTable extends MessageTable
       context.handle(_statusMeta,
           status.isAcceptableOrUnknown(data['status']!, _statusMeta));
     }
+    if (data.containsKey('reply_to_id')) {
+      context.handle(
+          _replyToIdMeta,
+          replyToId.isAcceptableOrUnknown(
+              data['reply_to_id']!, _replyToIdMeta));
+    }
     return context;
   }
 
@@ -723,6 +743,8 @@ class $MessageTableTable extends MessageTable
           .read(DriftSqlType.bool, data['${effectivePrefix}is_error'])!,
       status: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      replyToId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reply_to_id']),
     );
   }
 
@@ -754,6 +776,9 @@ class MessageTableData extends DataClass
 
   /// Detailed status string: 'sending', 'sent', 'streaming', 'failed'.
   final String status;
+
+  /// Nullable ID of the message this message is replying to.
+  final String? replyToId;
   const MessageTableData(
       {required this.id,
       required this.conversationId,
@@ -761,7 +786,8 @@ class MessageTableData extends DataClass
       required this.content,
       required this.timestamp,
       required this.isError,
-      required this.status});
+      required this.status,
+      this.replyToId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -772,6 +798,9 @@ class MessageTableData extends DataClass
     map['timestamp'] = Variable<DateTime>(timestamp);
     map['is_error'] = Variable<bool>(isError);
     map['status'] = Variable<String>(status);
+    if (!nullToAbsent || replyToId != null) {
+      map['reply_to_id'] = Variable<String>(replyToId);
+    }
     return map;
   }
 
@@ -784,6 +813,9 @@ class MessageTableData extends DataClass
       timestamp: Value(timestamp),
       isError: Value(isError),
       status: Value(status),
+      replyToId: replyToId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(replyToId),
     );
   }
 
@@ -798,6 +830,7 @@ class MessageTableData extends DataClass
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
       isError: serializer.fromJson<bool>(json['isError']),
       status: serializer.fromJson<String>(json['status']),
+      replyToId: serializer.fromJson<String?>(json['replyToId']),
     );
   }
   @override
@@ -811,6 +844,7 @@ class MessageTableData extends DataClass
       'timestamp': serializer.toJson<DateTime>(timestamp),
       'isError': serializer.toJson<bool>(isError),
       'status': serializer.toJson<String>(status),
+      'replyToId': serializer.toJson<String?>(replyToId),
     };
   }
 
@@ -821,7 +855,8 @@ class MessageTableData extends DataClass
           String? content,
           DateTime? timestamp,
           bool? isError,
-          String? status}) =>
+          String? status,
+          Value<String?> replyToId = const Value.absent()}) =>
       MessageTableData(
         id: id ?? this.id,
         conversationId: conversationId ?? this.conversationId,
@@ -830,6 +865,7 @@ class MessageTableData extends DataClass
         timestamp: timestamp ?? this.timestamp,
         isError: isError ?? this.isError,
         status: status ?? this.status,
+        replyToId: replyToId.present ? replyToId.value : this.replyToId,
       );
   MessageTableData copyWithCompanion(MessageTableCompanion data) {
     return MessageTableData(
@@ -843,6 +879,7 @@ class MessageTableData extends DataClass
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
       isError: data.isError.present ? data.isError.value : this.isError,
       status: data.status.present ? data.status.value : this.status,
+      replyToId: data.replyToId.present ? data.replyToId.value : this.replyToId,
     );
   }
 
@@ -855,14 +892,15 @@ class MessageTableData extends DataClass
           ..write('content: $content, ')
           ..write('timestamp: $timestamp, ')
           ..write('isError: $isError, ')
-          ..write('status: $status')
+          ..write('status: $status, ')
+          ..write('replyToId: $replyToId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, conversationId, senderRole, content, timestamp, isError, status);
+  int get hashCode => Object.hash(id, conversationId, senderRole, content,
+      timestamp, isError, status, replyToId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -873,7 +911,8 @@ class MessageTableData extends DataClass
           other.content == this.content &&
           other.timestamp == this.timestamp &&
           other.isError == this.isError &&
-          other.status == this.status);
+          other.status == this.status &&
+          other.replyToId == this.replyToId);
 }
 
 class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
@@ -884,6 +923,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
   final Value<DateTime> timestamp;
   final Value<bool> isError;
   final Value<String> status;
+  final Value<String?> replyToId;
   final Value<int> rowid;
   const MessageTableCompanion({
     this.id = const Value.absent(),
@@ -893,6 +933,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     this.timestamp = const Value.absent(),
     this.isError = const Value.absent(),
     this.status = const Value.absent(),
+    this.replyToId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MessageTableCompanion.insert({
@@ -903,6 +944,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     required DateTime timestamp,
     this.isError = const Value.absent(),
     this.status = const Value.absent(),
+    this.replyToId = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         conversationId = Value(conversationId),
@@ -917,6 +959,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     Expression<DateTime>? timestamp,
     Expression<bool>? isError,
     Expression<String>? status,
+    Expression<String>? replyToId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -927,6 +970,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       if (timestamp != null) 'timestamp': timestamp,
       if (isError != null) 'is_error': isError,
       if (status != null) 'status': status,
+      if (replyToId != null) 'reply_to_id': replyToId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -939,6 +983,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       Value<DateTime>? timestamp,
       Value<bool>? isError,
       Value<String>? status,
+      Value<String?>? replyToId,
       Value<int>? rowid}) {
     return MessageTableCompanion(
       id: id ?? this.id,
@@ -948,6 +993,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       timestamp: timestamp ?? this.timestamp,
       isError: isError ?? this.isError,
       status: status ?? this.status,
+      replyToId: replyToId ?? this.replyToId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -976,6 +1022,9 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (replyToId.present) {
+      map['reply_to_id'] = Variable<String>(replyToId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -992,6 +1041,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
           ..write('timestamp: $timestamp, ')
           ..write('isError: $isError, ')
           ..write('status: $status, ')
+          ..write('replyToId: $replyToId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2105,6 +2155,7 @@ typedef $$MessageTableTableCreateCompanionBuilder = MessageTableCompanion
   required DateTime timestamp,
   Value<bool> isError,
   Value<String> status,
+  Value<String?> replyToId,
   Value<int> rowid,
 });
 typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
@@ -2116,6 +2167,7 @@ typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
   Value<DateTime> timestamp,
   Value<bool> isError,
   Value<String> status,
+  Value<String?> replyToId,
   Value<int> rowid,
 });
 
@@ -2167,6 +2219,9 @@ class $$MessageTableTableFilterComposer
   ColumnFilters<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get replyToId => $composableBuilder(
+      column: $table.replyToId, builder: (column) => ColumnFilters(column));
+
   $$ConversationTableTableFilterComposer get conversationId {
     final $$ConversationTableTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -2215,6 +2270,9 @@ class $$MessageTableTableOrderingComposer
   ColumnOrderings<String> get status => $composableBuilder(
       column: $table.status, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get replyToId => $composableBuilder(
+      column: $table.replyToId, builder: (column) => ColumnOrderings(column));
+
   $$ConversationTableTableOrderingComposer get conversationId {
     final $$ConversationTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -2262,6 +2320,9 @@ class $$MessageTableTableAnnotationComposer
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get replyToId =>
+      $composableBuilder(column: $table.replyToId, builder: (column) => column);
 
   $$ConversationTableTableAnnotationComposer get conversationId {
     final $$ConversationTableTableAnnotationComposer composer =
@@ -2315,6 +2376,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             Value<DateTime> timestamp = const Value.absent(),
             Value<bool> isError = const Value.absent(),
             Value<String> status = const Value.absent(),
+            Value<String?> replyToId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion(
@@ -2325,6 +2387,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             timestamp: timestamp,
             isError: isError,
             status: status,
+            replyToId: replyToId,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2335,6 +2398,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             required DateTime timestamp,
             Value<bool> isError = const Value.absent(),
             Value<String> status = const Value.absent(),
+            Value<String?> replyToId = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion.insert(
@@ -2345,6 +2409,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             timestamp: timestamp,
             isError: isError,
             status: status,
+            replyToId: replyToId,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

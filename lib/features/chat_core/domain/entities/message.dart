@@ -27,6 +27,7 @@ class Message {
     required this.timestamp,
     this.isError = false,
     this.status = MessageStatus.sent,
+    this.replyToId,
   });
 
   final String id;
@@ -36,6 +37,7 @@ class Message {
   final DateTime timestamp;
   final bool isError;
   final MessageStatus status;
+  final String? replyToId;
 
   Message copyWith({
     String? id,
@@ -45,6 +47,7 @@ class Message {
     DateTime? timestamp,
     bool? isError,
     MessageStatus? status,
+    String? replyToId,
   }) {
     return Message(
       id: id ?? this.id,
@@ -54,6 +57,7 @@ class Message {
       timestamp: timestamp ?? this.timestamp,
       isError: isError ?? this.isError,
       status: status ?? this.status,
+      replyToId: replyToId ?? this.replyToId,
     );
   }
 
@@ -68,7 +72,8 @@ class Message {
           content == other.content &&
           timestamp == other.timestamp &&
           isError == other.isError &&
-          status == other.status;
+          status == other.status &&
+          replyToId == other.replyToId;
 
   @override
   int get hashCode =>
@@ -78,5 +83,6 @@ class Message {
       content.hashCode ^
       timestamp.hashCode ^
       isError.hashCode ^
-      status.hashCode;
+      status.hashCode ^
+      replyToId.hashCode;
 }

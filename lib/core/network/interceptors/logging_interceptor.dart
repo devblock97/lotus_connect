@@ -33,7 +33,9 @@ class LoggingInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (kDebugMode) {
       AppLogger.error(
-        '<-- ERROR ${err.response?.statusCode} ${err.requestOptions.uri}: ${err.message}',
+        '<-- ERROR '
+        '${err.response?.statusCode} '
+        '${err.requestOptions.uri}: ${err.message}',
       );
     }
     handler.next(err);

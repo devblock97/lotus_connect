@@ -6,6 +6,7 @@ abstract class PrivateChatRemoteDataSource {
   Future<Message> sendMessage({
     required String conversationId,
     required String content,
+    String? replyToId,
   });
   Future<void> deleteMessage(String messageId);
   Future<void> updateMessage(String messageId, String content);
@@ -29,11 +30,13 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   Future<Message> sendMessage({
     required String conversationId,
     required String content,
+    String? replyToId,
   }) async {
     try {
       final data = await _apiService.sendMessage(
         conversationId: conversationId,
         content: content,
+        replyToId: replyToId,
       );
       final messageId = data['id'] as String? ?? '';
       final createdAtStr = (data['created_at'] ?? data['createdAt']) as String?;
@@ -47,6 +50,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         role: MessageRole.user,
         content: content,
         timestamp: timestamp,
+        replyToId: replyToId,
       );
     } catch (e) {
       throw Exception(e);
@@ -73,6 +77,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         final timestamp = createdAtStr != null
             ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
             : DateTime.now();
+        final replyToId = (item['reply_to_id'] ?? item['replyToId']) as String?;
 
         return Message(
           id: id,
@@ -82,6 +87,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
               : MessageRole.assistant,
           content: content,
           timestamp: timestamp,
+          replyToId: replyToId,
         );
       }).toList();
     } catch (e) {

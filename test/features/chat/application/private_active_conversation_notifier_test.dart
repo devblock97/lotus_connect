@@ -37,6 +37,18 @@ void main() {
   late MockSettingsNotifier mockSettingsNotifier;
   late MockPrivateConversationListNotifier mockListNotifier;
 
+  setUpAll(() {
+    registerFallbackValue(
+      Message(
+        id: '',
+        conversationId: '',
+        role: MessageRole.user,
+        content: '',
+        timestamp: DateTime.now(),
+      ),
+    );
+  });
+
   setUp(() {
     mockPrivateChatRepo = MockPrivateChatRepository();
     mockChatCoreRepo = MockChatCoreRepository();
@@ -52,8 +64,8 @@ void main() {
   });
 
   test(
-      'should reconcile complete history when remote messages count '
-      'is less than 100', () async {
+      'should reconcile complete history when remote messages count is less than 100',
+      () async {
     final timestamp1 = DateTime.now().subtract(const Duration(minutes: 5));
     final timestamp2 = DateTime.now().subtract(const Duration(minutes: 3));
     final timestamp3 = DateTime.now().subtract(const Duration(minutes: 1));
@@ -175,8 +187,8 @@ void main() {
   });
 
   test(
-      'should reconcile within window when remote messages count '
-      'is 100 or more (partial history)', () async {
+      'should reconcile within window when remote messages count is 100 or more (partial history)',
+      () async {
     final timestampMin = DateTime.now().subtract(const Duration(minutes: 100));
     final timestamp0 =
         DateTime.now().subtract(const Duration(minutes: 105)); // Outside window
@@ -283,5 +295,99 @@ void main() {
     verifyNever(
       () => mockChatCoreRepo.deleteMessage('legacy-timestamp-id-12345'),
     );
+  });
+
+  test(
+      'should handle reply to message state, send it, and clear the reply state',
+      () async {
+    final parentMessage = Message(
+      id: 'parent_id_123',
+      conversationId: 'test_conv_id',
+      role: MessageRole.assistant,
+      content: 'Hello, parent message',
+      timestamp: DateTime.now(),
+    );
+
+    when(() => mockChatCoreRepo.watchMessages('test_conv_id'))
+        .thenAnswer((_) => Stream.value(const Right([])));
+
+    final container = ProviderContainer(
+      overrides: [
+        privateChatRepositoryProvider.overrideWithValue(mockPrivateChatRepo),
+        chatCoreRepositoryProvider.overrideWithValue(mockChatCoreRepo),
+        settingsProvider.overrideWith((ref) => mockSettingsNotifier),
+        privateConversationListProvider.overrideWith((ref) => mockListNotifier),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(privateActiveConversationProvider.notifier);
+
+    // Initial state: replyingToMessage is null
+    expect(
+      container.read(privateActiveConversationProvider).replyingToMessage,
+      isNull,
+    );
+
+    // 1. Set reply message
+    notifier.setReplyingToMessage(parentMessage);
+    expect(
+      container.read(privateActiveConversationProvider).replyingToMessage,
+      parentMessage,
+    );
+
+    // 2. Cancel reply
+    notifier.cancelReply();
+    expect(
+      container.read(privateActiveConversationProvider).replyingToMessage,
+      isNull,
+    );
+
+    // 3. Set reply again and mock send message use case
+    notifier.setReplyingToMessage(parentMessage);
+
+    // We need to mock chat core repo save/delete calls for sending message
+    when(() => mockChatCoreRepo.saveMessage(any()))
+        .thenAnswer((_) async => const Right(null));
+    when(() => mockChatCoreRepo.saveDraftMessage(any(), any()))
+        .thenAnswer((_) async => const Right(null));
+    when(
+      () => mockPrivateChatRepo.sendMessage(
+        conversationId: 'test_conv_id',
+        content: 'Reply content',
+        replyToId: 'parent_id_123',
+      ),
+    ).thenAnswer(
+      (_) async => Right(
+        Message(
+          id: 'new_msg_id',
+          conversationId: 'test_conv_id',
+          role: MessageRole.user,
+          content: 'Reply content',
+          timestamp: DateTime.now(),
+          replyToId: 'parent_id_123',
+        ),
+      ),
+    );
+    when(() => mockChatCoreRepo.deleteMessage(any()))
+        .thenAnswer((_) async => const Right(null));
+
+    // Send the reply message
+    await notifier.sendMessage('Reply content');
+
+    // Verify reply state is cleared
+    expect(
+      container.read(privateActiveConversationProvider).replyingToMessage,
+      isNull,
+    );
+
+    // Verify repository sendMessage call received correct replyToId
+    verify(
+      () => mockPrivateChatRepo.sendMessage(
+        conversationId: 'test_conv_id',
+        content: 'Reply content',
+        replyToId: 'parent_id_123',
+      ),
+    ).called(1);
   });
 }

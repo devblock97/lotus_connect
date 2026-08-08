@@ -42,14 +42,16 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   FutureResult<Message> sendMessage({
     required String conversationId,
     required String content,
+    String? replyToId,
   }) async {
     try {
       final remoteMessage = await _remoteDataSource.sendMessage(
         conversationId: conversationId,
         content: content,
+        replyToId: replyToId,
       );
       return Right(remoteMessage);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(ServerFailure('Failed to send message: $e', e));
     }
   }
@@ -59,7 +61,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
     try {
       await _remoteDataSource.deleteMessage(messageId);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(ServerFailure('Failed to delete message: $e', e));
     }
   }
@@ -72,7 +74,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
     try {
       await _remoteDataSource.updateMessage(messageId, content);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(ServerFailure('Failed to update message: $e', e));
     }
   }

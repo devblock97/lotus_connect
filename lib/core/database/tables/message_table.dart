@@ -25,6 +25,9 @@ class MessageTable extends Table {
   /// Detailed status string: 'sending', 'sent', 'streaming', 'failed'.
   TextColumn get status => text().withDefault(const Constant('sent'))();
 
+  /// Nullable ID of the message this message is replying to.
+  TextColumn get replyToId => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

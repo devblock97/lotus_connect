@@ -16,7 +16,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     try {
       final settings = await localDataSource.getSettings();
       state = settings;
-    } catch (_) {
+    } on Object catch (_) {
       // Retain default AppSettings
     }
   }

@@ -97,7 +97,7 @@ class GeminiAiProvider implements AiProvider {
         }
       }
       return '';
-    } catch (e) {
+    } on Object catch (e) {
       throw AiProviderException('Gemini API call failed: $e', e);
     }
   }
@@ -172,7 +172,7 @@ class GeminiAiProvider implements AiProvider {
             yield '⚠️ Gemini API Error (${response.statusCode}): ${errObj['message']}';
             return;
           }
-        } catch (_) {}
+        } on Object catch (_) {}
         yield '⚠️ Gemini API Error (${response.statusCode}): $rawError';
         return;
       }
@@ -202,7 +202,7 @@ class GeminiAiProvider implements AiProvider {
                   }
                 }
               }
-            } catch (_) {
+            } on Object catch (_) {
               // Partial chunk retry
             }
           }
@@ -228,10 +228,10 @@ class GeminiAiProvider implements AiProvider {
           } else {
             errorDetails = rawJsonStr;
           }
-        } catch (_) {}
+        } on Object catch (_) {}
       }
       yield '⚠️ Gemini API Error ($errorDetails)';
-    } catch (e) {
+    } on Object catch (e) {
       yield 'Error connecting to Gemini API: $e';
     }
   }

@@ -23,7 +23,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 7; // Incremented schema version to trigger migration
+  int get schemaVersion => 8; // Incremented schema version for replyToId column
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -31,7 +31,8 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (m, from, to) async {
-          // Destructive upgrade strategy for development phase to avoid schema mismatch
+          // Destructive upgrade strategy for development phase
+          // to avoid schema mismatch
           if (from < to) {
             for (final table in allTables) {
               await m.deleteTable(table.actualTableName);

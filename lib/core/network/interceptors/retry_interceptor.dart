@@ -38,7 +38,7 @@ class RetryInterceptor extends Interceptor {
           ),
         );
         return handler.resolve(response);
-      } catch (_) {
+      } on Object catch (_) {
         return handler.next(err);
       }
     }

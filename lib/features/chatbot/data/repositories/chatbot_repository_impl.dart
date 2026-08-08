@@ -60,7 +60,7 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
       yield Left(NetworkFailure(e.message, e));
     } on AiProviderException catch (e) {
       yield Left(ApiFailure(e.message, cause: e));
-    } catch (e) {
+    } on Object catch (e) {
       yield Left(UnknownFailure('Streaming error occurred: $e', e));
     }
   }
@@ -70,7 +70,7 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
     try {
       _remoteDataSource.cancelGeneration();
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(UnknownFailure('Failed to cancel generation: $e', e));
     }
   }
@@ -80,7 +80,7 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
     try {
       final settings = await _localDataSource.getSettings();
       return Right(settings);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to fetch settings: $e', e));
     }
   }

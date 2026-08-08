@@ -2,7 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 
-/// Interceptor to automatically refresh access tokens using Refresh Token Rotation (RTR) on 401.
+/// Interceptor to automatically refresh access tokens
+/// using Refresh Token Rotation (RTR) on 401.
 class TokenRefreshInterceptor extends Interceptor {
   /// Constructor.
   TokenRefreshInterceptor({
@@ -99,7 +100,7 @@ class TokenRefreshInterceptor extends Interceptor {
 
           return handler.resolve(retryResponse);
         }
-      } catch (e) {
+      } on Object catch (e) {
         AppLogger.error('Token Refresh Rotation failed: $e');
         onRefreshFailed();
       } finally {
