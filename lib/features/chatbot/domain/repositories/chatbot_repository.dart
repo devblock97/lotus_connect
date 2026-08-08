@@ -1,7 +1,7 @@
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 
 abstract class ChatbotRepository {
   /// Creates a new conversation.

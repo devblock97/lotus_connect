@@ -2,12 +2,12 @@ import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_local_data_source.dart';
-import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_remote_data_source.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
+import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_local_data_source.dart';
+import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_remote_data_source.dart';
+import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
 
 /// Repository implementation fulfilling [ChatbotRepository] contract.
@@ -32,7 +32,6 @@ class ChatbotRepositoryImpl implements ChatbotRepository {
     return _chatCoreRepository.createLocalConversation(
       title: title,
       modelName: modelName,
-      isUserToUser: false,
     );
   }
 

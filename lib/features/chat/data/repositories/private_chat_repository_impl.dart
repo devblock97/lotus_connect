@@ -45,8 +45,8 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   }) async {
     try {
       final remoteMessage = await _remoteDataSource.sendMessage(
-          conversationId: conversationId,
-          content: content,
+        conversationId: conversationId,
+        content: content,
       );
       return Right(remoteMessage);
     } catch (e) {

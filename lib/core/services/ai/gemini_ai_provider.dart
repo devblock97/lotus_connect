@@ -61,24 +61,24 @@ class GeminiAiProvider implements AiProvider {
           contents.add({
             'role': role,
             'parts': [
-              {'text': msg['content']}
-            ]
+              {'text': msg['content']},
+            ],
           });
         }
       }
       contents.add({
         'role': 'user',
         'parts': [
-          {'text': prompt}
-        ]
+          {'text': prompt},
+        ],
       });
 
       final body = <String, dynamic>{'contents': contents};
       if (systemPrompt != null && systemPrompt.isNotEmpty) {
         body['systemInstruction'] = {
           'parts': [
-            {'text': systemPrompt}
-          ]
+            {'text': systemPrompt},
+          ],
         };
       }
 
@@ -127,24 +127,24 @@ class GeminiAiProvider implements AiProvider {
         contents.add({
           'role': role,
           'parts': [
-            {'text': msg['content']}
-          ]
+            {'text': msg['content']},
+          ],
         });
       }
     }
     contents.add({
       'role': 'user',
       'parts': [
-        {'text': prompt}
-      ]
+        {'text': prompt},
+      ],
     });
 
     final body = <String, dynamic>{'contents': contents};
     if (systemPrompt != null && systemPrompt.isNotEmpty) {
       body['systemInstruction'] = {
         'parts': [
-          {'text': systemPrompt}
-        ]
+          {'text': systemPrompt},
+        ],
       };
     }
 

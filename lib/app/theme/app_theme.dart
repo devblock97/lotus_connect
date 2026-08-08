@@ -33,8 +33,6 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.bgLight,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primaryLight,
-        surface: AppColors.surfaceLight,
         onSurface: AppColors.textLight,
         secondary: Color(0xFF0066FF),
       ),
@@ -63,7 +61,6 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.bgDark,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryDark,
         surface: AppColors.surfaceDark,
         onSurface: AppColors.textDark,
         secondary: Color(0xFF64B5F6),

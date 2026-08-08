@@ -52,7 +52,9 @@ class ChatApiService {
     try {
       final response = await dioClient.get('/users/friends');
       final list = response.data as List<dynamic>;
-      return list.map((item) => User.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => User.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException('Failed to get friends list: $e');
     }
@@ -63,7 +65,9 @@ class ChatApiService {
     try {
       final response = await dioClient.get('/users/friends/requests');
       final list = response.data as List<dynamic>;
-      return list.map((item) => User.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => User.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException('Failed to get friend requests: $e');
     }
@@ -77,7 +81,9 @@ class ChatApiService {
         queryParameters: {'q': query},
       );
       final list = response.data as List<dynamic>;
-      return list.map((item) => User.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => User.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       throw ServerException('Failed to search users: $e');
     }
@@ -122,21 +128,23 @@ class ChatApiService {
     required String content,
     String? replyToId,
   }) async {
-      try {
-        final response = await dioClient.post(
-          'chats/$conversationId/messages',
-          data: {
-            'content': content,
-            if (replyToId != null) 'replyToId': replyToId,
-          },
-        );
-        return response.data as Map<String, dynamic>;
-      } catch (e) {
-        throw ServerException('Failed to send message: $e');
-      }
+    try {
+      final response = await dioClient.post(
+        'chats/$conversationId/messages',
+        data: {
+          'content': content,
+          if (replyToId != null) 'replyToId': replyToId,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw ServerException('Failed to send message: $e');
+    }
   }
 
-  Future<Map<String, dynamic>> deleteMessage({required String messageId}) async {
+  Future<Map<String, dynamic>> deleteMessage({
+    required String messageId,
+  }) async {
     try {
       final response = await dioClient.delete(
         '/chats/messages/$messageId',

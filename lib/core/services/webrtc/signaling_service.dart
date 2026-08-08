@@ -29,19 +29,23 @@ class WebRTCSignalingService {
   StreamSubscription? _subscription;
 
   // Streams for calls UI to listen to call invitation/lifecycle changes
-  final _invitationController = StreamController<WebRTCCallInvitation>.broadcast();
+  final _invitationController =
+      StreamController<WebRTCCallInvitation>.broadcast();
   final _acceptController = StreamController<Map<String, dynamic>>.broadcast();
   final _endController = StreamController<Map<String, dynamic>>.broadcast();
   final _sdpController = StreamController<Map<String, dynamic>>.broadcast();
   final _iceController = StreamController<Map<String, dynamic>>.broadcast();
-  final _inviteAckController = StreamController<Map<String, dynamic>>.broadcast();
+  final _inviteAckController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
-  Stream<WebRTCCallInvitation> get invitationStream => _invitationController.stream;
+  Stream<WebRTCCallInvitation> get invitationStream =>
+      _invitationController.stream;
   Stream<Map<String, dynamic>> get acceptStream => _acceptController.stream;
   Stream<Map<String, dynamic>> get endStream => _endController.stream;
   Stream<Map<String, dynamic>> get sdpStream => _sdpController.stream;
   Stream<Map<String, dynamic>> get iceStream => _iceController.stream;
-  Stream<Map<String, dynamic>> get inviteAckStream => _inviteAckController.stream;
+  Stream<Map<String, dynamic>> get inviteAckStream =>
+      _inviteAckController.stream;
 
   void _subscribeToWebSocket() {
     _subscription = webSocketService.eventStream.listen((eventFrame) {
@@ -52,23 +56,21 @@ class WebRTCSignalingService {
 
       switch (event) {
         case 'call:invite':
-          _invitationController.add(WebRTCCallInvitation(
-            callId: payload['callId'] as String? ?? '',
-            senderId: payload['senderId'] as String? ?? '',
-            conversationId: payload['conversationId'] as String?,
-            channelId: payload['channelId'] as String? ?? '',
-            isVideo: payload['isVideo'] as bool? ?? false,
-          ));
-          break;
+          _invitationController.add(
+            WebRTCCallInvitation(
+              callId: payload['callId'] as String? ?? '',
+              senderId: payload['senderId'] as String? ?? '',
+              conversationId: payload['conversationId'] as String?,
+              channelId: payload['channelId'] as String? ?? '',
+              isVideo: payload['isVideo'] as bool? ?? false,
+            ),
+          );
         case 'call:accept':
           _acceptController.add(payload);
-          break;
         case 'call:invite_ack':
           _inviteAckController.add(payload);
-          break;
         case 'call:ended':
           _endController.add(payload);
-          break;
         case 'signaling:offer':
         case 'signaling:answer':
           _sdpController.add({
@@ -76,10 +78,8 @@ class WebRTCSignalingService {
             'senderId': payload['senderId'],
             'sdp': payload['sdp'],
           });
-          break;
         case 'signaling:ice-candidate':
           _iceController.add(payload);
-          break;
       }
     });
   }
@@ -132,7 +132,7 @@ class WebRTCSignalingService {
       'sdp': {
         'type': sdpType,
         'sdp': sdpDescription,
-      }
+      },
     });
   }
 
@@ -149,7 +149,7 @@ class WebRTCSignalingService {
         'candidate': candidate,
         'sdpMid': sdpMid,
         'sdpMLineIndex': sdpMLineIndex,
-      }
+      },
     });
   }
 

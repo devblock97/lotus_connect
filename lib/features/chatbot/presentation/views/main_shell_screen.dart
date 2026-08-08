@@ -2,22 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
+import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
-import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/alerts_screen.dart';
-import 'package:lotus_connect/features/chatbot/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 
 class MainShellScreen extends ConsumerStatefulWidget {
   const MainShellScreen({super.key});
@@ -67,7 +67,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             : DateTime.now();
 
         AppLogger.debug(
-            'WS message parsed - id: $messageId, conv: $conversationId, sender: $senderId, content: $content');
+          'WS message parsed - id: $messageId, conv: $conversationId, '
+          'sender: $senderId, content: $content',
+        );
 
         if (conversationId.isEmpty) {
           AppLogger.warning('WS message ignored: empty conversationId');
@@ -78,9 +80,12 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         final isFromSelf = senderId.isNotEmpty && senderId == currentUserId;
 
         AppLogger.debug(
-            'WS check self - currentUserId: $currentUserId, isFromSelf: $isFromSelf');
+          'WS check self - currentUserId: $currentUserId, '
+          'isFromSelf: $isFromSelf',
+        );
 
-        // Sender already saved their message locally upon tapping send. Ignore self echo frames.
+        // Sender already saved their message locally upon tapping send.
+        // Ignore self echo frames.
         if (isFromSelf) {
           AppLogger.debug('WS Ignoring self echo frame');
           return;
@@ -96,7 +101,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           }
           for (final friend in ref.read(contactsProvider).friends) {
             if (friend.id == senderId) {
-              peerDisplayName = friend.fullName?.trim().isNotEmpty == true
+              peerDisplayName = friend.fullName?.trim().isNotEmpty ?? false
                   ? friend.fullName!.trim()
                   : friend.username;
               break;
@@ -105,7 +110,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         }
         peerDisplayName ??= _fallbackPeerName(senderId);
 
-        // Auto-create a local conversation if it doesn't exist on the recipient's device yet.
+        // Auto-create a local conversation if it doesn't exist on
+        // the recipient's device yet.
         final conversations = await localDataSource.getConversations();
         final existingConversations =
             conversations.where((c) => c.id == conversationId);
@@ -119,7 +125,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             peerId: senderId,
           );
           AppLogger.info(
-              'WS Auto-created conversation $conversationId for peer $senderId');
+            'WS Auto-created conversation $conversationId for peer $senderId',
+          );
         } else if (existingConversation.title == _fallbackPeerName(senderId)) {
           await localDataSource.renameConversation(
             conversationId,
@@ -133,8 +140,6 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           role: MessageRole.assistant,
           content: content,
           timestamp: timestamp,
-          isError: false,
-          status: MessageStatus.sent,
         );
 
         await localDataSource.saveMessage(message);
@@ -159,7 +164,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           }
         }
       } else if (event == 'notification:new') {
-        ref.read(notificationsProvider.notifier).loadNotifications();
+        await ref.read(notificationsProvider.notifier).loadNotifications();
       }
     });
   }
@@ -174,14 +179,16 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
     final sender = payload['sender'];
     final profile = sender is Map ? Map<String, dynamic>.from(sender) : payload;
     final fullName = profile['fullName'] ?? profile['full_name'];
-    if (fullName is String && fullName.trim().isNotEmpty)
+    if (fullName is String && fullName.trim().isNotEmpty) {
       return fullName.trim();
+    }
 
     final username = profile['username'] ??
         profile['senderUsername'] ??
         profile['sender_username'];
-    if (username is String && username.trim().isNotEmpty)
+    if (username is String && username.trim().isNotEmpty) {
       return username.trim();
+    }
 
     final displayName = profile['displayName'] ??
         profile['display_name'] ??
@@ -203,25 +210,26 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
 
-    // Listen to token changes to dynamically connect or disconnect WS
-    ref.listen<String>(
-      settingsProvider.select((s) => s.accessToken),
-      (prev, next) {
-        if (next.isNotEmpty) {
-          ref.read(webSocketServiceProvider).connect();
-        } else {
-          ref.read(webSocketServiceProvider).disconnect();
-        }
-      },
-    );
-
-    // Automatically switch to Calls tab (index 2) on incoming WebRTC call invitation
-    ref.listen<AsyncValue<WebRTCCallInvitation>>(incomingCallProvider,
+    ref
+      ..listen<String>(
+        settingsProvider.select((s) => s.accessToken),
         (prev, next) {
-      if (next.hasValue) {
-        ref.read(shellIndexProvider.notifier).state = 2;
-      }
-    });
+          if (next.isNotEmpty) {
+            ref.read(webSocketServiceProvider).connect();
+          } else {
+            ref.read(webSocketServiceProvider).disconnect();
+          }
+        },
+      )
+      // Automatically switch to Calls tab (index 2) on incoming call
+      ..listen<AsyncValue<WebRTCCallInvitation>>(
+        incomingCallProvider,
+        (prev, next) {
+          if (next.hasValue) {
+            ref.read(shellIndexProvider.notifier).state = 2;
+          }
+        },
+      );
 
     final shellIndex = ref.watch(shellIndexProvider);
 

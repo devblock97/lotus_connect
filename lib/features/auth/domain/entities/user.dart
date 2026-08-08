@@ -6,18 +6,11 @@ class User {
   const User({
     required this.id,
     required this.username,
-    this.fullName,
     required this.email,
+    this.fullName,
     this.friendshipStatus,
     this.friendshipSenderId,
   });
-
-  final String id;
-  final String username;
-  final String? fullName;
-  final String email;
-  final String? friendshipStatus;
-  final String? friendshipSenderId;
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -29,6 +22,13 @@ class User {
       friendshipSenderId: json['friendshipSenderId'] as String?,
     );
   }
+
+  final String id;
+  final String username;
+  final String? fullName;
+  final String email;
+  final String? friendshipStatus;
+  final String? friendshipSenderId;
 
   Map<String, dynamic> toJson() {
     return {

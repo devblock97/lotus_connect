@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
-import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -118,8 +117,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.contacts,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          loc.contacts,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         actions: [
           IconButton(
@@ -145,8 +146,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
           children: [
             // Search Input Header
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: TextField(
                 controller: _searchController,
                 onChanged: (val) {
@@ -172,7 +172,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       : null,
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  contentPadding: const EdgeInsets.symmetric(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -188,40 +188,51 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       state.requests.isEmpty &&
                       state.searchResults.isEmpty
                   ? const Center(child: CircularProgressIndicator())
-                  : (_searchQuery.isEmpty && filteredFriends.isEmpty && state.requests.isEmpty)
+                  : (_searchQuery.isEmpty &&
+                          filteredFriends.isEmpty &&
+                          state.requests.isEmpty)
                       ? _buildEmptyState(theme)
                       : ListView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           children: [
-                            if (_searchQuery.isEmpty && state.requests.isNotEmpty) ...[
+                            if (_searchQuery.isEmpty &&
+                                state.requests.isNotEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 8.0),
+                                  vertical: 8,
+                                  horizontal: 8,
+                                ),
                                 child: Text(
                                   'FRIEND REQUESTS (${state.requests.length})',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     color: theme.colorScheme.primary,
-                                    letterSpacing: 1.0,
+                                    letterSpacing: 1,
                                   ),
                                 ),
                               ),
-                              ...state.requests.take(3).map(
-                                  (req) => _buildRequestItem(theme, req)),
+                              ...state.requests
+                                  .take(3)
+                                  .map((req) => _buildRequestItem(theme, req)),
                               if (state.requests.length > 3)
                                 Align(
                                   alignment: Alignment.centerLeft,
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
                                     child: TextButton(
                                       onPressed: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => const AllFriendRequestsScreen(),
+                                            builder: (context) =>
+                                                const AllFriendRequestsScreen(),
                                           ),
                                         );
                                       },
@@ -235,61 +246,70 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                                 filteredFriends.isNotEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 8.0),
+                                  vertical: 8,
+                                  horizontal: 8,
+                                ),
                                 child: Text(
                                   'MY FRIENDS',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     color: theme.colorScheme.primary,
-                                    letterSpacing: 1.0,
+                                    letterSpacing: 1,
                                   ),
                                 ),
                               ),
                               ...filteredFriends.map(
-                                  (friend) => _buildFriendItem(theme, friend)),
+                                (friend) => _buildFriendItem(theme, friend),
+                              ),
                               const SizedBox(height: 16),
                             ] else if (_searchQuery.isEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 8.0),
+                                  vertical: 8,
+                                  horizontal: 8,
+                                ),
                                 child: Text(
                                   'ALL FRIENDS',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey.shade600,
-                                    letterSpacing: 1.0,
+                                    letterSpacing: 1,
                                   ),
                                 ),
                               ),
                               ...filteredFriends.map(
-                                  (friend) => _buildFriendItem(theme, friend)),
+                                (friend) => _buildFriendItem(theme, friend),
+                              ),
                             ],
                             if (_searchQuery.isNotEmpty &&
                                 globalResults.isNotEmpty) ...[
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 8.0),
+                                  vertical: 8,
+                                  horizontal: 8,
+                                ),
                                 child: Text(
                                   'GLOBAL SEARCH / ADD FRIENDS',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey.shade600,
-                                    letterSpacing: 1.0,
+                                    letterSpacing: 1,
                                   ),
                                 ),
                               ),
                               ...globalResults.map(
-                                  (user) => _buildGlobalUserItem(theme, user)),
+                                (user) => _buildGlobalUserItem(theme, user),
+                              ),
                             ],
                             if (_searchQuery.isNotEmpty &&
                                 filteredFriends.isEmpty &&
                                 globalResults.isEmpty)
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 40.0),
+                                    const EdgeInsets.symmetric(vertical: 40),
                                 child: _buildEmptyState(theme),
                               ),
                           ],
@@ -324,7 +344,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
           ),
           child: Text(
             'Requested',
-            style: TextStyle(color: Colors.amber.shade800, fontSize: 12, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.amber.shade800,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         );
       } else {
@@ -334,11 +358,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             IconButton(
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
               onPressed: () async {
-                final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(user.id);
+                final success = await ref
+                    .read(contactsProvider.notifier)
+                    .acceptFriendRequest(user.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(success ? 'Friend request accepted!' : 'Failed to accept request'),
+                      content: Text(
+                        success
+                            ? 'Friend request accepted!'
+                            : 'Failed to accept request',
+                      ),
                       backgroundColor: success ? Colors.green : Colors.red,
                     ),
                   );
@@ -349,11 +379,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             IconButton(
               icon: const Icon(Icons.cancel_outlined, color: Colors.red),
               onPressed: () async {
-                final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(user.id);
+                final success = await ref
+                    .read(contactsProvider.notifier)
+                    .rejectFriendRequest(user.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(success ? 'Friend request rejected!' : 'Failed to reject request'),
+                      content: Text(
+                        success
+                            ? 'Friend request rejected!'
+                            : 'Failed to reject request',
+                      ),
                       backgroundColor: success ? Colors.green : Colors.red,
                     ),
                   );
@@ -373,9 +409,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(success
-                    ? 'Friend request sent to @${user.username}'
-                    : 'Failed to send request'),
+                content: Text(
+                  success
+                      ? 'Friend request sent to @${user.username}'
+                      : 'Failed to send request',
+                ),
                 backgroundColor: success ? Colors.green : Colors.red,
               ),
             );
@@ -396,8 +434,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     }
 
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       leading: CircleAvatar(
         backgroundColor: avatarColor.withValues(alpha: 0.15),
         child: Text(
@@ -429,8 +466,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         Colors.primaries[friend.username.hashCode % Colors.primaries.length];
 
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       leading: CircleAvatar(
         backgroundColor: avatarColor.withValues(alpha: 0.15),
         child: Text(
@@ -451,8 +487,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
         children: [
           // Chat Button
           IconButton(
-            icon: Icon(Icons.chat_bubble_outline,
-                color: theme.colorScheme.primary),
+            icon: Icon(
+              Icons.chat_bubble_outline,
+              color: theme.colorScheme.primary,
+            ),
             onPressed: () => _startPrivateChat(friend),
             tooltip: loc.chat,
           ),
@@ -478,8 +516,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline_rounded,
-              size: 64, color: Colors.grey.shade400),
+          Icon(
+            Icons.people_outline_rounded,
+            size: 64,
+            color: Colors.grey.shade400,
+          ),
           const SizedBox(height: 16),
           const Text(
             'No Contacts found',
@@ -506,11 +547,12 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
   Future<void> _startPrivateChat(User friend) async {
     final currentContext = context;
-    final conv =
-        await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
-              friendId: friend.id,
-              title: friend.fullName ?? friend.username,
-            );
+    final conv = await ref
+        .read(privateConversationListProvider.notifier)
+        .createNewPrivateChat(
+          friendId: friend.id,
+          title: friend.fullName ?? friend.username,
+        );
 
     if (conv != null && currentContext.mounted) {
       Navigator.of(currentContext).push(
@@ -531,11 +573,14 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
   Widget _buildRequestItem(ThemeData theme, User requestUser) {
     final loc = AppLocalizations.of(context)!;
     final displayName = requestUser.fullName ?? requestUser.username;
-    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
-    final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
+    final initials = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+    final avatarColor = Colors
+        .primaries[requestUser.username.hashCode % Colors.primaries.length];
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       leading: CircleAvatar(
         backgroundColor: avatarColor.withValues(alpha: 0.15),
         child: Text(
@@ -557,11 +602,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
           IconButton(
             icon: const Icon(Icons.close, color: Colors.redAccent),
             onPressed: () async {
-              final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(requestUser.id);
+              final success = await ref
+                  .read(contactsProvider.notifier)
+                  .rejectFriendRequest(requestUser.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Declined friend request from @${requestUser.username}' : 'Failed to reject request'),
+                    content: Text(
+                      success
+                          ? 'Declined friend request from @${requestUser.username}'
+                          : 'Failed to reject request',
+                    ),
                     backgroundColor: success ? Colors.orange : Colors.red,
                   ),
                 );
@@ -572,11 +623,17 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
           IconButton(
             icon: const Icon(Icons.check, color: Colors.green),
             onPressed: () async {
-              final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(requestUser.id);
+              final success = await ref
+                  .read(contactsProvider.notifier)
+                  .acceptFriendRequest(requestUser.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Accepted friend request from @${requestUser.username}' : 'Failed to accept request'),
+                    content: Text(
+                      success
+                          ? 'Accepted friend request from @${requestUser.username}'
+                          : 'Failed to accept request',
+                    ),
                     backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );
@@ -601,72 +658,91 @@ class AllFriendRequestsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.friendRequests, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          loc.friendRequests,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(contactsProvider.notifier).loadFriends(),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
             if (state.requests.isNotEmpty) ...[
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 child: Text(
                   'PENDING REQUESTS (${state.requests.length})',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.primary,
-                    letterSpacing: 1.0,
+                    letterSpacing: 1,
                   ),
                 ),
               ),
-              ...state.requests.map((req) => _buildRequestItem(context, ref, req)),
+              ...state.requests
+                  .map((req) => _buildRequestItem(context, ref, req)),
               const SizedBox(height: 24),
             ] else
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32.0),
+                padding: EdgeInsets.symmetric(vertical: 32),
                 child: Center(
-                  child: Text('No pending requests', style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    'No pending requests',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: Text(
                 'MY FRIENDS (${state.friends.length})',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade600,
-                  letterSpacing: 1.0,
+                  letterSpacing: 1,
                 ),
               ),
             ),
             if (state.friends.isEmpty)
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32.0),
+                padding: EdgeInsets.symmetric(vertical: 32),
                 child: Center(
-                  child: Text('No friends yet', style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    'No friends yet',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               )
             else
-              ...state.friends.map((friend) => _buildFriendItem(context, ref, theme, friend)),
+              ...state.friends.map(
+                (friend) => _buildFriendItem(context, ref, theme, friend),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRequestItem(BuildContext context, WidgetRef ref, User requestUser) {
+  Widget _buildRequestItem(
+    BuildContext context,
+    WidgetRef ref,
+    User requestUser,
+  ) {
     final loc = AppLocalizations.of(context)!;
     final displayName = requestUser.fullName ?? requestUser.username;
-    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
-    final avatarColor = Colors.primaries[requestUser.username.hashCode % Colors.primaries.length];
+    final initials = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+    final avatarColor = Colors
+        .primaries[requestUser.username.hashCode % Colors.primaries.length];
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       leading: CircleAvatar(
         backgroundColor: avatarColor.withValues(alpha: 0.15),
         child: Text(
@@ -688,11 +764,17 @@ class AllFriendRequestsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.close, color: Colors.redAccent),
             onPressed: () async {
-              final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(requestUser.id);
+              final success = await ref
+                  .read(contactsProvider.notifier)
+                  .rejectFriendRequest(requestUser.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Declined friend request from @${requestUser.username}' : 'Failed to reject request'),
+                    content: Text(
+                      success
+                          ? 'Declined friend request from @${requestUser.username}'
+                          : 'Failed to reject request',
+                    ),
                     backgroundColor: success ? Colors.orange : Colors.red,
                   ),
                 );
@@ -703,11 +785,17 @@ class AllFriendRequestsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.check, color: Colors.green),
             onPressed: () async {
-              final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(requestUser.id);
+              final success = await ref
+                  .read(contactsProvider.notifier)
+                  .acceptFriendRequest(requestUser.id);
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Accepted friend request from @${requestUser.username}' : 'Failed to accept request'),
+                    content: Text(
+                      success
+                          ? 'Accepted friend request from @${requestUser.username}'
+                          : 'Failed to accept request',
+                    ),
                     backgroundColor: success ? Colors.green : Colors.red,
                   ),
                 );
@@ -720,14 +808,22 @@ class AllFriendRequestsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFriendItem(BuildContext context, WidgetRef ref, ThemeData theme, User friend) {
+  Widget _buildFriendItem(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    User friend,
+  ) {
     final loc = AppLocalizations.of(context)!;
     final displayName = friend.fullName ?? friend.username;
-    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
-    final avatarColor = Colors.primaries[friend.username.hashCode % Colors.primaries.length];
+    final initials = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+    final avatarColor =
+        Colors.primaries[friend.username.hashCode % Colors.primaries.length];
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
       leading: CircleAvatar(
         backgroundColor: avatarColor.withValues(alpha: 0.15),
         child: Text(
@@ -747,13 +843,17 @@ class AllFriendRequestsScreen extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary),
+            icon: Icon(
+              Icons.chat_bubble_outline,
+              color: theme.colorScheme.primary,
+            ),
             onPressed: () => _startPrivateChat(context, ref, friend),
             tooltip: loc.chat,
           ),
           IconButton(
             icon: const Icon(Icons.phone_outlined, color: Colors.blue),
-            onPressed: () => _startCall(context, ref, friend.id, isVideo: false),
+            onPressed: () =>
+                _startCall(context, ref, friend.id, isVideo: false),
             tooltip: loc.voiceCall,
           ),
           IconButton(
@@ -766,9 +866,15 @@ class AllFriendRequestsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _startPrivateChat(BuildContext context, WidgetRef ref, User friend) async {
+  Future<void> _startPrivateChat(
+    BuildContext context,
+    WidgetRef ref,
+    User friend,
+  ) async {
     final currentContext = context;
-    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
+    final conv = await ref
+        .read(privateConversationListProvider.notifier)
+        .createNewPrivateChat(
           friendId: friend.id,
           title: friend.fullName ?? friend.username,
         );
@@ -782,9 +888,16 @@ class AllFriendRequestsScreen extends ConsumerWidget {
     }
   }
 
-  void _startCall(BuildContext context, WidgetRef ref, String friendId, {required bool isVideo}) {
-    ref.read(callRequestProvider.notifier).state = CallRequest(recipientId: friendId, isVideo: isVideo);
+  void _startCall(
+    BuildContext context,
+    WidgetRef ref,
+    String friendId, {
+    required bool isVideo,
+  }) {
+    ref.read(callRequestProvider.notifier).state =
+        CallRequest(recipientId: friendId, isVideo: isVideo);
     ref.read(shellIndexProvider.notifier).state = 2; // Switch to Calls tab
-    Navigator.of(context).popUntil((route) => route.isFirst); // Pop back to main shell
+    Navigator.of(context)
+        .popUntil((route) => route.isFirst); // Pop back to main shell
   }
 }

@@ -1,9 +1,9 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockChatbotRepository extends Mock implements ChatbotRepository {}
 

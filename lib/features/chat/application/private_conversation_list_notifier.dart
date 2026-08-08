@@ -1,11 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
-import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
-import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 
 /// UI state for private human-to-human conversation history list.
 class PrivateConversationListState {
@@ -62,7 +63,9 @@ class PrivateConversationListNotifier
 
   void _initStream() {
     state = state.copyWith(isLoading: true);
-    _ref.read(getConversationsUseCaseProvider)(const NoParams()).listen((result) {
+    _ref
+        .read(getConversationsUseCaseProvider)(const NoParams())
+        .listen((result) {
       result.fold(
         (failure) => state = state.copyWith(
           isLoading: false,
@@ -74,7 +77,7 @@ class PrivateConversationListNotifier
           final sorted = List<Conversation>.from(userConversations)
             ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-          String? currentSelected = state.selectedConversationId;
+          var currentSelected = state.selectedConversationId;
           if (currentSelected == null && sorted.isNotEmpty) {
             currentSelected = sorted.first.id;
           }

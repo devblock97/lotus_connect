@@ -71,7 +71,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   /// Sets auth tokens.
   Future<void> setTokens(String accessToken, String refreshToken) async {
-    state = state.copyWith(accessToken: accessToken, refreshToken: refreshToken);
+    state =
+        state.copyWith(accessToken: accessToken, refreshToken: refreshToken);
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     await localDataSource.updateSettings(state);
   }

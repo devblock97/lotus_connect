@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
+import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chat/presentation/widgets/person_message_bubble.dart';
-import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/person_message_bubble.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
-import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Dedicated screen for private, person-to-person conversations.
 class ChatScreen extends ConsumerStatefulWidget {
@@ -34,7 +34,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ref
             .read(privateConversationListProvider.notifier)
             .selectConversation(widget.conversationId);
-        _webSocketService.send('chat:focus', {'conversationId': widget.conversationId});
+        _webSocketService
+            .send('chat:focus', {'conversationId': widget.conversationId});
       } catch (e) {
         AppLogger.error('Error in ChatScreen initState callback: $e');
       }
@@ -65,7 +66,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final conversations = ref.watch(privateConversationListProvider).conversations;
+    final conversations =
+        ref.watch(privateConversationListProvider).conversations;
     Conversation? conversation;
     for (final item in conversations) {
       if (item.id == widget.conversationId) {
@@ -77,7 +79,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final activeNotifier = ref.read(privateActiveConversationProvider.notifier);
     final friends = ref.watch(contactsProvider).friends;
 
-    ref.listen<PrivateActiveConversationState>(privateActiveConversationProvider, (_, next) {
+    ref.listen<PrivateActiveConversationState>(
+        privateActiveConversationProvider, (_, next) {
       if (next.conversationId == widget.conversationId &&
           next.messages.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
@@ -132,13 +135,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
         actions: [
           IconButton(
-              icon: const Icon(Icons.call_outlined),
-              onPressed: () {},
-              tooltip: loc.voiceCall),
+            icon: const Icon(Icons.call_outlined),
+            onPressed: () {},
+            tooltip: loc.voiceCall,
+          ),
           IconButton(
-              icon: const Icon(Icons.videocam_outlined),
-              onPressed: () {},
-              tooltip: loc.videoCall),
+            icon: const Icon(Icons.videocam_outlined),
+            onPressed: () {},
+            tooltip: loc.videoCall,
+          ),
         ],
       ),
       body: Column(

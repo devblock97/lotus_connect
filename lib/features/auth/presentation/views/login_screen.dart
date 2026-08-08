@@ -49,14 +49,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_isLogin && !_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('You must agree to the Terms of Service & Privacy Policy.'),
+          content:
+              Text('You must agree to the Terms of Service & Privacy Policy.'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    if (!_isLogin && _passwordController.text != _confirmPasswordController.text) {
+    if (!_isLogin &&
+        _passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Passwords do not match.'),
@@ -111,7 +113,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _showServerConfigDialog() {
     final settings = ref.read(settingsProvider);
-    _serverHostController.text = 'https://be10-2001-ee0-1b38-2b4c-2838-129a-ce08-7508.ngrok-free.app/api/v1';
+    _serverHostController.text =
+        'https://be10-2001-ee0-1b38-2b4c-2838-129a-ce08-7508.ngrok-free.app/api/v1';
 
     showDialog(
       context: context,
@@ -142,7 +145,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await ref.read(settingsProvider.notifier).setServerHost(_serverHostController.text.trim());
+              await ref
+                  .read(settingsProvider.notifier)
+                  .setServerHost(_serverHostController.text.trim());
               if (mounted) Navigator.pop(context);
             },
             child: const Text('Save'),
@@ -155,10 +160,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Calculate password strength segments (1 to 4)
   int _calculatePasswordStrength(String pass) {
     if (pass.isEmpty) return 0;
-    int score = 0;
+    var score = 0;
     if (pass.length >= 6) score++;
-    if (pass.contains(RegExp(r'[A-Z]'))) score++;
-    if (pass.contains(RegExp(r'[0-9]'))) score++;
+    if (pass.contains(RegExp('[A-Z]'))) score++;
+    if (pass.contains(RegExp('[0-9]'))) score++;
     if (pass.contains(RegExp(r'[!@#\$&*~]'))) score++;
     return score.clamp(1, 4);
   }
@@ -190,17 +195,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey.shade200),
                         ),
-                        child: const Icon(Icons.spa, color: Color(0xFFD4AF37), size: 18),
+                        child: const Icon(
+                          Icons.spa,
+                          color: Color(0xFFD4AF37),
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         'Ai Assistant',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined, color: Colors.grey),
+                    icon:
+                        const Icon(Icons.settings_outlined, color: Colors.grey),
                     onPressed: _showServerConfigDialog,
                   ),
                 ],
@@ -243,15 +257,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         // FULL NAME (Registration Only)
                         const Text(
                           'FULL NAME',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 0.5),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black54,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _fullNameController,
                           decoration: InputDecoration(
                             hintText: 'Enter your full name',
-                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                            prefixIcon: const Icon(Icons.person_outline, color: Colors.grey, size: 20),
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 14,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
@@ -259,23 +285,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               borderSide: BorderSide.none,
                             ),
                           ),
-                          validator: (val) =>
-                              val == null || val.isEmpty ? 'Full name required' : null,
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Full name required'
+                              : null,
                         ),
                         const SizedBox(height: 18),
 
                         // USERNAME (Registration Only)
                         const Text(
                           'USERNAME',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 0.5),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black54,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             hintText: 'Choose a unique username',
-                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                            prefixIcon: const Icon(Icons.alternate_email, color: Colors.grey, size: 20),
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 14,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.alternate_email,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
@@ -284,8 +323,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           validator: (val) {
-                            if (val == null || val.isEmpty) return 'Username required';
-                            if (val.length < 3) return 'Username must be at least 3 characters';
+                            if (val == null || val.isEmpty) {
+                              return 'Username required';
+                            }
+                            if (val.length < 3) {
+                              return 'Username must be at least 3 characters';
+                            }
                             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(val)) {
                               return 'Only alphanumeric characters & underscores';
                             }
@@ -298,7 +341,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       // EMAIL ADDRESS
                       const Text(
                         'EMAIL ADDRESS',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 0.5),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black54,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -306,8 +354,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: 'name@company.com',
-                          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                          prefixIcon: const Icon(Icons.mail_outline, color: Colors.grey, size: 20),
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 14,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.mail_outline,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
                           filled: true,
                           fillColor: const Color(0xFFF3F4F6),
                           border: OutlineInputBorder(
@@ -315,15 +370,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (val) =>
-                            val == null || !val.contains('@') ? 'Invalid email address' : null,
+                        validator: (val) => val == null || !val.contains('@')
+                            ? 'Invalid email address'
+                            : null,
                       ),
                       const SizedBox(height: 18),
 
                       // PASSWORD
                       const Text(
                         'PASSWORD',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 0.5),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black54,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
@@ -331,16 +392,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         obscureText: _obscurePassword,
                         onChanged: (val) => setState(() {}),
                         decoration: InputDecoration(
-                          hintText: _isLogin ? '•••••••••' : 'Create a strong password',
-                          hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                          prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey, size: 20),
+                          hintText: _isLogin
+                              ? '•••••••••'
+                              : 'Create a strong password',
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 14,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
                               color: Colors.grey,
                               size: 20,
                             ),
-                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
                           ),
                           filled: true,
                           fillColor: const Color(0xFFF3F4F6),
@@ -349,8 +423,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (val) =>
-                            val == null || val.length < 6 ? 'Password must be at least 6 characters' : null,
+                        validator: (val) => val == null || val.length < 6
+                            ? 'Password must be at least 6 characters'
+                            : null,
                       ),
 
                       // Password Strength Indicator (Registration Only)
@@ -359,7 +434,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Row(
                           children: List.generate(4, (index) {
                             final filled = index < strength;
-                            Color color = Colors.grey.shade300;
+                            var color = Colors.grey.shade300;
                             if (filled) {
                               if (strength == 1) color = Colors.red;
                               if (strength == 2) color = Colors.orange;
@@ -369,7 +444,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             return Expanded(
                               child: Container(
                                 height: 4,
-                                margin: const EdgeInsets.symmetric(horizontal: 2),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 2),
                                 decoration: BoxDecoration(
                                   color: color,
                                   borderRadius: BorderRadius.circular(2),
@@ -385,7 +461,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         // CONFIRM PASSWORD (Registration Only)
                         const Text(
                           'CONFIRM PASSWORD',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black54, letterSpacing: 0.5),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black54,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
@@ -393,15 +474,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
                             hintText: 'Repeat your password',
-                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                            prefixIcon: const Icon(Icons.refresh, color: Colors.grey, size: 20),
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 14,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.refresh,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                _obscureConfirmPassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
                                 color: Colors.grey,
                                 size: 20,
                               ),
-                              onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                              onPressed: () => setState(
+                                () => _obscureConfirmPassword =
+                                    !_obscureConfirmPassword,
+                              ),
                             ),
                             filled: true,
                             fillColor: const Color(0xFFF3F4F6),
@@ -411,8 +504,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           validator: (val) {
-                            if (val == null || val.isEmpty) return 'Confirm password required';
-                            if (val != _passwordController.text) return 'Passwords do not match';
+                            if (val == null || val.isEmpty) {
+                              return 'Confirm password required';
+                            }
+                            if (val != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
                             return null;
                           },
                         ),
@@ -424,22 +521,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Checkbox(
                               value: _agreeToTerms,
                               activeColor: Colors.black,
-                              onChanged: (val) => setState(() => _agreeToTerms = val ?? false),
+                              onChanged: (val) =>
+                                  setState(() => _agreeToTerms = val ?? false),
                             ),
                             Expanded(
                               child: RichText(
                                 text: TextSpan(
-                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 13,
+                                  ),
                                   children: const [
                                     TextSpan(text: 'I agree to the '),
                                     TextSpan(
                                       text: 'Terms of Service',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                     TextSpan(text: ' and '),
                                     TextSpan(
                                       text: 'Privacy Policy',
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                     TextSpan(text: '.'),
                                   ],
@@ -488,7 +595,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                  valueColor:
+                                      AlwaysStoppedAnimation(Colors.white),
                                 ),
                               )
                             : Row(
@@ -496,7 +604,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 children: [
                                   Text(
                                     _isLogin ? 'Log In' : 'Create Account',
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
                                   const Icon(Icons.arrow_forward, size: 18),
@@ -513,7 +624,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
                               'OR CONTINUE WITH',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                           Expanded(child: Divider(color: Colors.grey.shade200)),
@@ -528,7 +643,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: OutlinedButton(
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
                                 side: BorderSide(color: Colors.grey.shade200),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -540,12 +656,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   Image.network(
                                     'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
                                     height: 18,
-                                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.g_mobiledata, color: Colors.blue, size: 24),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                      Icons.g_mobiledata,
+                                      color: Colors.blue,
+                                      size: 24,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
                                   const Text(
                                     'Google',
-                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -556,7 +682,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: OutlinedButton(
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
                                 side: BorderSide(color: Colors.grey.shade200),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -565,11 +692,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.apple, color: Colors.black, size: 20),
+                                  Icon(
+                                    Icons.apple,
+                                    color: Colors.black,
+                                    size: 20,
+                                  ),
                                   SizedBox(width: 8),
                                   Text(
                                     'Apple',
-                                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -584,8 +719,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _isLogin ? "Don't have an account? " : "Already have an account? ",
-                            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                            _isLogin
+                                ? "Don't have an account? "
+                                : 'Already have an account? ',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {

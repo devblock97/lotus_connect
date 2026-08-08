@@ -6,11 +6,11 @@ class CallLog {
   const CallLog({
     required this.id,
     required this.hostId,
-    this.conversationId,
     required this.channelId,
     required this.isVideo,
     required this.status,
     required this.createdAt,
+    this.conversationId,
     this.endedAt,
   });
 
@@ -18,14 +18,17 @@ class CallLog {
     return CallLog(
       id: json['id'] as String? ?? '',
       hostId: json['hostId'] as String? ?? json['host_id'] as String? ?? '',
-      conversationId: json['conversationId'] as String? ?? json['conversation_id'] as String?,
-      channelId: json['channelId'] as String? ?? json['channel_id'] as String? ?? '',
+      conversationId: json['conversationId'] as String? ??
+          json['conversation_id'] as String?,
+      channelId:
+          json['channelId'] as String? ?? json['channel_id'] as String? ?? '',
       isVideo: json['isVideo'] as bool? ?? json['is_video'] as bool? ?? false,
       status: json['status'] as String? ?? 'initiated',
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
           : json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'] as String) ?? DateTime.now()
+              ? DateTime.tryParse(json['created_at'] as String) ??
+                  DateTime.now()
               : DateTime.now(),
       endedAt: json['endedAt'] != null
           ? DateTime.tryParse(json['endedAt'] as String)
@@ -88,7 +91,7 @@ class CallHistoryNotifier extends StateNotifier<CallHistoryState> {
     state = state.copyWith(isLoading: true);
     try {
       final list = await _chatApiService.getCallHistory();
-      final callLogs = list.map((item) => CallLog.fromJson(item)).toList();
+      final callLogs = list.map(CallLog.fromJson).toList();
       state = state.copyWith(history: callLogs, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -100,7 +103,8 @@ class CallHistoryNotifier extends StateNotifier<CallHistoryState> {
 }
 
 /// Global provider for CallHistoryNotifier.
-final callHistoryProvider = StateNotifierProvider<CallHistoryNotifier, CallHistoryState>((ref) {
+final callHistoryProvider =
+    StateNotifierProvider<CallHistoryNotifier, CallHistoryState>((ref) {
   final apiService = ref.watch(chatApiServiceProvider);
   return CallHistoryNotifier(apiService);
 });

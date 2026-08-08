@@ -1,8 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
@@ -60,7 +61,9 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
 
   void _initStream() {
     state = state.copyWith(isLoading: true);
-    _ref.read(getConversationsUseCaseProvider)(const NoParams()).listen((result) {
+    _ref
+        .read(getConversationsUseCaseProvider)(const NoParams())
+        .listen((result) {
       result.fold(
         (failure) => state = state.copyWith(
           isLoading: false,
@@ -72,7 +75,7 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
           final sorted = List<Conversation>.from(aiConversations)
             ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
-          String? currentSelected = state.selectedConversationId;
+          var currentSelected = state.selectedConversationId;
           if (currentSelected == null && sorted.isNotEmpty) {
             currentSelected = sorted.first.id;
           }

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -66,8 +66,10 @@ class ConversationListView extends ConsumerWidget {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(Icons.contacts_outlined,
-                          color: Colors.amber),
+                      leading: const Icon(
+                        Icons.contacts_outlined,
+                        color: Colors.amber,
+                      ),
                       title: Text(loc.viewContactsAndFriends),
                       onTap: () {
                         Navigator.pop(context);
@@ -240,13 +242,13 @@ class ConversationListView extends ConsumerWidget {
           ],
         ),
         subtitle: Text(
-          conversation.draftMessage?.isNotEmpty == true
+          conversation.draftMessage?.isNotEmpty ?? false
               ? 'Draft: ${conversation.draftMessage}'
               : 'Tap to resume conversation...',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: conversation.draftMessage?.isNotEmpty == true
+            color: conversation.draftMessage?.isNotEmpty ?? false
                 ? Colors.redAccent
                 : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
           ),
@@ -349,12 +351,13 @@ class ConversationListView extends ConsumerWidget {
                     ),
                   );
                 } else {
-                  final err = ref.read(privateConversationListProvider).errorMessage;
+                  final err =
+                      ref.read(privateConversationListProvider).errorMessage;
                   if (screenContext.mounted) {
                     ScaffoldMessenger.of(screenContext).showSnackBar(
                       SnackBar(
-                          content:
-                              Text(err ?? 'Failed to start chat with user')),
+                        content: Text(err ?? 'Failed to start chat with user'),
+                      ),
                     );
                   }
                 }

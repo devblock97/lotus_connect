@@ -59,11 +59,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Registration action.
   Future<bool> register({
     required String username,
-    String? fullName,
     required String email,
     required String password,
+    String? fullName,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       await _authService.register(
         username: username,
@@ -84,7 +84,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String email,
     required String password,
   }) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true);
     try {
       final credentials = await _authService.login(
         email: email,

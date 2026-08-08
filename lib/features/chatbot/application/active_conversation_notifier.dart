@@ -1,11 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
-import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
 
 /// UI state for active chatbot window.
@@ -211,7 +211,6 @@ class ActiveConversationNotifier
             role: MessageRole.assistant,
             content: accumulatedText,
             timestamp: DateTime.now(),
-            status: MessageStatus.sent,
           );
           await repository.saveMessage(aiMessage);
         }
@@ -243,7 +242,6 @@ class ActiveConversationNotifier
         role: MessageRole.assistant,
         content: state.streamingContent,
         timestamp: DateTime.now(),
-        status: MessageStatus.sent,
       );
       await repository.saveMessage(aiMessage);
     }

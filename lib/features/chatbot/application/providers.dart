@@ -4,6 +4,8 @@ import 'package:lotus_connect/core/services/ai/ai_provider.dart';
 import 'package:lotus_connect/core/services/ai/gemini_ai_provider.dart';
 import 'package:lotus_connect/core/services/ai/local_ai_provider.dart';
 import 'package:lotus_connect/core/services/ai/mock_ai_provider.dart';
+import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_local_data_source.dart';
 import 'package:lotus_connect/features/chatbot/data/datasources/chatbot_remote_data_source.dart';
@@ -11,8 +13,6 @@ import 'package:lotus_connect/features/chatbot/data/repositories/chatbot_reposit
 import 'package:lotus_connect/features/chatbot/domain/repositories/chatbot_repository.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/stream_ai_response_usecase.dart';
-import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
-import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 
 /// Dio client provider configured dynamically with user settings and RTR support.
 final dioClientProvider = Provider<DioClient>((ref) {
@@ -21,7 +21,9 @@ final dioClientProvider = Provider<DioClient>((ref) {
     serverHostGetter: () => ref.read(settingsProvider).serverHost,
     refreshTokenGetter: () => ref.read(settingsProvider).refreshToken,
     onTokensRefreshed: (accessToken, refreshToken) async {
-      await ref.read(settingsProvider.notifier).setTokens(accessToken, refreshToken);
+      await ref
+          .read(settingsProvider.notifier)
+          .setTokens(accessToken, refreshToken);
     },
     onRefreshFailed: () {
       ref.read(settingsProvider.notifier).clearTokens();

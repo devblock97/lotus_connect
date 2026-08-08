@@ -111,34 +111,42 @@ class PrivateActiveConversationNotifier
             (failure) async {},
             (localMessages) async {
               final uuidRegex = RegExp(
-                r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+                '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+                r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
               );
 
               final remoteIds = remoteMessages.map((m) => m.id).toSet();
 
               if (remoteMessages.length < 100) {
-                // If remote returned fewer than 100 messages, we have fetched the complete history.
-                // Any local message with a UUID not in remoteMessages must have been deleted.
+                // If remote returned fewer than 100 messages,
+                // we have fetched the complete history.
+                // Any local message with a UUID not in remoteMessages
+                // must have been deleted.
                 for (final msg in localMessages) {
-                  if (uuidRegex.hasMatch(msg.id) && !remoteIds.contains(msg.id)) {
+                  if (uuidRegex.hasMatch(msg.id) &&
+                      !remoteIds.contains(msg.id)) {
                     await localRepository.deleteMessage(msg.id);
                   }
                 }
               } else {
                 // Reconcile within the window of fetched remote messages.
-                // Subtract 5 seconds to account for precision loss in DB or clock skew.
+                // Subtract 5 seconds to account for precision loss
+                // in DB or clock skew.
                 DateTime? minTimestamp;
                 for (final msg in remoteMessages) {
-                  if (minTimestamp == null || msg.timestamp.isBefore(minTimestamp)) {
+                  if (minTimestamp == null ||
+                      msg.timestamp.isBefore(minTimestamp)) {
                     minTimestamp = msg.timestamp;
                   }
                 }
 
                 if (minTimestamp != null) {
-                  final adjustedMin = minTimestamp.subtract(const Duration(seconds: 5));
+                  final adjustedMin =
+                      minTimestamp.subtract(const Duration(seconds: 5));
                   for (final msg in localMessages) {
                     if (uuidRegex.hasMatch(msg.id) &&
-                        (msg.timestamp.isAfter(adjustedMin) || msg.timestamp.isAtSameMomentAs(adjustedMin))) {
+                        (msg.timestamp.isAfter(adjustedMin) ||
+                            msg.timestamp.isAtSameMomentAs(adjustedMin))) {
                       if (!remoteIds.contains(msg.id)) {
                         await localRepository.deleteMessage(msg.id);
                       }
@@ -150,7 +158,7 @@ class PrivateActiveConversationNotifier
           );
         },
       );
-    } catch (_) {
+    } on Object catch (_) {
       // Ignore background sync errors
     }
   }
@@ -186,16 +194,7 @@ class PrivateActiveConversationNotifier
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
       },
-      (_) async {
-        // Clear draft locally
-        // await _chatCoreRepository.saveDraftMessage(params.conversationId, '');
-
-        // Send over WebSocket
-        // _webSocketService.sendChatMessage(
-        //   conversationId: params.conversationId,
-        //   content: trimmedText,
-        // );
-      },
+      (_) async {},
     );
   }
 
