@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
@@ -52,6 +54,9 @@ class PrivateActiveConversationNotifier
       : super(const PrivateActiveConversationState()) {
     _init();
   }
+
+  Timer? _typingTimer;
+  bool _isCurrentlyTyping = false;
 
   final Ref _ref;
   StreamSubscription<dynamic>? _messageSubscription;
@@ -225,6 +230,33 @@ class PrivateActiveConversationNotifier
     if (convId == null) return;
     state = state.copyWith(draftInput: draft);
     await _ref.read(chatCoreRepositoryProvider).saveDraftMessage(convId, draft);
+
+    _sendTypingStatus(draft.trim().isNotEmpty);
+  }
+
+  void _sendTypingStatus(bool isTyping) {
+    if (_isCurrentlyTyping == isTyping) return;
+    _isCurrentlyTyping = isTyping;
+
+    final listState = _ref.read(privateConversationListProvider);
+    final conversation = listState.conversations
+        .firstWhereOrNull((c) => c.id == state.conversationId);
+    final recipientId = conversation?.peerId ?? '';
+
+    if (recipientId.isNotEmpty && state.conversationId != null) {
+      _ref.read(webSocketServiceProvider).sendTyping(
+            recipientId: recipientId,
+            conversationId: state.conversationId!,
+            isTyping: isTyping,
+          );
+    }
+
+    _typingTimer?.cancel();
+    if (isTyping) {
+      _typingTimer = Timer(const Duration(seconds: 3), () {
+        _sendTypingStatus(false);
+      });
+    }
   }
 
   /// Deletes a message by its ID.
@@ -258,6 +290,7 @@ class PrivateActiveConversationNotifier
   @override
   void dispose() {
     _messageSubscription?.cancel();
+    _typingTimer?.cancel();
     super.dispose();
   }
 }

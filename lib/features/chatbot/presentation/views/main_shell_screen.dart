@@ -6,6 +6,8 @@ import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
+import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
+import 'package:lotus_connect/features/chat/application/typing_status_provider.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -67,7 +69,10 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             : DateTime.now();
 
         AppLogger.debug(
-          'WS message parsed - id: $messageId, conv: $conversationId, sender: $senderId, content: $content',
+          'WS message parsed - id: $messageId, '
+          'conv: $conversationId, '
+          'sender: $senderId, '
+          'content: $content',
         );
 
         if (conversationId.isEmpty) {
@@ -79,7 +84,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         final isFromSelf = senderId.isNotEmpty && senderId == currentUserId;
 
         AppLogger.debug(
-          'WS check self - currentUserId: $currentUserId, isFromSelf: $isFromSelf',
+          'WS check self - currentUserId: $currentUserId, '
+          'isFromSelf: $isFromSelf',
         );
 
         // Sender already saved their message locally upon tapping send.
@@ -166,6 +172,40 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         }
       } else if (event == 'notification:new') {
         await ref.read(notificationsProvider.notifier).loadNotifications();
+      } else if (event == 'typing') {
+        final conversationId = (payload['conversationId'] ??
+                payload['conversation_id']) as String? ??
+            '';
+        final isTyping = payload['isTyping'] as bool? ?? false;
+
+        ref
+            .read(typingStatusProvider.notifier)
+            .setTyping(conversationId, isTyping);
+      } else if (event == 'chat:read') {
+        final messageId = payload['messageId'] as String? ?? '';
+
+        if (messageId.isNotEmpty) {
+          final localDataSource = ref.read(chatCoreLocalDataSourceProvider);
+          final readMessage = await localDataSource.getMessage(messageId);
+
+          if (readMessage != null) {
+            await localDataSource.markOutgoingMessagesAsRead(
+              readMessage.conversationId,
+              readMessage.timestamp,
+            );
+          }
+        }
+      } else if (event == 'presence:status') {
+        final userId = payload['userId'] as String? ?? '';
+        final isOnline = payload['isOnline'] as bool? ?? false;
+        final lastSeenStr = payload['lastSeen'] as String?;
+        final lastSeen = lastSeenStr != null
+            ? DateTime.tryParse(lastSeenStr) ?? DateTime.now()
+            : DateTime.now();
+
+        ref
+            .read(presenceProvider.notifier)
+            .updatePresence(userId, isOnline, lastSeen);
       }
     });
   }

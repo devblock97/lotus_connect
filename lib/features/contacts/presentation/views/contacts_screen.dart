@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,69 +31,71 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     super.dispose();
   }
 
-  void _showAddFriendDialog(BuildContext context) {
+  Future<void> _showAddFriendDialog(BuildContext context) async {
     final loc = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(loc.addFriend),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              loc.enterUsernameToSendRequest,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _addFriendController,
-              decoration: const InputDecoration(
-                hintText: 'e.g. johndoe',
-                prefixIcon: Icon(Icons.alternate_email),
-                border: OutlineInputBorder(),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(loc.addFriend),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                loc.enterUsernameToSendRequest,
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _addFriendController,
+                decoration: const InputDecoration(
+                  hintText: 'e.g. johndoe',
+                  prefixIcon: Icon(Icons.alternate_email),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(loc.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final username = _addFriendController.text.trim();
+                if (username.isEmpty) return;
+
+                Navigator.pop(context);
+                final success = await ref
+                    .read(contactsProvider.notifier)
+                    .sendFriendRequest(username);
+
+                if (context.mounted) {
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Friend request sent to @$username'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    _addFriendController.clear();
+                  } else {
+                    final err = ref.read(contactsProvider).errorMessage;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(err ?? 'Failed to send request'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: Text(loc.sendRequest),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(loc.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final username = _addFriendController.text.trim();
-              if (username.isEmpty) return;
-
-              Navigator.pop(context);
-              final success = await ref
-                  .read(contactsProvider.notifier)
-                  .sendFriendRequest(username);
-
-              if (context.mounted) {
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Friend request sent to @$username'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  _addFriendController.clear();
-                } else {
-                  final err = ref.read(contactsProvider).errorMessage;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(err ?? 'Failed to send request'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(loc.sendRequest),
-          ),
-        ],
       ),
     );
   }
@@ -172,7 +176,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                       : null,
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  contentPadding: const EdgeInsets.symmetric(),
+                  contentPadding: EdgeInsets.zero,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,

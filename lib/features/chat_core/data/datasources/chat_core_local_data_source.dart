@@ -23,6 +23,10 @@ abstract class ChatCoreLocalDataSource {
   Future<void> deleteMessage(String messageId);
   Future<List<Message>> getMessages(String conversationId);
   Future<Message?> getMessage(String messageId);
+  Future<void> markOutgoingMessagesAsRead(
+    String conversationId,
+    DateTime timestamp,
+  );
 }
 
 class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
@@ -276,6 +280,21 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
         orElse: () => MessageStatus.sent,
       ),
       replyToId: row.replyToId,
+    );
+  }
+
+  @override
+  Future<void> markOutgoingMessagesAsRead(
+    String conversationId,
+    DateTime timestamp,
+  ) async {
+    await (_db.update(_db.messageTable)
+          ..where((tbl) => tbl.conversationId.equals(conversationId))
+          ..where((tbl) => tbl.timestamp.isSmallerOrEqualValue(timestamp)))
+        .write(
+      MessageTableCompanion(
+        status: Value(MessageStatus.read.name),
+      ),
     );
   }
 }

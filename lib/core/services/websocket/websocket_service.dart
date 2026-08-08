@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
-/// Service managing dynamic, resilient WebSocket connections to the Rust gateway.
 class WebSocketService {
   WebSocketService(this._ref);
 
@@ -60,7 +59,7 @@ class WebSocketService {
       );
 
       _startHeartbeat();
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('WS Connection failed: $e');
       _scheduleReconnect();
     }
@@ -122,7 +121,7 @@ class WebSocketService {
     try {
       final decoded = json.decode(message.toString()) as Map<String, dynamic>;
       _eventStreamController.add(decoded);
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('WS Parsing error on frame: $message, error: $e');
     }
   }

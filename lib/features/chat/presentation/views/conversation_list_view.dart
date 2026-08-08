@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
+import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -195,85 +198,102 @@ class ConversationListView extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     final notifier = ref.read(privateConversationListProvider.notifier);
-    final timeStr = DateFormat('h:mm a').format(conversation.updatedAt);
+    final repository = ref.watch(chatCoreRepositoryProvider);
     final displayTitle = _displayTitle(
       conversation,
       ref.watch(contactsProvider).friends,
     );
 
-    return Dismissible(
-      key: Key(conversation.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      onDismissed: (_) {
-        notifier.deleteConversation(conversation.id);
-      },
-      child: ListTile(
-        selected: isSelected,
-        selectedTileColor:
-            theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-          child: Text(
-            displayTitle.isNotEmpty ? displayTitle[0].toUpperCase() : 'C',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+    return StreamBuilder<Result<List<Message>>>(
+      stream: repository.watchMessages(conversation.id),
+      builder: (context, snapshot) {
+        final messages = snapshot.data?.fold<List<Message>>(
+          (_) => const [],
+          (items) => items,
+        );
+        final lastMessage =
+            messages != null && messages.isNotEmpty ? messages.last : null;
+        final subtitle = lastMessage == null
+            ? 'Tap to resume conversation...'
+            : lastMessage.content.replaceAll(RegExp(r'\s+'), ' ');
+        final time = lastMessage?.timestamp ?? conversation.updatedAt;
+        final timeStr = DateFormat('h:mm a').format(time);
+
+        return Dismissible(
+          key: Key(conversation.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            color: Colors.red,
+            child: const Icon(Icons.delete, color: Colors.white),
           ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
+          onDismissed: (_) {
+            notifier.deleteConversation(conversation.id);
+          },
+          child: ListTile(
+            selected: isSelected,
+            selectedTileColor:
+                theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
+            leading: CircleAvatar(
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
               child: Text(
-                displayTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                displayTitle.isNotEmpty ? displayTitle[0].toUpperCase() : 'C',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-            if (conversation.isPinned)
-              const Padding(
-                padding: EdgeInsets.only(left: 4),
-                child: Icon(Icons.push_pin, size: 14, color: Colors.amber),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    displayTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                if (conversation.isPinned)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: Icon(Icons.push_pin, size: 14, color: Colors.amber),
+                  ),
+              ],
+            ),
+            subtitle: Text(
+              conversation.draftMessage?.isNotEmpty ?? false
+                  ? 'Draft: ${conversation.draftMessage}'
+                  : subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: conversation.draftMessage?.isNotEmpty ?? false
+                    ? Colors.redAccent
+                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
               ),
-          ],
-        ),
-        subtitle: Text(
-          conversation.draftMessage?.isNotEmpty ?? false
-              ? 'Draft: ${conversation.draftMessage}'
-              : 'Tap to resume conversation...',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: conversation.draftMessage?.isNotEmpty ?? false
-                ? Colors.redAccent
-                : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-          ),
-        ),
-        trailing: Text(
-          timeStr,
-          style: TextStyle(
-            fontSize: 11,
-            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-          ),
-        ),
-        onTap: () {
-          notifier.selectConversation(conversation.id);
-          if (conversation.isUserToUser) {
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => ChatScreen(conversationId: conversation.id),
+            ),
+            trailing: Text(
+              timeStr,
+              style: TextStyle(
+                fontSize: 11,
+                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
               ),
-            );
-          } else {
-            onSelectConversation?.call();
-          }
-        },
-      ),
+            ),
+            onTap: () {
+              notifier.selectConversation(conversation.id);
+              if (conversation.isUserToUser) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ChatScreen(conversationId: conversation.id),
+                  ),
+                );
+              } else {
+                onSelectConversation?.call();
+              }
+            },
+          ),
+        );
+      },
     );
   }
 

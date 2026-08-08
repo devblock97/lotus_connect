@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/application/auth_state.dart';
@@ -91,6 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         setState(() {
           _isLogin = true;
         });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Registration successful! Please login.'),
@@ -111,48 +114,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _showServerConfigDialog() {
-    final settings = ref.read(settingsProvider);
+  Future<void> _showServerConfigDialog() async {
     _serverHostController.text =
         'https://be10-2001-ee0-1b38-2b4c-2838-129a-ce08-7508.ngrok-free.app/api/v1';
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Configure Server Host'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _serverHostController,
-              decoration: const InputDecoration(
-                hintText: 'http://10.0.2.2:8080/api/v1',
-                prefixIcon: Icon(Icons.dns_outlined),
-                border: OutlineInputBorder(),
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Configure Server Host'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _serverHostController,
+                decoration: const InputDecoration(
+                  hintText: 'http://10.0.2.2:8080/api/v1',
+                  prefixIcon: Icon(Icons.dns_outlined),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await ref
+                    .read(settingsProvider.notifier)
+                    .setServerHost(_serverHostController.text.trim());
+                if (!context.mounted) return;
+                if (mounted) Navigator.pop(context);
+              },
+              child: const Text('Save'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await ref
-                  .read(settingsProvider.notifier)
-                  .setServerHost(_serverHostController.text.trim());
-              if (mounted) Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
       ),
     );
   }
@@ -164,14 +168,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (pass.length >= 6) score++;
     if (pass.contains(RegExp('[A-Z]'))) score++;
     if (pass.contains(RegExp('[0-9]'))) score++;
-    if (pass.contains(RegExp(r'[!@#\$&*~]'))) score++;
+    if (pass.contains(RegExp(r'[!@#$&*~]'))) score++;
     return score.clamp(1, 4);
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final theme = Theme.of(context);
     final strength = _calculatePasswordStrength(_passwordController.text);
 
     return Scaffold(
@@ -180,7 +183,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Top Bar: Server Config gear (so user can configure endpoints easily)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -330,7 +332,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               return 'Username must be at least 3 characters';
                             }
                             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(val)) {
-                              return 'Only alphanumeric characters & underscores';
+                              return 'Only alphanumeric characters '
+                                  '& underscores';
                             }
                             return null;
                           },
