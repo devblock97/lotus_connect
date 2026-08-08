@@ -73,7 +73,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       state = state.copyWith(isLoading: false);
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
       return false;
     }
@@ -106,7 +106,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = AuthState(user: user);
       return true;
-    } catch (e) {
+    } on Object catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
       return false;
     }

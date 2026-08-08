@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_colors.dart';
 import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -247,7 +248,9 @@ class PersonMessageBubble extends ConsumerWidget {
                   size: 14,
                   color: message.isError
                       ? theme.colorScheme.error
-                      : theme.colorScheme.primary.withValues(alpha: .75),
+                      : (message.status == MessageStatus.read
+                          ? AppColors.primaryLight
+                          : theme.disabledColor.withValues(alpha: 0.6)),
                 ),
               ],
             ],
