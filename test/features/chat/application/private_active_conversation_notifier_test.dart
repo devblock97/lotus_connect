@@ -15,6 +15,7 @@ import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart
 import 'package:mocktail/mocktail.dart';
 
 class MockPrivateChatRepository extends Mock implements PrivateChatRepository {}
+
 class MockChatCoreRepository extends Mock implements ChatCoreRepository {}
 
 class MockSettingsNotifier extends StateNotifier<AppSettings>
@@ -50,7 +51,9 @@ void main() {
     );
   });
 
-  test('should reconcile complete history when remote messages count is less than 100', () async {
+  test(
+      'should reconcile complete history when remote messages count '
+      'is less than 100', () async {
     final timestamp1 = DateTime.now().subtract(const Duration(minutes: 5));
     final timestamp2 = DateTime.now().subtract(const Duration(minutes: 3));
     final timestamp3 = DateTime.now().subtract(const Duration(minutes: 1));
@@ -116,10 +119,12 @@ void main() {
     when(() => mockChatCoreRepo.watchMessages('test_conv_id'))
         .thenAnswer((_) => Stream.value(Right(localMessages)));
 
-    when(() => mockPrivateChatRepo.fetchRemoteMessages(
-          conversationId: 'test_conv_id',
-          currentUserId: 'test_user_id',
-        )).thenAnswer((_) async => Right(remoteMessages));
+    when(
+      () => mockPrivateChatRepo.fetchRemoteMessages(
+        conversationId: 'test_conv_id',
+        currentUserId: 'test_user_id',
+      ),
+    ).thenAnswer((_) async => Right(remoteMessages));
 
     for (final msg in remoteMessages) {
       when(() => mockChatCoreRepo.saveMessage(msg))
@@ -154,17 +159,30 @@ void main() {
     }
 
     // Verify msg2 and msg0 (UUIDs missing from remote) were deleted
-    verify(() => mockChatCoreRepo.deleteMessage('00000000-0000-0000-0000-000000000002')).called(1);
-    verify(() => mockChatCoreRepo.deleteMessage('00000000-0000-0000-0000-000000000000')).called(1);
+    verify(
+      () => mockChatCoreRepo
+          .deleteMessage('00000000-0000-0000-0000-000000000002'),
+    ).called(1);
+    verify(
+      () => mockChatCoreRepo
+          .deleteMessage('00000000-0000-0000-0000-000000000000'),
+    ).called(1);
 
     // Verify legacy message (not a UUID) was NOT deleted
-    verifyNever(() => mockChatCoreRepo.deleteMessage('legacy-timestamp-id-12345'));
+    verifyNever(
+      () => mockChatCoreRepo.deleteMessage('legacy-timestamp-id-12345'),
+    );
   });
 
-  test('should reconcile within window when remote messages count is 100 or more (partial history)', () async {
+  test(
+      'should reconcile within window when remote messages count '
+      'is 100 or more (partial history)', () async {
     final timestampMin = DateTime.now().subtract(const Duration(minutes: 100));
-    final timestamp0 = DateTime.now().subtract(const Duration(minutes: 105)); // Outside window
-    final timestamp2 = DateTime.now().subtract(const Duration(minutes: 50));  // Inside window, deleted on remote
+    final timestamp0 =
+        DateTime.now().subtract(const Duration(minutes: 105)); // Outside window
+    final timestamp2 = DateTime.now().subtract(
+      const Duration(minutes: 50),
+    ); // Inside window, deleted on remote
 
     // Generate 100 remote messages
     final remoteMessages = List.generate(100, (i) {
@@ -215,10 +233,12 @@ void main() {
     when(() => mockChatCoreRepo.watchMessages('test_conv_id'))
         .thenAnswer((_) => Stream.value(Right(localMessages)));
 
-    when(() => mockPrivateChatRepo.fetchRemoteMessages(
-          conversationId: 'test_conv_id',
-          currentUserId: 'test_user_id',
-        )).thenAnswer((_) async => Right(remoteMessages));
+    when(
+      () => mockPrivateChatRepo.fetchRemoteMessages(
+        conversationId: 'test_conv_id',
+        currentUserId: 'test_user_id',
+      ),
+    ).thenAnswer((_) async => Right(remoteMessages));
 
     for (final msg in remoteMessages) {
       when(() => mockChatCoreRepo.saveMessage(msg))
@@ -248,12 +268,20 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
     // Verify msg deleted on server was deleted locally (inside window)
-    verify(() => mockChatCoreRepo.deleteMessage('00000000-0000-0000-0000-222222222222')).called(1);
+    verify(
+      () => mockChatCoreRepo
+          .deleteMessage('00000000-0000-0000-0000-222222222222'),
+    ).called(1);
 
     // Verify msg older than minTimestamp was NOT deleted (outside window)
-    verifyNever(() => mockChatCoreRepo.deleteMessage('00000000-0000-0000-0000-111111111111'));
+    verifyNever(
+      () => mockChatCoreRepo
+          .deleteMessage('00000000-0000-0000-0000-111111111111'),
+    );
 
     // Verify legacy message was NOT deleted
-    verifyNever(() => mockChatCoreRepo.deleteMessage('legacy-timestamp-id-12345'));
+    verifyNever(
+      () => mockChatCoreRepo.deleteMessage('legacy-timestamp-id-12345'),
+    );
   });
 }

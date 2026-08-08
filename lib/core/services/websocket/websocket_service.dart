@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
+import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
 /// Service managing dynamic, resilient WebSocket connections to the Rust gateway.
 class WebSocketService {
@@ -25,7 +25,8 @@ class WebSocketService {
   Stream<Map<String, dynamic>> get eventStream => _eventStreamController.stream;
 
   /// Connection state helper.
-  bool get isConnected => _socket != null && _socket!.readyState == WebSocket.open;
+  bool get isConnected =>
+      _socket != null && _socket!.readyState == WebSocket.open;
 
   /// Initiates connection using credentials from settings.
   Future<void> connect() async {
@@ -45,7 +46,8 @@ class WebSocketService {
     AppLogger.info('WS Connecting to: $wsUrl');
 
     try {
-      _socket = await WebSocket.connect(wsUrl).timeout(const Duration(seconds: 10));
+      _socket =
+          await WebSocket.connect(wsUrl).timeout(const Duration(seconds: 10));
       _reconnectDelaySeconds = 2;
       AppLogger.info('WS Connected successfully');
 
@@ -171,9 +173,8 @@ class WebSocketService {
   }
 
   String _buildWsUrl(String restUrl, String token) {
-    var wsBase = restUrl
-        .replaceAll('https://', 'wss://')
-        .replaceAll('http://', 'ws://');
+    var wsBase =
+        restUrl.replaceAll('https://', 'wss://').replaceAll('http://', 'ws://');
     if (!wsBase.endsWith('/')) {
       wsBase = '$wsBase/';
     }

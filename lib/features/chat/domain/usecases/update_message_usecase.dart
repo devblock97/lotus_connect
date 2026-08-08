@@ -25,7 +25,8 @@ class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
   @override
   FutureResult<void> call(UpdateMessageParam params) async {
     final uuidRegex = RegExp(
-      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
     );
 
     if (!uuidRegex.hasMatch(params.messageId)) {
@@ -39,7 +40,7 @@ class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
     );
 
     return updateResult.fold(
-      (failure) => Left(failure),
+      Left.new,
       (_) => _updateLocally(params.messageId, params.content),
     );
   }
@@ -48,7 +49,7 @@ class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
     try {
       final getResult = await _chatCoreRepository.getMessage(messageId);
       return await getResult.fold(
-        (failure) => Left(failure),
+        Left.new,
         (msg) async {
           if (msg != null) {
             final updatedMsg = msg.copyWith(content: content);
@@ -57,7 +58,7 @@ class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
           return const Right(null);
         },
       );
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to update message locally: $e', e));
     }
   }

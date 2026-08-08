@@ -1,9 +1,7 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Service interfacing withauth REST endpoints on the Rust backend.
 class AuthService {
@@ -14,9 +12,9 @@ class AuthService {
   /// Registers a new user.
   Future<User> register({
     required String username,
-    String? fullName,
     required String email,
     required String password,
+    String? fullName,
   }) async {
     try {
       final response = await dioClient.post(

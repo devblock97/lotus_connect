@@ -1,6 +1,5 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
-import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
@@ -51,22 +50,19 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
       content: trimmedText,
     );
 
-    return sendResult.fold(
-      (failure) async {
-        final failedMessage = userMessage.copyWith(
-          status: MessageStatus.error,
-          isError: true,
-        );
-        await _chatCoreRepository.saveMessage(failedMessage);
-        return Left(failure);
-      },
-      (remoteMessage) async {
-        // Delete optimistic message and save the permanent
-        // server-synchronized message
-        await _chatCoreRepository.deleteMessage(optimisticId);
-        await _chatCoreRepository.saveMessage(remoteMessage);
-        return Right(remoteMessage);
-      }
-    );
+    return sendResult.fold((failure) async {
+      final failedMessage = userMessage.copyWith(
+        status: MessageStatus.error,
+        isError: true,
+      );
+      await _chatCoreRepository.saveMessage(failedMessage);
+      return Left(failure);
+    }, (remoteMessage) async {
+      // Delete optimistic message and save the permanent
+      // server-synchronized message
+      await _chatCoreRepository.deleteMessage(optimisticId);
+      await _chatCoreRepository.saveMessage(remoteMessage);
+      return Right(remoteMessage);
+    });
   }
 }

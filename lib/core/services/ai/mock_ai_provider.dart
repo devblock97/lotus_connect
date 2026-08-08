@@ -59,7 +59,8 @@ class MockAiProvider implements AiProvider {
         lower.contains('python') ||
         lower.contains('stock') ||
         lower.contains('nvidia')) {
-      return '''Based on market data from Q3 2024, NVIDIA has shown significant outperformance. Here is the comparative analysis:
+      return '''
+Based on market data from Q3 2024, NVIDIA has shown significant outperformance. Here is the comparative analysis:
 
 ```python
 def calculate_alpha(stock_returns, market_returns):

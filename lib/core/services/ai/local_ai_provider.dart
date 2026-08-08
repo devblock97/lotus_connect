@@ -12,7 +12,7 @@ class LocalAiProvider implements AiProvider {
     String? baseUrl,
   })  : _dioClient = dioClient,
         _baseUrl =
-            baseUrl?.isNotEmpty == true ? baseUrl! : 'http://localhost:11434';
+            baseUrl?.isNotEmpty ?? false ? baseUrl! : 'http://localhost:11434';
 
   final DioClient _dioClient;
   final String _baseUrl;

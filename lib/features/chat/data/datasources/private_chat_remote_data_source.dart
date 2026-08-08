@@ -38,8 +38,8 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
       final messageId = data['id'] as String? ?? '';
       final createdAtStr = (data['created_at'] ?? data['createdAt']) as String?;
       final timestamp = createdAtStr != null
-        ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-        : DateTime.now();
+          ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+          : DateTime.now();
 
       return Message(
         id: messageId,
@@ -47,7 +47,6 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         role: MessageRole.user,
         content: content,
         timestamp: timestamp,
-        status: MessageStatus.sent,
       );
     } catch (e) {
       throw Exception(e);
@@ -66,9 +65,11 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
       );
       return list.map((item) {
         final id = item['id'] as String? ?? '';
-        final senderId = (item['sender_id'] ?? item['senderId']) as String? ?? '';
+        final senderId =
+            (item['sender_id'] ?? item['senderId']) as String? ?? '';
         final content = item['content'] as String? ?? '';
-        final createdAtStr = (item['created_at'] ?? item['createdAt']) as String?;
+        final createdAtStr =
+            (item['created_at'] ?? item['createdAt']) as String?;
         final timestamp = createdAtStr != null
             ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
             : DateTime.now();
@@ -76,10 +77,11 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         return Message(
           id: id,
           conversationId: conversationId,
-          role: senderId == currentUserId ? MessageRole.user : MessageRole.assistant,
+          role: senderId == currentUserId
+              ? MessageRole.user
+              : MessageRole.assistant,
           content: content,
           timestamp: timestamp,
-          status: MessageStatus.sent,
         );
       }).toList();
     } catch (e) {

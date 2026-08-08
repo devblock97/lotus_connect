@@ -33,24 +33,24 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
   @override
   Stream<List<Conversation>> watchConversations() {
     return _db.select(_db.conversationTable).watch().map(
-      (rows) => rows
-        .map(
-          (row) => Conversation(
-            id: row.id,
-            title: row.title,
-            createdAt: row.createdAt,
-            updatedAt: row.updatedAt,
-            isPinned: row.isPinned,
-            isFavourite: row.isFavourite,
-            modelName: row.modelName,
-            draftMessage: row.draftMessage,
-            systemPrompt: row.systemPrompt,
-            isUserToUser: row.isUserToUser,
-            peerId: row.peerId,
-          ),
-        )
-        .toList(),
-    );
+          (rows) => rows
+              .map(
+                (row) => Conversation(
+                  id: row.id,
+                  title: row.title,
+                  createdAt: row.createdAt,
+                  updatedAt: row.updatedAt,
+                  isPinned: row.isPinned,
+                  isFavourite: row.isFavourite,
+                  modelName: row.modelName,
+                  draftMessage: row.draftMessage,
+                  systemPrompt: row.systemPrompt,
+                  isUserToUser: row.isUserToUser,
+                  peerId: row.peerId,
+                ),
+              )
+              .toList(),
+        );
   }
 
   @override
@@ -139,7 +139,9 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
 
   @override
   Future<void> renameConversation(
-      String conversationId, String newTitle) async {
+    String conversationId,
+    String newTitle,
+  ) async {
     await (_db.update(_db.conversationTable)
           ..where((tbl) => tbl.id.equals(conversationId)))
         .write(
@@ -219,8 +221,8 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
 
   @override
   Future<void> deleteMessage(String messageId) async {
-    await (_db.delete(_db.messageTable)
-      ..where((t) => t.id.equals(messageId))).go();
+    await (_db.delete(_db.messageTable)..where((t) => t.id.equals(messageId)))
+        .go();
   }
 
   @override

@@ -18,7 +18,8 @@ class DeleteMessageUseCase implements UseCase<void, String> {
   @override
   FutureResult<void> call(String messageId) async {
     final uuidRegex = RegExp(
-      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
     );
 
     if (!uuidRegex.hasMatch(messageId)) {
@@ -26,20 +27,22 @@ class DeleteMessageUseCase implements UseCase<void, String> {
       try {
         await _chatCoreRepository.deleteMessage(messageId);
         return const Right(null);
-      } catch (e) {
+      } on Object catch (e) {
         return Left(DatabaseFailure('Failed to delete message locally: $e', e));
       }
     }
 
     final deleteResult = await _privateChatRepository.deleteMessage(messageId);
     return deleteResult.fold(
-      (failure) => Left(failure),
+      Left.new,
       (_) async {
         try {
           await _chatCoreRepository.deleteMessage(messageId);
           return const Right(null);
-        } catch (e) {
-          return Left(DatabaseFailure('Failed to delete message locally: $e', e));
+        } on Object catch (e) {
+          return Left(
+            DatabaseFailure('Failed to delete message locally: $e', e),
+          );
         }
       },
     );

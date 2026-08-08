@@ -100,14 +100,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  settings.username.isNotEmpty ? settings.username : 'Alex Chen',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  settings.username.isNotEmpty
+                      ? settings.username
+                      : 'Alex Chen',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    settings.email.isNotEmpty ? settings.email : 'Senior Product Designer & AI enthusiast. Exploring neural networks.',
+                    settings.email.isNotEmpty
+                        ? settings.email
+                        : 'Senior Product Designer & AI enthusiast. Exploring neural networks.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -122,16 +129,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: settings.userId));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('User ID copied to clipboard!')),
+                        const SnackBar(
+                          content: Text('User ID copied to clipboard!'),
+                        ),
                       );
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.copy, size: 12, color: theme.colorScheme.primary),
+                          Icon(
+                            Icons.copy,
+                            size: 12,
+                            color: theme.colorScheme.primary,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             'ID: ${settings.userId}',
@@ -229,9 +245,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     const SizedBox(height: 6),
                     TextField(
                       controller: _localUrlController,
-                      onChanged: (val) {
-                        notifier.setLocalLlmBaseUrl(val);
-                      },
+                      onChanged: notifier.setLocalLlmBaseUrl,
                       decoration: InputDecoration(
                         hintText: 'e.g. http://localhost:11434',
                         filled: true,
@@ -265,9 +279,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     TextField(
                       controller: _apiKeyController,
                       obscureText: _isObscured,
-                      onChanged: (val) {
-                        notifier.setGeminiApiKey(val);
-                      },
+                      onChanged: notifier.setGeminiApiKey,
                       decoration: InputDecoration(
                         hintText: loc.pasteApiKey,
                         filled: true,
@@ -475,7 +487,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          letterSpacing: 1.0,
+          letterSpacing: 1,
           color: Colors.grey,
         ),
       ),

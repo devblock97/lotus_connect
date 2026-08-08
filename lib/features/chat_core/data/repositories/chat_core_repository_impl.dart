@@ -21,7 +21,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       final conversations = await _localDataSource.getConversations();
       return Right(conversations);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to get conversations: $e', e));
     }
   }
@@ -39,7 +39,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.renameConversation(conversationId, newTitle);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to rename conversation: $e', e));
     }
   }
@@ -49,7 +49,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.deleteConversation(conversationId);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to delete conversation: $e', e));
     }
   }
@@ -59,7 +59,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.togglePinConversation(conversationId);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to toggle pin conversation: $e', e));
     }
   }
@@ -69,9 +69,10 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.toggleFavouriteConversation(conversationId);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(
-          DatabaseFailure('Failed to toggle favourite conversation: $e', e));
+        DatabaseFailure('Failed to toggle favourite conversation: $e', e),
+      );
     }
   }
 
@@ -83,7 +84,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.saveDraftMessage(conversationId, draft);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to save draft message: $e', e));
     }
   }
@@ -93,7 +94,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.saveMessage(message);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to save message: $e', e));
     }
   }
@@ -115,8 +116,10 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
         id: id,
       );
       return Right(conversation);
-    } catch (e) {
-      return Left(DatabaseFailure('Failed to create local conversation: $e', e));
+    } on Object catch (e) {
+      return Left(
+        DatabaseFailure('Failed to create local conversation: $e', e),
+      );
     }
   }
 
@@ -125,7 +128,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       await _localDataSource.deleteMessage(id);
       return const Right(null);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to delete message: $e', e));
     }
   }
@@ -135,7 +138,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       final messages = await _localDataSource.getMessages(conversationId);
       return Right(messages);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to get messages: $e', e));
     }
   }
@@ -145,7 +148,7 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
     try {
       final message = await _localDataSource.getMessage(messageId);
       return Right(message);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to get message: $e', e));
     }
   }

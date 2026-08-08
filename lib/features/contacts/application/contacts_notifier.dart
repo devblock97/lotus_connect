@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// State representing the Contacts feature status.
 class ContactsState {
@@ -50,7 +50,9 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     try {
       final friendsList = await _chatApiService.getFriends();
       final requestsList = await _chatApiService.getFriendRequests();
-      AppLogger.debug('WS requestsList loaded: ${requestsList.length} items. Contents: ${requestsList.map((e) => e.username).toList()}');
+      AppLogger.debug(
+        'WS requestsList loaded: ${requestsList.length} items. Contents: ${requestsList.map((e) => e.username).toList()}',
+      );
       state = state.copyWith(
         friends: friendsList,
         requests: requestsList,
@@ -137,7 +139,8 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
 }
 
 /// Global provider for ContactsNotifier.
-final contactsProvider = StateNotifierProvider<ContactsNotifier, ContactsState>((ref) {
+final contactsProvider =
+    StateNotifierProvider<ContactsNotifier, ContactsState>((ref) {
   final apiService = ref.watch(chatApiServiceProvider);
   return ContactsNotifier(apiService);
 });

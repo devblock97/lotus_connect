@@ -54,9 +54,8 @@ class AppSettings {
 
   /// Server host base URL, falling back to AppConfig.defaultServerHost.
   String get serverHost {
-    var host = _serverHost.isNotEmpty
-        ? _serverHost
-        : AppConfig.defaultServerHost;
+    var host =
+        _serverHost.isNotEmpty ? _serverHost : AppConfig.defaultServerHost;
     // Auto-migrate any legacy localhost, 10.0.2.2, or dynamic ngrok subdomains to the central active ngrok tunnel domain
     if (host == 'http://localhost:8080/api/v1' ||
         host == 'http://10.0.2.2:8080/api/v1' ||

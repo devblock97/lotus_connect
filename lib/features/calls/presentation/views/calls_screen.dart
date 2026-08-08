@@ -1,16 +1,13 @@
 import 'dart:async';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -19,8 +16,8 @@ import 'package:lotus_connect/features/contacts/application/contacts_notifier.da
 enum CallStatus {
   idle,
   ringingOut, // We are calling someone else
-  ringingIn,  // Someone else is calling us
-  connected,  // Active WebRTC session
+  ringingIn, // Someone else is calling us
+  connected, // Active WebRTC session
 }
 
 class RippleAnimation extends StatefulWidget {
@@ -32,7 +29,8 @@ class RippleAnimation extends StatefulWidget {
   State<RippleAnimation> createState() => _RippleAnimationState();
 }
 
-class _RippleAnimationState extends State<RippleAnimation> with SingleTickerProviderStateMixin {
+class _RippleAnimationState extends State<RippleAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -65,7 +63,8 @@ class _RippleAnimationState extends State<RippleAnimation> with SingleTickerProv
                 height: 140 + progress * 180,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF8B857B).withValues(alpha: (1.0 - progress) * 0.15),
+                  color: const Color(0xFF8B857B)
+                      .withValues(alpha: (1.0 - progress) * 0.15),
                 ),
               );
             }),
@@ -156,7 +155,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   void _log(String text) {
     if (mounted) {
       setState(() {
-        _consoleLogs.insert(0, '${DateTime.now().toIso8601String().split('T').last.substring(0, 8)} | $text');
+        _consoleLogs.insert(
+          0,
+          '${DateTime.now().toIso8601String().split('T').last.substring(0, 8)} | $text',
+        );
       });
     }
   }
@@ -170,7 +172,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (newStatus == CallStatus.ringingIn) {
       _log('Starting incoming call ringtone...');
       try {
-        FlutterRingtonePlayer().playRingtone(looping: true);
+        FlutterRingtonePlayer().playRingtone();
       } catch (e) {
         _log('Error playing ringtone: $e');
       }
@@ -208,7 +210,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final signaling = ref.read(webrtcSignalingServiceProvider);
 
     _inviteSub = signaling.invitationStream.listen((invite) {
-      _log('Incoming call invite! ID: ${invite.callId} from Peer: ${invite.senderId}');
+      _log(
+        'Incoming call invite! ID: ${invite.callId} from Peer: ${invite.senderId}',
+      );
       setState(() {
         _activeCallId = invite.callId;
         _activePeerId = invite.senderId;
@@ -263,9 +267,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           _remoteOfferDescription = RTCSessionDescription(sdp, type);
           // If receiver already clicked accept and connection is ready, configure the remote offer description immediately
           if (_status == CallStatus.connected && _peerConnection != null) {
-            final currentRemoteDesc = await _peerConnection!.getRemoteDescription();
+            final currentRemoteDesc =
+                await _peerConnection!.getRemoteDescription();
             if (currentRemoteDesc == null) {
-              await _peerConnection!.setRemoteDescription(_remoteOfferDescription!);
+              await _peerConnection!
+                  .setRemoteDescription(_remoteOfferDescription!);
               final answer = await _peerConnection!.createAnswer({
                 'offerToReceiveAudio': true,
                 'offerToReceiveVideo': _isVideo,
@@ -287,9 +293,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           }
         } else if (type == 'answer') {
           if (_peerConnection != null) {
-            final currentRemoteDesc = await _peerConnection!.getRemoteDescription();
+            final currentRemoteDesc =
+                await _peerConnection!.getRemoteDescription();
             if (currentRemoteDesc == null) {
-              await _peerConnection!.setRemoteDescription(RTCSessionDescription(sdp, type));
+              await _peerConnection!
+                  .setRemoteDescription(RTCSessionDescription(sdp, type));
               // Drain ice candidates queue
               for (final cand in _remoteIceCandidatesQueue) {
                 await _peerConnection!.addCandidate(cand);
@@ -313,7 +321,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         );
         _log('ICE Candidate received: ...${cand.candidate?.split(' ').first}');
 
-        if (_peerConnection != null && await _peerConnection!.getRemoteDescription() != null) {
+        if (_peerConnection != null &&
+            await _peerConnection!.getRemoteDescription() != null) {
           await _peerConnection!.addCandidate(cand);
         } else {
           _remoteIceCandidatesQueue.add(cand);
@@ -372,15 +381,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       ],
     }, {
       'mandatory': {},
-      'optional': [{'DtlsSrtpKeyAgreement': true}],
+      'optional': [
+        {'DtlsSrtpKeyAgreement': true},
+      ],
     });
 
     pc.onIceConnectionState = (state) {
-      _log('ICE Connection State: ${state.toString()}');
+      _log('ICE Connection State: $state');
     };
 
     pc.onSignalingState = (state) {
-      _log('Signaling State: ${state.toString()}');
+      _log('Signaling State: $state');
     };
 
     pc.onIceCandidate = (candidate) {
@@ -592,7 +603,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
 
     // Fallback names mapping for realistic history mocks
-    final names = ['Sarah Jenkins', 'Marcus Chen', 'Elena Kostic', 'David Kim', 'Marcus Thorne', 'Sarah Chen'];
+    final names = [
+      'Sarah Jenkins',
+      'Marcus Chen',
+      'Elena Kostic',
+      'David Kim',
+      'Marcus Thorne',
+      'Sarah Chen',
+    ];
     return names[hostId.hashCode % names.length];
   }
 
@@ -630,7 +648,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               ? const Center(
                   child: Text(
                     'No events logged yet. Start a call to trace signaling traffic.',
-                    style: TextStyle(color: Colors.white30, fontFamily: 'monospace', fontSize: 11),
+                    style: TextStyle(
+                      color: Colors.white30,
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                    ),
                   ),
                 )
               : ListView.builder(
@@ -639,7 +661,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Text(
                       _consoleLogs[index],
-                      style: const TextStyle(color: Colors.greenAccent, fontFamily: 'monospace', fontSize: 11),
+                      style: const TextStyle(
+                        color: Colors.greenAccent,
+                        fontFamily: 'monospace',
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ),
@@ -647,9 +673,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              setState(() {
-                _consoleLogs.clear();
-              });
+              setState(_consoleLogs.clear);
               Navigator.pop(context);
             },
             child: const Text('Clear Logs'),
@@ -744,7 +768,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               isVideo: false,
               status: 'ended',
               createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-              endedAt: DateTime.now().subtract(const Duration(hours: 3))
+              endedAt: DateTime.now()
+                  .subtract(const Duration(hours: 3))
                   .add(const Duration(minutes: 12, seconds: 45)),
             ),
             CallLog(
@@ -753,14 +778,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               channelId: 'room-3',
               isVideo: false,
               status: 'ended',
-              createdAt: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
-              endedAt: DateTime.now().subtract(const Duration(days: 1, hours: 2))
+              createdAt:
+                  DateTime.now().subtract(const Duration(days: 1, hours: 2)),
+              endedAt: DateTime.now()
+                  .subtract(const Duration(days: 1, hours: 2))
                   .add(const Duration(minutes: 4, seconds: 20)),
             ),
           ];
 
     final filteredHistory = displayHistory.where((log) {
-      final peerName = _resolvePeerName(log.hostId, friendsState.friends).toLowerCase();
+      final peerName =
+          _resolvePeerName(log.hostId, friendsState.friends).toLowerCase();
       final query = _searchQuery.toLowerCase();
       return peerName.contains(query);
     }).toList();
@@ -774,7 +802,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       final diff = now.difference(log.createdAt).inDays;
       if (diff == 0 && log.createdAt.day == now.day) {
         todayLogs.add(log);
-      } else if (diff <= 1 || (diff == 2 && log.createdAt.day == now.subtract(const Duration(days: 1)).day)) {
+      } else if (diff <= 1 ||
+          (diff == 2 &&
+              log.createdAt.day == now.subtract(const Duration(days: 1)).day)) {
         yesterdayLogs.add(log);
       } else {
         olderLogs.add(log);
@@ -842,12 +872,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: _showFriendsTab ? Colors.white : Colors.transparent,
+                            color: _showFriendsTab
+                                ? Colors.white
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: _showFriendsTab
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.05),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -858,8 +891,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           child: Text(
                             'Friends',
                             style: TextStyle(
-                              fontWeight: _showFriendsTab ? FontWeight.bold : FontWeight.normal,
-                              color: _showFriendsTab ? Colors.black : Colors.grey.shade600,
+                              fontWeight: _showFriendsTab
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: _showFriendsTab
+                                  ? Colors.black
+                                  : Colors.grey.shade600,
                             ),
                           ),
                         ),
@@ -874,12 +911,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: !_showFriendsTab ? Colors.white : Colors.transparent,
+                            color: !_showFriendsTab
+                                ? Colors.white
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: !_showFriendsTab
                                 ? [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.05),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
@@ -890,8 +930,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           child: Text(
                             'History',
                             style: TextStyle(
-                              fontWeight: !_showFriendsTab ? FontWeight.bold : FontWeight.normal,
-                              color: !_showFriendsTab ? Colors.black : Colors.grey.shade600,
+                              fontWeight: !_showFriendsTab
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: !_showFriendsTab
+                                  ? Colors.black
+                                  : Colors.grey.shade600,
                             ),
                           ),
                         ),
@@ -928,7 +972,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     : null,
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -941,7 +985,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           Expanded(
             child: _showFriendsTab
                 ? _buildFriendsView(filteredFriends, theme)
-                : _buildHistoryView(todayLogs, yesterdayLogs, olderLogs, friendsState.friends, theme),
+                : _buildHistoryView(
+                    todayLogs,
+                    yesterdayLogs,
+                    olderLogs,
+                    friendsState.friends,
+                    theme,
+                  ),
           ),
         ],
       ),
@@ -967,7 +1017,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             const SizedBox(height: 16),
             Text(
               'No friends found',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
+              ),
             ),
           ],
         ),
@@ -982,7 +1036,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         final presenceText = _getPresenceStatusText(friend.username);
         final presenceColor = _getPresenceColor(friend.username);
         final displayName = friend.fullName ?? friend.username;
-        final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
+        final initials = displayName.isNotEmpty
+            ? displayName.substring(0, 1).toUpperCase()
+            : '?';
 
         return Card(
           elevation: 0,
@@ -992,14 +1048,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             side: BorderSide(color: Colors.grey.shade100),
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             leading: Stack(
               children: [
                 CircleAvatar(
-                  backgroundColor: presenceColor.withOpacity(0.1),
+                  backgroundColor: presenceColor.withValues(alpha: 0.1),
                   child: Text(
                     initials,
-                    style: TextStyle(color: presenceColor, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: presenceColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -1029,18 +1089,30 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(Icons.chat_bubble_outline, color: theme.colorScheme.primary, size: 22),
+                  icon: Icon(
+                    Icons.chat_bubble_outline,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
                   onPressed: () => _startPrivateChat(friend),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.phone_outlined, color: Colors.blue, size: 22),
+                  icon: const Icon(
+                    Icons.phone_outlined,
+                    color: Colors.blue,
+                    size: 22,
+                  ),
                   onPressed: () {
                     _peerIdController.text = friend.id;
                     _startCall(isVideo: false);
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.videocam_outlined, color: Colors.green, size: 22),
+                  icon: const Icon(
+                    Icons.videocam_outlined,
+                    color: Colors.green,
+                    size: 22,
+                  ),
                   onPressed: () {
                     _peerIdController.text = friend.id;
                     _startCall(isVideo: true);
@@ -1066,11 +1138,19 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.call_missed_outgoing, size: 64, color: Colors.grey.shade400),
+            Icon(
+              Icons.call_missed_outgoing,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
             const SizedBox(height: 16),
             Text(
               'No call history logs',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey.shade700,
+              ),
             ),
           ],
         ),
@@ -1103,14 +1183,20 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
+          letterSpacing: 0.5,
+        ),
       ),
     );
   }
 
   Widget _buildHistoryItem(CallLog log, List<User> friends, ThemeData theme) {
     final peerName = _resolvePeerName(log.hostId, friends);
-    final initials = peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
+    final initials =
+        peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
 
     final isMissed = log.status == 'missed' || log.status == 'rejected';
     final nameColor = isMissed ? Colors.red : Colors.black;
@@ -1141,10 +1227,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         leading: Stack(
           children: [
             CircleAvatar(
-              backgroundColor: isMissed ? Colors.red.shade50 : Colors.grey.shade100,
+              backgroundColor:
+                  isMissed ? Colors.red.shade50 : Colors.grey.shade100,
               child: Text(
                 initials,
-                style: TextStyle(color: isMissed ? Colors.red : Colors.grey.shade800, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: isMissed ? Colors.red : Colors.grey.shade800,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Positioned(
@@ -1165,7 +1255,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         ),
         title: Text(
           peerName,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: nameColor),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: nameColor,
+          ),
         ),
         subtitle: Row(
           children: [
@@ -1208,9 +1302,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   color: Colors.black87,
                 ),
                 onPressed: () {
-                  final targetPeerId = log.hostId == ref.read(settingsProvider).userId
-                      ? _activePeerId ?? ''
-                      : log.hostId;
+                  final targetPeerId =
+                      log.hostId == ref.read(settingsProvider).userId
+                          ? _activePeerId ?? ''
+                          : log.hostId;
                   if (targetPeerId.isNotEmpty) {
                     _peerIdController.text = targetPeerId;
                     _startCall(isVideo: log.isVideo);
@@ -1225,7 +1320,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Future<void> _startPrivateChat(User friend) async {
-    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
+    final conv = await ref
+        .read(privateConversationListProvider.notifier)
+        .createNewPrivateChat(
           friendId: friend.id,
           title: friend.fullName ?? friend.username,
         );
@@ -1236,8 +1333,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildRingingInUI() {
-    final hasSarah = _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah');
-    final displayName = hasSarah ? 'Sarah Chen' : (_activePeerId?.substring(0, 8) ?? 'User');
+    final hasSarah =
+        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah');
+    final displayName =
+        hasSarah ? 'Sarah Chen' : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Container(
@@ -1256,7 +1355,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(height: 32),
-              
+
               // Animated Radiating Avatar
               Column(
                 children: [
@@ -1387,9 +1486,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildRingingOutUI() {
-    final displayName = _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
-        ? 'Sarah Chen'
-        : (_activePeerId?.substring(0, 8) ?? 'User');
+    final displayName =
+        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
+            ? 'Sarah Chen'
+            : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Container(
@@ -1409,7 +1509,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(height: 32),
-
               Column(
                 children: [
                   RippleAnimation(
@@ -1447,7 +1546,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isVideo ? 'CALLING VIDEO PEER...' : 'CALLING VOICE PEER...',
+                    _isVideo
+                        ? 'CALLING VIDEO PEER...'
+                        : 'CALLING VOICE PEER...',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -1457,7 +1558,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   ),
                 ],
               ),
-
               Padding(
                 padding: const EdgeInsets.only(bottom: 64),
                 child: Column(
@@ -1495,9 +1595,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Widget _buildConnectedUI() {
     final size = MediaQuery.of(context).size;
-    final displayName = _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
-        ? 'Sarah Chen'
-        : (_activePeerId?.substring(0, 8) ?? 'User');
+    final displayName =
+        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
+            ? 'Sarah Chen'
+            : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Stack(
@@ -1539,12 +1640,20 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     const SizedBox(height: 18),
                     Text(
                       displayName,
-                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     const Text(
                       'Voice Connected',
-                      style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 0.5),
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ],
                 ),
@@ -1568,13 +1677,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
+                    child: const Icon(
+                      Icons.chevron_left,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
                 ),
 
                 // Encryption Pill
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(20),
@@ -1598,7 +1712,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
                 // Call Duration Counter
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(12),
@@ -1628,15 +1743,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     const SnackBar(content: Text('Chat screen overlay opened')),
                   );
                 }),
-                  const SizedBox(height: 16),
-                  _buildFloatingSideButton(Icons.more_horiz, () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('More call options opened')),
-                    );
-                  }),
-                ],
-              ),
+                const SizedBox(height: 16),
+                _buildFloatingSideButton(Icons.more_horiz, () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('More call options opened')),
+                  );
+                }),
+              ],
             ),
+          ),
 
           // Picture in Picture View (YOU)
           if (_isVideo)
@@ -1663,14 +1778,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       child: RTCVideoView(
                         _localRenderer,
                         mirror: true,
-                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
                     ),
                     Positioned(
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
@@ -1720,12 +1839,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           track.enabled = !_isMuted;
                         });
                       });
-                      _log(_isMuted ? 'Muted microphone' : 'Unmuted microphone');
+                      _log(
+                        _isMuted ? 'Muted microphone' : 'Unmuted microphone',
+                      );
                     },
                     icon: Icon(_isMuted ? Icons.mic_off : Icons.mic),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor: _isMuted ? Colors.white24 : Colors.transparent,
+                      backgroundColor:
+                          _isMuted ? Colors.white24 : Colors.transparent,
                       padding: const EdgeInsets.all(12),
                     ),
                   ),
@@ -1740,12 +1862,19 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             track.enabled = !_isVideoOff;
                           });
                         });
-                        _log(_isVideoOff ? 'Disabled local video' : 'Enabled local video');
+                        _log(
+                          _isVideoOff
+                              ? 'Disabled local video'
+                              : 'Enabled local video',
+                        );
                       },
-                      icon: Icon(_isVideoOff ? Icons.videocam_off : Icons.videocam),
+                      icon: Icon(
+                        _isVideoOff ? Icons.videocam_off : Icons.videocam,
+                      ),
                       color: Colors.white,
                       style: IconButton.styleFrom(
-                        backgroundColor: _isVideoOff ? Colors.white24 : Colors.transparent,
+                        backgroundColor:
+                            _isVideoOff ? Colors.white24 : Colors.transparent,
                         padding: const EdgeInsets.all(12),
                       ),
                     ),
@@ -1754,7 +1883,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   IconButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Screen sharing simulation initiated')),
+                        const SnackBar(
+                          content: Text('Screen sharing simulation initiated'),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.ios_share),
@@ -1773,10 +1904,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       });
                       _log(_isSpeakerOn ? 'Speaker ON' : 'Speaker OFF');
                     },
-                    icon: Icon(_isSpeakerOn ? Icons.volume_up : Icons.volume_down),
+                    icon: Icon(
+                      _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
+                    ),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor: _isSpeakerOn ? Colors.white24 : Colors.transparent,
+                      backgroundColor:
+                          _isSpeakerOn ? Colors.white24 : Colors.transparent,
                       padding: const EdgeInsets.all(12),
                     ),
                   ),
@@ -1815,7 +1949,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.black54,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -1847,10 +1985,12 @@ class CallsSearchResultsScreen extends ConsumerStatefulWidget {
   final void Function(String peerId, bool isVideo) onStartCall;
 
   @override
-  ConsumerState<CallsSearchResultsScreen> createState() => _CallsSearchResultsScreenState();
+  ConsumerState<CallsSearchResultsScreen> createState() =>
+      _CallsSearchResultsScreenState();
 }
 
-class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScreen> {
+class _CallsSearchResultsScreenState
+    extends ConsumerState<CallsSearchResultsScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -1887,10 +2027,12 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: contactsState.searchResults.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final user = contactsState.searchResults[index];
-                    final isFriend = contactsState.friends.any((f) => f.id == user.id);
+                    final isFriend =
+                        contactsState.friends.any((f) => f.id == user.id);
                     return _buildSearchResultItem(theme, user, isFriend);
                   },
                 ),
@@ -1899,8 +2041,11 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
 
   Widget _buildSearchResultItem(ThemeData theme, User user, bool isFriend) {
     final displayName = user.fullName ?? user.username;
-    final initials = displayName.isNotEmpty ? displayName.substring(0, 1).toUpperCase() : '?';
-    final avatarColor = Colors.primaries[user.username.hashCode % Colors.primaries.length];
+    final initials = displayName.isNotEmpty
+        ? displayName.substring(0, 1).toUpperCase()
+        : '?';
+    final avatarColor =
+        Colors.primaries[user.username.hashCode % Colors.primaries.length];
 
     return Card(
       color: Colors.white,
@@ -1920,7 +2065,11 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                   backgroundColor: avatarColor.withValues(alpha: 0.15),
                   child: Text(
                     initials,
-                    style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      color: avatarColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -1930,19 +2079,26 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                     children: [
                       Text(
                         displayName,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '@${user.username}',
-                        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 if (isFriend)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.green.shade50,
                       borderRadius: BorderRadius.circular(12),
@@ -1951,11 +2107,19 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check, size: 12, color: Colors.green.shade700),
+                        Icon(
+                          Icons.check,
+                          size: 12,
+                          color: Colors.green.shade700,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Friend',
-                          style: TextStyle(color: Colors.green.shade700, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -1970,7 +2134,8 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
               children: [
                 if (!isFriend) ...[
                   if (user.friendshipStatus == 'pending') ...[
-                    if (user.friendshipSenderId == ref.watch(settingsProvider).userId)
+                    if (user.friendshipSenderId ==
+                        ref.watch(settingsProvider).userId)
                       _buildActionButton(
                         icon: Icons.hourglass_empty_outlined,
                         label: 'Requested',
@@ -1983,12 +2148,19 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                         label: 'Accept',
                         color: Colors.green,
                         onTap: () async {
-                          final success = await ref.read(contactsProvider.notifier).acceptFriendRequest(user.id);
+                          final success = await ref
+                              .read(contactsProvider.notifier)
+                              .acceptFriendRequest(user.id);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(success ? 'Friend request accepted!' : 'Failed to accept request'),
-                                backgroundColor: success ? Colors.green : Colors.red,
+                                content: Text(
+                                  success
+                                      ? 'Friend request accepted!'
+                                      : 'Failed to accept request',
+                                ),
+                                backgroundColor:
+                                    success ? Colors.green : Colors.red,
                               ),
                             );
                           }
@@ -1999,12 +2171,19 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                         label: 'Reject',
                         color: Colors.red,
                         onTap: () async {
-                          final success = await ref.read(contactsProvider.notifier).rejectFriendRequest(user.id);
+                          final success = await ref
+                              .read(contactsProvider.notifier)
+                              .rejectFriendRequest(user.id);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(success ? 'Friend request rejected!' : 'Failed to reject request'),
-                                backgroundColor: success ? Colors.green : Colors.red,
+                                content: Text(
+                                  success
+                                      ? 'Friend request rejected!'
+                                      : 'Failed to reject request',
+                                ),
+                                backgroundColor:
+                                    success ? Colors.green : Colors.red,
                               ),
                             );
                           }
@@ -2017,12 +2196,19 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                       label: 'Add Friend',
                       color: theme.colorScheme.primary,
                       onTap: () async {
-                        final success = await ref.read(contactsProvider.notifier).sendFriendRequest(user.username);
+                        final success = await ref
+                            .read(contactsProvider.notifier)
+                            .sendFriendRequest(user.username);
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text(success ? 'Friend request sent to @${user.username}' : 'Failed to send request'),
-                              backgroundColor: success ? Colors.green : Colors.red,
+                              content: Text(
+                                success
+                                    ? 'Friend request sent to @${user.username}'
+                                    : 'Failed to send request',
+                              ),
+                              backgroundColor:
+                                  success ? Colors.green : Colors.red,
                             ),
                           );
                         }
@@ -2037,13 +2223,17 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
                   color: Colors.grey.shade700,
                   onTap: () async {
                     final currentContext = context;
-                    final conv = await ref.read(privateConversationListProvider.notifier).createNewPrivateChat(
+                    final conv = await ref
+                        .read(privateConversationListProvider.notifier)
+                        .createNewPrivateChat(
                           friendId: user.id,
                           title: user.fullName ?? user.username,
                         );
                     if (conv != null && currentContext.mounted) {
-                      ref.read(shellIndexProvider.notifier).state = 1; // Switch to Chats tab
-                      Navigator.of(currentContext).popUntil((route) => route.isFirst);
+                      ref.read(shellIndexProvider.notifier).state =
+                          1; // Switch to Chats tab
+                      Navigator.of(currentContext)
+                          .popUntil((route) => route.isFirst);
                     }
                   },
                 ),
@@ -2093,7 +2283,11 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -2108,7 +2302,11 @@ class _CallsSearchResultsScreenState extends ConsumerState<CallsSearchResultsScr
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_outlined, size: 64, color: Colors.grey.shade400),
+            Icon(
+              Icons.search_off_outlined,
+              size: 64,
+              color: Colors.grey.shade400,
+            ),
             const SizedBox(height: 16),
             const Text(
               'No matching users',

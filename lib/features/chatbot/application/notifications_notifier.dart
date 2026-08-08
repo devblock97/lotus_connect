@@ -7,9 +7,9 @@ class AppNotification {
     required this.userId,
     required this.title,
     required this.body,
-    this.data,
     required this.isRead,
     required this.createdAt,
+    this.data,
   });
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {
@@ -23,7 +23,8 @@ class AppNotification {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
           : json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'] as String) ?? DateTime.now()
+              ? DateTime.tryParse(json['created_at'] as String) ??
+                  DateTime.now()
               : DateTime.now(),
     );
   }
@@ -62,7 +63,8 @@ class NotificationsState {
 }
 
 class NotificationsNotifier extends StateNotifier<NotificationsState> {
-  NotificationsNotifier(this._chatApiService) : super(const NotificationsState()) {
+  NotificationsNotifier(this._chatApiService)
+      : super(const NotificationsState()) {
     loadNotifications();
   }
 
@@ -72,7 +74,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     state = state.copyWith(isLoading: true);
     try {
       final list = await _chatApiService.getNotifications();
-      final notifications = list.map((item) => AppNotification.fromJson(item)).toList();
+      final notifications = list.map(AppNotification.fromJson).toList();
       state = state.copyWith(notifications: notifications, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -94,7 +96,8 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   }
 }
 
-final notificationsProvider = StateNotifierProvider<NotificationsNotifier, NotificationsState>((ref) {
+final notificationsProvider =
+    StateNotifierProvider<NotificationsNotifier, NotificationsState>((ref) {
   final apiService = ref.watch(chatApiServiceProvider);
   return NotificationsNotifier(apiService);
 });

@@ -21,7 +21,7 @@ class RetryInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final extra = err.requestOptions.extra;
-    final retryCount = (extra['retry_count'] as int? ?? 0);
+    final retryCount = extra['retry_count'] as int? ?? 0;
 
     if (_shouldRetry(err) && retryCount < maxRetries) {
       extra['retry_count'] = retryCount + 1;
