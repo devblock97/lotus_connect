@@ -16,24 +16,31 @@ class PrivateActiveConversationState {
     this.messages = const [],
     this.draftInput = '',
     this.errorMessage,
+    this.replyingToMessage,
   });
 
   final String? conversationId;
   final List<Message> messages;
   final String draftInput;
   final String? errorMessage;
+  final Message? replyingToMessage;
 
   PrivateActiveConversationState copyWith({
     String? conversationId,
     List<Message>? messages,
     String? draftInput,
     String? errorMessage,
+    Message? replyingToMessage,
+    bool clearReplyingTo = false,
   }) {
     return PrivateActiveConversationState(
       conversationId: conversationId ?? this.conversationId,
       messages: messages ?? this.messages,
       draftInput: draftInput ?? this.draftInput,
       errorMessage: errorMessage,
+      replyingToMessage: clearReplyingTo
+          ? null
+          : (replyingToMessage ?? this.replyingToMessage),
     );
   }
 }
@@ -171,22 +178,28 @@ class PrivateActiveConversationNotifier
     final convId = state.conversationId;
     if (convId == null) return;
 
+    final replyToId = state.replyingToMessage?.id;
     final userMessage = Message(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       conversationId: convId,
       role: MessageRole.user,
       content: trimmedText,
       timestamp: DateTime.now(),
+      replyToId: replyToId,
     );
 
-    // Update UI immediately
-    state = state.copyWith(messages: [...state.messages, userMessage]);
+    // Update UI immediately and clear active reply preview
+    state = state.copyWith(
+      messages: [...state.messages, userMessage],
+      clearReplyingTo: true,
+    );
 
     final useCase = _ref.read(sendMessageUseCaseProvider);
     final result = await useCase(
       SendMessageParams(
         conversationId: convId,
         text: trimmedText,
+        replyToId: replyToId,
       ),
     );
 
@@ -196,6 +209,14 @@ class PrivateActiveConversationNotifier
       },
       (_) async {},
     );
+  }
+
+  void setReplyingToMessage(Message message) {
+    state = state.copyWith(replyingToMessage: message);
+  }
+
+  void cancelReply() {
+    state = state.copyWith(clearReplyingTo: true);
   }
 
   /// Updates local draft typing content.

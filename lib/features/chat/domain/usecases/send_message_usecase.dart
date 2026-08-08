@@ -10,10 +10,12 @@ class SendMessageParams {
   const SendMessageParams({
     required this.conversationId,
     required this.text,
+    this.replyToId,
   });
 
   final String conversationId;
   final String text;
+  final String? replyToId;
 }
 
 class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
@@ -40,6 +42,7 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
       role: MessageRole.user,
       content: trimmedText,
       timestamp: DateTime.now(),
+      replyToId: params.replyToId,
     );
 
     await _chatCoreRepository.saveMessage(userMessage);
@@ -48,6 +51,7 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
     final sendResult = await _privateChatRepository.sendMessage(
       conversationId: params.conversationId,
       content: trimmedText,
+      replyToId: params.replyToId,
     );
 
     return sendResult.fold((failure) async {

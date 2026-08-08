@@ -13,6 +13,7 @@ abstract class PrivateChatRepository {
   FutureResult<Message> sendMessage({
     required String conversationId,
     required String content,
+    String? replyToId,
   }) =>
       throw UnimplementedError('Stub');
 

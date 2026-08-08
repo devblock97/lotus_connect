@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
@@ -7,6 +8,7 @@ import 'package:lotus_connect/features/chat/application/private_active_conversat
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/person_message_bubble.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -155,12 +157,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               itemCount: activeState.conversationId == widget.conversationId
                   ? activeState.messages.length
                   : 0,
-              itemBuilder: (_, index) => PersonMessageBubble(
-                message: activeState.messages[index],
-                peerName: displayName,
-              ),
+              itemBuilder: (_, index) {
+                final message = activeState.messages[index];
+                final repliedTo = message.replyToId != null
+                    ? activeState.messages
+                        .firstWhereOrNull((m) => m.id == message.replyToId)
+                    : null;
+                return PersonMessageBubble(
+                  message: message,
+                  peerName: displayName,
+                  repliedToMessage: repliedTo,
+                );
+              },
             ),
           ),
+          if (activeState.replyingToMessage != null)
+            _buildReplyPreview(
+              context,
+              activeState.replyingToMessage!,
+              displayName,
+              activeNotifier,
+            ),
           ChatInputField(
             isGenerating: false,
             onSend: activeNotifier.sendMessage,
@@ -171,6 +188,63 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             onChanged: activeNotifier.updateDraft,
             hintText: 'Message $displayName',
             showAiDisclaimer: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReplyPreview(
+    BuildContext context,
+    Message replyingTo,
+    String peerName,
+    PrivateActiveConversationNotifier notifier,
+  ) {
+    final theme = Theme.of(context);
+    final isMine = replyingTo.role.isUser;
+    final senderName = isMine ? 'You' : peerName;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: theme.colorScheme.surfaceContainerLow ?? theme.cardColor,
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 36,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Replying to $senderName',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  replyingTo.content,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.textTheme.bodyMedium?.color
+                        ?.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, size: 20),
+            onPressed: notifier.cancelReply,
           ),
         ],
       ),

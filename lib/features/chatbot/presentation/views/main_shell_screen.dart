@@ -67,8 +67,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             : DateTime.now();
 
         AppLogger.debug(
-          'WS message parsed - id: $messageId, conv: $conversationId, '
-          'sender: $senderId, content: $content',
+          'WS message parsed - id: $messageId, conv: $conversationId, sender: $senderId, content: $content',
         );
 
         if (conversationId.isEmpty) {
@@ -80,8 +79,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         final isFromSelf = senderId.isNotEmpty && senderId == currentUserId;
 
         AppLogger.debug(
-          'WS check self - currentUserId: $currentUserId, '
-          'isFromSelf: $isFromSelf',
+          'WS check self - currentUserId: $currentUserId, isFromSelf: $isFromSelf',
         );
 
         // Sender already saved their message locally upon tapping send.
@@ -134,12 +132,15 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           );
         }
 
+        final replyToId =
+            (payload['reply_to_id'] ?? payload['replyToId']) as String?;
         final message = Message(
           id: messageId,
           conversationId: conversationId,
           role: MessageRole.assistant,
           content: content,
           timestamp: timestamp,
+          replyToId: replyToId,
         );
 
         await localDataSource.saveMessage(message);

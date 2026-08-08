@@ -97,6 +97,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
                     (e) => e.name == row.status,
                     orElse: () => MessageStatus.sent,
                   ),
+                  replyToId: row.replyToId,
                 ),
               )
               .toList(),
@@ -215,6 +216,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             timestamp: message.timestamp,
             isError: Value(message.isError),
             status: Value(message.status.name),
+            replyToId: Value(message.replyToId),
           ),
         );
   }
@@ -247,6 +249,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
               (e) => e.name == row.status,
               orElse: () => MessageStatus.sent,
             ),
+            replyToId: row.replyToId,
           ),
         )
         .toList();
@@ -272,6 +275,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
         (e) => e.name == row.status,
         orElse: () => MessageStatus.sent,
       ),
+      replyToId: row.replyToId,
     );
   }
 }

@@ -65,7 +65,7 @@ class LocalAiProvider implements AiProvider {
 
       final messageMap = response.data?['message'] as Map<String, dynamic>?;
       return messageMap?['content'] as String? ?? '';
-    } catch (e) {
+    } on Object catch (e) {
       return 'Failed to call local LLM. Make sure Ollama/LM Studio is running at $_baseUrl. Error: $e';
     }
   }
@@ -132,7 +132,7 @@ class LocalAiProvider implements AiProvider {
                 yield content;
               }
             }
-          } catch (_) {
+          } on Object catch (_) {
             // Partial JSON buffer retry
           }
         }
@@ -140,7 +140,7 @@ class LocalAiProvider implements AiProvider {
     } on DioException catch (e) {
       if (CancelToken.isCancel(e)) return;
       yield '⚠️ Local LLM connection failed at $_baseUrl.\n\nPlease start Ollama (`ollama run llama3`) or check your connection. Error: ${e.message}';
-    } catch (e) {
+    } on Object catch (e) {
       yield 'Error connecting to local LLM: $e';
     }
   }

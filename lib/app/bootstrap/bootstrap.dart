@@ -8,7 +8,8 @@ import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
-/// Bootstraps Lotus Connect application with global error handling and ProviderScope.
+/// Bootstraps Lotus Connect application with
+/// global error handling and ProviderScope.
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 

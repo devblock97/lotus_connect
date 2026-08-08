@@ -10,11 +10,13 @@ class PersonMessageBubble extends ConsumerWidget {
   const PersonMessageBubble({
     required this.message,
     required this.peerName,
+    this.repliedToMessage,
     super.key,
   });
 
   final Message message;
   final String peerName;
+  final Message? repliedToMessage;
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
@@ -49,6 +51,8 @@ class PersonMessageBubble extends ConsumerWidget {
 
   void _showOptionsDialog(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
+    final isMine = message.role.isUser;
+
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -58,39 +62,56 @@ class PersonMessageBubble extends ConsumerWidget {
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
-                _showEditDialog(context, ref);
+                ref
+                    .read(privateActiveConversationProvider.notifier)
+                    .setReplyingToMessage(message);
               },
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.edit_rounded, size: 20),
-                  const SizedBox(width: 12),
-                  Text(loc.editMessage),
+                  Icon(Icons.reply_rounded, size: 20),
+                  SizedBox(width: 12),
+                  Text('Reply'),
                 ],
               ),
             ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showDeleteConfirmation(context, ref);
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.delete_rounded,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    loc.deleteMessage,
-                    style: TextStyle(
+            if (isMine) ...[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _showEditDialog(context, ref);
+                },
+                child: Row(
+                  children: [
+                    const Icon(Icons.edit_rounded, size: 20),
+                    const SizedBox(width: 12),
+                    Text(loc.editMessage),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _showDeleteConfirmation(context, ref);
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_rounded,
+                      size: 20,
                       color: Theme.of(context).colorScheme.error,
-                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Text(
+                      loc.deleteMessage,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ],
         );
       },
@@ -168,7 +189,7 @@ class PersonMessageBubble extends ConsumerWidget {
             ),
           ],
           GestureDetector(
-            onLongPress: isMine ? () => _showOptionsDialog(context, ref) : null,
+            onLongPress: () => _showOptionsDialog(context, ref),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
@@ -180,9 +201,28 @@ class PersonMessageBubble extends ConsumerWidget {
                   bottomRight: Radius.circular(isMine ? 4 : 18),
                 ),
               ),
-              child: Text(
-                message.content,
-                style: TextStyle(color: foreground, fontSize: 15, height: 1.35),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (repliedToMessage != null) ...[
+                    _buildBubbleReplyHeader(
+                      context,
+                      repliedToMessage!,
+                      theme,
+                      isMine,
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  Text(
+                    message.content,
+                    style: TextStyle(
+                      color: foreground,
+                      fontSize: 15,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -211,6 +251,74 @@ class PersonMessageBubble extends ConsumerWidget {
                 ),
               ],
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBubbleReplyHeader(
+    BuildContext context,
+    Message repliedTo,
+    ThemeData theme,
+    bool isMine,
+  ) {
+    final repliedIsMine = repliedTo.role.isUser;
+    final senderName = repliedIsMine ? 'You' : peerName;
+    final barColor = isMine
+        ? theme.colorScheme.onPrimary.withValues(alpha: 0.6)
+        : theme.colorScheme.primary;
+    final textColor = isMine
+        ? theme.colorScheme.onPrimary.withValues(alpha: 0.8)
+        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8);
+    final titleColor =
+        isMine ? theme.colorScheme.onPrimary : theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: isMine
+            ? theme.colorScheme.onPrimary.withValues(alpha: 0.1)
+            : theme.colorScheme.surfaceContainerLow ??
+                theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 3,
+            height: 24,
+            color: barColor,
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  senderName,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  repliedTo.content,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: textColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
