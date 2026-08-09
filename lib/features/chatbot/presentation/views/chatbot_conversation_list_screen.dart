@@ -15,6 +15,7 @@ class ChatbotConversationListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final state = ref.watch(conversationListProvider);
     final notifier = ref.read(conversationListProvider.notifier);
     final conversations = state.filteredConversations
@@ -23,9 +24,9 @@ class ChatbotConversationListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'AI conversations',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+          style: theme.textTheme.headlineSmall,
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -129,16 +130,17 @@ class _AiConversationTile extends ConsumerWidget {
             conversation.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: theme.textTheme.titleMedium,
           ),
           subtitle: Text(
             subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium,
           ),
           trailing: Text(
             DateFormat('h:mm a').format(time),
-            style: TextStyle(
+            style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 11,
               color: theme.textTheme.bodySmall?.color?.withValues(alpha: .65),
             ),

@@ -175,4 +175,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save => 'Save';
+
+  @override
+  String get pleaseEnterRecipientPeerId => 'Please enter a recipient Peer ID';
+
+  @override
+  String get signalingEventLogs => 'Signaling Event Logs';
+
+  @override
+  String get noEventsLoggedYet =>
+      'No events logged yet. Start a call to trace signaling traffic.';
+
+  @override
+  String get clearLogs => 'Clear Logs';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get startNewCall => 'Start New Call';
+
+  @override
+  String get enterUserAddressToPlaceCall =>
+      'Enter user address/UUID to place a WebRTC call:';
+
+  @override
+  String get voice => 'Voice';
+
+  @override
+  String get video => 'Video';
+
+  @override
+  String get viewSignalingLogs => 'View signaling logs';
+
+  @override
+  String get refreshHistory => 'Refresh history';
+
+  @override
+  String get friends => 'Friends';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get searchFriendsOrCalls => 'Search friends or calls...';
+
+  @override
+  String get noFriendsFound => 'No friends found';
+
+  @override
+  String get noCallHistoryLogs => 'No call history logs';
+
+  @override
+  String get incomingCall => 'Incoming Call';
+
+  @override
+  String get outgoingCall => 'Outgoing Call';
+
+  @override
+  String get calling => 'Calling...';
+
+  @override
+  String get ringing => 'Ringing...';
+
+  @override
+  String get connected => 'Connected';
+
+  @override
+  String get callEnded => 'Call Ended';
+
+  @override
+  String get missedCall => 'Missed Call';
+
+  @override
+  String get speaker => 'Speaker';
+
+  @override
+  String get mute => 'Mute';
+
+  @override
+  String get unmute => 'Unmute';
+
+  @override
+  String get videoOn => 'Video On';
+
+  @override
+  String get videoOff => 'Video Off';
+
+  @override
+  String get endCall => 'End Call';
+
+  @override
+  String get screenSharingSimulation => 'Screen sharing simulation initiated';
+
+  @override
+  String get chatScreenOverlayOpened => 'Chat screen overlay opened';
+
+  @override
+  String get moreWithOptionsOpened => 'More call options opened';
+
+  @override
+  String get yesterday => 'YESTERDAY';
+
+  @override
+  String get older => 'OLDER';
+
+  @override
+  String get missed => 'Missed';
+
+  @override
+  String get remindMe => 'Remind Me';
+
+  @override
+  String get message => 'Message';
+
+  @override
+  String get voiceConnected => 'Voice Connected';
+
+  @override
+  String get endToEndEncrypted => 'END-TO-END ENCRYPTED';
+
+  @override
+  String get you => 'YOU';
 }

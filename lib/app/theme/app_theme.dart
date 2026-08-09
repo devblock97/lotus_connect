@@ -132,6 +132,86 @@ class AppTheme {
     outlineVariant: Color(0xFFD8C7A5),
   );
 
+  static TextTheme _buildTextTheme(TextTheme baseTextTheme, Color textColor) {
+    return baseTextTheme.copyWith(
+      displayLarge: baseTextTheme.displayLarge?.copyWith(
+        fontSize: 42,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      displayMedium: baseTextTheme.displayMedium?.copyWith(
+        fontSize: 36,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      displaySmall: baseTextTheme.displaySmall?.copyWith(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      titleSmall: baseTextTheme.titleSmall?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+      bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: textColor,
+      ),
+      bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+        color: textColor,
+      ),
+      bodySmall: baseTextTheme.bodySmall?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.normal,
+        color: textColor,
+      ),
+      labelLarge: baseTextTheme.labelLarge?.copyWith(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      labelMedium: baseTextTheme.labelMedium?.copyWith(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+      labelSmall: baseTextTheme.labelSmall?.copyWith(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+    );
+  }
+
   /// Light Theme configuration.
   static ThemeData get lightTheme {
     final baseTextTheme = GoogleFonts.interTextTheme();
@@ -159,10 +239,7 @@ class AppTheme {
         color: lightColorScheme.outlineVariant,
         space: 1,
       ),
-      textTheme: baseTextTheme.apply(
-        bodyColor: lightColorScheme.onSurface,
-        displayColor: lightColorScheme.onSurface,
-      ),
+      textTheme: _buildTextTheme(baseTextTheme, lightColorScheme.onSurface),
       extensions: const <ThemeExtension<dynamic>>[
         AppChatTheme(
           userBubbleBg: AppColors.userBubbleLight,
@@ -203,10 +280,7 @@ class AppTheme {
         color: darkColorScheme.outlineVariant,
         space: 1,
       ),
-      textTheme: baseTextTheme.apply(
-        bodyColor: darkColorScheme.onSurface,
-        displayColor: darkColorScheme.onSurface,
-      ),
+      textTheme: _buildTextTheme(baseTextTheme, darkColorScheme.onSurface),
       extensions: const <ThemeExtension<dynamic>>[
         AppChatTheme(
           userBubbleBg: AppColors.userBubbleDark,
@@ -247,10 +321,7 @@ class AppTheme {
         color: sepiaColorScheme.outlineVariant,
         space: 1,
       ),
-      textTheme: baseTextTheme.apply(
-        bodyColor: sepiaColorScheme.onSurface,
-        displayColor: sepiaColorScheme.onSurface,
-      ),
+      textTheme: _buildTextTheme(baseTextTheme, sepiaColorScheme.onSurface),
       extensions: const <ThemeExtension<dynamic>>[
         AppChatTheme(
           userBubbleBg: AppColors.userBubbleSepia,

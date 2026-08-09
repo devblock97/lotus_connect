@@ -425,6 +425,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get save;
+
+  /// No description provided for @pleaseEnterRecipientPeerId.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a recipient Peer ID'**
+  String get pleaseEnterRecipientPeerId;
+
+  /// No description provided for @signalingEventLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signaling Event Logs'**
+  String get signalingEventLogs;
+
+  /// No description provided for @noEventsLoggedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No events logged yet. Start a call to trace signaling traffic.'**
+  String get noEventsLoggedYet;
+
+  /// No description provided for @clearLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Logs'**
+  String get clearLogs;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @startNewCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Start New Call'**
+  String get startNewCall;
+
+  /// No description provided for @enterUserAddressToPlaceCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter user address/UUID to place a WebRTC call:'**
+  String get enterUserAddressToPlaceCall;
+
+  /// No description provided for @voice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get voice;
+
+  /// No description provided for @video.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get video;
+
+  /// No description provided for @viewSignalingLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'View signaling logs'**
+  String get viewSignalingLogs;
+
+  /// No description provided for @refreshHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh history'**
+  String get refreshHistory;
+
+  /// No description provided for @friends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get friends;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @searchFriendsOrCalls.
+  ///
+  /// In en, this message translates to:
+  /// **'Search friends or calls...'**
+  String get searchFriendsOrCalls;
+
+  /// No description provided for @noFriendsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No friends found'**
+  String get noFriendsFound;
+
+  /// No description provided for @noCallHistoryLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'No call history logs'**
+  String get noCallHistoryLogs;
+
+  /// No description provided for @incomingCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming Call'**
+  String get incomingCall;
+
+  /// No description provided for @outgoingCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Outgoing Call'**
+  String get outgoingCall;
+
+  /// No description provided for @calling.
+  ///
+  /// In en, this message translates to:
+  /// **'Calling...'**
+  String get calling;
+
+  /// No description provided for @ringing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ringing...'**
+  String get ringing;
+
+  /// No description provided for @connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get connected;
+
+  /// No description provided for @callEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Call Ended'**
+  String get callEnded;
+
+  /// No description provided for @missedCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed Call'**
+  String get missedCall;
+
+  /// No description provided for @speaker.
+  ///
+  /// In en, this message translates to:
+  /// **'Speaker'**
+  String get speaker;
+
+  /// No description provided for @mute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get mute;
+
+  /// No description provided for @unmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get unmute;
+
+  /// No description provided for @videoOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Video On'**
+  String get videoOn;
+
+  /// No description provided for @videoOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Off'**
+  String get videoOff;
+
+  /// No description provided for @endCall.
+  ///
+  /// In en, this message translates to:
+  /// **'End Call'**
+  String get endCall;
+
+  /// No description provided for @screenSharingSimulation.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen sharing simulation initiated'**
+  String get screenSharingSimulation;
+
+  /// No description provided for @chatScreenOverlayOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat screen overlay opened'**
+  String get chatScreenOverlayOpened;
+
+  /// No description provided for @moreWithOptionsOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'More call options opened'**
+  String get moreWithOptionsOpened;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'YESTERDAY'**
+  String get yesterday;
+
+  /// No description provided for @older.
+  ///
+  /// In en, this message translates to:
+  /// **'OLDER'**
+  String get older;
+
+  /// No description provided for @missed.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// No description provided for @remindMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind Me'**
+  String get remindMe;
+
+  /// No description provided for @message.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get message;
+
+  /// No description provided for @voiceConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Connected'**
+  String get voiceConnected;
+
+  /// No description provided for @endToEndEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'END-TO-END ENCRYPTED'**
+  String get endToEndEncrypted;
+
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU'**
+  String get you;
 }
 
 class _AppLocalizationsDelegate
