@@ -174,4 +174,127 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get save => 'Lưu';
+
+  @override
+  String get pleaseEnterRecipientPeerId =>
+      'Vui lòng nhập Peer ID của người nhận';
+
+  @override
+  String get signalingEventLogs => 'Nhật ký sự kiện báo hiệu';
+
+  @override
+  String get noEventsLoggedYet =>
+      'Chưa có sự kiện nào được ghi nhận. Hãy bắt đầu một cuộc gọi để theo dõi lưu lượng báo hiệu.';
+
+  @override
+  String get clearLogs => 'Xóa nhật ký';
+
+  @override
+  String get close => 'Đóng';
+
+  @override
+  String get startNewCall => 'Bắt đầu cuộc gọi mới';
+
+  @override
+  String get enterUserAddressToPlaceCall =>
+      'Nhập địa chỉ/UUID người dùng để thực hiện cuộc gọi WebRTC:';
+
+  @override
+  String get voice => 'Thoại';
+
+  @override
+  String get video => 'Video';
+
+  @override
+  String get viewSignalingLogs => 'Xem nhật ký báo hiệu';
+
+  @override
+  String get refreshHistory => 'Làm mới lịch sử';
+
+  @override
+  String get friends => 'Bạn bè';
+
+  @override
+  String get history => 'Lịch sử';
+
+  @override
+  String get searchFriendsOrCalls => 'Tìm bạn bè hoặc cuộc gọi...';
+
+  @override
+  String get noFriendsFound => 'Không tìm thấy bạn bè nào';
+
+  @override
+  String get noCallHistoryLogs => 'Không có lịch sử cuộc gọi';
+
+  @override
+  String get incomingCall => 'Cuộc gọi đến';
+
+  @override
+  String get outgoingCall => 'Cuộc gọi đi';
+
+  @override
+  String get calling => 'Đang gọi...';
+
+  @override
+  String get ringing => 'Đang đổ chuông...';
+
+  @override
+  String get connected => 'Đã kết nối';
+
+  @override
+  String get callEnded => 'Cuộc gọi đã kết thúc';
+
+  @override
+  String get missedCall => 'Cuộc gọi nhỡ';
+
+  @override
+  String get speaker => 'Loa ngoài';
+
+  @override
+  String get mute => 'Tắt tiếng';
+
+  @override
+  String get unmute => 'Bật tiếng';
+
+  @override
+  String get videoOn => 'Bật video';
+
+  @override
+  String get videoOff => 'Tắt video';
+
+  @override
+  String get endCall => 'Gác máy';
+
+  @override
+  String get screenSharingSimulation => 'Mô phỏng chia sẻ màn hình đã bắt đầu';
+
+  @override
+  String get chatScreenOverlayOpened => 'Trình bao phủ trò chuyện đã mở';
+
+  @override
+  String get moreWithOptionsOpened => 'Tùy chọn cuộc gọi mở rộng đã mở';
+
+  @override
+  String get yesterday => 'HÔM QUA';
+
+  @override
+  String get older => 'CŨ HƠN';
+
+  @override
+  String get missed => 'Nhỡ';
+
+  @override
+  String get remindMe => 'Nhắc tôi';
+
+  @override
+  String get message => 'Tin nhắn';
+
+  @override
+  String get voiceConnected => 'Cuộc gọi thoại đã kết nối';
+
+  @override
+  String get endToEndEncrypted => 'MÃ HÓA ĐẦU CUỐI';
+
+  @override
+  String get you => 'BẠN';
 }

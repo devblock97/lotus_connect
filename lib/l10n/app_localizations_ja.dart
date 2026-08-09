@@ -169,4 +169,126 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get save => '保存';
+
+  @override
+  String get pleaseEnterRecipientPeerId => '宛先のピアIDを入力してください';
+
+  @override
+  String get signalingEventLogs => 'シグナリングイベントログ';
+
+  @override
+  String get noEventsLoggedYet =>
+      'ログに記録されたイベントはまだありません。通話を開始してシグナリングトラフィックを追跡します。';
+
+  @override
+  String get clearLogs => 'ログをクリア';
+
+  @override
+  String get close => '閉じる';
+
+  @override
+  String get startNewCall => '新しい通話を開始';
+
+  @override
+  String get enterUserAddressToPlaceCall =>
+      'WebRTC通話を発信するには、ユーザーアドレス/UUIDを入力してください：';
+
+  @override
+  String get voice => '音声通話';
+
+  @override
+  String get video => 'ビデオ通話';
+
+  @override
+  String get viewSignalingLogs => 'シグナリングログを表示';
+
+  @override
+  String get refreshHistory => '履歴を更新';
+
+  @override
+  String get friends => '友達';
+
+  @override
+  String get history => '履歴';
+
+  @override
+  String get searchFriendsOrCalls => '友達や通話を検索...';
+
+  @override
+  String get noFriendsFound => '友達が見つかりません';
+
+  @override
+  String get noCallHistoryLogs => '通話履歴はありません';
+
+  @override
+  String get incomingCall => '着信';
+
+  @override
+  String get outgoingCall => '発信';
+
+  @override
+  String get calling => 'ダイヤル中...';
+
+  @override
+  String get ringing => '呼び出し中...';
+
+  @override
+  String get connected => '接続中';
+
+  @override
+  String get callEnded => '通話終了';
+
+  @override
+  String get missedCall => '不在着信';
+
+  @override
+  String get speaker => 'スピーカー';
+
+  @override
+  String get mute => '消音';
+
+  @override
+  String get unmute => '消音解除';
+
+  @override
+  String get videoOn => 'ビデオON';
+
+  @override
+  String get videoOff => 'ビデオOFF';
+
+  @override
+  String get endCall => '通話を終了';
+
+  @override
+  String get screenSharingSimulation => '画面共有シミュレーションが開始されました';
+
+  @override
+  String get chatScreenOverlayOpened => 'チャット画面オーバーレイが開きました';
+
+  @override
+  String get moreWithOptionsOpened => '通話の詳細オプションが開きました';
+
+  @override
+  String get yesterday => '昨日';
+
+  @override
+  String get older => '過去';
+
+  @override
+  String get missed => '不在';
+
+  @override
+  String get remindMe => 'リマインダー';
+
+  @override
+  String get message => 'メッセージ';
+
+  @override
+  String get voiceConnected => '音声通話接続中';
+
+  @override
+  String get endToEndEncrypted => 'エンドツーエンドで暗号化';
+
+  @override
+  String get you => '自分';
 }

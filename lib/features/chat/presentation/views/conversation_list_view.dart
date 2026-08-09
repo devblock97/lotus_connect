@@ -37,7 +37,7 @@ class ConversationListView extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           loc.tabChats,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+          style: theme.textTheme.headlineSmall,
         ),
         actions: [
           IconButton(
@@ -139,13 +139,14 @@ class ConversationListView extends ConsumerWidget {
                         ),
                       ],
                       if (conversations.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(32),
+                        Padding(
+                          padding: const EdgeInsets.all(32),
                           child: Center(
                             child: Text(
                               'No private chats found.\nTap + to start a chat!',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey),
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.grey),
                             ),
                           ),
                         ),
@@ -172,8 +173,7 @@ class ConversationListView extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
               title,
-              style: TextStyle(
-                fontSize: 12,
+              style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
                 color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
@@ -239,7 +239,8 @@ class ConversationListView extends ConsumerWidget {
               backgroundColor: theme.colorScheme.surfaceContainerHighest,
               child: Text(
                 displayTitle.isNotEmpty ? displayTitle[0].toUpperCase() : 'C',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
             title: Row(
@@ -249,7 +250,7 @@ class ConversationListView extends ConsumerWidget {
                     displayTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 if (conversation.isPinned)
@@ -265,7 +266,7 @@ class ConversationListView extends ConsumerWidget {
                   : subtitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: conversation.draftMessage?.isNotEmpty ?? false
                     ? Colors.redAccent
                     : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
@@ -273,7 +274,7 @@ class ConversationListView extends ConsumerWidget {
             ),
             trailing: Text(
               timeStr,
-              style: TextStyle(
+              style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 11,
                 color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
               ),

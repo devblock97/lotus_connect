@@ -6,13 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
+import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 enum CallStatus {
   idle,
@@ -408,8 +411,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   Future<void> _startCall({required bool isVideo}) async {
     final peerId = _peerIdController.text.trim();
     if (peerId.isEmpty) {
+      final loc = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a recipient Peer ID')),
+        SnackBar(content: Text(loc.pleaseEnterRecipientPeerId)),
       );
       return;
     }
@@ -519,48 +523,61 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     return _buildIdleUI();
   }
 
-  String _getPresenceStatusText(String username) {
-    final hash = username.hashCode % 4;
-    if (hash == 0) return 'Online';
-    if (hash == 1) return 'Busy • In a meeting';
-    if (hash == 2) return 'Away';
-    return 'Last seen 2h ago';
+  String _getPresenceStatusText(String peerId) {
+    final presenceMap = ref.watch(presenceProvider);
+    final peerPresence = presenceMap[peerId];
+    final isOnline = peerPresence?.isOnline ?? false;
+    final lastSeen = peerPresence?.lastSeen ?? DateTime.now();
+    if (isOnline) {
+      return 'Online';
+    } else {
+      return formatLastSeen(isOnline, lastSeen);
+    }
   }
 
-  Color _getPresenceColor(String username) {
-    final hash = username.hashCode % 4;
-    if (hash == 0) return Colors.green;
-    if (hash == 1) return Colors.red;
-    if (hash == 2) return Colors.amber;
+  Color _getPresenceColor(String peerId) {
+    final presenceMap = ref.watch(presenceProvider);
+    final peerPresence = presenceMap[peerId];
+    final isOnline = peerPresence?.isOnline ?? false;
+    if (isOnline) return Colors.green;
     return Colors.grey;
   }
 
-  String _resolvePeerName(String hostId, List<User> friends) {
+  String _resolvePeerId(CallLog log) {
     final currentUserId = ref.read(settingsProvider).userId;
-    final targetId = hostId == currentUserId ? _activePeerId ?? '' : hostId;
+    if (log.hostId != currentUserId) {
+      return log.hostId;
+    }
+    if (log.conversationId != null) {
+      final conversations =
+          ref.read(privateConversationListProvider).conversations;
+      for (final c in conversations) {
+        if (c.id == log.conversationId && c.isUserToUser) {
+          return c.peerId;
+        }
+      }
+    }
+    return '';
+  }
 
+  String _resolvePeerName(CallLog log, List<User> friends) {
+    final targetId = _resolvePeerId(log);
     if (targetId.isNotEmpty) {
       for (final f in friends) {
         if (f.id == targetId) {
           return f.fullName ?? f.username;
         }
       }
+      return 'User ${targetId.substring(0, 8)}';
     }
-
-    // Fallback names mapping for realistic history mocks
-    final names = [
-      'Sarah Jenkins',
-      'Marcus Chen',
-      'Elena Kostic',
-      'David Kim',
-      'Marcus Thorne',
-      'Sarah Chen',
-    ];
-    return names[hostId.hashCode % names.length];
+    return 'Unknown User';
   }
 
   String _formatDurationText(int seconds) {
-    if (seconds <= 0) return 'Missed';
+    if (seconds <= 0) {
+      final loc = AppLocalizations.of(context)!;
+      return loc.missed;
+    }
     final m = seconds ~/ 60;
     final s = seconds % 60;
     if (m > 0) {
@@ -570,14 +587,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   void _showLogsDialog() {
+    final loc = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.terminal, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('Signaling Event Logs'),
+            const Icon(Icons.terminal, color: Colors.blue),
+            const SizedBox(width: 8),
+            Text(loc.signalingEventLogs),
           ],
         ),
         content: Container(
@@ -590,10 +608,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             border: Border.all(color: Colors.white10),
           ),
           child: _consoleLogs.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'No events logged yet. Start a call to trace signaling traffic.',
-                    style: TextStyle(
+                    loc.noEventsLoggedYet,
+                    style: const TextStyle(
                       color: Colors.white30,
                       fontFamily: 'monospace',
                       fontSize: 11,
@@ -621,11 +639,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               setState(_consoleLogs.clear);
               Navigator.pop(context);
             },
-            child: const Text('Clear Logs'),
+            child: Text(loc.clearLogs),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(loc.close),
           ),
         ],
       ),
@@ -633,17 +651,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   void _showStartNewCallManualDialog() {
+    final loc = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Start New Call'),
+        title: Text(loc.startNewCall),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Enter user address/UUID to place a WebRTC call:',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              loc.enterUserAddressToPlaceCall,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -659,7 +678,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(loc.cancel),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -667,7 +686,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               _startCall(isVideo: false);
             },
             icon: const Icon(Icons.phone),
-            label: const Text('Voice'),
+            label: Text(loc.voice),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -675,7 +694,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               _startCall(isVideo: true);
             },
             icon: const Icon(Icons.videocam),
-            label: const Text('Video'),
+            label: Text(loc.video),
           ),
         ],
       ),
@@ -684,6 +703,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Widget _buildIdleUI() {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final friendsState = ref.watch(contactsProvider);
     final historyState = ref.watch(callHistoryProvider);
     final currentUserId = ref.read(settingsProvider).userId;
@@ -699,6 +719,32 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final yesterdayLogs = <CallLog>[];
     final olderLogs = <CallLog>[];
 
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final yesterdayStart = todayStart.subtract(const Duration(days: 1));
+
+    for (final log in historyState.history) {
+      final peerName = _resolvePeerName(log, friendsState.friends);
+      if (_searchQuery.isNotEmpty &&
+          !peerName.toLowerCase().contains(_searchQuery.toLowerCase())) {
+        continue;
+      }
+
+      final localCreatedAt = log.createdAt.toLocal();
+      final logDate = DateTime(
+        localCreatedAt.year,
+        localCreatedAt.month,
+        localCreatedAt.day,
+      );
+      if (logDate.isAtSameMomentAs(todayStart)) {
+        todayLogs.add(log);
+      } else if (logDate.isAtSameMomentAs(yesterdayStart)) {
+        yesterdayLogs.add(log);
+      } else {
+        olderLogs.add(log);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 8,
@@ -713,23 +759,23 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'logs',
                 child: Row(
                   children: [
-                    Icon(Icons.terminal, size: 18),
-                    SizedBox(width: 8),
-                    Text('View signaling logs'),
+                    const Icon(Icons.terminal, size: 18),
+                    const SizedBox(width: 8),
+                    Text(loc.viewSignalingLogs),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'clear',
                 child: Row(
                   children: [
-                    Icon(Icons.refresh, size: 18),
-                    SizedBox(width: 8),
-                    Text('Refresh history'),
+                    const Icon(Icons.refresh, size: 18),
+                    const SizedBox(width: 8),
+                    Text(loc.refreshHistory),
                   ],
                 ),
               ),
@@ -777,7 +823,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            'Friends',
+                            loc.friends,
                             style: TextStyle(
                               fontWeight: _showFriendsTab
                                   ? FontWeight.bold
@@ -816,7 +862,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            'History',
+                            loc.history,
                             style: TextStyle(
                               fontWeight: !_showFriendsTab
                                   ? FontWeight.bold
@@ -845,7 +891,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search friends or calls...',
+                hintText: loc.searchFriendsOrCalls,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -889,13 +935,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_call),
-        label: const Text('Start New Call'),
+        label: Text(loc.startNewCall),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       ),
     );
   }
 
   Widget _buildFriendsView(List<User> friends, ThemeData theme) {
+    final loc = AppLocalizations.of(context)!;
     if (friends.isEmpty) {
       return Center(
         child: Column(
@@ -904,7 +951,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             Icon(Icons.people_outline, size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 16),
             Text(
-              'No friends found',
+              loc.noFriendsFound,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -921,8 +968,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       itemCount: friends.length,
       itemBuilder: (context, index) {
         final friend = friends[index];
-        final presenceText = _getPresenceStatusText(friend.username);
-        final presenceColor = _getPresenceColor(friend.username);
+        final presenceText = _getPresenceStatusText(friend.id);
+        final presenceColor = _getPresenceColor(friend.id);
         final displayName = friend.fullName ?? friend.username;
         final initials = displayName.isNotEmpty
             ? displayName.substring(0, 1).toUpperCase()
@@ -967,7 +1014,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             ),
             title: Text(
               displayName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              style: theme.textTheme.titleMedium,
             ),
             subtitle: Text(
               presenceText,
@@ -1021,6 +1068,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     List<User> friends,
     ThemeData theme,
   ) {
+    final loc = AppLocalizations.of(context)!;
     if (today.isEmpty && yesterday.isEmpty && older.isEmpty) {
       return Center(
         child: Column(
@@ -1033,7 +1081,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No call history logs',
+              loc.noCallHistoryLogs,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1049,17 +1097,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         if (today.isNotEmpty) ...[
-          _buildHistorySectionHeader('TODAY'),
+          _buildHistorySectionHeader(loc.today),
           ...today.map((log) => _buildHistoryItem(log, friends, theme)),
           const SizedBox(height: 12),
         ],
         if (yesterday.isNotEmpty) ...[
-          _buildHistorySectionHeader('YESTERDAY'),
+          _buildHistorySectionHeader(loc.yesterday),
           ...yesterday.map((log) => _buildHistoryItem(log, friends, theme)),
           const SizedBox(height: 12),
         ],
         if (older.isNotEmpty) ...[
-          _buildHistorySectionHeader('OLDER'),
+          _buildHistorySectionHeader(loc.older),
           ...older.map((log) => _buildHistoryItem(log, friends, theme)),
         ],
       ],
@@ -1082,7 +1130,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildHistoryItem(CallLog log, List<User> friends, ThemeData theme) {
-    final peerName = _resolvePeerName(log.hostId, friends);
+    final loc = AppLocalizations.of(context)!;
+    final peerName = _resolvePeerName(log, friends);
     final initials =
         peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
 
@@ -1143,11 +1192,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         ),
         title: Text(
           peerName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: nameColor,
-          ),
+          style: theme.textTheme.titleMedium,
         ),
         subtitle: Row(
           children: [
@@ -1158,7 +1203,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             ),
             const SizedBox(width: 4),
             Text(
-              log.isVideo ? 'Video Call' : 'Voice Call',
+              log.isVideo ? loc.videoCall : loc.voiceCall,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
             if (log.durationSeconds > 0) ...[
@@ -1190,10 +1235,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   color: Colors.black87,
                 ),
                 onPressed: () {
-                  final targetPeerId =
-                      log.hostId == ref.read(settingsProvider).userId
-                          ? _activePeerId ?? ''
-                          : log.hostId;
+                  final targetPeerId = _resolvePeerId(log);
                   if (targetPeerId.isNotEmpty) {
                     _peerIdController.text = targetPeerId;
                     _startCall(isVideo: log.isVideo);
@@ -1221,10 +1263,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildRingingInUI() {
-    final hasSarah =
-        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah');
-    final displayName =
-        hasSarah ? 'Sarah Chen' : (_activePeerId?.substring(0, 8) ?? 'User');
+    final loc = AppLocalizations.of(context)!;
+    final friend = ref
+        .read(contactsProvider)
+        .friends
+        .where((f) => f.id == _activePeerId)
+        .firstOrNull;
+    final displayName = friend != null
+        ? (friend.fullName ?? friend.username)
+        : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Container(
@@ -1282,7 +1329,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _isVideo ? 'INCOMING VIDEO CALL' : 'INCOMING VOICE CALL',
+                    _isVideo
+                        ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
+                        : '${loc.incomingCall.toUpperCase()} (${loc.voice.toUpperCase()})',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -1299,8 +1348,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildTextActionButton(Icons.alarm, 'Remind Me'),
-                    _buildTextActionButton(Icons.chat_bubble, 'Message'),
+                    _buildTextActionButton(Icons.alarm, loc.remindMe),
+                    _buildTextActionButton(Icons.chat_bubble, loc.message),
                   ],
                 ),
               ),
@@ -1327,9 +1376,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           icon: const Icon(Icons.call_end),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          'Decline',
-                          style: TextStyle(
+                        Text(
+                          loc.decline,
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
@@ -1353,9 +1402,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           icon: Icon(_isVideo ? Icons.videocam : Icons.call),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          'Accept',
-                          style: TextStyle(
+                        Text(
+                          loc.accept,
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
@@ -1374,10 +1423,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildRingingOutUI() {
-    final displayName =
-        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
-            ? 'Sarah Chen'
-            : (_activePeerId?.substring(0, 8) ?? 'User');
+    final loc = AppLocalizations.of(context)!;
+    final friend = ref
+        .read(contactsProvider)
+        .friends
+        .where((f) => f.id == _activePeerId)
+        .firstOrNull;
+    final displayName = friend != null
+        ? (friend.fullName ?? friend.username)
+        : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Container(
@@ -1435,8 +1489,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _isVideo
-                        ? 'CALLING VIDEO PEER...'
-                        : 'CALLING VOICE PEER...',
+                        ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
+                        : '${loc.calling.toUpperCase()} (${loc.voice.toUpperCase()})',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -1463,9 +1517,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       icon: const Icon(Icons.call_end),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Cancel',
-                      style: TextStyle(
+                    Text(
+                      loc.cancel,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -1482,11 +1536,16 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   Widget _buildConnectedUI() {
+    final loc = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
-    final displayName =
-        _activePeerId != null && _activePeerId!.toLowerCase().contains('sarah')
-            ? 'Sarah Chen'
-            : (_activePeerId?.substring(0, 8) ?? 'User');
+    final friend = ref
+        .read(contactsProvider)
+        .friends
+        .where((f) => f.id == _activePeerId)
+        .firstOrNull;
+    final displayName = friend != null
+        ? (friend.fullName ?? friend.username)
+        : (_activePeerId?.substring(0, 8) ?? 'User');
 
     return Scaffold(
       body: Stack(
@@ -1535,9 +1594,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Voice Connected',
-                      style: TextStyle(
+                    Text(
+                      loc.voiceConnected,
+                      style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
                         letterSpacing: 0.5,
@@ -1581,13 +1640,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.lock, color: Color(0xFF34C759), size: 14),
-                      SizedBox(width: 6),
+                      const Icon(
+                        Icons.lock,
+                        color: Color(0xFF34C759),
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
                       Text(
-                        'END-TO-END ENCRYPTED',
-                        style: TextStyle(
+                        loc.endToEndEncrypted.toUpperCase(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -1628,13 +1691,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               children: [
                 _buildFloatingSideButton(Icons.chat_bubble, () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Chat screen overlay opened')),
+                    SnackBar(content: Text(loc.chatScreenOverlayOpened)),
                   );
                 }),
                 const SizedBox(height: 16),
                 _buildFloatingSideButton(Icons.more_horiz, () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('More call options opened')),
+                    SnackBar(content: Text(loc.moreWithOptionsOpened)),
                   );
                 }),
               ],
@@ -1682,9 +1745,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           color: Colors.black.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'YOU',
-                          style: TextStyle(
+                        child: Text(
+                          loc.you.toUpperCase(),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -1771,8 +1834,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   IconButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Screen sharing simulation initiated'),
+                        SnackBar(
+                          content: Text(loc.screenSharingSimulation),
                         ),
                       );
                     },

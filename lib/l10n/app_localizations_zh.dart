@@ -169,4 +169,124 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get save => '保存';
+
+  @override
+  String get pleaseEnterRecipientPeerId => '请输入接收方的 Peer ID';
+
+  @override
+  String get signalingEventLogs => '信令事件日志';
+
+  @override
+  String get noEventsLoggedYet => '暂无已记录的信令事件。开始通话以追踪信令流量。';
+
+  @override
+  String get clearLogs => '清除日志';
+
+  @override
+  String get close => '关闭';
+
+  @override
+  String get startNewCall => '开始新通话';
+
+  @override
+  String get enterUserAddressToPlaceCall => '输入用户地址/UUID 以进行 WebRTC 通话：';
+
+  @override
+  String get voice => '语音';
+
+  @override
+  String get video => '视频';
+
+  @override
+  String get viewSignalingLogs => '查看信令日志';
+
+  @override
+  String get refreshHistory => '刷新历史记录';
+
+  @override
+  String get friends => '好友';
+
+  @override
+  String get history => '历史记录';
+
+  @override
+  String get searchFriendsOrCalls => '搜索好友或通话...';
+
+  @override
+  String get noFriendsFound => '未找到好友';
+
+  @override
+  String get noCallHistoryLogs => '暂无通话历史记录';
+
+  @override
+  String get incomingCall => '呼入通话';
+
+  @override
+  String get outgoingCall => '呼出通话';
+
+  @override
+  String get calling => '正在呼叫...';
+
+  @override
+  String get ringing => '正在响铃...';
+
+  @override
+  String get connected => '已连接';
+
+  @override
+  String get callEnded => '通话已结束';
+
+  @override
+  String get missedCall => '未接来电';
+
+  @override
+  String get speaker => '扬声器';
+
+  @override
+  String get mute => '静音';
+
+  @override
+  String get unmute => '取消静音';
+
+  @override
+  String get videoOn => '开启视频';
+
+  @override
+  String get videoOff => '关闭视频';
+
+  @override
+  String get endCall => '挂断通话';
+
+  @override
+  String get screenSharingSimulation => '已启动屏幕共享模拟';
+
+  @override
+  String get chatScreenOverlayOpened => '聊天浮窗已打开';
+
+  @override
+  String get moreWithOptionsOpened => '通话更多选项已打开';
+
+  @override
+  String get yesterday => '昨天';
+
+  @override
+  String get older => '更早';
+
+  @override
+  String get missed => '未接';
+
+  @override
+  String get remindMe => '提醒我';
+
+  @override
+  String get message => '短信';
+
+  @override
+  String get voiceConnected => '语音已连接';
+
+  @override
+  String get endToEndEncrypted => '端到端加密';
+
+  @override
+  String get you => '你';
 }

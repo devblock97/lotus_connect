@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
@@ -157,7 +157,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        _formatLastSeen(isOnline, lastSeen),
+                        formatLastSeen(isOnline, lastSeen),
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).textTheme.bodySmall?.color,
@@ -243,30 +243,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
     );
-  }
-
-  String _formatLastSeen(bool isOnline, DateTime lastSeen) {
-    if (isOnline) {
-      return 'Online';
-    } else {
-      final now = DateTime.now();
-      final difference = now.difference(lastSeen);
-
-      if (difference.inSeconds < 60) {
-        return 'active just now';
-      } else if (difference.inMinutes < 60) {
-        final minutes = difference.inMinutes;
-        return 'active $minutes minute${minutes == 1 ? '' : 's'} ago';
-      } else if (difference.inHours < 24) {
-        final hours = difference.inHours;
-        return 'active $hours hour${hours == 1 ? '' : 's'} ago';
-      } else if (difference.inDays < 30) {
-        final days = difference.inDays;
-        return 'active $days day${days == 1 ? '' : 's'} ago';
-      } else {
-        return 'active on ${DateFormat('MMM d, yyyy').format(lastSeen)}';
-      }
-    }
   }
 
   Widget _buildReplyPreview(
