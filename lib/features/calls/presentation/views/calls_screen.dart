@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
+import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -18,62 +19,6 @@ enum CallStatus {
   ringingOut, // We are calling someone else
   ringingIn, // Someone else is calling us
   connected, // Active WebRTC session
-}
-
-class RippleAnimation extends StatefulWidget {
-  const RippleAnimation({required this.child, super.key});
-
-  final Widget child;
-
-  @override
-  State<RippleAnimation> createState() => _RippleAnimationState();
-}
-
-class _RippleAnimationState extends State<RippleAnimation>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            ...List.generate(3, (index) {
-              final progress = (_controller.value + index / 3) % 1.0;
-              return Container(
-                width: 140 + progress * 180,
-                height: 140 + progress * 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF8B857B)
-                      .withValues(alpha: (1.0 - progress) * 0.15),
-                ),
-              );
-            }),
-            widget.child,
-          ],
-        );
-      },
-    );
-  }
 }
 
 class CallsScreen extends ConsumerStatefulWidget {
@@ -750,66 +695,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       return name.contains(query) || username.contains(query);
     }).toList();
 
-    final displayHistory = historyState.history.isNotEmpty
-        ? historyState.history
-        : [
-            CallLog(
-              id: 'call-1',
-              hostId: 'sarah-jenkins-id',
-              channelId: 'room-1',
-              isVideo: true,
-              status: 'rejected',
-              createdAt: DateTime.now().subtract(const Duration(minutes: 45)),
-            ),
-            CallLog(
-              id: 'call-2',
-              hostId: currentUserId,
-              channelId: 'room-2',
-              isVideo: false,
-              status: 'ended',
-              createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-              endedAt: DateTime.now()
-                  .subtract(const Duration(hours: 3))
-                  .add(const Duration(minutes: 12, seconds: 45)),
-            ),
-            CallLog(
-              id: 'call-3',
-              hostId: 'elena-kostic-id',
-              channelId: 'room-3',
-              isVideo: false,
-              status: 'ended',
-              createdAt:
-                  DateTime.now().subtract(const Duration(days: 1, hours: 2)),
-              endedAt: DateTime.now()
-                  .subtract(const Duration(days: 1, hours: 2))
-                  .add(const Duration(minutes: 4, seconds: 20)),
-            ),
-          ];
-
-    final filteredHistory = displayHistory.where((log) {
-      final peerName =
-          _resolvePeerName(log.hostId, friendsState.friends).toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      return peerName.contains(query);
-    }).toList();
-
     final todayLogs = <CallLog>[];
     final yesterdayLogs = <CallLog>[];
     final olderLogs = <CallLog>[];
-
-    final now = DateTime.now();
-    for (final log in filteredHistory) {
-      final diff = now.difference(log.createdAt).inDays;
-      if (diff == 0 && log.createdAt.day == now.day) {
-        todayLogs.add(log);
-      } else if (diff <= 1 ||
-          (diff == 2 &&
-              log.createdAt.day == now.subtract(const Duration(days: 1)).day)) {
-        yesterdayLogs.add(log);
-      } else {
-        olderLogs.add(log);
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(

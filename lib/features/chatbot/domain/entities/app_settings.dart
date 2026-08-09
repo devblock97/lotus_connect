@@ -1,10 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:lotus_connect/app/config/app_config.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 
 /// Pure Dart entity representing app-wide user preferences.
 @immutable
-class AppSettings {
+class AppSettings extends Equatable {
   /// Creates an [AppSettings].
   const AppSettings({
     this.themeMode = AppThemeMode.dark,
@@ -21,6 +22,32 @@ class AppSettings {
     this.username = '',
     this.email = '',
   }) : _serverHost = serverHost;
+
+  factory AppSettings.fromJson(Map<String, dynamic> json) {
+    final themeName = json['themeMode'] as String? ?? 'dark';
+    final themeMode = AppThemeMode.values.firstWhere(
+      (e) => e.name == themeName,
+      orElse: () => AppThemeMode.dark,
+    );
+
+    return AppSettings(
+      themeMode: themeMode,
+      languageCode: json['languageCode'] as String? ?? 'en',
+      activeAiProvider: json['activeAiProvider'] as String? ?? 'mock',
+      activeAiModel: json['activeAiModel'] as String? ?? 'gemini-1.5-flash',
+      geminiApiKey: json['geminiApiKey'] as String? ?? '',
+      localLlmBaseUrl:
+          json['localLlmBaseUrl'] as String? ?? 'http://localhost:11434',
+      systemPrompt: json['systemPrompt'] as String? ??
+          'You are a helpful, expert AI assistant.',
+      accessToken: json['accessToken'] as String? ?? '',
+      refreshToken: json['refreshToken'] as String? ?? '',
+      serverHost: json['serverHost'] as String? ?? '',
+      userId: json['userId'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+    );
+  }
 
   /// Selected theme mode.
   final AppThemeMode themeMode;
@@ -76,6 +103,24 @@ class AppSettings {
   /// Persisted Email.
   final String email;
 
+  Map<String, dynamic> toJson() {
+    return {
+      'themeMode': themeMode.name,
+      'languageCode': languageCode,
+      'activeAiProvider': activeAiProvider,
+      'activeAiModel': activeAiModel,
+      'geminiApiKey': geminiApiKey,
+      'localLlmBaseUrl': localLlmBaseUrl,
+      'systemPrompt': systemPrompt,
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'serverHost': serverHost,
+      'userId': userId,
+      'username': username,
+      'email': email,
+    };
+  }
+
   /// Returns a copy of [AppSettings] with updated values.
   AppSettings copyWith({
     AppThemeMode? themeMode,
@@ -110,37 +155,19 @@ class AppSettings {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppSettings &&
-          runtimeType == other.runtimeType &&
-          themeMode == other.themeMode &&
-          languageCode == other.languageCode &&
-          activeAiProvider == other.activeAiProvider &&
-          activeAiModel == other.activeAiModel &&
-          geminiApiKey == other.geminiApiKey &&
-          localLlmBaseUrl == other.localLlmBaseUrl &&
-          systemPrompt == other.systemPrompt &&
-          accessToken == other.accessToken &&
-          refreshToken == other.refreshToken &&
-          serverHost == other.serverHost &&
-          userId == other.userId &&
-          username == other.username &&
-          email == other.email;
-
-  @override
-  int get hashCode =>
-      themeMode.hashCode ^
-      languageCode.hashCode ^
-      activeAiProvider.hashCode ^
-      activeAiModel.hashCode ^
-      geminiApiKey.hashCode ^
-      localLlmBaseUrl.hashCode ^
-      systemPrompt.hashCode ^
-      accessToken.hashCode ^
-      refreshToken.hashCode ^
-      serverHost.hashCode ^
-      userId.hashCode ^
-      username.hashCode ^
-      email.hashCode;
+  List<Object?> get props => [
+        themeMode,
+        languageCode,
+        activeAiProvider,
+        activeAiModel,
+        geminiApiKey,
+        localLlmBaseUrl,
+        systemPrompt,
+        accessToken,
+        refreshToken,
+        _serverHost,
+        userId,
+        username,
+        email,
+      ];
 }

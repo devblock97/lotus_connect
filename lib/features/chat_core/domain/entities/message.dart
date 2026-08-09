@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 enum MessageRole {
@@ -19,7 +20,7 @@ enum MessageStatus {
 }
 
 @immutable
-class Message {
+class Message extends Equatable {
   const Message({
     required this.id,
     required this.conversationId,
@@ -63,27 +64,14 @@ class Message {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Message &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          conversationId == other.conversationId &&
-          role == other.role &&
-          content == other.content &&
-          timestamp == other.timestamp &&
-          isError == other.isError &&
-          status == other.status &&
-          replyToId == other.replyToId;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      conversationId.hashCode ^
-      role.hashCode ^
-      content.hashCode ^
-      timestamp.hashCode ^
-      isError.hashCode ^
-      status.hashCode ^
-      replyToId.hashCode;
+  List<Object?> get props => [
+        id,
+        conversationId,
+        role,
+        content,
+        timestamp,
+        isError,
+        status,
+        replyToId,
+      ];
 }

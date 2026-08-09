@@ -1,7 +1,8 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 @immutable
-class Conversation {
+class Conversation extends Equatable {
   const Conversation({
     required this.id,
     required this.title,
@@ -16,6 +17,22 @@ class Conversation {
     this.peerId = '',
   });
 
+  factory Conversation.fromJson(Map<String, dynamic> json) {
+    return Conversation(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      isPinned: json['isPinned'] as bool? ?? false,
+      isFavourite: json['isFavourite'] as bool? ?? false,
+      modelName: json['modelName'] as String? ?? 'gemini-1.5-flash',
+      draftMessage: json['draftMessage'] as String?,
+      systemPrompt: json['systemPrompt'] as String?,
+      isUserToUser: json['isUserToUser'] as bool? ?? false,
+      peerId: json['peerId'] as String? ?? '',
+    );
+  }
+
   final String id;
   final String title;
   final DateTime createdAt;
@@ -27,6 +44,22 @@ class Conversation {
   final String? systemPrompt;
   final bool isUserToUser;
   final String peerId;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'isPinned': isPinned,
+      'isFavourite': isFavourite,
+      'modelName': modelName,
+      'draftMessage': draftMessage,
+      'systemPrompt': systemPrompt,
+      'isUserToUser': isUserToUser,
+      'peerId': peerId,
+    };
+  }
 
   Conversation copyWith({
     String? id,
@@ -57,33 +90,17 @@ class Conversation {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Conversation &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          title == other.title &&
-          createdAt == other.createdAt &&
-          updatedAt == other.updatedAt &&
-          isPinned == other.isPinned &&
-          isFavourite == other.isFavourite &&
-          modelName == other.modelName &&
-          draftMessage == other.draftMessage &&
-          systemPrompt == other.systemPrompt &&
-          isUserToUser == other.isUserToUser &&
-          peerId == other.peerId;
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      title.hashCode ^
-      createdAt.hashCode ^
-      updatedAt.hashCode ^
-      isPinned.hashCode ^
-      isFavourite.hashCode ^
-      modelName.hashCode ^
-      draftMessage.hashCode ^
-      systemPrompt.hashCode ^
-      isUserToUser.hashCode ^
-      peerId.hashCode;
+  List<Object?> get props => [
+        id,
+        title,
+        createdAt,
+        updatedAt,
+        isPinned,
+        isFavourite,
+        modelName,
+        draftMessage,
+        systemPrompt,
+        isUserToUser,
+        peerId,
+      ];
 }

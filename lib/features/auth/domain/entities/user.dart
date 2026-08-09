@@ -1,8 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 /// Pure Dart entity representing a registered/authenticated User.
 @immutable
-class User {
+class User extends Equatable {
   const User({
     required this.id,
     required this.username,
@@ -42,14 +43,12 @@ class User {
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is User &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          username == other.username &&
-          email == other.email;
-
-  @override
-  int get hashCode => id.hashCode ^ username.hashCode ^ email.hashCode;
+  List<Object?> get props => [
+        id,
+        username,
+        fullName,
+        email,
+        friendshipStatus,
+        friendshipSenderId,
+      ];
 }
