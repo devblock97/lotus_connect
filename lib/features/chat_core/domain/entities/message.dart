@@ -13,6 +13,7 @@ enum MessageRole {
 enum MessageStatus {
   sending,
   sent,
+  read,
   streaming,
   error,
 }
