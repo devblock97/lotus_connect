@@ -9,6 +9,9 @@ Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, op
 
 # Demo: https://devblocks.tech/wp-content/uploads/2026/07/lotus_connect_chatbot_demo.mov
 
+## Chat Person-to-Person
+# Demo: https://devblocks.tech/wp-content/uploads/2026/08/chat-p2p.mov
+
 ## Tech Stack
 - **Flutter** (Latest Stable)
 - **State Management & Dependency Injection**: Riverpod 3.x
