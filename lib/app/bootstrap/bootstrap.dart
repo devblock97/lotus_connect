@@ -20,7 +20,6 @@ Future<void> bootstrap() async {
   );
 }
 
-/// Root widget for Lotus Connect application.
 class LotusConnectApp extends ConsumerWidget {
   const LotusConnectApp({super.key});
 

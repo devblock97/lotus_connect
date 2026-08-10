@@ -122,7 +122,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
     }
     final displayName = _displayName(privateConversation, friend);
-
     final presenceMap = ref.watch(presenceProvider);
     final peerPresence = presenceMap[privateConversation.peerId];
     final isOnline = peerPresence?.isOnline ?? false;

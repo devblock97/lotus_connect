@@ -208,7 +208,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _sdpSub = signaling.sdpStream.listen((payload) async {
       try {
         final type = payload['type'] as String;
-        final sdp = payload['sdp'] as String;
+        String sdp;
+        final rawSdp = payload['sdp'];
+        if (rawSdp is Map) {
+          sdp = rawSdp['sdp'] as String;
+        } else {
+          sdp = rawSdp as String;
+        }
         _log('WebRTC SDP $type received from Peer: ${payload['senderId']}');
 
         if (type == 'offer') {
@@ -291,83 +297,78 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     try {
       _localRenderer.srcObject = null;
       _remoteRenderer.srcObject = null;
-    } catch (_) {}
+    } on Object catch (_) {}
   }
 
   Future<void> _createPeerConnection() async {
     if (_peerConnection != null) return;
-    _log('Initializing audio session...');
-    try {
-      await Helper.ensureAudioSession();
-      _isSpeakerOn = _isVideo;
-      await Helper.setSpeakerphoneOn(_isSpeakerOn);
-    } catch (e) {
-      _log('Audio session initialization failed: $e');
-    }
+    _isSpeakerOn = _isVideo;
 
     _log('Creating RTCPeerConnection...');
     final pc = await createPeerConnection({
       'iceServers': [
-        {'url': 'stun:stun.l.google.com:19302'},
-        {'url': 'stun:stun1.l.google.com:19302'},
-        {'url': 'stun:stun2.l.google.com:19302'},
         {
-          'url': 'turn:openrelay.metered.ca:80',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
+          'urls': 'stun:stun.relay.metered.ca:80',
         },
         {
-          'url': 'turn:openrelay.metered.ca:443',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
+          'urls': 'turn:global.relay.metered.ca:80',
+          'username': 'acd85cccc8fcb9b021c2232c',
+          'credential': '7UUjeLhQO9xU+HxT',
         },
         {
-          'url': 'turn:openrelay.metered.ca:443?transport=tcp',
-          'username': 'openrelayproject',
-          'credential': 'openrelayproject',
+          'urls': 'turn:global.relay.metered.ca:80?transport=tcp',
+          'username': 'acd85cccc8fcb9b021c2232c',
+          'credential': '7UUjeLhQO9xU+HxT',
+        },
+        {
+          'urls': 'turn:global.relay.metered.ca:443',
+          'username': 'acd85cccc8fcb9b021c2232c',
+          'credential': '7UUjeLhQO9xU+HxT',
+        },
+        {
+          'urls': 'turns:global.relay.metered.ca:443?transport=tcp',
+          'username': 'acd85cccc8fcb9b021c2232c',
+          'credential': '7UUjeLhQO9xU+HxT',
         },
       ],
     }, {
-      'mandatory': {},
+      'mandatory': <dynamic, dynamic>{},
       'optional': [
         {'DtlsSrtpKeyAgreement': true},
       ],
     });
 
-    pc.onIceConnectionState = (state) {
-      _log('ICE Connection State: $state');
-    };
-
-    pc.onSignalingState = (state) {
-      _log('Signaling State: $state');
-    };
-
-    pc.onIceCandidate = (candidate) {
-      if (candidate.candidate != null && _activePeerId != null) {
-        ref.read(webrtcSignalingServiceProvider).sendIceCandidate(
-              recipientId: _activePeerId!,
-              candidate: candidate.candidate!,
-              sdpMid: candidate.sdpMid ?? '0',
-              sdpMLineIndex: candidate.sdpMLineIndex ?? 0,
-            );
+    pc
+      ..onIceConnectionState = (state) {
+        _log('ICE Connection State: $state');
       }
-    };
-
-    pc.onTrack = (event) {
-      _log('Remote track received');
-      if (event.streams.isNotEmpty) {
+      ..onSignalingState = (state) {
+        _log('Signaling State: $state');
+      }
+      ..onIceCandidate = (candidate) {
+        if (candidate.candidate != null && _activePeerId != null) {
+          ref.read(webrtcSignalingServiceProvider).sendIceCandidate(
+                recipientId: _activePeerId!,
+                candidate: candidate.candidate!,
+                sdpMid: candidate.sdpMid ?? '0',
+                sdpMLineIndex: candidate.sdpMLineIndex ?? 0,
+              );
+        }
+      }
+      ..onTrack = (event) {
+        _log('Remote track received');
+        if (event.streams.isNotEmpty) {
+          setState(() {
+            _remoteRenderer.srcObject = event.streams[0];
+          });
+        }
+      }
+      ..onAddStream = (stream) {
+        _log('Remote stream received (legacy)');
         setState(() {
-          _remoteRenderer.srcObject = event.streams[0];
+          _remoteRenderer.srcObject = stream;
         });
-      }
-    };
-
-    pc.onAddStream = (stream) {
-      _log('Remote stream received (legacy)');
-      setState(() {
-        _remoteRenderer.srcObject = stream;
-      });
-    };
+      };
 
     final constraints = {
       'audio': true,
@@ -906,7 +907,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     : null,
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(),
+                contentPadding: EdgeInsets.zero,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -1272,6 +1273,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final displayName = friend != null
         ? (friend.fullName ?? friend.username)
         : (_activePeerId?.substring(0, 8) ?? 'User');
+    final initialName = displayName.substring(0, 1);
 
     return Scaffold(
       body: Container(
@@ -1291,7 +1293,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             children: [
               const SizedBox(height: 32),
 
-              // Animated Radiating Avatar
               Column(
                 children: [
                   RippleAnimation(
@@ -1308,11 +1309,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             offset: const Offset(0, 10),
                           ),
                         ],
-                        image: const DecorationImage(
-                          image: NetworkImage(
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
-                          ),
-                          fit: BoxFit.cover,
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        child: Text(
+                          initialName,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(
+                                fontSize: 45,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -1432,6 +1440,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final displayName = friend != null
         ? (friend.fullName ?? friend.username)
         : (_activePeerId?.substring(0, 8) ?? 'User');
+    final initialName = displayName.substring(0, 1);
 
     return Scaffold(
       body: Container(
@@ -1467,11 +1476,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             offset: const Offset(0, 10),
                           ),
                         ],
-                        image: const DecorationImage(
-                          image: NetworkImage(
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
-                          ),
-                          fit: BoxFit.cover,
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        child: Text(
+                          initialName,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(
+                                fontSize: 45,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -1546,6 +1562,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final displayName = friend != null
         ? (friend.fullName ?? friend.username)
         : (_activePeerId?.substring(0, 8) ?? 'User');
+    final initialName = displayName.substring(0, 1);
 
     return Scaffold(
       body: Stack(
@@ -1576,11 +1593,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white24, width: 2),
-                        image: const DecorationImage(
-                          image: NetworkImage(
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop',
-                          ),
-                          fit: BoxFit.cover,
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        child: Text(
+                          initialName,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineLarge!
+                              .copyWith(
+                                fontSize: 45,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),

@@ -8,18 +8,18 @@ String formatLastSeen(bool isOnline, DateTime lastSeen) {
     final difference = now.difference(lastSeen);
 
     if (difference.inSeconds < 60) {
-      return 'active just now';
+      return 'just now';
     } else if (difference.inMinutes < 60) {
       final minutes = difference.inMinutes;
-      return 'active $minutes minute${minutes == 1 ? '' : 's'} ago';
+      return '$minutes minute${minutes == 1 ? '' : 's'} ago';
     } else if (difference.inHours < 24) {
       final hours = difference.inHours;
-      return 'active $hours hour${hours == 1 ? '' : 's'} ago';
+      return '$hours hour${hours == 1 ? '' : 's'} ago';
     } else if (difference.inDays < 30) {
       final days = difference.inDays;
-      return 'active $days day${days == 1 ? '' : 's'} ago';
+      return '$days day${days == 1 ? '' : 's'} ago';
     } else {
-      return 'active on ${DateFormat('MMM d, yyyy').format(lastSeen)}';
+      return DateFormat('MMM d, yyyy').format(lastSeen);
     }
   }
 }
