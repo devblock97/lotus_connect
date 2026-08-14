@@ -2,7 +2,6 @@
 
 A production-ready Flutter communication platform featuring clean architecture, reactive state management, and multi-engine LLM capabilities.
 
-# Chatbot Demo
 Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, optimistic UI bubble updates, and multi-engine AI support (live Gemini models & local Ollama models).
 
 <video src="https://devblocks.tech/wp-content/uploads/2026/07/lotus_connect_chatbot_demo.mov" controls width="100%"></video>
