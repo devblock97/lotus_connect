@@ -211,6 +211,22 @@ class ChatApiService {
     }
   }
 
+  /// Unregisters/deactivates a FCM/APNS push token upon user logout.
+  Future<void> unregisterDeviceToken({
+    required String token,
+  }) async {
+    try {
+      await dioClient.delete(
+        '/users/devices',
+        data: {
+          'token': token,
+        },
+      );
+    } catch (e) {
+      // Degrade gracefully if backend endpoint is unavailable during logout
+    }
+  }
+
   /// Fetches call logs history for the authenticated user.
   Future<List<Map<String, dynamic>>> getCallHistory() async {
     try {

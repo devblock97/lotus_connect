@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "760257501482",
+    "project_id": "lotus-connect-41bcf",
+    "storage_bucket": "lotus-connect-41bcf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760257501482:android:37f64715bf0010cf9ca653",
+        "android_client_info": {
+          "package_name": "devblock.tech.lotus_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzmus7MSI_AOXAYKz3-fSTojv_CLMuH8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
