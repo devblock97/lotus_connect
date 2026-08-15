@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Client-side state model representing a user's presence.
 class UserPresence {
   const UserPresence({
     required this.isOnline,
@@ -20,7 +19,6 @@ class UserPresence {
   }
 }
 
-/// StateNotifier tracking online status maps by user ID.
 class PresenceNotifier extends StateNotifier<Map<String, UserPresence>> {
   PresenceNotifier() : super({});
 
@@ -33,7 +31,6 @@ class PresenceNotifier extends StateNotifier<Map<String, UserPresence>> {
   }
 }
 
-/// Provider managing active user presence maps.
 final presenceProvider =
     StateNotifierProvider<PresenceNotifier, Map<String, UserPresence>>((ref) {
   return PresenceNotifier();

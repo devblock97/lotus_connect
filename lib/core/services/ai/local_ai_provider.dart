@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/core/services/ai/ai_provider.dart';
 
-/// Concrete local AI provider connecting to local LLM engines (Ollama, LM Studio).
 class LocalAiProvider implements AiProvider {
   /// Constructor taking [DioClient] and optional base URL.
   LocalAiProvider({

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/services/api/auth_service.dart';
+import 'package:lotus_connect/core/services/notification/push_notification_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -53,6 +54,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
           email: settings.email,
         ),
       );
+      // Automatically sync FCM token once authenticated session is loaded
+      Future.microtask(() {
+        _ref.read(pushNotificationServiceProvider).syncDeviceToken();
+      });
     }
   }
 
@@ -105,6 +110,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
 
       state = AuthState(user: user);
+
+      // Sync FCM token to backend database for the newly logged in user
+      await _ref.read(pushNotificationServiceProvider).syncDeviceToken();
+
       return true;
     } on Object catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -116,6 +125,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     final settings = _ref.read(settingsProvider);
     final settingsNotifier = _ref.read(settingsProvider.notifier);
+
+    // Unregister FCM device token from backend so logged-out device stops receiving pushes
+    try {
+      await _ref.read(pushNotificationServiceProvider).unregisterDeviceToken();
+    } catch (e) {
+      // Degrade gracefully if network request fails
+    }
 
     if (settings.refreshToken.isNotEmpty) {
       await _authService.logout(refreshToken: settings.refreshToken);
