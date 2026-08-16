@@ -297,4 +297,118 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get you => 'YOU';
+
+  @override
+  String get signInSubtitle => 'Sign in to continue your secure conversations.';
+
+  @override
+  String get joinSubtitle => 'Join the future of secure communication.';
+
+  @override
+  String get fullNameLabel => 'FULL NAME';
+
+  @override
+  String get enterFullNameHint => 'Enter your full name';
+
+  @override
+  String get fullNameRequired => 'Full name required';
+
+  @override
+  String get usernameLabel => 'USERNAME';
+
+  @override
+  String get chooseUsernameHint => 'Choose a unique username';
+
+  @override
+  String get usernameRequired => 'Username required';
+
+  @override
+  String get usernameMinLength => 'Username must be at least 3 characters';
+
+  @override
+  String get usernameAlphanumericOnly =>
+      'Only alphanumeric characters & underscores';
+
+  @override
+  String get emailAddressLabel => 'EMAIL ADDRESS';
+
+  @override
+  String get emailHint => 'name@company.com';
+
+  @override
+  String get invalidEmail => 'Invalid email address';
+
+  @override
+  String get passwordLabel => 'PASSWORD';
+
+  @override
+  String get loginPasswordHint => '•••••••••';
+
+  @override
+  String get createPasswordHint => 'Create a strong password';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters';
+
+  @override
+  String get confirmPasswordLabel => 'CONFIRM PASSWORD';
+
+  @override
+  String get repeatPasswordHint => 'Repeat your password';
+
+  @override
+  String get confirmPasswordRequired => 'Confirm password required';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get agreeToTermsPrefix => 'I agree to the ';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get andWord => ' and ';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get mustAgreeTerms =>
+      'You must agree to the Terms of Service & Privacy Policy.';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get logInButton => 'Log In';
+
+  @override
+  String get createAccountButton => 'Create Account';
+
+  @override
+  String get orContinueWith => 'OR CONTINUE WITH';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account? ';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get registerAction => 'Register';
+
+  @override
+  String get registrationSuccess => 'Registration successful! Please login.';
+
+  @override
+  String get authenticationFailed => 'Authentication failed';
+
+  @override
+  String get configureServerHost => 'Configure Server Host';
+
+  @override
+  String get enterBackendBaseUrl =>
+      'Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):';
 }

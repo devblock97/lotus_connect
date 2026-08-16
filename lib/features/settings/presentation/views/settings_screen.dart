@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
-import 'package:lotus_connect/features/auth/application/auth_state.dart';
+import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 

@@ -227,6 +227,17 @@ class ChatApiService {
     }
   }
 
+  /// Fetches conversation list from the backend REST API.
+  Future<List<Map<String, dynamic>>> getConversations() async {
+    try {
+      final response = await dioClient.get('/chats');
+      final list = response.data as List<dynamic>;
+      return list.map((item) => item as Map<String, dynamic>).toList();
+    } catch (e) {
+      throw ServerException('Failed to fetch remote conversations: $e');
+    }
+  }
+
   /// Fetches call logs history for the authenticated user.
   Future<List<Map<String, dynamic>>> getCallHistory() async {
     try {

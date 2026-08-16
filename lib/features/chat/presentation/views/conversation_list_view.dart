@@ -112,45 +112,48 @@ class ConversationListView extends ConsumerWidget {
           Expanded(
             child: state.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    children: [
-                      if (pinnedConversations.isNotEmpty) ...[
-                        _buildSectionHeader(context, 'PINNED'),
-                        ...pinnedConversations.map(
-                          (c) => _buildConversationTile(
-                            context,
-                            ref,
-                            c,
-                            state.selectedConversationId == c.id,
-                          ),
-                        ),
-                      ],
-                      if (unpinnedConversations.isNotEmpty) ...[
-                        if (pinnedConversations.isNotEmpty)
-                          _buildSectionHeader(context, 'RECENT'),
-                        ...unpinnedConversations.map(
-                          (c) => _buildConversationTile(
-                            context,
-                            ref,
-                            c,
-                            state.selectedConversationId == c.id,
-                          ),
-                        ),
-                      ],
-                      if (conversations.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Center(
-                            child: Text(
-                              'No private chats found.\nTap + to start a chat!',
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium
-                                  ?.copyWith(color: Colors.grey),
+                : RefreshIndicator(
+                    onRefresh: notifier.loadRemoteConversations,
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      children: [
+                        if (pinnedConversations.isNotEmpty) ...[
+                          _buildSectionHeader(context, 'PINNED'),
+                          ...pinnedConversations.map(
+                            (c) => _buildConversationTile(
+                              context,
+                              ref,
+                              c,
+                              state.selectedConversationId == c.id,
                             ),
                           ),
-                        ),
-                    ],
+                        ],
+                        if (unpinnedConversations.isNotEmpty) ...[
+                          if (pinnedConversations.isNotEmpty)
+                            _buildSectionHeader(context, 'RECENT'),
+                          ...unpinnedConversations.map(
+                            (c) => _buildConversationTile(
+                              context,
+                              ref,
+                              c,
+                              state.selectedConversationId == c.id,
+                            ),
+                          ),
+                        ],
+                        if (conversations.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Center(
+                              child: Text(
+                                'No private chats found.\nTap + to start a chat or pull down to refresh!',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
           ),
         ],

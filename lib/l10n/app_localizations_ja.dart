@@ -291,4 +291,116 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get you => '自分';
+
+  @override
+  String get signInSubtitle => 'サインインして安全なチャットを再開します。';
+
+  @override
+  String get joinSubtitle => '安全なコミュニケーションの未来へ。';
+
+  @override
+  String get fullNameLabel => '氏名';
+
+  @override
+  String get enterFullNameHint => '氏名を入力してください';
+
+  @override
+  String get fullNameRequired => '氏名は必須です';
+
+  @override
+  String get usernameLabel => 'ユーザー名';
+
+  @override
+  String get chooseUsernameHint => '一意のユーザー名を選択';
+
+  @override
+  String get usernameRequired => 'ユーザー名は必須です';
+
+  @override
+  String get usernameMinLength => 'ユーザー名は3文字以上必要です';
+
+  @override
+  String get usernameAlphanumericOnly => '英数字とアンダースコアのみ使用可能';
+
+  @override
+  String get emailAddressLabel => 'メールアドレス';
+
+  @override
+  String get emailHint => 'name@company.com';
+
+  @override
+  String get invalidEmail => '無効なメールアドレスです';
+
+  @override
+  String get passwordLabel => 'パスワード';
+
+  @override
+  String get loginPasswordHint => '•••••••••';
+
+  @override
+  String get createPasswordHint => '強力なパスワードを作成';
+
+  @override
+  String get passwordMinLength => 'パスワードは6文字以上必要です';
+
+  @override
+  String get confirmPasswordLabel => 'パスワードの確認';
+
+  @override
+  String get repeatPasswordHint => 'パスワードを再入力してください';
+
+  @override
+  String get confirmPasswordRequired => 'パスワードの確認は必須です';
+
+  @override
+  String get passwordsDoNotMatch => 'パスワードが一致しません';
+
+  @override
+  String get agreeToTermsPrefix => '利用規約と';
+
+  @override
+  String get termsOfService => '利用規約';
+
+  @override
+  String get andWord => 'および';
+
+  @override
+  String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
+  String get mustAgreeTerms => '利用規約とプライバシーポリシーに同意する必要があります。';
+
+  @override
+  String get forgotPassword => 'パスワードをお忘れですか？';
+
+  @override
+  String get logInButton => 'ログイン';
+
+  @override
+  String get createAccountButton => 'アカウント作成';
+
+  @override
+  String get orContinueWith => 'または以下で継続';
+
+  @override
+  String get dontHaveAccount => 'アカウントをお持ちでないですか？ ';
+
+  @override
+  String get alreadyHaveAccount => '既にアカウントをお持ちですか？ ';
+
+  @override
+  String get registerAction => '新規登録';
+
+  @override
+  String get registrationSuccess => '登録が完了しました！ログインしてください。';
+
+  @override
+  String get authenticationFailed => '認証に失敗しました';
+
+  @override
+  String get configureServerHost => 'サーバーホストの設定';
+
+  @override
+  String get enterBackendBaseUrl =>
+      'バックエンドのベースURLを入力 (例: http://10.0.2.2:8080/api/v1):';
 }
