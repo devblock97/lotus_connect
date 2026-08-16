@@ -13,7 +13,7 @@ Demo: https://devblocks.tech/wp-content/uploads/2026/07/lotus_connect_chatbot_de
 Demo: https://devblocks.tech/wp-content/uploads/2026/08/chat-p2p.mov
 
 # Call
-Demo: https://devblocks.tech/wp-content/uploads/2026/08/call.mov
+Demo: https://devblocks.tech/wp-content/uploads/2026/08/lotus_connect_video_call.mov
 
 ## Tech Stack
 - **Flutter** (Latest Stable)
