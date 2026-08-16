@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
@@ -63,6 +64,7 @@ class PrivateConversationListNotifier
 
   void _initStream() {
     state = state.copyWith(isLoading: true);
+    loadRemoteConversations();
     _ref
         .read(getConversationsUseCaseProvider)(const NoParams())
         .listen((result) {
@@ -90,6 +92,37 @@ class PrivateConversationListNotifier
         },
       );
     });
+  }
+
+  /// Syncs remote conversation list from backend server REST API (GET /chats).
+  Future<void> loadRemoteConversations() async {
+    try {
+      final chatApiService = _ref.read(chatApiServiceProvider);
+      final localDataSource = _ref.read(chatCoreLocalDataSourceProvider);
+      final remoteList = await chatApiService.getConversations();
+
+      for (final item in remoteList) {
+        final id = (item['id'] ??
+                item['conversationId'] ??
+                item['conversation_id']) as String? ??
+            '';
+        final title = (item['title'] ?? item['name'] ?? 'Chat') as String;
+        final peerId = (item['peerId'] ?? item['peer_id'] ?? '') as String;
+        if (id.isNotEmpty) {
+          final existing = await localDataSource.getConversations();
+          if (!existing.any((c) => c.id == id)) {
+            await localDataSource.createConversation(
+              id: id,
+              title: title,
+              isUserToUser: true,
+              peerId: peerId,
+            );
+          }
+        }
+      }
+    } catch (e) {
+      // Degrade gracefully if server is offline or endpoint returns empty
+    }
   }
 
   /// Updates search query filter.

@@ -280,7 +280,7 @@ class AppTheme {
         color: darkColorScheme.outlineVariant,
         space: 1,
       ),
-      textTheme: _buildTextTheme(baseTextTheme, darkColorScheme.onSurface),
+      textTheme: _buildTextTheme(baseTextTheme, AppColors.textDark),
       extensions: const <ThemeExtension<dynamic>>[
         AppChatTheme(
           userBubbleBg: AppColors.userBubbleDark,

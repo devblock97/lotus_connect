@@ -289,4 +289,116 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get you => '你';
+
+  @override
+  String get signInSubtitle => '登录以继续您的安全对话。';
+
+  @override
+  String get joinSubtitle => '加入安全通信的未来。';
+
+  @override
+  String get fullNameLabel => '全名';
+
+  @override
+  String get enterFullNameHint => '输入您的全名';
+
+  @override
+  String get fullNameRequired => '请输入全名';
+
+  @override
+  String get usernameLabel => '用户名';
+
+  @override
+  String get chooseUsernameHint => '选择唯一的用户名';
+
+  @override
+  String get usernameRequired => '请输入用户名';
+
+  @override
+  String get usernameMinLength => '用户名至少需要 3 个字符';
+
+  @override
+  String get usernameAlphanumericOnly => '仅限字母、数字与下划线';
+
+  @override
+  String get emailAddressLabel => '电子邮箱';
+
+  @override
+  String get emailHint => 'name@company.com';
+
+  @override
+  String get invalidEmail => '无效的电子邮箱地址';
+
+  @override
+  String get passwordLabel => '密码';
+
+  @override
+  String get loginPasswordHint => '•••••••••';
+
+  @override
+  String get createPasswordHint => '创建强密码';
+
+  @override
+  String get passwordMinLength => '密码至少需要 6 个字符';
+
+  @override
+  String get confirmPasswordLabel => '确认密码';
+
+  @override
+  String get repeatPasswordHint => '再次输入您的密码';
+
+  @override
+  String get confirmPasswordRequired => '请确认密码';
+
+  @override
+  String get passwordsDoNotMatch => '两次输入的密码不一致';
+
+  @override
+  String get agreeToTermsPrefix => '我同意 ';
+
+  @override
+  String get termsOfService => '服务条款';
+
+  @override
+  String get andWord => ' 与 ';
+
+  @override
+  String get privacyPolicy => '隐私政策';
+
+  @override
+  String get mustAgreeTerms => '您必须同意服务条款与隐私政策。';
+
+  @override
+  String get forgotPassword => '忘记密码？';
+
+  @override
+  String get logInButton => '登录';
+
+  @override
+  String get createAccountButton => '创建账户';
+
+  @override
+  String get orContinueWith => '或通过以下方式继续';
+
+  @override
+  String get dontHaveAccount => '还没有账户？';
+
+  @override
+  String get alreadyHaveAccount => '已有账户？';
+
+  @override
+  String get registerAction => '注册';
+
+  @override
+  String get registrationSuccess => '注册成功！请登录。';
+
+  @override
+  String get authenticationFailed => '身份验证失败';
+
+  @override
+  String get configureServerHost => '配置服务器主机';
+
+  @override
+  String get enterBackendBaseUrl =>
+      '输入后端基础 URL (例: http://10.0.2.2:8080/api/v1):';
 }

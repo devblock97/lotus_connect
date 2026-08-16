@@ -297,4 +297,119 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get you => 'BẠN';
+
+  @override
+  String get signInSubtitle =>
+      'Đăng nhập để tiếp tục các cuộc trò chuyện bảo mật của bạn.';
+
+  @override
+  String get joinSubtitle => 'Tham gia tương lai truyền thông bảo mật.';
+
+  @override
+  String get fullNameLabel => 'HỌ VÀ TÊN';
+
+  @override
+  String get enterFullNameHint => 'Nhập họ và tên của bạn';
+
+  @override
+  String get fullNameRequired => 'Vui lòng nhập họ và tên';
+
+  @override
+  String get usernameLabel => 'TÊN ĐĂNG NHẬP';
+
+  @override
+  String get chooseUsernameHint => 'Chọn tên đăng nhập duy nhất';
+
+  @override
+  String get usernameRequired => 'Vui lòng nhập tên đăng nhập';
+
+  @override
+  String get usernameMinLength => 'Tên đăng nhập phải có ít nhất 3 ký tự';
+
+  @override
+  String get usernameAlphanumericOnly =>
+      'Chỉ chấp nhận chữ cái, chữ số và dấu gạch dưới';
+
+  @override
+  String get emailAddressLabel => 'ĐỊA CHỈ EMAIL';
+
+  @override
+  String get emailHint => 'ten@congty.com';
+
+  @override
+  String get invalidEmail => 'Địa chỉ email không hợp lệ';
+
+  @override
+  String get passwordLabel => 'MẬT KHẨU';
+
+  @override
+  String get loginPasswordHint => '•••••••••';
+
+  @override
+  String get createPasswordHint => 'Tạo mật khẩu mạnh';
+
+  @override
+  String get passwordMinLength => 'Mật khẩu phải có ít nhất 6 ký tự';
+
+  @override
+  String get confirmPasswordLabel => 'XÁC NHẬN MẬT KHẨU';
+
+  @override
+  String get repeatPasswordHint => 'Nhập lại mật khẩu của bạn';
+
+  @override
+  String get confirmPasswordRequired => 'Vui lòng xác nhận mật khẩu';
+
+  @override
+  String get passwordsDoNotMatch => 'Mật khẩu xác nhận không khớp';
+
+  @override
+  String get agreeToTermsPrefix => 'Tôi đồng ý với ';
+
+  @override
+  String get termsOfService => 'Điều khoản dịch vụ';
+
+  @override
+  String get andWord => ' và ';
+
+  @override
+  String get privacyPolicy => 'Chính sách bảo mật';
+
+  @override
+  String get mustAgreeTerms =>
+      'Bạn phải đồng ý với Điều khoản dịch vụ & Chính sách bảo mật.';
+
+  @override
+  String get forgotPassword => 'Quên mật khẩu?';
+
+  @override
+  String get logInButton => 'Đăng nhập';
+
+  @override
+  String get createAccountButton => 'Tạo tài khoản';
+
+  @override
+  String get orContinueWith => 'HOẶC TIẾP TỤC VỚI';
+
+  @override
+  String get dontHaveAccount => 'Chưa có tài khoản? ';
+
+  @override
+  String get alreadyHaveAccount => 'Đã có tài khoản? ';
+
+  @override
+  String get registerAction => 'Đăng ký';
+
+  @override
+  String get registrationSuccess => 'Đăng ký thành công! Vui lòng đăng nhập.';
+
+  @override
+  String get authenticationFailed => 'Xác thực thất bại';
+
+  @override
+  String get configureServerHost => 'Cấu hình Máy chủ';
+
+  @override
+  String get enterBackendBaseUrl =>
+      'Nhập URL gốc của máy chủ (vd: http://10.0.2.2:8080/api/v1):';
 }
