@@ -99,16 +99,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _fullNameController,
                           decoration: InputDecoration(
                             hintText: loc.enterFullNameHint,
-                            hintStyle: theme.textTheme.labelMedium!.copyWith(
-                              color: const Color(0xFF222222),
-                            ),
+                            hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.person_outline,
                               color: Colors.grey,
                               size: 20,
                             ),
                             filled: true,
-                            fillColor: const Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -130,16 +127,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _usernameController,
                           decoration: InputDecoration(
                             hintText: loc.chooseUsernameHint,
-                            hintStyle: theme.textTheme.labelMedium!.copyWith(
-                              color: const Color(0xFF222222),
-                            ),
+                            hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.alternate_email,
                               color: Colors.grey,
                               size: 20,
                             ),
                             filled: true,
-                            fillColor: const Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -173,16 +167,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: loc.emailHint,
-                          hintStyle: theme.textTheme.labelMedium!.copyWith(
-                            color: const Color(0xFF222222),
-                          ),
+                          hintStyle: theme.textTheme.labelMedium,
                           prefixIcon: const Icon(
                             Icons.mail_outline,
                             color: Colors.grey,
                             size: 20,
                           ),
                           filled: true,
-                          fillColor: const Color(0xFFF3F4F6),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -194,7 +185,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 18),
 
-                      // PASSWORD
                       Text(
                         loc.passwordLabel,
                         style: theme.textTheme.titleSmall!.copyWith(
@@ -210,9 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           hintText: _isLogin
                               ? loc.loginPasswordHint
                               : loc.createPasswordHint,
-                          hintStyle: theme.textTheme.labelMedium!.copyWith(
-                            color: const Color(0xFF222222),
-                          ),
+                          hintStyle: theme.textTheme.labelMedium,
                           prefixIcon: const Icon(
                             Icons.lock_outline,
                             color: Colors.grey,
@@ -231,7 +219,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           filled: true,
-                          fillColor: const Color(0xFFF3F4F6),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
@@ -284,9 +271,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
                             hintText: loc.repeatPasswordHint,
-                            hintStyle: theme.textTheme.labelMedium!.copyWith(
-                              color: const Color(0xFF222222),
-                            ),
+                            hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.refresh,
                               color: Colors.grey,
@@ -306,7 +291,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             filled: true,
-                            fillColor: const Color(0xFFF3F4F6),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,

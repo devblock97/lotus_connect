@@ -90,7 +90,6 @@ class ConversationListView extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Search Input Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(

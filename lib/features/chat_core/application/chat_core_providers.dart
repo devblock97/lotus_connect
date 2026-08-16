@@ -7,6 +7,7 @@ import 'package:lotus_connect/features/chat_core/domain/usecases/delete_conversa
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_conversations_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/save_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_favourite_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_pin_conversation_usecase.dart';
 
@@ -58,4 +59,10 @@ final toggleFavouriteConversationUseCaseProvider =
 
 final saveDraftUseCaseProvider = Provider<SaveDraftUseCase>((ref) {
   return SaveDraftUseCase(ref.watch(chatCoreRepositoryProvider));
+});
+
+final saveMessageUseCaseProvider = Provider<SaveMessageUseCase>((ref) {
+  return SaveMessageUseCase(
+    chatCoreRepository: ref.watch(chatCoreRepositoryProvider),
+  );
 });

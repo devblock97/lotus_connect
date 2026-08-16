@@ -26,8 +26,8 @@ class Conversation extends Equatable {
       isPinned: json['isPinned'] as bool? ?? false,
       isFavourite: json['isFavourite'] as bool? ?? false,
       modelName: json['modelName'] as String? ?? 'gemini-1.5-flash',
-      draftMessage: json['draftMessage'] as String?,
-      systemPrompt: json['systemPrompt'] as String?,
+      draftMessage: json['draftMessage'] as String? ?? '',
+      systemPrompt: json['systemPrompt'] as String? ?? '',
       isUserToUser: json['isUserToUser'] as bool? ?? false,
       peerId: json['peerId'] as String? ?? '',
     );

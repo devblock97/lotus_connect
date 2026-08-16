@@ -9,6 +9,8 @@ import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/save_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
 /// State representing the active user-to-user conversation message stream.
@@ -178,14 +180,20 @@ class PrivateActiveConversationNotifier
   /// Sends a message over the WebSocket tunnel.
   Future<void> sendMessage(String text) async {
     final trimmedText = text.trim();
-    if (trimmedText.isEmpty) return;
+    if (trimmedText.isEmpty) {
+      state = state.copyWith(
+        errorMessage: 'Message content cannot be empty',
+      );
+      return;
+    }
 
     final convId = state.conversationId;
     if (convId == null) return;
 
     final replyToId = state.replyingToMessage?.id;
+    final optimisticId = DateTime.now().millisecondsSinceEpoch.toString();
     final userMessage = Message(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: optimisticId,
       conversationId: convId,
       role: MessageRole.user,
       content: trimmedText,
@@ -197,6 +205,11 @@ class PrivateActiveConversationNotifier
     state = state.copyWith(
       messages: [...state.messages, userMessage],
       clearReplyingTo: true,
+    );
+
+    final saveDraftMessageUseCase = _ref.read(saveDraftUseCaseProvider);
+    await saveDraftMessageUseCase(
+      SaveDraftParams(conversationId: convId, draft: ''),
     );
 
     final useCase = _ref.read(sendMessageUseCaseProvider);
@@ -212,7 +225,16 @@ class PrivateActiveConversationNotifier
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
       },
-      (_) async {},
+      (remoteMessage) async {
+        // Delete optimistic message and save the permanent
+        // server-synchronized message
+        await deleteMessage(optimisticId);
+        final saveMessageUseCase = _ref.read(saveMessageUseCaseProvider);
+        await saveMessageUseCase(SaveMessageParam(message: remoteMessage));
+        state = state.copyWith(
+          messages: [...state.messages, remoteMessage],
+        );
+      },
     );
   }
 

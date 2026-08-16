@@ -24,7 +24,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   }) async {
     try {
       final chatData = await _remoteDataSource.createPrivateChat(friendId);
-      final id = chatData['id'] as String;
+      final id = chatData.id;
 
       final conversation = await _localDataSource.saveLocalConversation(
         title: title,
@@ -33,7 +33,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
         id: id,
       );
       return Right(conversation);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(DatabaseFailure('Failed to create private chat: $e', e));
     }
   }
@@ -90,8 +90,18 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
         currentUserId: currentUserId,
       );
       return Right(remoteMessages);
-    } catch (e) {
+    } on Object catch (e) {
       return Left(ServerFailure('Failed to fetch remote messages: $e', e));
+    }
+  }
+
+  @override
+  FutureResult<List<Conversation>> getConversationList() async {
+    try {
+      final conversations = await _remoteDataSource.getConversations();
+      return Right(conversations);
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to get conversations list: $e'));
     }
   }
 }

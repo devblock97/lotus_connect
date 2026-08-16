@@ -29,4 +29,6 @@ abstract class PrivateChatRepository {
     required String conversationId,
     required String currentUserId,
   });
+
+  FutureResult<List<Conversation>> getConversationList();
 }

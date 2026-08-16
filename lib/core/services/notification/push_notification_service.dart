@@ -170,9 +170,10 @@ class PushNotificationService {
       onNotificationTap: onNotificationTap,
     );
 
-    await syncDeviceToken();
+    // Launch token sync in background asynchronously so it never blocks app launch / UI rendering
+    unawaited(syncDeviceToken());
 
-    // 8. Listen to token refreshes
+    // Listen to token refreshes
     FirebaseMessaging.instance.onTokenRefresh.listen(_registerTokenToBackend);
   }
 
@@ -310,7 +311,9 @@ class PushNotificationService {
     });
 
     // App opened from terminated cold start state by tapping notification
-    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    final initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage()
+        .timeout(const Duration(seconds: 2), onTimeout: () => null);
     if (initialMessage != null) {
       debugPrint(
         '[FCM Initial Notification Tapped] Cold Start from Terminated State -> Data: ${initialMessage.data}',
@@ -324,12 +327,33 @@ class PushNotificationService {
   Future<void> syncDeviceToken() async {
     try {
       debugPrint('[FCM Token Sync] Fetching FCM device token...');
-      final token = await FirebaseMessaging.instance.getToken();
+
+      // On iOS (especially Simulators or prior to APNS registration),
+      // verify APNS token availability first to avoid apns-token-not-set exception or freezing
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final apnsToken =
+            await FirebaseMessaging.instance.getAPNSToken().timeout(
+                  const Duration(seconds: 3),
+                  onTimeout: () => null,
+                );
+        if (apnsToken == null) {
+          debugPrint(
+            '[FCM Token Sync] APNS token not available yet (iOS Simulator or pending APNS). Skipping FCM token fetch.',
+          );
+          return;
+        }
+      }
+
+      final token = await FirebaseMessaging.instance.getToken().timeout(
+            const Duration(seconds: 5),
+            onTimeout: () => null,
+          );
+
       if (token != null && token.isNotEmpty) {
         debugPrint('[FCM Token Sync] Retrieved token: $token');
         await _registerTokenToBackend(token);
       } else {
-        debugPrint('[FCM Token Sync] Token is null or empty');
+        debugPrint('[FCM Token Sync] Token is null or timed out');
       }
     } on Object catch (e) {
       debugPrint('[FCM Token Sync Error]: $e');
@@ -358,7 +382,19 @@ class PushNotificationService {
 
   Future<void> unregisterDeviceToken() async {
     try {
-      final token = await FirebaseMessaging.instance.getToken();
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        final apnsToken =
+            await FirebaseMessaging.instance.getAPNSToken().timeout(
+                  const Duration(seconds: 2),
+                  onTimeout: () => null,
+                );
+        if (apnsToken == null) return;
+      }
+
+      final token = await FirebaseMessaging.instance.getToken().timeout(
+            const Duration(seconds: 3),
+            onTimeout: () => null,
+          );
       if (token != null && token.isNotEmpty) {
         debugPrint(
           '[FCM Token Unregister] Unregistering token from backend...',
