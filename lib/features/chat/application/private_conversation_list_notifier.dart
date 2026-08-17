@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/services/api/chat_api_service.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
@@ -97,30 +98,31 @@ class PrivateConversationListNotifier
   /// Syncs remote conversation list from backend server REST API (GET /chats).
   Future<void> loadRemoteConversations() async {
     try {
-      final chatApiService = _ref.read(chatApiServiceProvider);
       final localDataSource = _ref.read(chatCoreLocalDataSourceProvider);
-      final remoteList = await chatApiService.getConversations();
 
-      for (final item in remoteList) {
-        final id = (item['id'] ??
-                item['conversationId'] ??
-                item['conversation_id']) as String? ??
-            '';
-        final title = (item['title'] ?? item['name'] ?? 'Chat') as String;
-        final peerId = (item['peerId'] ?? item['peer_id'] ?? '') as String;
-        if (id.isNotEmpty) {
-          final existing = await localDataSource.getConversations();
-          if (!existing.any((c) => c.id == id)) {
-            await localDataSource.createConversation(
-              id: id,
-              title: title,
-              isUserToUser: true,
-              peerId: peerId,
-            );
+      final getConversationListUseCase =
+          _ref.read(getRemoteConversationUseCaseProvider);
+      final remoteList = await getConversationListUseCase(const NoParams());
+
+      await remoteList.fold((error) {
+        debugPrint('load remote conversations fold - error: ${error.message}');
+      }, (conversations) async {
+        final existing = await localDataSource.getConversations();
+        for (final item in conversations) {
+          if (item.id.isNotEmpty) {
+            if (!existing.any((c) => c.id == item.id)) {
+              await localDataSource.createConversation(
+                id: item.id,
+                title: item.title,
+                isUserToUser: true,
+                peerId: item.peerId,
+              );
+            }
           }
         }
-      }
-    } catch (e) {
+      });
+    } on Object catch (e, stackTrace) {
+      AppLogger.debug(e.toString(), e, stackTrace);
       // Degrade gracefully if server is offline or endpoint returns empty
     }
   }

@@ -89,89 +89,6 @@ class ChatApiService {
     }
   }
 
-  /// Creates a new private conversation with a friend.
-  Future<Map<String, dynamic>> createPrivateChat(String friendId) async {
-    try {
-      final response = await dioClient.post(
-        '/chats/private',
-        data: {'friendId': friendId},
-      );
-      return response.data as Map<String, dynamic>;
-    } catch (e) {
-      throw ServerException('Failed to create private chat: $e');
-    }
-  }
-
-  /// Fetches conversation messages with cursor pagination.
-  Future<List<Map<String, dynamic>>> getMessages({
-    required String conversationId,
-    String? cursor,
-    int limit = 20,
-  }) async {
-    try {
-      final response = await dioClient.get(
-        '/chats/$conversationId/messages',
-        queryParameters: {
-          if (cursor != null) 'cursor': cursor,
-          'limit': limit,
-        },
-      );
-      final list = response.data as List<dynamic>;
-      return list.map((item) => item as Map<String, dynamic>).toList();
-    } catch (e) {
-      throw ServerException('Failed to fetch messages: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>> sendMessage({
-    required String conversationId,
-    required String content,
-    String? replyToId,
-  }) async {
-    try {
-      final response = await dioClient.post(
-        'chats/$conversationId/messages',
-        data: {
-          'content': content,
-          if (replyToId != null) 'replyToId': replyToId,
-        },
-      );
-      return response.data as Map<String, dynamic>;
-    } catch (e) {
-      throw ServerException('Failed to send message: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>> deleteMessage({
-    required String messageId,
-  }) async {
-    try {
-      final response = await dioClient.delete(
-        '/chats/messages/$messageId',
-      );
-      return response.data as Map<String, dynamic>;
-    } catch (e) {
-      throw ServerException('Failed to delete message: $e');
-    }
-  }
-
-  Future<Map<String, dynamic>> updateMessage({
-    required String messageId,
-    required String content,
-  }) async {
-    try {
-      final response = await dioClient.put(
-        '/chats/messages/$messageId',
-        data: {
-          'content': content,
-        },
-      );
-      return response.data as Map<String, dynamic>;
-    } catch (e) {
-      throw ServerException('Failed to update message: $e');
-    }
-  }
-
   /// Uploads binary files using multipart/form-data.
   Future<String> uploadFile({
     required String filePath,
@@ -228,15 +145,15 @@ class ChatApiService {
   }
 
   /// Fetches conversation list from the backend REST API.
-  Future<List<Map<String, dynamic>>> getConversations() async {
-    try {
-      final response = await dioClient.get('/chats');
-      final list = response.data as List<dynamic>;
-      return list.map((item) => item as Map<String, dynamic>).toList();
-    } catch (e) {
-      throw ServerException('Failed to fetch remote conversations: $e');
-    }
-  }
+  // Future<List<Map<String, dynamic>>> getConversations() async {
+  //   try {
+  //     final response = await dioClient.get('/chats');
+  //     final list = response.data as List<dynamic>;
+  //     return list.map((item) => item as Map<String, dynamic>).toList();
+  //   } catch (e) {
+  //     throw ServerException('Failed to fetch remote conversations: $e');
+  //   }
+  // }
 
   /// Fetches call logs history for the authenticated user.
   Future<List<Map<String, dynamic>>> getCallHistory() async {
