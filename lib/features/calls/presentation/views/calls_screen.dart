@@ -8,7 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
+import 'package:lotus_connect/features/calls/application/active_call_notifier.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
+import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
+import 'package:lotus_connect/features/calls/presentation/widgets/connected_screen.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
@@ -85,7 +88,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _stopTimer();
     try {
       FlutterRingtonePlayer().stop();
-    } catch (_) {}
+    } on Object catch (_) {}
     _inviteSub?.cancel();
     _acceptSub?.cancel();
     _endSub?.cancel();
@@ -121,13 +124,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       _log('Starting incoming call ringtone...');
       try {
         FlutterRingtonePlayer().playRingtone();
-      } catch (e) {
+      } on Object catch (e) {
         _log('Error playing ringtone: $e');
       }
     } else {
       try {
         FlutterRingtonePlayer().stop();
-      } catch (_) {}
+      } on Object catch (_) {}
     }
   }
 
@@ -219,7 +222,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
         if (type == 'offer') {
           _remoteOfferDescription = RTCSessionDescription(sdp, type);
-          // If receiver already clicked accept and connection is ready, configure the remote offer description immediately
+          // If receiver already clicked accept and connection is ready,
+          // configure the remote offer description immediately
           if (_status == CallStatus.connected && _peerConnection != null) {
             final currentRemoteDesc =
                 await _peerConnection!.getRemoteDescription();
@@ -392,7 +396,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       stream.getTracks().forEach((track) {
         pc.addTrack(track, stream);
       });
-    } catch (e) {
+    } on Object catch (e) {
       _log('User media failed: $e');
     }
 
@@ -429,8 +433,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     });
     _updateStatus(CallStatus.ringingOut);
 
-    ref.read(webrtcSignalingServiceProvider).sendInvite(
-          recipientId: peerId,
+    ref.read(activeCallProvider.notifier).startCall(
+          peerId: peerId,
           channelId: channelId,
           isVideo: isVideo,
         );
@@ -442,10 +446,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _updateStatus(CallStatus.connected);
     _startTimer();
 
-    ref.read(webrtcSignalingServiceProvider).acceptCall(
-          callId: _activeCallId!,
-          recipientId: _activePeerId!,
-        );
+    ref
+        .read(activeCallProvider.notifier)
+        .acceptCall(_activeCallId!, _activePeerId!);
 
     try {
       await _createPeerConnection();
@@ -460,11 +463,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           });
           await _peerConnection!.setLocalDescription(answer);
 
-          ref.read(webrtcSignalingServiceProvider).sendSdp(
-                recipientId: _activePeerId!,
-                sdpType: 'answer',
-                sdpDescription: answer.sdp!,
-              );
+          ref
+              .read(activeCallProvider.notifier)
+              .sendSdp(_activePeerId!, 'answer', answer.sdp!);
 
           // Drain ice candidates queue
           for (final cand in _remoteIceCandidatesQueue) {
@@ -473,7 +474,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           _remoteIceCandidatesQueue.clear();
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       _log('Error during call acceptance: $e');
     }
   }
@@ -482,10 +483,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (_activeCallId == null || _activePeerId == null) return;
     _log('Declining call: $_activeCallId');
 
-    ref.read(webrtcSignalingServiceProvider).endCall(
-          callId: _activeCallId!,
-          recipientId: _activePeerId!,
-        );
+    ref
+        .read(activeCallProvider.notifier)
+        .endCall(_activeCallId!, _activePeerId!);
+
     _resetCallState();
   }
 
@@ -493,10 +494,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (_activeCallId == null || _activePeerId == null) return;
     _log('Hanging up call');
 
-    ref.read(webrtcSignalingServiceProvider).endCall(
-          callId: _activeCallId!,
-          recipientId: _activePeerId!,
-        );
+    ref
+        .read(activeCallProvider.notifier)
+        .endCall(_activeCallId!, _activePeerId!);
+
     _resetCallState();
   }
 
@@ -519,7 +520,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       return _buildRingingOutUI();
     }
     if (_status == CallStatus.connected) {
-      return _buildConnectedUI();
+      // return _buildConnectedUI();
+      return ConnectedScreen(
+        activePeerId: _activePeerId!,
+        isVideo: _isVideo,
+        remoteRenderer: _remoteRenderer,
+        localRenderer: _localRenderer,
+        duration: _formatDuration(_secondsElapsed),
+        isMuted: _isMuted,
+        hangUp: _hangUp,
+        localStream: _localStream,
+      );
     }
     return _buildIdleUI();
   }
@@ -1944,357 +1955,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: 22),
-      ),
-    );
-  }
-}
-
-class CallsSearchResultsScreen extends ConsumerStatefulWidget {
-  const CallsSearchResultsScreen({
-    required this.initialQuery,
-    required this.onStartCall,
-    super.key,
-  });
-
-  final String initialQuery;
-  final void Function(String peerId, bool isVideo) onStartCall;
-
-  @override
-  ConsumerState<CallsSearchResultsScreen> createState() =>
-      _CallsSearchResultsScreenState();
-}
-
-class _CallsSearchResultsScreenState
-    extends ConsumerState<CallsSearchResultsScreen> {
-  final _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.text = widget.initialQuery;
-    _searchQuery = widget.initialQuery;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(contactsProvider.notifier).searchUsers(widget.initialQuery);
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final contactsState = ref.watch(contactsProvider);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-        titleSpacing: 0,
-      ),
-      body: contactsState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : contactsState.searchResults.isEmpty
-              ? _buildEmptyState()
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: contactsState.searchResults.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final user = contactsState.searchResults[index];
-                    final isFriend =
-                        contactsState.friends.any((f) => f.id == user.id);
-                    return _buildSearchResultItem(theme, user, isFriend);
-                  },
-                ),
-    );
-  }
-
-  Widget _buildSearchResultItem(ThemeData theme, User user, bool isFriend) {
-    final displayName = user.fullName ?? user.username;
-    final initials = displayName.isNotEmpty
-        ? displayName.substring(0, 1).toUpperCase()
-        : '?';
-    final avatarColor =
-        Colors.primaries[user.username.hashCode % Colors.primaries.length];
-
-    return Card(
-      color: Colors.white,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade100),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: avatarColor.withValues(alpha: 0.15),
-                  child: Text(
-                    initials,
-                    style: TextStyle(
-                      color: avatarColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        displayName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '@${user.username}',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (isFriend)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green.shade200),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.check,
-                          size: 12,
-                          color: Colors.green.shade700,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Friend',
-                          style: TextStyle(
-                            color: Colors.green.shade700,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Divider(height: 1),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (!isFriend) ...[
-                  if (user.friendshipStatus == 'pending') ...[
-                    if (user.friendshipSenderId ==
-                        ref.watch(settingsProvider).userId)
-                      _buildActionButton(
-                        icon: Icons.hourglass_empty_outlined,
-                        label: 'Requested',
-                        color: Colors.amber.shade800,
-                        onTap: () {},
-                      )
-                    else ...[
-                      _buildActionButton(
-                        icon: Icons.check,
-                        label: 'Accept',
-                        color: Colors.green,
-                        onTap: () async {
-                          final success = await ref
-                              .read(contactsProvider.notifier)
-                              .acceptFriendRequest(user.id);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  success
-                                      ? 'Friend request accepted!'
-                                      : 'Failed to accept request',
-                                ),
-                                backgroundColor:
-                                    success ? Colors.green : Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      _buildActionButton(
-                        icon: Icons.close,
-                        label: 'Reject',
-                        color: Colors.red,
-                        onTap: () async {
-                          final success = await ref
-                              .read(contactsProvider.notifier)
-                              .rejectFriendRequest(user.id);
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  success
-                                      ? 'Friend request rejected!'
-                                      : 'Failed to reject request',
-                                ),
-                                backgroundColor:
-                                    success ? Colors.green : Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ] else ...[
-                    _buildActionButton(
-                      icon: Icons.person_add_alt_1,
-                      label: 'Add Friend',
-                      color: theme.colorScheme.primary,
-                      onTap: () async {
-                        final success = await ref
-                            .read(contactsProvider.notifier)
-                            .sendFriendRequest(user.username);
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                success
-                                    ? 'Friend request sent to @${user.username}'
-                                    : 'Failed to send request',
-                              ),
-                              backgroundColor:
-                                  success ? Colors.green : Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ],
-                // Send Message Action
-                _buildActionButton(
-                  icon: Icons.chat_bubble_outline,
-                  label: 'Message',
-                  color: Colors.grey.shade700,
-                  onTap: () async {
-                    final currentContext = context;
-                    final conv = await ref
-                        .read(privateConversationListProvider.notifier)
-                        .createNewPrivateChat(
-                          friendId: user.id,
-                          title: user.fullName ?? user.username,
-                        );
-                    if (conv != null && currentContext.mounted) {
-                      ref.read(shellIndexProvider.notifier).state =
-                          1; // Switch to Chats tab
-                      Navigator.of(currentContext)
-                          .popUntil((route) => route.isFirst);
-                    }
-                  },
-                ),
-                // Voice Call Action
-                _buildActionButton(
-                  icon: Icons.phone_outlined,
-                  label: 'Voice',
-                  color: Colors.blue,
-                  onTap: () {
-                    widget.onStartCall(user.id, false);
-                    Navigator.pop(context); // Go back to Call screen
-                  },
-                ),
-                // Video Call Action
-                _buildActionButton(
-                  icon: Icons.videocam_outlined,
-                  label: 'Video',
-                  color: Colors.green,
-                  onTap: () {
-                    widget.onStartCall(user.id, true);
-                    Navigator.pop(context); // Go back to Call screen
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off_outlined,
-              size: 64,
-              color: Colors.grey.shade400,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No matching users',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'We couldn\'t find any users matching "$_searchQuery".',
-              style: const TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }
