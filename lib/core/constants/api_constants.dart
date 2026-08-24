@@ -4,7 +4,7 @@ class ApiConstants {
 
   /// Default API base URL for Lotus Connect backend services.
   static const String baseUrl =
-      'https://be10-2001-ee0-1b38-2b4c-2838-129a-ce08-7508.ngrok-free.app/api/v1';
+      'https://ef21-2001-ee0-26e-7703-64c2-be98-cc71-71d6.ngrok-free.app/api/v1';
 
   /// Gemini API base URL. Use stable v1 endpoint.
   static const String geminiBaseUrl =

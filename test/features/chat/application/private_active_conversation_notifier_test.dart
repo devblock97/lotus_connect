@@ -135,6 +135,8 @@ void main() {
       () => mockPrivateChatRepo.fetchRemoteMessages(
         conversationId: 'test_conv_id',
         currentUserId: 'test_user_id',
+        cursor: any(named: 'cursor'),
+        limit: 100,
       ),
     ).thenAnswer((_) async => Right(remoteMessages));
 
@@ -143,7 +145,7 @@ void main() {
           .thenAnswer((_) async => const Right(null));
     }
 
-    when(() => mockChatCoreRepo.getMessages('test_conv_id'))
+    when(() => mockChatCoreRepo.getLocalMessages('test_conv_id'))
         .thenAnswer((_) async => Right(localMessages));
 
     when(() => mockChatCoreRepo.deleteMessage(any())).thenAnswer(
@@ -249,6 +251,8 @@ void main() {
       () => mockPrivateChatRepo.fetchRemoteMessages(
         conversationId: 'test_conv_id',
         currentUserId: 'test_user_id',
+        cursor: any(named: 'cursor'),
+        limit: 100,
       ),
     ).thenAnswer((_) async => Right(remoteMessages));
 
@@ -257,7 +261,7 @@ void main() {
           .thenAnswer((_) async => const Right(null));
     }
 
-    when(() => mockChatCoreRepo.getMessages('test_conv_id'))
+    when(() => mockChatCoreRepo.getLocalMessages('test_conv_id'))
         .thenAnswer((_) async => Right(localMessages));
 
     when(() => mockChatCoreRepo.deleteMessage(any())).thenAnswer(

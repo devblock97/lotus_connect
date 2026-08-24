@@ -28,6 +28,8 @@ abstract class PrivateChatRepository {
   FutureResult<List<Message>> fetchRemoteMessages({
     required String conversationId,
     required String currentUserId,
+    required int limit,
+    String? cursor,
   });
 
   FutureResult<List<Conversation>> getConversationList();

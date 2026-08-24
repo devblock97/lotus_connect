@@ -192,6 +192,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ? activeState.messages.length
                   : 0,
               itemBuilder: (_, index) {
+                debugPrint(
+                  'check conversation list length: ${activeState.messages.length}',
+                );
                 final message = activeState.messages[index];
                 final repliedTo = message.replyToId != null
                     ? activeState.messages

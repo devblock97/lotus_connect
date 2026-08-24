@@ -44,6 +44,7 @@ abstract class ChatCoreRepository {
 
   FutureResult<void> deleteMessage(String id);
 
-  FutureResult<List<Message>> getMessages(String conversationId);
+  FutureResult<List<Message>> getLocalMessages(String conversationId);
+
   FutureResult<Message?> getMessage(String messageId);
 }

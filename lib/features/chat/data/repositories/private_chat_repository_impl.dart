@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
@@ -83,11 +84,16 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   FutureResult<List<Message>> fetchRemoteMessages({
     required String conversationId,
     required String currentUserId,
+    required int limit,
+    String? cursor,
   }) async {
+    debugPrint('fetch remote message triggered');
     try {
       final remoteMessages = await _remoteDataSource.fetchRemoteMessages(
         conversationId: conversationId,
         currentUserId: currentUserId,
+        cursor: cursor,
+        limit: limit,
       );
       return Right(remoteMessages);
     } on Object catch (e) {

@@ -94,6 +94,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
     int limit = 100,
   }) async {
     try {
+      debugPrint('fetch remote messages cursor: $cursor; limit: $limit');
       final response = await _dioClient.get(
         '/chats/$conversationId/messages',
         queryParameters: {

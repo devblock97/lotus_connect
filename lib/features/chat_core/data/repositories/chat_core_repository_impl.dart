@@ -134,9 +134,9 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
   }
 
   @override
-  FutureResult<List<Message>> getMessages(String conversationId) async {
+  FutureResult<List<Message>> getLocalMessages(String conversationId) async {
     try {
-      final messages = await _localDataSource.getMessages(conversationId);
+      final messages = await _localDataSource.getLocalMessages(conversationId);
       return Right(messages);
     } on Object catch (e) {
       return Left(DatabaseFailure('Failed to get messages: $e', e));
