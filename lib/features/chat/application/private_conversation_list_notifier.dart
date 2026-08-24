@@ -75,6 +75,7 @@ class PrivateConversationListNotifier
           errorMessage: failure.message,
         ),
         (conversations) {
+          debugPrint('conversation list: ${conversations.length}');
           // Filter to user conversations only
           final userConversations = conversations.where((c) => c.isUserToUser);
           final sorted = List<Conversation>.from(userConversations)
@@ -104,9 +105,7 @@ class PrivateConversationListNotifier
           _ref.read(getRemoteConversationUseCaseProvider);
       final remoteList = await getConversationListUseCase(const NoParams());
 
-      await remoteList.fold((error) {
-        debugPrint('load remote conversations fold - error: ${error.message}');
-      }, (conversations) async {
+      await remoteList.fold((error) {}, (conversations) async {
         final existing = await localDataSource.getConversations();
         for (final item in conversations) {
           if (item.id.isNotEmpty) {
@@ -132,7 +131,6 @@ class PrivateConversationListNotifier
     state = state.copyWith(searchQuery: query);
   }
 
-  /// Selects active conversation.
   void selectConversation(String conversationId) {
     state = state.copyWith(selectedConversationId: conversationId);
   }

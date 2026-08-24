@@ -4,8 +4,10 @@ import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote
 import 'package:lotus_connect/features/chat/data/repositories/private_chat_repository_impl.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/delete_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
@@ -49,10 +51,10 @@ final sendMessageUseCaseProvider = Provider<SendMessageUseCase>((ref) {
 });
 
 /// Provider for DeleteMessageUseCase.
-final deleteMessageUseCaseProvider = Provider<DeleteMessageUseCase>((ref) {
-  return DeleteMessageUseCase(
+final deleteLocalMessageUseCaseProvider =
+    Provider<DeleteLocalMessageUseCase>((ref) {
+  return DeleteLocalMessageUseCase(
     chatCoreRepository: ref.watch(chatCoreRepositoryProvider),
-    privateChatRepository: ref.watch(privateChatRepositoryProvider),
   );
 });
 
@@ -69,5 +71,21 @@ final getRemoteConversationUseCaseProvider =
     Provider<GetRemoteConversationUseCase>((ref) {
   return GetRemoteConversationUseCase(
     privateChatRepository: ref.watch(privateChatRepositoryProvider),
+  );
+});
+
+/// Provider for GetRemoteMessageUseCase
+final getRemoteMessageUseCaseProvider =
+    Provider<GetRemoteMessageUseCase>((ref) {
+  return GetRemoteMessageUseCase(
+    repository: ref.watch(privateChatRepositoryProvider),
+  );
+});
+
+/// Provider for DeleteRemoteMessageUseCase
+final deleteRemoteMessageUseCaseProvider =
+    Provider<DeleteRemoteMessageUseCase>((ref) {
+  return DeleteRemoteMessageUseCase(
+    repository: ref.watch(privateChatRepositoryProvider),
   );
 });

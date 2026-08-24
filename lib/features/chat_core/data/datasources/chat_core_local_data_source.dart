@@ -21,7 +21,7 @@ abstract class ChatCoreLocalDataSource {
   Future<void> saveDraftMessage(String conversationId, String draft);
   Future<void> saveMessage(Message message);
   Future<void> deleteMessage(String messageId);
-  Future<List<Message>> getMessages(String conversationId);
+  Future<List<Message>> getLocalMessages(String conversationId);
   Future<Message?> getMessage(String messageId);
   Future<void> markOutgoingMessagesAsRead(
     String conversationId,
@@ -232,7 +232,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
   }
 
   @override
-  Future<List<Message>> getMessages(String conversationId) async {
+  Future<List<Message>> getLocalMessages(String conversationId) async {
     final query = _db.select(_db.messageTable)
       ..where((tbl) => tbl.conversationId.equals(conversationId))
       ..orderBy([(tbl) => OrderingTerm.asc(tbl.timestamp)]);

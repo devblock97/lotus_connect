@@ -1,16 +1,21 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/usecases/save_message_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
 /// State representing the active user-to-user conversation message stream.
@@ -52,10 +57,36 @@ class PrivateActiveConversationState {
 /// Notifier handling human-to-human active chat state over WebSockets.
 class PrivateActiveConversationNotifier
     extends StateNotifier<PrivateActiveConversationState> {
-  PrivateActiveConversationNotifier(this._ref)
-      : super(const PrivateActiveConversationState()) {
+  PrivateActiveConversationNotifier(
+    this._ref, {
+    required GetRemoteMessageUseCase getRemoteMessageUseCase,
+    required GetLocalMessageUseCase getLocalMessageUseCase,
+    required SaveLocalMessageUseCase saveLocalMessageUseCase,
+    required DeleteLocalMessageUseCase deleteLocalMessageUseCase,
+    required DeleteRemoteMessageUseCase deleteRemoteMessageUseCase,
+    required UpdateMessageUseCase updateMessageUseCase,
+    required SaveDraftMessageUseCase saveDraftMessageUseCase,
+    required SendMessageUseCase sendMessageUseCase,
+  })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
+        _getLocalMessageUseCase = getLocalMessageUseCase,
+        _saveLocalMessageUseCase = saveLocalMessageUseCase,
+        _deleteLocalMessageUseCase = deleteLocalMessageUseCase,
+        _deleteRemoteMessageUseCase = deleteRemoteMessageUseCase,
+        _updateMessageUseCase = updateMessageUseCase,
+        _saveDraftMessageUseCase = saveDraftMessageUseCase,
+        _sendMessageUseCase = sendMessageUseCase,
+        super(const PrivateActiveConversationState()) {
     _init();
   }
+
+  final GetRemoteMessageUseCase _getRemoteMessageUseCase;
+  final GetLocalMessageUseCase _getLocalMessageUseCase;
+  final SaveLocalMessageUseCase _saveLocalMessageUseCase;
+  final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
+  final DeleteRemoteMessageUseCase _deleteRemoteMessageUseCase;
+  final UpdateMessageUseCase _updateMessageUseCase;
+  final SaveDraftMessageUseCase _saveDraftMessageUseCase;
+  final SendMessageUseCase _sendMessageUseCase;
 
   Timer? _typingTimer;
   bool _isCurrentlyTyping = false;
@@ -101,12 +132,14 @@ class PrivateActiveConversationNotifier
       final currentUserId = _ref.read(settingsProvider).userId;
       if (currentUserId.isEmpty) return;
 
-      final remoteRepository = _ref.read(privateChatRepositoryProvider);
-      final localRepository = _ref.read(chatCoreRepositoryProvider);
+      // final messageCursor = state.messages.last.id;
 
-      final remoteResult = await remoteRepository.fetchRemoteMessages(
-        conversationId: conversationId,
-        currentUserId: currentUserId,
+      final remoteResult = await _getRemoteMessageUseCase(
+        GetRemoteMessageParam(
+          conversationId: conversationId,
+          userId: currentUserId,
+          limit: 100,
+        ),
       );
 
       await remoteResult.fold(
@@ -116,11 +149,13 @@ class PrivateActiveConversationNotifier
         (remoteMessages) async {
           // 1. Save all remote messages locally
           for (final msg in remoteMessages) {
-            await localRepository.saveMessage(msg);
+            await _saveLocalMessageUseCase(SaveLocalMessageParam(message: msg));
           }
 
           // 2. Reconcile deleted messages
-          final localResult = await localRepository.getMessages(conversationId);
+          final localResult = await _getLocalMessageUseCase(
+            GetLocalMessageParam(conversationId: conversationId),
+          );
           await localResult.fold(
             (failure) async {},
             (localMessages) async {
@@ -139,7 +174,7 @@ class PrivateActiveConversationNotifier
                 for (final msg in localMessages) {
                   if (uuidRegex.hasMatch(msg.id) &&
                       !remoteIds.contains(msg.id)) {
-                    await localRepository.deleteMessage(msg.id);
+                    await _deleteLocalMessageUseCase(msg.id);
                   }
                 }
               } else {
@@ -162,7 +197,7 @@ class PrivateActiveConversationNotifier
                         (msg.timestamp.isAfter(adjustedMin) ||
                             msg.timestamp.isAtSameMomentAs(adjustedMin))) {
                       if (!remoteIds.contains(msg.id)) {
-                        await localRepository.deleteMessage(msg.id);
+                        await _deleteLocalMessageUseCase(msg.id);
                       }
                     }
                   }
@@ -172,7 +207,8 @@ class PrivateActiveConversationNotifier
           );
         },
       );
-    } on Object catch (_) {
+    } on Object catch (e) {
+      debugPrint('check sync error message: $e');
       // Ignore background sync errors
     }
   }
@@ -207,13 +243,11 @@ class PrivateActiveConversationNotifier
       clearReplyingTo: true,
     );
 
-    final saveDraftMessageUseCase = _ref.read(saveDraftUseCaseProvider);
-    await saveDraftMessageUseCase(
-      SaveDraftParams(conversationId: convId, draft: ''),
+    await _saveDraftMessageUseCase(
+      SaveDraftMessageParams(conversationId: convId, draft: ''),
     );
 
-    final useCase = _ref.read(sendMessageUseCaseProvider);
-    final result = await useCase(
+    final result = await _sendMessageUseCase(
       SendMessageParams(
         conversationId: convId,
         text: trimmedText,
@@ -229,8 +263,9 @@ class PrivateActiveConversationNotifier
         // Delete optimistic message and save the permanent
         // server-synchronized message
         await deleteMessage(optimisticId);
-        final saveMessageUseCase = _ref.read(saveMessageUseCaseProvider);
-        await saveMessageUseCase(SaveMessageParam(message: remoteMessage));
+        await _saveLocalMessageUseCase(
+          SaveLocalMessageParam(message: remoteMessage),
+        );
         state = state.copyWith(
           messages: [...state.messages, remoteMessage],
         );
@@ -283,22 +318,41 @@ class PrivateActiveConversationNotifier
 
   /// Deletes a message by its ID.
   Future<void> deleteMessage(String messageId) async {
-    final useCase = _ref.read(deleteMessageUseCaseProvider);
-    final result = await useCase(messageId);
-    result.fold(
-      (failure) {
-        state = state.copyWith(errorMessage: failure.message);
-      },
-      (_) {
-        // State updates reactively via the watched SQLite query stream.
-      },
+    final uuidRegex = RegExp(
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
     );
+
+    if (!uuidRegex.hasMatch(messageId)) {
+      try {
+        final result = await _deleteLocalMessageUseCase(messageId);
+        await result.fold((error) {
+          state = state.copyWith(
+            errorMessage: "Can't delete message. Please try again",
+          );
+        }, (success) async {
+          state = state.copyWith();
+        });
+      } on Object catch (e) {
+        throw Exception(e.toString());
+      }
+      return;
+    }
+    final result = await _deleteRemoteMessageUseCase(
+      DeleteRemoteMessageParam(messageId: messageId),
+    );
+    await result.fold((remoteError) {
+      state = state.copyWith(
+        errorMessage: "Can't delete message. Please try again",
+      );
+    }, (remoteSuccess) async {
+      await _deleteLocalMessageUseCase(messageId);
+    });
   }
 
   Future<void> updateMessage(String messageId, String content) async {
-    final useCase = _ref.read(updateMessageUseCaseProvider);
     final params = UpdateMessageParam(messageId: messageId, content: content);
-    final result = await useCase(params);
+    final result = await _updateMessageUseCase(params);
     result.fold(
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
@@ -320,5 +374,15 @@ class PrivateActiveConversationNotifier
 /// Provider for PrivateActiveConversationNotifier.
 final privateActiveConversationProvider = StateNotifierProvider<
     PrivateActiveConversationNotifier, PrivateActiveConversationState>((ref) {
-  return PrivateActiveConversationNotifier(ref);
+  return PrivateActiveConversationNotifier(
+    ref,
+    getRemoteMessageUseCase: ref.watch(getRemoteMessageUseCaseProvider),
+    getLocalMessageUseCase: ref.watch(getLocalMessageUseCaseProvider),
+    saveLocalMessageUseCase: ref.watch(saveMessageUseCaseProvider),
+    deleteLocalMessageUseCase: ref.watch(deleteLocalMessageUseCaseProvider),
+    deleteRemoteMessageUseCase: ref.watch(deleteRemoteMessageUseCaseProvider),
+    updateMessageUseCase: ref.watch(updateMessageUseCaseProvider),
+    saveDraftMessageUseCase: ref.watch(saveDraftMessageUseCaseProvider),
+    sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
+  );
 });
