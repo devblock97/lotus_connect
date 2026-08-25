@@ -23,7 +23,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 8; // Incremented schema version for replyToId column
+  int get schemaVersion => 9; // Incremented schema version for replyToId column
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

@@ -28,6 +28,30 @@ class MessageTable extends Table {
   /// Nullable ID of the message this message is replying to.
   TextColumn get replyToId => text().nullable()();
 
+  /// Nullable media URL.
+  TextColumn get mediaUrl => text().nullable()();
+
+  /// Nullable thumbnail URL.
+  TextColumn get thumbnailUrl => text().nullable()();
+
+  /// Nullable file name.
+  TextColumn get fileName => text().nullable()();
+
+  /// Nullable file size.
+  IntColumn get fileSize => integer().nullable()();
+
+  /// Nullable MIME type.
+  TextColumn get mimeType => text().nullable()();
+
+  /// Nullable duration.
+  IntColumn get duration => integer().nullable()();
+
+  /// Flag indicating if the message was edited.
+  BoolColumn get isEdited => boolean().withDefault(const Constant(false))();
+
+  /// Nullable string containing serialized reactions.
+  TextColumn get reactions => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

@@ -102,6 +102,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
                     orElse: () => MessageStatus.sent,
                   ),
                   replyToId: row.replyToId,
+                  mediaUrl: row.mediaUrl,
+                  thumbnailUrl: row.thumbnailUrl,
+                  fileName: row.fileName,
+                  fileSize: row.fileSize,
+                  mimeType: row.mimeType,
+                  duration: row.duration,
+                  isEdited: row.isEdited,
+                  reactions: row.reactions,
                 ),
               )
               .toList(),
@@ -221,6 +229,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             isError: Value(message.isError),
             status: Value(message.status.name),
             replyToId: Value(message.replyToId),
+            mediaUrl: Value(message.mediaUrl),
+            thumbnailUrl: Value(message.thumbnailUrl),
+            fileName: Value(message.fileName),
+            fileSize: Value(message.fileSize),
+            mimeType: Value(message.mimeType),
+            duration: Value(message.duration),
+            isEdited: Value(message.isEdited),
+            reactions: Value(message.reactions),
           ),
         );
   }
@@ -254,6 +270,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
               orElse: () => MessageStatus.sent,
             ),
             replyToId: row.replyToId,
+            mediaUrl: row.mediaUrl,
+            thumbnailUrl: row.thumbnailUrl,
+            fileName: row.fileName,
+            fileSize: row.fileSize,
+            mimeType: row.mimeType,
+            duration: row.duration,
+            isEdited: row.isEdited,
+            reactions: row.reactions,
           ),
         )
         .toList();
@@ -280,6 +304,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
         orElse: () => MessageStatus.sent,
       ),
       replyToId: row.replyToId,
+      mediaUrl: row.mediaUrl,
+      thumbnailUrl: row.thumbnailUrl,
+      fileName: row.fileName,
+      fileSize: row.fileSize,
+      mimeType: row.mimeType,
+      duration: row.duration,
+      isEdited: row.isEdited,
+      reactions: row.reactions,
     );
   }
 
