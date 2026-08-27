@@ -170,6 +170,67 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             AppLogger.info('WS Edited message $messageId in SQLite');
           }
         }
+      } else if (event == 'chat:reaction_add') {
+        final messageId = payload['messageId'] as String? ?? '';
+        final userId = payload['userId'] as String? ?? '';
+        final reaction = payload['reaction'] as String? ?? '';
+        if (messageId.isNotEmpty && userId.isNotEmpty && reaction.isNotEmpty) {
+          final localDataSource = ref.read(chatCoreLocalDataSourceProvider);
+          final existing = await localDataSource.getMessage(messageId);
+          if (existing != null) {
+            final newReactions = List<Reaction>.from(existing.reactions);
+            final index = newReactions.indexWhere((r) => r.reaction == reaction);
+            if (index != -1) {
+              final r = newReactions[index];
+              if (!r.users.contains(userId)) {
+                newReactions[index] = Reaction(
+                  reaction: reaction,
+                  count: r.count + 1,
+                  users: [...r.users, userId],
+                );
+              }
+            } else {
+              newReactions.add(Reaction(
+                reaction: reaction,
+                count: 1,
+                users: [userId],
+              ));
+            }
+            final updated = existing.copyWith(reactions: newReactions);
+            await localDataSource.saveMessage(updated);
+            AppLogger.info('WS Added reaction $reaction to message $messageId in SQLite');
+          }
+        }
+      } else if (event == 'chat:reaction_remove') {
+        final messageId = payload['messageId'] as String? ?? '';
+        final userId = payload['userId'] as String? ?? '';
+        final reaction = payload['reaction'] as String? ?? '';
+        if (messageId.isNotEmpty && userId.isNotEmpty && reaction.isNotEmpty) {
+          final localDataSource = ref.read(chatCoreLocalDataSourceProvider);
+          final existing = await localDataSource.getMessage(messageId);
+          if (existing != null) {
+            final newReactions = List<Reaction>.from(existing.reactions);
+            final index = newReactions.indexWhere((r) => r.reaction == reaction);
+            if (index != -1) {
+              final r = newReactions[index];
+              if (r.users.contains(userId)) {
+                final newUsers = List<String>.from(r.users)..remove(userId);
+                if (newUsers.isEmpty) {
+                  newReactions.removeAt(index);
+                } else {
+                  newReactions[index] = Reaction(
+                    reaction: reaction,
+                    count: r.count - 1,
+                    users: newUsers,
+                  );
+                }
+                final updated = existing.copyWith(reactions: newReactions);
+                await localDataSource.saveMessage(updated);
+                AppLogger.info('WS Removed reaction $reaction from message $messageId in SQLite');
+              }
+            }
+          }
+        }
       } else if (event == 'notification:new') {
         await ref.read(notificationsProvider.notifier).loadNotifications();
       } else if (event == 'typing') {
