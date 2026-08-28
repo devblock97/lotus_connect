@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -27,6 +29,7 @@ class Message extends Equatable {
     required this.role,
     required this.content,
     required this.timestamp,
+    this.messageType,
     this.isError = false,
     this.status = MessageStatus.sent,
     this.replyToId,
@@ -37,7 +40,7 @@ class Message extends Equatable {
     this.mimeType,
     this.duration,
     this.updatedAt,
-    this.reactions,
+    this.reactions = const [],
     this.isEdited = false,
   });
 
@@ -48,9 +51,32 @@ class Message extends Equatable {
       return DateTime.tryParse(val.toString()) ?? DateTime.now();
     }
 
+    List<Reaction> parseReactions(dynamic val) {
+      if (val == null) return const [];
+      if (val is List) {
+        return val
+            .whereType<Map<String, dynamic>>()
+            .map(Reaction.fromJson)
+            .toList();
+      }
+      if (val is String && val.trim().isNotEmpty) {
+        try {
+          final decoded = jsonDecode(val);
+          if (decoded is List) {
+            return decoded
+                .whereType<Map<String, dynamic>>()
+                .map(Reaction.fromJson)
+                .toList();
+          }
+        } catch (_) {}
+      }
+      return const [];
+    }
+
     return Message(
       id: (json['id'] ?? '').toString(),
-      conversationId: (json['conversationId'] ?? json['conversation_id'] ?? '').toString(),
+      conversationId:
+          (json['conversationId'] ?? json['conversation_id'] ?? '').toString(),
       role: role,
       content: (json['content'] ?? '').toString(),
       timestamp: parseTime(json['createdAt'] ?? json['created_at']),
@@ -59,16 +85,22 @@ class Message extends Equatable {
         (e) => e.name == json['status'],
         orElse: () => MessageStatus.sent,
       ),
+      messageType: json['message_type'] as String?,
       replyToId: (json['replyToId'] ?? json['reply_to_id'])?.toString(),
       mediaUrl: (json['mediaUrl'] ?? json['media_url'])?.toString(),
       thumbnailUrl: (json['thumbnailUrl'] ?? json['thumbnail_url'])?.toString(),
       fileName: (json['fileName'] ?? json['file_name'])?.toString(),
       fileSize: json['fileSize'] as int? ?? json['file_size'] as int?,
-      mimeType: (json['mimeType'] ?? json['mime_type'] ?? json['mine_type'] ?? json['mineType'])?.toString(),
+      mimeType: (json['mimeType'] ??
+              json['mime_type'] ??
+              json['mine_type'] ??
+              json['mineType'])
+          ?.toString(),
       duration: json['duration'] as int?,
       updatedAt: (json['updatedAt'] ?? json['updated_at'])?.toString(),
-      reactions: json['reactions']?.toString(),
-      isEdited: json['isEdited'] as bool? ?? json['is_edited'] as bool? ?? false,
+      reactions: parseReactions(json['reactions']),
+      isEdited:
+          json['isEdited'] as bool? ?? json['is_edited'] as bool? ?? false,
     );
   }
 
@@ -87,8 +119,13 @@ class Message extends Equatable {
   final String? mimeType;
   final int? duration;
   final String? updatedAt;
-  final String? reactions;
+  final List<Reaction> reactions;
   final bool isEdited;
+  final String? messageType;
+
+  String? get serializedReactions => reactions.isNotEmpty
+      ? jsonEncode(reactions.map((e) => e.toJson()).toList())
+      : null;
 
   Message copyWith({
     String? id,
@@ -106,8 +143,9 @@ class Message extends Equatable {
     String? mimeType,
     int? duration,
     String? updatedAt,
-    String? reactions,
+    List<Reaction>? reactions,
     bool? isEdited,
+    String? messageType,
   }) {
     return Message(
       id: id ?? this.id,
@@ -127,6 +165,7 @@ class Message extends Equatable {
       updatedAt: updatedAt ?? this.updatedAt,
       reactions: reactions ?? this.reactions,
       isEdited: isEdited ?? this.isEdited,
+      messageType: messageType ?? this.messageType,
     );
   }
 
@@ -149,5 +188,41 @@ class Message extends Equatable {
         updatedAt,
         reactions,
         isEdited,
+      ];
+}
+
+class Reaction extends Equatable {
+  const Reaction({
+    required this.reaction,
+    this.count = 0,
+    this.users = const [],
+  });
+
+  factory Reaction.fromJson(Map<String, dynamic> json) {
+    return Reaction(
+      reaction: (json['reaction'] ?? '').toString(),
+      count: (json['count'] as num?)?.toInt() ?? 0,
+      users: (json['users'] as List<dynamic>?)
+              ?.map((u) => u.toString())
+              .toList() ??
+          const [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'reaction': reaction,
+        'count': count,
+        'users': users,
+      };
+
+  final String reaction;
+  final int count;
+  final List<String> users;
+
+  @override
+  List<Object?> get props => [
+        reaction,
+        count,
+        users,
       ];
 }

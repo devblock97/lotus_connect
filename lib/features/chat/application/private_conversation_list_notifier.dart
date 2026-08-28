@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
@@ -75,7 +74,6 @@ class PrivateConversationListNotifier
           errorMessage: failure.message,
         ),
         (conversations) {
-          debugPrint('conversation list: ${conversations.length}');
           // Filter to user conversations only
           final userConversations = conversations.where((c) => c.isUserToUser);
           final sorted = List<Conversation>.from(userConversations)
@@ -96,7 +94,6 @@ class PrivateConversationListNotifier
     });
   }
 
-  /// Syncs remote conversation list from backend server REST API (GET /chats).
   Future<void> loadRemoteConversations() async {
     try {
       final localDataSource = _ref.read(chatCoreLocalDataSourceProvider);

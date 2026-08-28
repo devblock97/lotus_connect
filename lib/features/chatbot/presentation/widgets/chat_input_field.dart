@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Bottom chat input field widget matching modern ChatGPT / Telegram styling.
 class ChatInputField extends StatefulWidget {
@@ -13,7 +16,7 @@ class ChatInputField extends StatefulWidget {
     super.key,
   });
 
-  final ValueChanged<String> onSend;
+  final void Function(String, XFile?) onSend;
   final bool isGenerating;
   final VoidCallback onStop;
   final String initialText;
@@ -27,6 +30,8 @@ class ChatInputField extends StatefulWidget {
 
 class _ChatInputFieldState extends State<ChatInputField> {
   late TextEditingController _controller;
+
+  XFile? files;
 
   @override
   void initState() {
@@ -52,8 +57,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
   void _handleSend() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
-      widget.onSend(text);
+      widget.onSend(text, files);
       _controller.clear();
+      files = null;
     }
   }
 
@@ -77,7 +83,49 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 ),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (files != null)
+                    Container(
+                      height: 70,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.outline.withAlpha(45),
+                            blurRadius: 0.3,
+                            spreadRadius: 0.2,
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          ClipRect(
+                            child: Center(
+                              child: Image.file(
+                                File(files!.path),
+                                fit: BoxFit.cover,
+                                height: 70,
+                                width: 70,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 3,
+                            right: 3,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  files = null;
+                                });
+                              },
+                              child: const Icon(Icons.close, color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
@@ -107,7 +155,20 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.image_outlined, size: 22),
-                          onPressed: () {},
+                          onPressed: () async {
+                            debugPrint('picker image');
+                            final picker = ImagePicker();
+                            final image = await picker.pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (image != null) {
+                              debugPrint('image here: ${image.path}');
+                              setState(() {
+                                files = image;
+                              });
+                              debugPrint('file here: ${image.path}');
+                            }
+                          },
                           tooltip: 'Attach Image',
                         ),
                         IconButton(

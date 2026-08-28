@@ -9,8 +9,10 @@ import 'package:lotus_connect/features/chat/application/private_conversation_lis
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
@@ -18,21 +20,31 @@ import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usec
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 
+enum Status { initialize, success, failure, loading }
+
 /// State representing the active user-to-user conversation message stream.
 class PrivateActiveConversationState {
   const PrivateActiveConversationState({
     this.conversationId,
     this.messages = const [],
     this.draftInput = '',
+    this.message,
     this.errorMessage,
     this.replyingToMessage,
+    this.hasLoadMore = false,
+    this.hasReachedMax = false,
+    this.status = Status.initialize,
   });
 
   final String? conversationId;
   final List<Message> messages;
+  final Message? message;
   final String draftInput;
   final String? errorMessage;
   final Message? replyingToMessage;
+  final bool hasLoadMore;
+  final bool hasReachedMax;
+  final Status status;
 
   PrivateActiveConversationState copyWith({
     String? conversationId,
@@ -41,6 +53,10 @@ class PrivateActiveConversationState {
     String? errorMessage,
     Message? replyingToMessage,
     bool clearReplyingTo = false,
+    bool? hasLoadMore,
+    bool? hasReachedMax,
+    Status? status,
+    Message? message,
   }) {
     return PrivateActiveConversationState(
       conversationId: conversationId ?? this.conversationId,
@@ -50,6 +66,10 @@ class PrivateActiveConversationState {
       replyingToMessage: clearReplyingTo
           ? null
           : (replyingToMessage ?? this.replyingToMessage),
+      hasLoadMore: hasLoadMore ?? this.hasLoadMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      status: status ?? this.status,
+      message: message ?? this.message,
     );
   }
 }
@@ -67,6 +87,8 @@ class PrivateActiveConversationNotifier
     required UpdateMessageUseCase updateMessageUseCase,
     required SaveDraftMessageUseCase saveDraftMessageUseCase,
     required SendMessageUseCase sendMessageUseCase,
+    required ReactionMessageUseCase reactionMessageUseCase,
+    required UploadFileUseCase uploadFileUseCase,
   })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
         _getLocalMessageUseCase = getLocalMessageUseCase,
         _saveLocalMessageUseCase = saveLocalMessageUseCase,
@@ -75,6 +97,8 @@ class PrivateActiveConversationNotifier
         _updateMessageUseCase = updateMessageUseCase,
         _saveDraftMessageUseCase = saveDraftMessageUseCase,
         _sendMessageUseCase = sendMessageUseCase,
+        _reactionMessageUseCase = reactionMessageUseCase,
+        _uploadFileUseCase = uploadFileUseCase,
         super(const PrivateActiveConversationState()) {
     _init();
   }
@@ -87,6 +111,8 @@ class PrivateActiveConversationNotifier
   final UpdateMessageUseCase _updateMessageUseCase;
   final SaveDraftMessageUseCase _saveDraftMessageUseCase;
   final SendMessageUseCase _sendMessageUseCase;
+  final ReactionMessageUseCase _reactionMessageUseCase;
+  final UploadFileUseCase _uploadFileUseCase;
 
   Timer? _typingTimer;
   bool _isCurrentlyTyping = false;
@@ -138,7 +164,7 @@ class PrivateActiveConversationNotifier
         GetRemoteMessageParam(
           conversationId: conversationId,
           userId: currentUserId,
-          limit: 100,
+          limit: 10,
         ),
       );
 
@@ -213,8 +239,53 @@ class PrivateActiveConversationNotifier
     }
   }
 
+  Future<void> loadMoreMessage(String conversationId, bool isBottom) async {
+    final currentUserId = _ref.read(settingsProvider).userId;
+    if (currentUserId.isEmpty) return;
+
+    if (!state.hasLoadMore || state.hasReachedMax) {
+      state = state.copyWith(
+        hasLoadMore: false,
+        hasReachedMax: true,
+      );
+      return;
+    }
+
+    final oldestMessage = state.messages.first;
+    final newestMessage = state.messages.last;
+    debugPrint(
+      'check oldest message: ${oldestMessage.id}; ${oldestMessage.content}',
+    );
+
+    final result = await _getRemoteMessageUseCase(
+      GetRemoteMessageParam(
+        conversationId: conversationId,
+        userId: currentUserId,
+        cursor: isBottom ? newestMessage.id : oldestMessage.id,
+        limit: 10,
+      ),
+    );
+
+    await result.fold((error) {
+      state = state.copyWith(errorMessage: error.message);
+    }, (newMessages) async {
+      for (final message in newMessages) {
+        await _saveLocalMessageUseCase(
+          SaveLocalMessageParam(message: message),
+        );
+      }
+
+      final hasReachedMax = newMessages.length >= 10;
+
+      state = state.copyWith(
+        hasLoadMore: false,
+        hasReachedMax: hasReachedMax,
+      );
+    });
+  }
+
   /// Sends a message over the WebSocket tunnel.
-  Future<void> sendMessage(String text) async {
+  Future<void> sendMessage(String text, [String? path]) async {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) {
       state = state.copyWith(
@@ -246,6 +317,48 @@ class PrivateActiveConversationNotifier
     await _saveDraftMessageUseCase(
       SaveDraftMessageParams(conversationId: convId, draft: ''),
     );
+
+    if (path != null) {
+      final uploadFileResult = await _uploadFileUseCase(
+        UploadFileParam(path: path),
+      );
+
+      await uploadFileResult.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (fileUrl) async {
+        final result = await _sendMessageUseCase(
+          SendMessageParams(
+            conversationId: convId,
+            text: trimmedText,
+            replyToId: replyToId,
+            fileName: fileUrl.split('/').last,
+            messageType: 'image',
+            thumbnailUrl: fileUrl,
+            mediaUrl: fileUrl,
+            mimeType: 'image/png',
+          ),
+        );
+
+        await result.fold(
+          (failure) {
+            state = state.copyWith(errorMessage: failure.message);
+          },
+          (remoteMessage) async {
+            // Delete optimistic message and save the permanent
+            // server-synchronized message
+            await deleteMessage(optimisticId);
+            await _saveLocalMessageUseCase(
+              SaveLocalMessageParam(message: remoteMessage),
+            );
+            state = state.copyWith(
+              messages: [...state.messages, remoteMessage],
+            );
+          },
+        );
+      });
+
+      return;
+    }
 
     final result = await _sendMessageUseCase(
       SendMessageParams(
@@ -363,6 +476,34 @@ class PrivateActiveConversationNotifier
     );
   }
 
+  Future<void> reactMessage(String messageId, String reaction) async {
+    final result = await _reactionMessageUseCase(
+      ReactionMessageParam(
+        messageId: messageId,
+        reaction: reaction,
+      ),
+    );
+
+    result.fold((error) {
+      state = state.copyWith(errorMessage: error.message);
+    }, (reaction) {
+      state = state.copyWith(status: Status.success);
+    });
+  }
+
+  Future<void> uploadFile(String message, String path) async {
+    final result = await _uploadFileUseCase(
+      UploadFileParam(path: path),
+    );
+
+    result.fold((error) {
+      state = state.copyWith(errorMessage: error.message);
+    }, (fileUrl) {
+      debugPrint('file url response: $fileUrl');
+      sendMessage(message, fileUrl);
+    });
+  }
+
   @override
   void dispose() {
     _messageSubscription?.cancel();
@@ -384,5 +525,7 @@ final privateActiveConversationProvider = StateNotifierProvider<
     updateMessageUseCase: ref.watch(updateMessageUseCaseProvider),
     saveDraftMessageUseCase: ref.watch(saveDraftMessageUseCaseProvider),
     sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
+    reactionMessageUseCase: ref.watch(reactionMessageUseCaseProvider),
+    uploadFileUseCase: ref.watch(uploadFileUseCaseProvider),
   );
 });

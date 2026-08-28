@@ -53,6 +53,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       final event = eventFrame['event'] as String?;
       final payload = eventFrame['payload'] as Map<String, dynamic>? ?? {};
 
+      AppLogger.debug('WS event received: $event');
+      AppLogger.debug('WS payload received: $payload');
+
       if (event == 'chat:message') {
         final messageId = payload['id'] as String? ??
             DateTime.now().millisecondsSinceEpoch.toString();
@@ -67,6 +70,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         final timestamp = createdAtStr != null
             ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
             : DateTime.now();
+        final mediaUrl = payload['media_url'] as String?;
+        final thumbnailUrl = payload['thumbnail_url'] as String?;
+        final mimeType = payload['mime_type'] as String?;
 
         AppLogger.debug(
           'WS message parsed - id: $messageId, '
@@ -147,6 +153,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           content: content,
           timestamp: timestamp,
           replyToId: replyToId,
+          mediaUrl: mediaUrl,
+          thumbnailUrl: thumbnailUrl,
+          mimeType: mimeType,
         );
 
         await localDataSource.saveMessage(message);
@@ -179,7 +188,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           final existing = await localDataSource.getMessage(messageId);
           if (existing != null) {
             final newReactions = List<Reaction>.from(existing.reactions);
-            final index = newReactions.indexWhere((r) => r.reaction == reaction);
+            final index =
+                newReactions.indexWhere((r) => r.reaction == reaction);
             if (index != -1) {
               final r = newReactions[index];
               if (!r.users.contains(userId)) {
@@ -190,15 +200,19 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
                 );
               }
             } else {
-              newReactions.add(Reaction(
-                reaction: reaction,
-                count: 1,
-                users: [userId],
-              ));
+              newReactions.add(
+                Reaction(
+                  reaction: reaction,
+                  count: 1,
+                  users: [userId],
+                ),
+              );
             }
             final updated = existing.copyWith(reactions: newReactions);
             await localDataSource.saveMessage(updated);
-            AppLogger.info('WS Added reaction $reaction to message $messageId in SQLite');
+            AppLogger.info(
+              'WS Added reaction $reaction to message $messageId in SQLite',
+            );
           }
         }
       } else if (event == 'chat:reaction_remove') {
@@ -210,7 +224,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           final existing = await localDataSource.getMessage(messageId);
           if (existing != null) {
             final newReactions = List<Reaction>.from(existing.reactions);
-            final index = newReactions.indexWhere((r) => r.reaction == reaction);
+            final index =
+                newReactions.indexWhere((r) => r.reaction == reaction);
             if (index != -1) {
               final r = newReactions[index];
               if (r.users.contains(userId)) {
@@ -226,7 +241,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
                 }
                 final updated = existing.copyWith(reactions: newReactions);
                 await localDataSource.saveMessage(updated);
-                AppLogger.info('WS Removed reaction $reaction from message $messageId in SQLite');
+                AppLogger.info(
+                  'WS Removed reaction $reaction from message $messageId in SQLite',
+                );
               }
             }
           }
@@ -339,8 +356,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       const ChatbotConversationListScreen(),
       ConversationListView(
         onSelectConversation: () {
-          ref.read(shellIndexProvider.notifier).state =
-              0; // Switch back to AI Chat when conversation is selected
+          ref.read(shellIndexProvider.notifier).state = 0;
         },
       ),
       const CallsScreen(),

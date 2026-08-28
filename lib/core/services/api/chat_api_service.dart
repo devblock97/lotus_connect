@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -86,27 +85,6 @@ class ChatApiService {
           .toList();
     } catch (e) {
       throw ServerException('Failed to search users: $e');
-    }
-  }
-
-  /// Uploads binary files using multipart/form-data.
-  Future<String> uploadFile({
-    required String filePath,
-    required String fileName,
-  }) async {
-    try {
-      final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(filePath, filename: fileName),
-      });
-      final response = await dioClient.post(
-        '/uploads',
-        data: formData,
-        options: Options(contentType: 'multipart/form-data'),
-      );
-      final data = response.data as Map<String, dynamic>;
-      return data['fileUrl'] as String;
-    } catch (e) {
-      throw ServerException('Failed to upload file: $e');
     }
   }
 

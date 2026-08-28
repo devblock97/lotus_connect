@@ -64,8 +64,8 @@ void main() {
   });
 
   test(
-      'should reconcile complete history when remote messages count is less than 100',
-      () async {
+      'should reconcile complete history when '
+      'remote messages count is less than 100', () async {
     final timestamp1 = DateTime.now().subtract(const Duration(minutes: 5));
     final timestamp2 = DateTime.now().subtract(const Duration(minutes: 3));
     final timestamp3 = DateTime.now().subtract(const Duration(minutes: 1));
@@ -133,10 +133,10 @@ void main() {
 
     when(
       () => mockPrivateChatRepo.fetchRemoteMessages(
-        conversationId: 'test_conv_id',
-        currentUserId: 'test_user_id',
-        cursor: any(named: 'cursor'),
-        limit: 100,
+        conversationId: any(named: 'conversationId'),
+        currentUserId: any(named: 'currentUserId'),
+        cursor: any(named: 'cursor', that: isNull),
+        limit: any(named: 'limit'),
       ),
     ).thenAnswer((_) async => Right(remoteMessages));
 
@@ -189,8 +189,8 @@ void main() {
   });
 
   test(
-      'should reconcile within window when remote messages count is 100 or more (partial history)',
-      () async {
+      'should reconcile within window when '
+      'remote messages count is 100 or more (partial history)', () async {
     final timestampMin = DateTime.now().subtract(const Duration(minutes: 100));
     final timestamp0 =
         DateTime.now().subtract(const Duration(minutes: 105)); // Outside window
@@ -249,10 +249,10 @@ void main() {
 
     when(
       () => mockPrivateChatRepo.fetchRemoteMessages(
-        conversationId: 'test_conv_id',
-        currentUserId: 'test_user_id',
-        cursor: any(named: 'cursor'),
-        limit: 100,
+        conversationId: any(named: 'conversationId'),
+        currentUserId: any(named: 'currentUserId'),
+        cursor: any(named: 'cursor', that: isNull),
+        limit: any(named: 'limit'),
       ),
     ).thenAnswer((_) async => Right(remoteMessages));
 
@@ -302,14 +302,15 @@ void main() {
   });
 
   test(
-      'should handle reply to message state, send it, and clear the reply state',
-      () async {
+      'should handle reply to message state, '
+      'send it, and clear the reply state', () async {
     final parentMessage = Message(
       id: 'parent_id_123',
       conversationId: 'test_conv_id',
       role: MessageRole.assistant,
       content: 'Hello, parent message',
       timestamp: DateTime.now(),
+      mediaUrl: 'file_path',
     );
 
     when(() => mockChatCoreRepo.watchMessages('test_conv_id'))
