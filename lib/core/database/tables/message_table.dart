@@ -10,23 +10,34 @@ class MessageTable extends Table {
   TextColumn get conversationId =>
       text().references(ConversationTable, #id, onDelete: KeyAction.cascade)();
 
-  /// Sender role: 'user', 'assistant', 'system'.
   TextColumn get senderRole => text()();
 
-  /// Text content of message.
   TextColumn get content => text()();
 
-  /// Message timestamp.
   DateTimeColumn get timestamp => dateTime()();
 
-  /// Error status flag.
   BoolColumn get isError => boolean().withDefault(const Constant(false))();
 
   /// Detailed status string: 'sending', 'sent', 'streaming', 'failed'.
   TextColumn get status => text().withDefault(const Constant('sent'))();
 
-  /// Nullable ID of the message this message is replying to.
   TextColumn get replyToId => text().nullable()();
+
+  TextColumn get mediaUrl => text().nullable()();
+
+  TextColumn get thumbnailUrl => text().nullable()();
+
+  TextColumn get fileName => text().nullable()();
+
+  IntColumn get fileSize => integer().nullable()();
+
+  TextColumn get mimeType => text().nullable()();
+
+  IntColumn get duration => integer().nullable()();
+
+  BoolColumn get isEdited => boolean().withDefault(const Constant(false))();
+
+  TextColumn get reactions => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

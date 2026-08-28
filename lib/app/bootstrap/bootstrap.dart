@@ -53,7 +53,7 @@ Future<void> bootstrap() async {
     if (activeCall != null) {
       debugPrint('Cold-start active call found: ${activeCall.id}');
     }
-  } catch (e) {
+  } on Object catch (e) {
     debugPrint('Bootstrap initialization note: $e');
   }
 

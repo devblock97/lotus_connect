@@ -8,8 +8,10 @@ import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message
 import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 
@@ -86,6 +88,20 @@ final getRemoteMessageUseCaseProvider =
 final deleteRemoteMessageUseCaseProvider =
     Provider<DeleteRemoteMessageUseCase>((ref) {
   return DeleteRemoteMessageUseCase(
+    repository: ref.watch(privateChatRepositoryProvider),
+  );
+});
+
+/// Provider for ReactionMessageUseCase
+final reactionMessageUseCaseProvider = Provider<ReactionMessageUseCase>((ref) {
+  return ReactionMessageUseCase(
+    repository: ref.watch(privateChatRepositoryProvider),
+  );
+});
+
+/// Provider for UploadFileUseCase
+final uploadFileUseCaseProvider = Provider<UploadFileUseCase>((ref) {
+  return UploadFileUseCase(
     repository: ref.watch(privateChatRepositoryProvider),
   );
 });

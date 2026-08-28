@@ -1,25 +1,42 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
+import 'package:lotus_connect/features/chat/data/models/reaction_message_model.dart';
+import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 abstract class PrivateChatRemoteDataSource {
   Future<Conversation> createPrivateChat(String friendId);
+
   Future<Message> sendMessage({
     required String conversationId,
     required String content,
     String? replyToId,
+    String? thumbnailUrl,
+    String? mediaUrl,
+    String? messageType,
+    String? mimeType,
+    String? fileName,
   });
+
   Future<void> deleteMessage(String messageId);
+
   Future<void> updateMessage(String messageId, String content);
+
   Future<List<Message>> fetchRemoteMessages({
     required String conversationId,
     required String currentUserId,
     String? cursor,
     int limit = 100,
   });
+
   Future<List<Conversation>> getConversations();
+
+  Future<ReactionMessageEntity> reactMessage(String messageId, String reaction);
+
+  Future<String> uploadFile({required String path});
 }
 
 class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
@@ -51,33 +68,33 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
     required String conversationId,
     required String content,
     String? replyToId,
+    String? thumbnailUrl,
+    String? mediaUrl,
+    String? messageType,
+    String? mimeType,
+    String? fileName,
   }) async {
     try {
       final response = await _dioClient.post(
         'chats/$conversationId/messages',
         data: {
           'content': content,
+          if (messageType != null) 'messageType': messageType,
           if (replyToId != null) 'replyToId': replyToId,
+          if (thumbnailUrl != null) 'thumbnailUrl': thumbnailUrl,
+          if (mediaUrl != null) 'mediaUrl': mediaUrl,
+          if (fileName != null) 'fileName': fileName,
+          if (mimeType != null) 'mimeType': mimeType,
         },
       );
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
-        final messageId = data['id'] as String? ?? '';
-        final createdAtStr =
-            (data['created_at'] ?? data['createdAt']) as String?;
-        final timestamp = createdAtStr != null
-            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-            : DateTime.now();
-
-        return Message(
-          id: messageId,
-          conversationId: conversationId,
-          role: MessageRole.user,
-          content: content,
-          timestamp: timestamp,
-          replyToId: replyToId,
+        final message = Message.fromJson(
+          data,
+          MessageRole.user,
         );
+        return message;
       }
 
       throw const ServerException('Send message failed. Please try again!');
@@ -106,35 +123,14 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
       final data = response.data as List? ?? [];
 
       return data.map((item) {
-        final id = item['id'] as String? ?? '';
+        final jsonMap = item as Map<String, dynamic>;
         final senderId =
-            (item['sender_id'] ?? item['senderId']) as String? ?? '';
-        final content = item['content'] as String? ?? '';
-        final createdAtStr =
-            (item['created_at'] ?? item['createdAt']) as String?;
-        final timestamp = createdAtStr != null
-            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-            : DateTime.now();
-        final replyToId = (item['reply_to_id'] ?? item['replyToId']) as String?;
+            (jsonMap['sender_id'] ?? jsonMap['senderId']) as String? ?? '';
+        final role = senderId == currentUserId
+            ? MessageRole.user
+            : MessageRole.assistant;
 
-        debugPrint('remote message id: $id');
-        debugPrint('remote message sender id: $senderId');
-        debugPrint('remote message content: $content');
-        debugPrint('remote message created at: $createdAtStr');
-        debugPrint('remote message timestamp: $timestamp');
-        debugPrint('remote message reply to id: $replyToId');
-        debugPrint('---------------------------------------------');
-
-        return Message(
-          id: id,
-          conversationId: conversationId,
-          role: senderId == currentUserId
-              ? MessageRole.user
-              : MessageRole.assistant,
-          content: content,
-          timestamp: timestamp,
-          replyToId: replyToId,
-        );
+        return Message.fromJson(jsonMap, role);
       }).toList();
     } catch (e) {
       throw Exception(e);
@@ -188,6 +184,44 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
       }).toList();
     } catch (e) {
       throw Exception(e);
+    }
+  }
+
+  @override
+  Future<ReactionMessageEntity> reactMessage(
+    String messageId,
+    String reaction,
+  ) async {
+    try {
+      final response = await _dioClient.post(
+        '/chats/messages/$messageId/reactions',
+        data: {'reaction': reaction},
+      );
+      final data = ReactionMessageModel.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      return data.toEntity();
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  @override
+  Future<String> uploadFile({required String path}) async {
+    try {
+      final fileName = path.split('/').last;
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(path, filename: fileName),
+      });
+      final response = await _dioClient.post(
+        '/uploads',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      final data = response.data as Map<String, dynamic>;
+      return data['fileUrl'] as String;
+    } catch (e) {
+      throw ServerException('Failed to upload file: $e');
     }
   }
 }

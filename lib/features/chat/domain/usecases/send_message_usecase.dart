@@ -8,11 +8,21 @@ class SendMessageParams {
     required this.conversationId,
     required this.text,
     this.replyToId,
+    this.thumbnailUrl,
+    this.mediaUrl,
+    this.fileName,
+    this.messageType,
+    this.mimeType,
   });
 
   final String conversationId;
   final String text;
   final String? replyToId;
+  final String? thumbnailUrl;
+  final String? mediaUrl;
+  final String? fileName;
+  final String? messageType;
+  final String? mimeType;
 }
 
 class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
@@ -28,6 +38,11 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
       conversationId: params.conversationId,
       content: params.text,
       replyToId: params.replyToId,
+      messageType: params.messageType,
+      mediaUrl: params.mediaUrl,
+      thumbnailUrl: params.thumbnailUrl,
+      fileName: params.fileName,
+      mimeType: params.mimeType,
     );
   }
 }

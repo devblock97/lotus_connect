@@ -4,6 +4,7 @@ import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -44,12 +45,22 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
     required String conversationId,
     required String content,
     String? replyToId,
+    String? thumbnailUrl,
+    String? mediaUrl,
+    String? messageType,
+    String? mimeType,
+    String? fileName,
   }) async {
     try {
       final remoteMessage = await _remoteDataSource.sendMessage(
         conversationId: conversationId,
         content: content,
         replyToId: replyToId,
+        mediaUrl: mediaUrl,
+        thumbnailUrl: thumbnailUrl,
+        messageType: messageType,
+        fileName: fileName,
+        mimeType: mimeType,
       );
       return Right(remoteMessage);
     } on Object catch (e) {
@@ -108,6 +119,29 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
       return Right(conversations);
     } on Object catch (e) {
       return Left(ServerFailure('Failed to get conversations list: $e'));
+    }
+  }
+
+  @override
+  FutureResult<ReactionMessageEntity> reactMessage(
+    String messageId,
+    String reaction,
+  ) async {
+    try {
+      final react = await _remoteDataSource.reactMessage(messageId, reaction);
+      return Right(react);
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to react message: $e'));
+    }
+  }
+
+  @override
+  FutureResult<String> uploadFiles(String path) async {
+    try {
+      final fileUrl = await _remoteDataSource.uploadFile(path: path);
+      return Right(fileUrl);
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to upload file: $e'));
     }
   }
 }

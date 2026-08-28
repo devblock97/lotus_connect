@@ -652,6 +652,58 @@ class $MessageTableTable extends MessageTable
   late final GeneratedColumn<String> replyToId = GeneratedColumn<String>(
       'reply_to_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mediaUrlMeta =
+      const VerificationMeta('mediaUrl');
+  @override
+  late final GeneratedColumn<String> mediaUrl = GeneratedColumn<String>(
+      'media_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _thumbnailUrlMeta =
+      const VerificationMeta('thumbnailUrl');
+  @override
+  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
+      'thumbnail_url', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _fileNameMeta =
+      const VerificationMeta('fileName');
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+      'file_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _fileSizeMeta =
+      const VerificationMeta('fileSize');
+  @override
+  late final GeneratedColumn<int> fileSize = GeneratedColumn<int>(
+      'file_size', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _mimeTypeMeta =
+      const VerificationMeta('mimeType');
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+      'mime_type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _durationMeta =
+      const VerificationMeta('duration');
+  @override
+  late final GeneratedColumn<int> duration = GeneratedColumn<int>(
+      'duration', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _isEditedMeta =
+      const VerificationMeta('isEdited');
+  @override
+  late final GeneratedColumn<bool> isEdited = GeneratedColumn<bool>(
+      'is_edited', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_edited" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _reactionsMeta =
+      const VerificationMeta('reactions');
+  @override
+  late final GeneratedColumn<String> reactions = GeneratedColumn<String>(
+      'reactions', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -661,7 +713,15 @@ class $MessageTableTable extends MessageTable
         timestamp,
         isError,
         status,
-        replyToId
+        replyToId,
+        mediaUrl,
+        thumbnailUrl,
+        fileName,
+        fileSize,
+        mimeType,
+        duration,
+        isEdited,
+        reactions
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -720,6 +780,40 @@ class $MessageTableTable extends MessageTable
           replyToId.isAcceptableOrUnknown(
               data['reply_to_id']!, _replyToIdMeta));
     }
+    if (data.containsKey('media_url')) {
+      context.handle(_mediaUrlMeta,
+          mediaUrl.isAcceptableOrUnknown(data['media_url']!, _mediaUrlMeta));
+    }
+    if (data.containsKey('thumbnail_url')) {
+      context.handle(
+          _thumbnailUrlMeta,
+          thumbnailUrl.isAcceptableOrUnknown(
+              data['thumbnail_url']!, _thumbnailUrlMeta));
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(_fileNameMeta,
+          fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta));
+    }
+    if (data.containsKey('file_size')) {
+      context.handle(_fileSizeMeta,
+          fileSize.isAcceptableOrUnknown(data['file_size']!, _fileSizeMeta));
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(_mimeTypeMeta,
+          mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta));
+    }
+    if (data.containsKey('duration')) {
+      context.handle(_durationMeta,
+          duration.isAcceptableOrUnknown(data['duration']!, _durationMeta));
+    }
+    if (data.containsKey('is_edited')) {
+      context.handle(_isEditedMeta,
+          isEdited.isAcceptableOrUnknown(data['is_edited']!, _isEditedMeta));
+    }
+    if (data.containsKey('reactions')) {
+      context.handle(_reactionsMeta,
+          reactions.isAcceptableOrUnknown(data['reactions']!, _reactionsMeta));
+    }
     return context;
   }
 
@@ -745,6 +839,22 @@ class $MessageTableTable extends MessageTable
           .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
       replyToId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}reply_to_id']),
+      mediaUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}media_url']),
+      thumbnailUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}thumbnail_url']),
+      fileName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}file_name']),
+      fileSize: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}file_size']),
+      mimeType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}mime_type']),
+      duration: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}duration']),
+      isEdited: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_edited'])!,
+      reactions: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reactions']),
     );
   }
 
@@ -779,6 +889,30 @@ class MessageTableData extends DataClass
 
   /// Nullable ID of the message this message is replying to.
   final String? replyToId;
+
+  /// Nullable media URL.
+  final String? mediaUrl;
+
+  /// Nullable thumbnail URL.
+  final String? thumbnailUrl;
+
+  /// Nullable file name.
+  final String? fileName;
+
+  /// Nullable file size.
+  final int? fileSize;
+
+  /// Nullable MIME type.
+  final String? mimeType;
+
+  /// Nullable duration.
+  final int? duration;
+
+  /// Flag indicating if the message was edited.
+  final bool isEdited;
+
+  /// Nullable string containing serialized reactions.
+  final String? reactions;
   const MessageTableData(
       {required this.id,
       required this.conversationId,
@@ -787,7 +921,15 @@ class MessageTableData extends DataClass
       required this.timestamp,
       required this.isError,
       required this.status,
-      this.replyToId});
+      this.replyToId,
+      this.mediaUrl,
+      this.thumbnailUrl,
+      this.fileName,
+      this.fileSize,
+      this.mimeType,
+      this.duration,
+      required this.isEdited,
+      this.reactions});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -800,6 +942,28 @@ class MessageTableData extends DataClass
     map['status'] = Variable<String>(status);
     if (!nullToAbsent || replyToId != null) {
       map['reply_to_id'] = Variable<String>(replyToId);
+    }
+    if (!nullToAbsent || mediaUrl != null) {
+      map['media_url'] = Variable<String>(mediaUrl);
+    }
+    if (!nullToAbsent || thumbnailUrl != null) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    if (!nullToAbsent || fileName != null) {
+      map['file_name'] = Variable<String>(fileName);
+    }
+    if (!nullToAbsent || fileSize != null) {
+      map['file_size'] = Variable<int>(fileSize);
+    }
+    if (!nullToAbsent || mimeType != null) {
+      map['mime_type'] = Variable<String>(mimeType);
+    }
+    if (!nullToAbsent || duration != null) {
+      map['duration'] = Variable<int>(duration);
+    }
+    map['is_edited'] = Variable<bool>(isEdited);
+    if (!nullToAbsent || reactions != null) {
+      map['reactions'] = Variable<String>(reactions);
     }
     return map;
   }
@@ -816,6 +980,28 @@ class MessageTableData extends DataClass
       replyToId: replyToId == null && nullToAbsent
           ? const Value.absent()
           : Value(replyToId),
+      mediaUrl: mediaUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mediaUrl),
+      thumbnailUrl: thumbnailUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnailUrl),
+      fileName: fileName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileName),
+      fileSize: fileSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fileSize),
+      mimeType: mimeType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mimeType),
+      duration: duration == null && nullToAbsent
+          ? const Value.absent()
+          : Value(duration),
+      isEdited: Value(isEdited),
+      reactions: reactions == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reactions),
     );
   }
 
@@ -831,6 +1017,14 @@ class MessageTableData extends DataClass
       isError: serializer.fromJson<bool>(json['isError']),
       status: serializer.fromJson<String>(json['status']),
       replyToId: serializer.fromJson<String?>(json['replyToId']),
+      mediaUrl: serializer.fromJson<String?>(json['mediaUrl']),
+      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      fileName: serializer.fromJson<String?>(json['fileName']),
+      fileSize: serializer.fromJson<int?>(json['fileSize']),
+      mimeType: serializer.fromJson<String?>(json['mimeType']),
+      duration: serializer.fromJson<int?>(json['duration']),
+      isEdited: serializer.fromJson<bool>(json['isEdited']),
+      reactions: serializer.fromJson<String?>(json['reactions']),
     );
   }
   @override
@@ -845,6 +1039,14 @@ class MessageTableData extends DataClass
       'isError': serializer.toJson<bool>(isError),
       'status': serializer.toJson<String>(status),
       'replyToId': serializer.toJson<String?>(replyToId),
+      'mediaUrl': serializer.toJson<String?>(mediaUrl),
+      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'fileName': serializer.toJson<String?>(fileName),
+      'fileSize': serializer.toJson<int?>(fileSize),
+      'mimeType': serializer.toJson<String?>(mimeType),
+      'duration': serializer.toJson<int?>(duration),
+      'isEdited': serializer.toJson<bool>(isEdited),
+      'reactions': serializer.toJson<String?>(reactions),
     };
   }
 
@@ -856,7 +1058,15 @@ class MessageTableData extends DataClass
           DateTime? timestamp,
           bool? isError,
           String? status,
-          Value<String?> replyToId = const Value.absent()}) =>
+          Value<String?> replyToId = const Value.absent(),
+          Value<String?> mediaUrl = const Value.absent(),
+          Value<String?> thumbnailUrl = const Value.absent(),
+          Value<String?> fileName = const Value.absent(),
+          Value<int?> fileSize = const Value.absent(),
+          Value<String?> mimeType = const Value.absent(),
+          Value<int?> duration = const Value.absent(),
+          bool? isEdited,
+          Value<String?> reactions = const Value.absent()}) =>
       MessageTableData(
         id: id ?? this.id,
         conversationId: conversationId ?? this.conversationId,
@@ -866,6 +1076,15 @@ class MessageTableData extends DataClass
         isError: isError ?? this.isError,
         status: status ?? this.status,
         replyToId: replyToId.present ? replyToId.value : this.replyToId,
+        mediaUrl: mediaUrl.present ? mediaUrl.value : this.mediaUrl,
+        thumbnailUrl:
+            thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+        fileName: fileName.present ? fileName.value : this.fileName,
+        fileSize: fileSize.present ? fileSize.value : this.fileSize,
+        mimeType: mimeType.present ? mimeType.value : this.mimeType,
+        duration: duration.present ? duration.value : this.duration,
+        isEdited: isEdited ?? this.isEdited,
+        reactions: reactions.present ? reactions.value : this.reactions,
       );
   MessageTableData copyWithCompanion(MessageTableCompanion data) {
     return MessageTableData(
@@ -880,6 +1099,16 @@ class MessageTableData extends DataClass
       isError: data.isError.present ? data.isError.value : this.isError,
       status: data.status.present ? data.status.value : this.status,
       replyToId: data.replyToId.present ? data.replyToId.value : this.replyToId,
+      mediaUrl: data.mediaUrl.present ? data.mediaUrl.value : this.mediaUrl,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      fileSize: data.fileSize.present ? data.fileSize.value : this.fileSize,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      duration: data.duration.present ? data.duration.value : this.duration,
+      isEdited: data.isEdited.present ? data.isEdited.value : this.isEdited,
+      reactions: data.reactions.present ? data.reactions.value : this.reactions,
     );
   }
 
@@ -893,14 +1122,37 @@ class MessageTableData extends DataClass
           ..write('timestamp: $timestamp, ')
           ..write('isError: $isError, ')
           ..write('status: $status, ')
-          ..write('replyToId: $replyToId')
+          ..write('replyToId: $replyToId, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('fileName: $fileName, ')
+          ..write('fileSize: $fileSize, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('duration: $duration, ')
+          ..write('isEdited: $isEdited, ')
+          ..write('reactions: $reactions')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, conversationId, senderRole, content,
-      timestamp, isError, status, replyToId);
+  int get hashCode => Object.hash(
+      id,
+      conversationId,
+      senderRole,
+      content,
+      timestamp,
+      isError,
+      status,
+      replyToId,
+      mediaUrl,
+      thumbnailUrl,
+      fileName,
+      fileSize,
+      mimeType,
+      duration,
+      isEdited,
+      reactions);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -912,7 +1164,15 @@ class MessageTableData extends DataClass
           other.timestamp == this.timestamp &&
           other.isError == this.isError &&
           other.status == this.status &&
-          other.replyToId == this.replyToId);
+          other.replyToId == this.replyToId &&
+          other.mediaUrl == this.mediaUrl &&
+          other.thumbnailUrl == this.thumbnailUrl &&
+          other.fileName == this.fileName &&
+          other.fileSize == this.fileSize &&
+          other.mimeType == this.mimeType &&
+          other.duration == this.duration &&
+          other.isEdited == this.isEdited &&
+          other.reactions == this.reactions);
 }
 
 class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
@@ -924,6 +1184,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
   final Value<bool> isError;
   final Value<String> status;
   final Value<String?> replyToId;
+  final Value<String?> mediaUrl;
+  final Value<String?> thumbnailUrl;
+  final Value<String?> fileName;
+  final Value<int?> fileSize;
+  final Value<String?> mimeType;
+  final Value<int?> duration;
+  final Value<bool> isEdited;
+  final Value<String?> reactions;
   final Value<int> rowid;
   const MessageTableCompanion({
     this.id = const Value.absent(),
@@ -934,6 +1202,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     this.isError = const Value.absent(),
     this.status = const Value.absent(),
     this.replyToId = const Value.absent(),
+    this.mediaUrl = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.fileSize = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.duration = const Value.absent(),
+    this.isEdited = const Value.absent(),
+    this.reactions = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MessageTableCompanion.insert({
@@ -945,6 +1221,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     this.isError = const Value.absent(),
     this.status = const Value.absent(),
     this.replyToId = const Value.absent(),
+    this.mediaUrl = const Value.absent(),
+    this.thumbnailUrl = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.fileSize = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.duration = const Value.absent(),
+    this.isEdited = const Value.absent(),
+    this.reactions = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         conversationId = Value(conversationId),
@@ -960,6 +1244,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     Expression<bool>? isError,
     Expression<String>? status,
     Expression<String>? replyToId,
+    Expression<String>? mediaUrl,
+    Expression<String>? thumbnailUrl,
+    Expression<String>? fileName,
+    Expression<int>? fileSize,
+    Expression<String>? mimeType,
+    Expression<int>? duration,
+    Expression<bool>? isEdited,
+    Expression<String>? reactions,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -971,6 +1263,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       if (isError != null) 'is_error': isError,
       if (status != null) 'status': status,
       if (replyToId != null) 'reply_to_id': replyToId,
+      if (mediaUrl != null) 'media_url': mediaUrl,
+      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (fileName != null) 'file_name': fileName,
+      if (fileSize != null) 'file_size': fileSize,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (duration != null) 'duration': duration,
+      if (isEdited != null) 'is_edited': isEdited,
+      if (reactions != null) 'reactions': reactions,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -984,6 +1284,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       Value<bool>? isError,
       Value<String>? status,
       Value<String?>? replyToId,
+      Value<String?>? mediaUrl,
+      Value<String?>? thumbnailUrl,
+      Value<String?>? fileName,
+      Value<int?>? fileSize,
+      Value<String?>? mimeType,
+      Value<int?>? duration,
+      Value<bool>? isEdited,
+      Value<String?>? reactions,
       Value<int>? rowid}) {
     return MessageTableCompanion(
       id: id ?? this.id,
@@ -994,6 +1302,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       isError: isError ?? this.isError,
       status: status ?? this.status,
       replyToId: replyToId ?? this.replyToId,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      fileName: fileName ?? this.fileName,
+      fileSize: fileSize ?? this.fileSize,
+      mimeType: mimeType ?? this.mimeType,
+      duration: duration ?? this.duration,
+      isEdited: isEdited ?? this.isEdited,
+      reactions: reactions ?? this.reactions,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1025,6 +1341,30 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     if (replyToId.present) {
       map['reply_to_id'] = Variable<String>(replyToId.value);
     }
+    if (mediaUrl.present) {
+      map['media_url'] = Variable<String>(mediaUrl.value);
+    }
+    if (thumbnailUrl.present) {
+      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (fileSize.present) {
+      map['file_size'] = Variable<int>(fileSize.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (duration.present) {
+      map['duration'] = Variable<int>(duration.value);
+    }
+    if (isEdited.present) {
+      map['is_edited'] = Variable<bool>(isEdited.value);
+    }
+    if (reactions.present) {
+      map['reactions'] = Variable<String>(reactions.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1042,6 +1382,14 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
           ..write('isError: $isError, ')
           ..write('status: $status, ')
           ..write('replyToId: $replyToId, ')
+          ..write('mediaUrl: $mediaUrl, ')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('fileName: $fileName, ')
+          ..write('fileSize: $fileSize, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('duration: $duration, ')
+          ..write('isEdited: $isEdited, ')
+          ..write('reactions: $reactions, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2156,6 +2504,14 @@ typedef $$MessageTableTableCreateCompanionBuilder = MessageTableCompanion
   Value<bool> isError,
   Value<String> status,
   Value<String?> replyToId,
+  Value<String?> mediaUrl,
+  Value<String?> thumbnailUrl,
+  Value<String?> fileName,
+  Value<int?> fileSize,
+  Value<String?> mimeType,
+  Value<int?> duration,
+  Value<bool> isEdited,
+  Value<String?> reactions,
   Value<int> rowid,
 });
 typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
@@ -2168,6 +2524,14 @@ typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
   Value<bool> isError,
   Value<String> status,
   Value<String?> replyToId,
+  Value<String?> mediaUrl,
+  Value<String?> thumbnailUrl,
+  Value<String?> fileName,
+  Value<int?> fileSize,
+  Value<String?> mimeType,
+  Value<int?> duration,
+  Value<bool> isEdited,
+  Value<String?> reactions,
   Value<int> rowid,
 });
 
@@ -2222,6 +2586,30 @@ class $$MessageTableTableFilterComposer
   ColumnFilters<String> get replyToId => $composableBuilder(
       column: $table.replyToId, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
+      column: $table.thumbnailUrl, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get fileSize => $composableBuilder(
+      column: $table.fileSize, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+      column: $table.mimeType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get duration => $composableBuilder(
+      column: $table.duration, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isEdited => $composableBuilder(
+      column: $table.isEdited, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get reactions => $composableBuilder(
+      column: $table.reactions, builder: (column) => ColumnFilters(column));
+
   $$ConversationTableTableFilterComposer get conversationId {
     final $$ConversationTableTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -2273,6 +2661,31 @@ class $$MessageTableTableOrderingComposer
   ColumnOrderings<String> get replyToId => $composableBuilder(
       column: $table.replyToId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get mediaUrl => $composableBuilder(
+      column: $table.mediaUrl, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
+      column: $table.thumbnailUrl,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get fileSize => $composableBuilder(
+      column: $table.fileSize, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+      column: $table.mimeType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get duration => $composableBuilder(
+      column: $table.duration, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isEdited => $composableBuilder(
+      column: $table.isEdited, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get reactions => $composableBuilder(
+      column: $table.reactions, builder: (column) => ColumnOrderings(column));
+
   $$ConversationTableTableOrderingComposer get conversationId {
     final $$ConversationTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -2323,6 +2736,30 @@ class $$MessageTableTableAnnotationComposer
 
   GeneratedColumn<String> get replyToId =>
       $composableBuilder(column: $table.replyToId, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaUrl =>
+      $composableBuilder(column: $table.mediaUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
+      column: $table.thumbnailUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<int> get fileSize =>
+      $composableBuilder(column: $table.fileSize, builder: (column) => column);
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get duration =>
+      $composableBuilder(column: $table.duration, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEdited =>
+      $composableBuilder(column: $table.isEdited, builder: (column) => column);
+
+  GeneratedColumn<String> get reactions =>
+      $composableBuilder(column: $table.reactions, builder: (column) => column);
 
   $$ConversationTableTableAnnotationComposer get conversationId {
     final $$ConversationTableTableAnnotationComposer composer =
@@ -2377,6 +2814,14 @@ class $$MessageTableTableTableManager extends RootTableManager<
             Value<bool> isError = const Value.absent(),
             Value<String> status = const Value.absent(),
             Value<String?> replyToId = const Value.absent(),
+            Value<String?> mediaUrl = const Value.absent(),
+            Value<String?> thumbnailUrl = const Value.absent(),
+            Value<String?> fileName = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
+            Value<String?> mimeType = const Value.absent(),
+            Value<int?> duration = const Value.absent(),
+            Value<bool> isEdited = const Value.absent(),
+            Value<String?> reactions = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion(
@@ -2388,6 +2833,14 @@ class $$MessageTableTableTableManager extends RootTableManager<
             isError: isError,
             status: status,
             replyToId: replyToId,
+            mediaUrl: mediaUrl,
+            thumbnailUrl: thumbnailUrl,
+            fileName: fileName,
+            fileSize: fileSize,
+            mimeType: mimeType,
+            duration: duration,
+            isEdited: isEdited,
+            reactions: reactions,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2399,6 +2852,14 @@ class $$MessageTableTableTableManager extends RootTableManager<
             Value<bool> isError = const Value.absent(),
             Value<String> status = const Value.absent(),
             Value<String?> replyToId = const Value.absent(),
+            Value<String?> mediaUrl = const Value.absent(),
+            Value<String?> thumbnailUrl = const Value.absent(),
+            Value<String?> fileName = const Value.absent(),
+            Value<int?> fileSize = const Value.absent(),
+            Value<String?> mimeType = const Value.absent(),
+            Value<int?> duration = const Value.absent(),
+            Value<bool> isEdited = const Value.absent(),
+            Value<String?> reactions = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion.insert(
@@ -2410,6 +2871,14 @@ class $$MessageTableTableTableManager extends RootTableManager<
             isError: isError,
             status: status,
             replyToId: replyToId,
+            mediaUrl: mediaUrl,
+            thumbnailUrl: thumbnailUrl,
+            fileName: fileName,
+            fileSize: fileSize,
+            mimeType: mimeType,
+            duration: duration,
+            isEdited: isEdited,
+            reactions: reactions,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

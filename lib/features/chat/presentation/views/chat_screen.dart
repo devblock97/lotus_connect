@@ -41,7 +41,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             .selectConversation(widget.conversationId);
         _webSocketService
             .send('chat:focus', {'conversationId': widget.conversationId});
-      } catch (e) {
+      } on Object catch (e) {
         AppLogger.error('Error in ChatScreen initState callback: $e');
       }
     });
@@ -51,21 +51,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void dispose() {
     try {
       _webSocketService.send('chat:focus', {'conversationId': null});
-    } catch (e) {
+    } on Object catch (e) {
       AppLogger.error('Error in ChatScreen dispose callback: $e');
     }
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-      );
-    }
   }
 
   @override
@@ -192,9 +182,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ? activeState.messages.length
                   : 0,
               itemBuilder: (_, index) {
-                debugPrint(
-                  'check conversation list length: ${activeState.messages.length}',
-                );
                 final message = activeState.messages[index];
                 final repliedTo = message.replyToId != null
                     ? activeState.messages
@@ -204,6 +191,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   message: message,
                   peerName: displayName,
                   repliedToMessage: repliedTo,
+                  onSelectReaction: (msg, emoji) {
+                    ref
+                        .read(privateActiveConversationProvider.notifier)
+                        .reactMessage(msg.id, emoji);
+                  },
                 );
               },
             ),
@@ -233,7 +225,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ChatInputField(
             isGenerating: false,
-            onSend: activeNotifier.sendMessage,
+            onSend: (message, file) {
+              activeNotifier.sendMessage(message, file?.path);
+            },
             onStop: () {},
             initialText: activeState.conversationId == widget.conversationId
                 ? activeState.draftInput
@@ -302,6 +296,43 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
     );
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  bool get _isBottom {
+    final currPixel = _scrollController.position.pixels;
+    final maxPixel = _scrollController.position.maxScrollExtent;
+
+    return currPixel >= (maxPixel * 0.9);
+  }
+
+  bool get _isTop {
+    final currPixel = _scrollController.position.pixels;
+    final maxPixel = _scrollController.position.maxScrollExtent;
+
+    return currPixel <= maxPixel * 0.1;
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      ref
+          .read(privateActiveConversationProvider.notifier)
+          .loadMoreMessage(widget.conversationId, true);
+    }
+    if (_isTop) {
+      ref
+          .read(privateActiveConversationProvider.notifier)
+          .loadMoreMessage(widget.conversationId, false);
+    }
   }
 
   String _displayName(Conversation conversation, User? friend) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:lotus_connect/core/database/app_database.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
@@ -33,6 +35,20 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
   ChatCoreLocalDataSourceImpl(this._db);
 
   final AppDatabase _db;
+
+  List<Reaction> _parseReactions(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map<String, dynamic>>()
+            .map(Reaction.fromJson)
+            .toList();
+      }
+    } on Object catch (_) {}
+    return const [];
+  }
 
   @override
   Stream<List<Conversation>> watchConversations() {
@@ -102,6 +118,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
                     orElse: () => MessageStatus.sent,
                   ),
                   replyToId: row.replyToId,
+                  mediaUrl: row.mediaUrl,
+                  thumbnailUrl: row.thumbnailUrl,
+                  fileName: row.fileName,
+                  fileSize: row.fileSize,
+                  mimeType: row.mimeType,
+                  duration: row.duration,
+                  isEdited: row.isEdited,
+                  reactions: _parseReactions(row.reactions),
                 ),
               )
               .toList(),
@@ -221,6 +245,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             isError: Value(message.isError),
             status: Value(message.status.name),
             replyToId: Value(message.replyToId),
+            mediaUrl: Value(message.mediaUrl),
+            thumbnailUrl: Value(message.thumbnailUrl),
+            fileName: Value(message.fileName),
+            fileSize: Value(message.fileSize),
+            mimeType: Value(message.mimeType),
+            duration: Value(message.duration),
+            isEdited: Value(message.isEdited),
+            reactions: Value(message.serializedReactions),
           ),
         );
   }
@@ -254,6 +286,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
               orElse: () => MessageStatus.sent,
             ),
             replyToId: row.replyToId,
+            mediaUrl: row.mediaUrl,
+            thumbnailUrl: row.thumbnailUrl,
+            fileName: row.fileName,
+            fileSize: row.fileSize,
+            mimeType: row.mimeType,
+            duration: row.duration,
+            isEdited: row.isEdited,
+            reactions: _parseReactions(row.reactions),
           ),
         )
         .toList();
@@ -280,6 +320,14 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
         orElse: () => MessageStatus.sent,
       ),
       replyToId: row.replyToId,
+      mediaUrl: row.mediaUrl,
+      thumbnailUrl: row.thumbnailUrl,
+      fileName: row.fileName,
+      fileSize: row.fileSize,
+      mimeType: row.mimeType,
+      duration: row.duration,
+      isEdited: row.isEdited,
+      reactions: _parseReactions(row.reactions),
     );
   }
 

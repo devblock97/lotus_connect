@@ -12,12 +12,14 @@ class PersonMessageBubble extends ConsumerWidget {
     required this.message,
     required this.peerName,
     this.repliedToMessage,
+    this.onSelectReaction,
     super.key,
   });
 
   final Message message;
   final String peerName;
   final Message? repliedToMessage;
+  final void Function(Message message, String emoji)? onSelectReaction;
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
@@ -53,67 +55,106 @@ class PersonMessageBubble extends ConsumerWidget {
   void _showOptionsDialog(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final isMine = message.role.isUser;
+    final defaultEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🙏'];
 
     showDialog<void>(
       context: context,
       builder: (context) {
-        return SimpleDialog(
-          title: Text(loc.chat),
-          children: [
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.of(context).pop();
-                ref
-                    .read(privateActiveConversationProvider.notifier)
-                    .setReplyingToMessage(message);
-              },
-              child: const Row(
-                children: [
-                  Icon(Icons.reply_rounded, size: 20),
-                  SizedBox(width: 12),
-                  Text('Reply'),
-                ],
-              ),
-            ),
-            if (isMine) ...[
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _showEditDialog(context, ref);
-                },
-                child: Row(
-                  children: [
-                    const Icon(Icons.edit_rounded, size: 20),
-                    const SizedBox(width: 12),
-                    Text(loc.editMessage),
-                  ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: defaultEmojis
+                          .map(
+                            (emoji) => InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                onSelectReaction?.call(message, emoji);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 4,
+                                ),
+                                child: Text(
+                                  emoji,
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _showDeleteConfirmation(context, ref);
-                },
-                child: Row(
-                  children: [
-                    Icon(
+                const SizedBox(height: 12),
+                const Divider(height: 1),
+                const SizedBox(height: 4),
+                // Action options
+                ListTile(
+                  leading: const Icon(Icons.reply_rounded, size: 20),
+                  title: const Text('Reply'),
+                  dense: true,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    ref
+                        .read(privateActiveConversationProvider.notifier)
+                        .setReplyingToMessage(message);
+                  },
+                ),
+                if (isMine) ...[
+                  ListTile(
+                    leading: const Icon(Icons.edit_rounded, size: 20),
+                    title: Text(loc.editMessage),
+                    dense: true,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showEditDialog(context, ref);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(
                       Icons.delete_rounded,
                       size: 20,
                       color: Theme.of(context).colorScheme.error,
                     ),
-                    const SizedBox(width: 12),
-                    Text(
+                    title: Text(
                       loc.deleteMessage,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ],
+                    dense: true,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      _showDeleteConfirmation(context, ref);
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ),
         );
       },
     );
@@ -215,6 +256,20 @@ class PersonMessageBubble extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                   ],
+                  if (message.thumbnailUrl != null)
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Image.network(
+                        message.thumbnailUrl!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   Text(
                     message.content,
                     style: TextStyle(
@@ -223,6 +278,8 @@ class PersonMessageBubble extends ConsumerWidget {
                       height: 1.35,
                     ),
                   ),
+                  if (message.reactions.isNotEmpty)
+                    _buildReactionBadges(context, theme, isMine),
                 ],
               ),
             ),
@@ -256,6 +313,70 @@ class PersonMessageBubble extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildReactionBadges(
+    BuildContext context,
+    ThemeData theme,
+    bool isMine,
+  ) {
+    if (message.reactions.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        spacing: 4,
+        runSpacing: 4,
+        children: message.reactions.map((entry) {
+          return GestureDetector(
+            onTap: () => onSelectReaction?.call(message, entry.reaction),
+            child: Stack(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isMine
+                        ? theme.colorScheme.onPrimary.withValues(alpha: 0.18)
+                        : theme.colorScheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: (isMine
+                              ? theme.colorScheme.onPrimary
+                              : theme.dividerColor)
+                          .withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        entry.reaction,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+                if (entry.count > 1)
+                  Positioned(
+                    bottom: -5,
+                    right: -1,
+                    child: Text(
+                      entry.count.toString(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }

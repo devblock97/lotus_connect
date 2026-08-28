@@ -269,7 +269,9 @@ class _ChatbotScreenState extends ConsumerState<ChatbotScreen> {
           // Bottom Input Field
           ChatInputField(
             isGenerating: activeState.isGenerating,
-            onSend: activeNotifier.sendMessage,
+            onSend: (message, file) {
+              activeNotifier.sendMessage(message);
+            },
             onStop: activeNotifier.stopGeneration,
             initialText: activeState.draftInput,
             onChanged: activeNotifier.updateDraft,

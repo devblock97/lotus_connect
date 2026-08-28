@@ -1,4 +1,5 @@
 import 'package:lotus_connect/core/utils/typedefs.dart';
+import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
@@ -14,6 +15,11 @@ abstract class PrivateChatRepository {
     required String conversationId,
     required String content,
     String? replyToId,
+    String? thumbnailUrl,
+    String? mediaUrl,
+    String? messageType,
+    String? mimeType,
+    String? fileName,
   }) =>
       throw UnimplementedError('Stub');
 
@@ -33,4 +39,11 @@ abstract class PrivateChatRepository {
   });
 
   FutureResult<List<Conversation>> getConversationList();
+
+  FutureResult<ReactionMessageEntity> reactMessage(
+    String messageId,
+    String reaction,
+  );
+
+  FutureResult<String> uploadFiles(String path);
 }
