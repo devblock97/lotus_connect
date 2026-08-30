@@ -1,23 +1,21 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
-import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/active_call_notifier.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/connected_screen.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
-import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 enum CallStatus {
@@ -28,7 +26,9 @@ enum CallStatus {
 }
 
 class CallsScreen extends ConsumerStatefulWidget {
-  const CallsScreen({super.key});
+  const CallsScreen({required this.callRequest, super.key});
+
+  final CallRequest callRequest;
 
   @override
   ConsumerState<CallsScreen> createState() => _CallsScreenState();
@@ -75,6 +75,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(contactsProvider.notifier).loadFriends();
       ref.read(callHistoryProvider.notifier).loadCallHistory();
+      if (widget.callRequest.recipientId.isNotEmpty) {
+        _peerIdController.text = widget.callRequest.recipientId;
+        _isVideo = widget.callRequest.isVideo;
+        _startCall(isVideo: widget.callRequest.isVideo);
+      }
     });
   }
 
@@ -162,7 +167,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
     _inviteSub = signaling.invitationStream.listen((invite) {
       _log(
-        'Incoming call invite! ID: ${invite.callId} from Peer: ${invite.senderId}',
+        'Incoming call invite! ID: ${invite.callId} '
+        'from Peer: ${invite.senderId}',
       );
       setState(() {
         _activeCallId = invite.callId;
@@ -177,7 +183,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       _updateStatus(CallStatus.connected);
       _startTimer();
 
-      // We are the caller (host). Let's establish peer connection and send offer.
+      // We are the caller (host).
+      // Let's establish peer connection and send offer.
       await _createPeerConnection();
       if (_peerConnection != null) {
         final offer = await _peerConnection!.createOffer({
@@ -520,7 +527,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       return _buildRingingOutUI();
     }
     if (_status == CallStatus.connected) {
-      // return _buildConnectedUI();
       return ConnectedScreen(
         activePeerId: _activePeerId!,
         isVideo: _isVideo,
@@ -533,26 +539,6 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       );
     }
     return _buildIdleUI();
-  }
-
-  String _getPresenceStatusText(String peerId) {
-    final presenceMap = ref.watch(presenceProvider);
-    final peerPresence = presenceMap[peerId];
-    final isOnline = peerPresence?.isOnline ?? false;
-    final lastSeen = peerPresence?.lastSeen ?? DateTime.now();
-    if (isOnline) {
-      return 'Online';
-    } else {
-      return formatLastSeen(isOnline, lastSeen);
-    }
-  }
-
-  Color _getPresenceColor(String peerId) {
-    final presenceMap = ref.watch(presenceProvider);
-    final peerPresence = presenceMap[peerId];
-    final isOnline = peerPresence?.isOnline ?? false;
-    if (isOnline) return Colors.green;
-    return Colors.grey;
   }
 
   String _resolvePeerId(CallLog log) {
@@ -980,94 +966,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       itemCount: friends.length,
       itemBuilder: (context, index) {
         final friend = friends[index];
-        final presenceText = _getPresenceStatusText(friend.id);
-        final presenceColor = _getPresenceColor(friend.id);
-        final displayName = friend.fullName ?? friend.username;
-        final initials = displayName.isNotEmpty
-            ? displayName.substring(0, 1).toUpperCase()
-            : '?';
 
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade100),
-          ),
-          child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            leading: Stack(
-              children: [
-                CircleAvatar(
-                  backgroundColor: presenceColor.withValues(alpha: 0.1),
-                  child: Text(
-                    initials,
-                    style: TextStyle(
-                      color: presenceColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: presenceColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            title: Text(
-              displayName,
-              style: theme.textTheme.titleMedium,
-            ),
-            subtitle: Text(
-              presenceText,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.chat_bubble_outline,
-                    color: theme.colorScheme.primary,
-                    size: 22,
-                  ),
-                  onPressed: () => _startPrivateChat(friend),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.phone_outlined,
-                    color: Colors.blue,
-                    size: 22,
-                  ),
-                  onPressed: () {
-                    _peerIdController.text = friend.id;
-                    _startCall(isVideo: false);
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.videocam_outlined,
-                    color: Colors.green,
-                    size: 22,
-                  ),
-                  onPressed: () {
-                    _peerIdController.text = friend.id;
-                    _startCall(isVideo: true);
-                  },
-                ),
-              ],
-            ),
-          ),
+        return ContactCard(
+          friend: friend,
+          voiceCall: () {
+            _peerIdController.text = friend.id;
+            _startCall(isVideo: false);
+          },
+          videoCall: () {
+            _peerIdController.text = friend.id;
+            _startCall(isVideo: true);
+          },
         );
       },
     );
