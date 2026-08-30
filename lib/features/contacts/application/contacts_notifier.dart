@@ -1,7 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
-import 'package:lotus_connect/core/services/api/chat_api_service.dart';
+import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
+import 'package:lotus_connect/features/contacts/application/contacts_provider.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/accept_friend_request_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/get_contacts_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/get_friend_requests_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/reject_friend_request_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/search_user_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/send_friend_request_usecase.dart';
 
 /// State representing the Contacts feature status.
 class ContactsState {
@@ -36,29 +42,47 @@ class ContactsState {
   }
 }
 
-/// StateNotifier handling contact list fetching, adding friends, and accepting requests.
 class ContactsNotifier extends StateNotifier<ContactsState> {
-  ContactsNotifier(this._chatApiService) : super(const ContactsState()) {
+  ContactsNotifier({
+    required GetContactsUseCase getContactsUseCase,
+    required SendFriendRequestUseCase sendFriendRequestUseCase,
+    required AcceptFriendRequestUseCase acceptFriendRequestUseCase,
+    required RejectFriendRequestUseCase rejectFriendRequestUseCase,
+    required GetFriendRequestsUseCase getFriendRequestsUseCase,
+    required SearchUserUseCase searchUserUseCase,
+  })  : _getContactsUseCase = getContactsUseCase,
+        _sendFriendRequestUseCase = sendFriendRequestUseCase,
+        _acceptFriendRequestUseCase = acceptFriendRequestUseCase,
+        _rejectFriendRequestUseCase = rejectFriendRequestUseCase,
+        _getFriendRequestsUseCase = getFriendRequestsUseCase,
+        _searchUserUseCase = searchUserUseCase,
+        super(const ContactsState()) {
     loadFriends();
   }
 
-  final ChatApiService _chatApiService;
+  final GetContactsUseCase _getContactsUseCase;
+  final SendFriendRequestUseCase _sendFriendRequestUseCase;
+  final AcceptFriendRequestUseCase _acceptFriendRequestUseCase;
+  final RejectFriendRequestUseCase _rejectFriendRequestUseCase;
+  final GetFriendRequestsUseCase _getFriendRequestsUseCase;
+  final SearchUserUseCase _searchUserUseCase;
 
-  /// Fetches the accepted friends list.
   Future<void> loadFriends() async {
     state = state.copyWith(isLoading: true);
     try {
-      final friendsList = await _chatApiService.getFriends();
-      final requestsList = await _chatApiService.getFriendRequests();
-      AppLogger.debug(
-        'WS requestsList loaded: ${requestsList.length} items. Contents: ${requestsList.map((e) => e.username).toList()}',
-      );
-      state = state.copyWith(
-        friends: friendsList,
-        requests: requestsList,
-        isLoading: false,
-      );
-    } catch (e) {
+      final friendsList = await _getContactsUseCase(const NoParams());
+      final requestsList = await _getFriendRequestsUseCase(const NoParams());
+
+      friendsList.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (friends) {
+        state = state.copyWith(
+          friends: friends,
+          requests: requestsList.getOrElse((failure) => []),
+          isLoading: false,
+        );
+      });
+    } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
@@ -66,7 +90,6 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     }
   }
 
-  /// Searches users by username, email, or full name.
   Future<void> searchUsers(String query) async {
     if (query.trim().isEmpty) {
       state = state.copyWith(searchResults: const []);
@@ -74,9 +97,13 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     }
     state = state.copyWith(isLoading: true);
     try {
-      final results = await _chatApiService.searchUsers(query);
-      state = state.copyWith(searchResults: results, isLoading: false);
-    } catch (e) {
+      final results = await _searchUserUseCase(SearchUserParam(query: query));
+      results.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (result) {
+        state = state.copyWith(searchResults: result, isLoading: false);
+      });
+    } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
@@ -84,19 +111,24 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     }
   }
 
-  /// Clears the search results.
   void clearSearch() {
     state = state.copyWith(searchResults: const []);
   }
 
-  /// Sends a new friend request.
   Future<bool> sendFriendRequest(String username) async {
     state = state.copyWith(isLoading: true);
     try {
-      await _chatApiService.sendFriendRequest(username);
-      state = state.copyWith(isLoading: false);
-      return true;
-    } catch (e) {
+      final response = await _sendFriendRequestUseCase(
+        SendFriendRequestParam(username: username),
+      );
+      response.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (success) {
+        state = state.copyWith(isLoading: false);
+        return true;
+      });
+      return false;
+    } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
@@ -105,14 +137,21 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     }
   }
 
-  /// Accepts a friend request.
   Future<bool> acceptFriendRequest(String friendId) async {
     state = state.copyWith(isLoading: true);
     try {
-      await _chatApiService.acceptFriendRequest(friendId);
-      await loadFriends(); // Refresh lists
-      return true;
-    } catch (e) {
+      final response = await _acceptFriendRequestUseCase(
+        AcceptFriendRequestParam(targetId: friendId),
+      );
+
+      await response.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (success) async {
+        await loadFriends();
+        return true;
+      });
+      return false;
+    } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
@@ -121,14 +160,20 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     }
   }
 
-  /// Rejects a friend request.
   Future<bool> rejectFriendRequest(String friendId) async {
     state = state.copyWith(isLoading: true);
     try {
-      await _chatApiService.rejectFriendRequest(friendId);
-      await loadFriends(); // Refresh lists
-      return true;
-    } catch (e) {
+      final response = await _rejectFriendRequestUseCase(
+        RejectFriendRequestParam(targetId: friendId),
+      );
+      await response.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (success) async {
+        await loadFriends();
+        return true;
+      });
+      return false;
+    } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
@@ -141,6 +186,12 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
 /// Global provider for ContactsNotifier.
 final contactsProvider =
     StateNotifierProvider<ContactsNotifier, ContactsState>((ref) {
-  final apiService = ref.watch(chatApiServiceProvider);
-  return ContactsNotifier(apiService);
+  return ContactsNotifier(
+    getContactsUseCase: ref.watch(getContactsUseCaseProvider),
+    sendFriendRequestUseCase: ref.watch(sendFriendRequestUseCaseProvider),
+    acceptFriendRequestUseCase: ref.watch(acceptFriendRequestUseCaseProvider),
+    rejectFriendRequestUseCase: ref.watch(rejectFriendRequestUseCaseProvider),
+    getFriendRequestsUseCase: ref.watch(getFriendRequestsUseCaseProvider),
+    searchUserUseCase: ref.watch(searchUserUseCaseProvider),
+  );
 });

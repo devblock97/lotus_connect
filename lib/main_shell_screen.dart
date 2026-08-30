@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
-import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/typing_status_provider.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
@@ -18,6 +17,7 @@ import 'package:lotus_connect/features/chatbot/application/settings_notifier.dar
 import 'package:lotus_connect/features/chatbot/presentation/views/alerts_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -359,7 +359,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           ref.read(shellIndexProvider.notifier).state = 0;
         },
       ),
-      const CallsScreen(),
+      const ContactsScreen(),
       const AlertsScreen(),
       const SettingsScreen(),
     ];
@@ -399,9 +399,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             label: loc.tabChats,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.call_outlined),
-            selectedIcon: const Icon(Icons.call),
-            label: loc.tabCalls,
+            icon: const Icon(Icons.perm_contact_cal_outlined),
+            selectedIcon: const Icon(Icons.perm_contact_cal_sharp),
+            label: loc.contacts,
           ),
           NavigationDestination(
             icon: const Icon(Icons.notifications_none_rounded),
