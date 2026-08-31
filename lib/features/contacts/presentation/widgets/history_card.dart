@@ -21,9 +21,8 @@ class HistoryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final peerName = _resolvePeerName(log, friends, ref);
-    final initials =
-        peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
+    final peerName = log.hostName ?? log.username;
+    final initials = peerName?.substring(0, 1).toUpperCase();
 
     final isMissed = log.status == 'missed' || log.status == 'rejected';
     final timeText = DateFormat('h:mm a').format(log.createdAt.toLocal());
@@ -55,7 +54,7 @@ class HistoryCard extends ConsumerWidget {
               backgroundColor:
                   isMissed ? Colors.red.shade50 : Colors.grey.shade100,
               child: Text(
-                initials,
+                initials!,
                 style: TextStyle(
                   color: isMissed ? Colors.red : Colors.grey.shade800,
                   fontWeight: FontWeight.bold,
@@ -79,7 +78,7 @@ class HistoryCard extends ConsumerWidget {
           ],
         ),
         title: Text(
-          peerName,
+          peerName!,
           style: theme.textTheme.titleMedium,
         ),
         subtitle: Row(

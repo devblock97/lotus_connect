@@ -25,6 +25,9 @@ class LoggingInterceptor extends Interceptor {
       AppLogger.debug(
         '<-- ${response.statusCode} ${response.requestOptions.uri}',
       );
+      if (response.data != null) {
+        AppLogger.debug('Response: ${response.data}');
+      }
     }
     handler.next(response);
   }
@@ -32,10 +35,11 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (kDebugMode) {
+      final errorDetail = err.response?.data ?? err.message;
       AppLogger.error(
         '<-- ERROR '
         '${err.response?.statusCode} '
-        '${err.requestOptions.uri}: ${err.message}',
+        '${err.requestOptions.uri}: $errorDetail',
       );
     }
     handler.next(err);

@@ -34,6 +34,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     _webSocketService = ref.read(webSocketServiceProvider);
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         ref
@@ -81,7 +82,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         privateActiveConversationProvider, (_, next) {
       if (next.conversationId == widget.conversationId &&
           next.messages.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+        // WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+        if (_isTop) {
+          debugPrint('should display move down icon');
+        }
       }
 
       final peerMessages = next.messages.where((m) => m.role.isAssistant);
@@ -323,12 +327,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      ref
-          .read(privateActiveConversationProvider.notifier)
-          .loadMoreMessage(widget.conversationId, true);
-    }
+    // if (_isBottom) {
+    //   ref
+    //       .read(privateActiveConversationProvider.notifier)
+    //       .loadMoreMessage(widget.conversationId, true);
+    // }
     if (_isTop) {
+      debugPrint("hello, it's me");
       ref
           .read(privateActiveConversationProvider.notifier)
           .loadMoreMessage(widget.conversationId, false);

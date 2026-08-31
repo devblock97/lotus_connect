@@ -11,6 +11,8 @@ class CallLog extends Equatable {
     required this.createdAt,
     this.conversationId,
     this.endedAt,
+    this.hostName,
+    this.username,
   });
 
   final String id;
@@ -21,6 +23,8 @@ class CallLog extends Equatable {
   final String status;
   final DateTime createdAt;
   final DateTime? endedAt;
+  final String? hostName;
+  final String? username;
 
   /// Returns call duration in seconds.
   int get durationSeconds {
@@ -38,5 +42,7 @@ class CallLog extends Equatable {
         status,
         createdAt,
         endedAt,
+        hostName,
+        username,
       ];
 }

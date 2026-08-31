@@ -27,7 +27,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final state = ref.read(contactsProvider);
+    final state = ref.watch(contactsProvider);
     // Filter friends list based on search query
     final filteredFriends = state.friends.where((friend) {
       final name = (friend.fullName ?? '').toLowerCase();
@@ -50,7 +50,6 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       },
       child: Column(
         children: [
-          // Search Input Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
@@ -86,17 +85,12 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
               ),
             ),
           ),
-
-          // Friends List Area
           Expanded(
             child: state.isLoading &&
                     state.friends.isEmpty &&
-                    state.requests.isEmpty &&
                     state.searchResults.isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : (_searchQuery.isEmpty &&
-                        filteredFriends.isEmpty &&
-                        state.requests.isEmpty)
+                : (_searchQuery.isEmpty && filteredFriends.isEmpty)
                     ? _buildEmptyState(theme)
                     : ListView(
                         physics: const AlwaysScrollableScrollPhysics(),

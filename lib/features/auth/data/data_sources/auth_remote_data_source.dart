@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -43,11 +45,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'email': email,
           'password': password,
         },
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return UserModel.fromJson(response.data as Map<String, dynamic>);
       }
-      throw const ServerException('Registration failed');
+      final data = response.data;
+      var errorMessage = 'Registration failed';
+      if (data is Map<String, dynamic>) {
+        errorMessage = data['error'] as String? ??
+            data['message'] as String? ??
+            errorMessage;
+      }
+      throw ServerException(errorMessage);
     } on Object catch (e) {
       if (e is ServerException || e is NetworkException) rethrow;
       throw ServerException('Failed to register: $e');
@@ -62,7 +74,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? deviceToken,
   }) async {
     try {
-      final response = await dioClient.post<dynamic>(
+      debugPrint('device token: $deviceToken');
+      final response = await dioClient.post(
         '/auth/login',
         data: {
           'email': email,
@@ -70,13 +83,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           if (platform != null) 'platform': platform,
           if (deviceToken != null) 'deviceToken': deviceToken,
         },
+        options: Options(
+          validateStatus: (status) => status != null && status < 500,
+        ),
       );
       if (response.statusCode == 200) {
         return AuthResponseModel.fromJson(
           response.data as Map<String, dynamic>,
         );
       }
-      throw const ServerException('Login failed');
+      final data = response.data;
+      var errorMessage = 'Failed to login';
+      if (data is Map<String, dynamic>) {
+        errorMessage = data['error'] as String? ??
+            data['message'] as String? ??
+            errorMessage;
+      }
+      throw ServerException(errorMessage);
     } on Object catch (e) {
       if (e is ServerException || e is NetworkException) rethrow;
       throw ServerException('Failed to login: $e');

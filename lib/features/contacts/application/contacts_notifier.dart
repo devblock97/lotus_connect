@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
@@ -9,7 +10,6 @@ import 'package:lotus_connect/features/contacts/domain/usecases/reject_friend_re
 import 'package:lotus_connect/features/contacts/domain/usecases/search_user_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/send_friend_request_usecase.dart';
 
-/// State representing the Contacts feature status.
 class ContactsState {
   const ContactsState({
     this.friends = const [],
@@ -71,14 +71,13 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
     state = state.copyWith(isLoading: true);
     try {
       final friendsList = await _getContactsUseCase(const NoParams());
-      final requestsList = await _getFriendRequestsUseCase(const NoParams());
 
       friendsList.fold((error) {
         state = state.copyWith(errorMessage: error.message);
       }, (friends) {
+        debugPrint('check load friend: ${friends.length}');
         state = state.copyWith(
           friends: friends,
-          requests: requestsList.getOrElse((failure) => []),
           isLoading: false,
         );
       });

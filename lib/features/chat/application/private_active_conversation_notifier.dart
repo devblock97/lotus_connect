@@ -243,7 +243,10 @@ class PrivateActiveConversationNotifier
     final currentUserId = _ref.read(settingsProvider).userId;
     if (currentUserId.isEmpty) return;
 
-    if (!state.hasLoadMore || state.hasReachedMax) {
+    debugPrint(
+      'state.hasLoadMore: ${state.hasLoadMore}; state.hasReachedMax: ${state.hasReachedMax}',
+    );
+    if (!state.hasLoadMore) {
       state = state.copyWith(
         hasLoadMore: false,
         hasReachedMax: true,
