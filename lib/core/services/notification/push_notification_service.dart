@@ -180,19 +180,22 @@ class PushNotificationService {
   Future<void> _initializeFirebaseSafely() async {
     try {
       if (Firebase.apps.isEmpty) {
-        if (defaultTargetPlatform == TargetPlatform.iOS) {
-          try {
-            await Firebase.initializeApp();
-          } on Object catch (_) {
-            await Firebase.initializeApp(
-              options: DefaultFirebaseOptions.currentPlatform,
-            );
-          }
-        } else {
-          await Firebase.initializeApp(
-            options: DefaultFirebaseOptions.currentPlatform,
-          );
-        }
+        // if (defaultTargetPlatform == TargetPlatform.iOS) {
+        //   try {
+        //     await Firebase.initializeApp();
+        //   } on Object catch (_) {
+        //     await Firebase.initializeApp(
+        //       options: DefaultFirebaseOptions.currentPlatform,
+        //     );
+        //   }
+        // } else {
+        //   await Firebase.initializeApp(
+        //     options: DefaultFirebaseOptions.currentPlatform,
+        //   );
+        // }
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
       }
     } on Object catch (e) {
       debugPrint('PushNotificationService Firebase init note: $e');

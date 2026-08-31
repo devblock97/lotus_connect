@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
+import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
-class RequestCard extends StatelessWidget {
+class RequestCard extends ConsumerWidget {
   const RequestCard({
     required this.user,
     this.voiceCall,
@@ -17,7 +19,7 @@ class RequestCard extends StatelessWidget {
   final VoidCallback? startChat;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final avatarColor =
@@ -28,6 +30,7 @@ class RequestCard extends StatelessWidget {
         : '?';
 
     return Container(
+      margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -55,7 +58,6 @@ class RequestCard extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Chat Button
             IconButton(
               icon: Icon(
                 Icons.chat_bubble_outline,
@@ -64,17 +66,47 @@ class RequestCard extends StatelessWidget {
               onPressed: startChat,
               tooltip: loc.chat,
             ),
-            // Voice Call Button
             IconButton(
-              icon: const Icon(Icons.phone_outlined, color: Colors.blue),
-              onPressed: voiceCall,
-              tooltip: loc.voiceCall,
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              onPressed: () async {
+                final success = await ref
+                    .read(contactsProvider.notifier)
+                    .acceptFriendRequest(user.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                            ? 'Friend request accepted!'
+                            : 'Failed to accept request',
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              },
+              tooltip: loc.accept,
             ),
-            // Video Call Button
             IconButton(
-              icon: const Icon(Icons.videocam_outlined, color: Colors.green),
-              onPressed: videoCall,
-              tooltip: loc.videoCall,
+              icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+              onPressed: () async {
+                final success = await ref
+                    .read(contactsProvider.notifier)
+                    .rejectFriendRequest(user.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                            ? 'Friend request rejected!'
+                            : 'Failed to reject request',
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              },
+              tooltip: loc.reject,
             ),
           ],
         ),

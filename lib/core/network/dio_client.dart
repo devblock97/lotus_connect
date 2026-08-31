@@ -132,8 +132,21 @@ class DioClient {
   }
 
   NetworkException _handleDioException(DioException e) {
+    var message = 'Network error occurred';
+    final data = e.response?.data;
+    if (data is Map<String, dynamic>) {
+      message = data['error'] as String? ??
+          data['message'] as String? ??
+          e.message ??
+          message;
+    } else if (data is String && data.isNotEmpty) {
+      message = data;
+    } else if (e.message != null && e.message!.isNotEmpty) {
+      message = e.message!;
+    }
+
     return NetworkException(
-      e.message ?? 'Network error occurred',
+      message,
       statusCode: e.response?.statusCode,
       cause: e,
     );

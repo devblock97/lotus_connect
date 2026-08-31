@@ -11,12 +11,16 @@ class CallLogModel extends CallLog {
     required super.createdAt,
     super.conversationId,
     super.endedAt,
+    super.hostName,
+    super.username,
   });
 
   factory CallLogModel.fromJson(Map<String, dynamic> json) {
     return CallLogModel(
       id: json['id'] as String? ?? '',
       hostId: json['hostId'] as String? ?? json['host_id'] as String? ?? '',
+      hostName: json['hostName'] as String? ?? json['host_name'] as String?,
+      username: json['username'] as String?,
       conversationId: json['conversationId'] as String? ??
           json['conversation_id'] as String?,
       channelId:
@@ -41,6 +45,8 @@ class CallLogModel extends CallLog {
     return {
       'id': id,
       'hostId': hostId,
+      if (hostName != null) 'hostName': hostName,
+      if (username != null) 'username': username,
       if (conversationId != null) 'conversationId': conversationId,
       'channelId': channelId,
       'isVideo': isVideo,

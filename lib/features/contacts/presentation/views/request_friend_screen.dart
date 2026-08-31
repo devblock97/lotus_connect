@@ -5,17 +5,30 @@ import 'package:lotus_connect/features/chat/application/private_conversation_lis
 import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/request_card.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
-class AllFriendRequestsScreen extends ConsumerWidget {
+class AllFriendRequestsScreen extends ConsumerStatefulWidget {
   const AllFriendRequestsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AllFriendRequestsScreen> createState() =>
+      _AllFriendRequestsScreenState();
+}
+
+class _AllFriendRequestsScreenState
+    extends ConsumerState<AllFriendRequestsScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final state = ref.watch(contactsProvider);
+    final state = ref.watch(friendRequestProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -27,37 +40,27 @@ class AllFriendRequestsScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () => ref.read(contactsProvider.notifier).loadFriends(),
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          children: [
-            if (state.requests.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                child: Text(
-                  'PENDING REQUESTS (${state.requests.length})',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                    letterSpacing: 1,
-                  ),
-                ),
+        child: state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                itemCount: state.requests.length,
+                itemBuilder: (context, index) {
+                  final requesters = state.requests;
+                  if (requesters.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: Text(
+                          'No pending requests',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return RequestCard(user: requesters[index]);
+                },
               ),
-              ...state.requests.map((user) => RequestCard(user: user)),
-              const SizedBox(height: 24),
-            ] else
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(
-                  child: Text(
-                    'No pending requests',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }
