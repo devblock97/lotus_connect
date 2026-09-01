@@ -412,4 +412,78 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get enterBackendBaseUrl =>
       'Nhập URL gốc của máy chủ (vd: http://10.0.2.2:8080/api/v1):';
+
+  @override
+  String get pending => 'Chờ duyệt';
+
+  @override
+  String get egUsernameHint => 'vd: johndoe';
+
+  @override
+  String friendRequestSentTo(String username) {
+    return 'Đã gửi lời mời kết bạn đến @$username';
+  }
+
+  @override
+  String get failedToSendRequest => 'Gửi yêu cầu thất bại';
+
+  @override
+  String get searchFriends => 'Tìm kiếm bạn bè...';
+
+  @override
+  String get myFriends => 'BẠN BÈ CỦA TÔI';
+
+  @override
+  String get allFriends => 'TẤT CẢ BẠN BÈ';
+
+  @override
+  String get globalSearchAddFriends => 'TÌM KIẾM TOÀN CẦU / THÊM BẠN';
+
+  @override
+  String get requested => 'Đã gửi yêu cầu';
+
+  @override
+  String get friendRequestAccepted => 'Đã chấp nhận lời mời kết bạn!';
+
+  @override
+  String get failedToAcceptRequest => 'Chấp nhận yêu cầu thất bại';
+
+  @override
+  String get friendRequestRejected => 'Đã từ chối lời mời kết bạn!';
+
+  @override
+  String get failedToRejectRequest => 'Từ chối yêu cầu thất bại';
+
+  @override
+  String get noContactsFound => 'Không tìm thấy danh bạ';
+
+  @override
+  String get noMatchingResults =>
+      'Không có kết quả phù hợp cho tìm kiếm của bạn.';
+
+  @override
+  String get sendFriendRequestsPrompt =>
+      'Gửi lời mời kết bạn để bắt đầu trò chuyện và gọi điện.';
+
+  @override
+  String get noPendingRequests => 'Không có yêu cầu nào đang chờ';
+
+  @override
+  String get online => 'Trực tuyến';
+
+  @override
+  String get unknownUser => 'Người dùng không xác định';
+
+  @override
+  String get unfriend => 'Hủy kết bạn';
+
+  @override
+  String get unfriendConfirmation =>
+      'Bạn có chắc muốn hủy kết bạn với người này?';
+
+  @override
+  String get friendRemoved => 'Đã xóa bạn thành công';
+
+  @override
+  String get failedToRemoveFriend => 'Không thể xóa bạn bè';
 }

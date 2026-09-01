@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
@@ -32,22 +33,38 @@ class ContactsRepositoryImpl implements ContactsRepository {
   }
 
   @override
-  FutureResult<void> acceptFriendRequest({required String targetId}) async {
+  FutureResult<ResponseEntityBase> acceptFriendRequest({
+    required String targetId,
+  }) async {
     try {
       final response = await _remoteDataSource.acceptFriendRequest(targetId);
-      return const Right(null);
+      return Right(response);
     } on Object {
       return const Left(ServerFailure('Failed to accept friend request'));
     }
   }
 
   @override
-  FutureResult<void> rejectFriendRequest({required String targetId}) async {
+  FutureResult<ResponseEntityBase> rejectFriendRequest({
+    required String targetId,
+  }) async {
     try {
       final response = await _remoteDataSource.rejectFriendRequest(targetId);
-      return const Right(null);
+      return Right(response);
     } on Object {
       return const Left(ServerFailure('Failed to reject friend request'));
+    }
+  }
+
+  @override
+  FutureResult<ResponseEntityBase> deleteFriend({
+    required String friendId,
+  }) async {
+    try {
+      final response = await _remoteDataSource.deleteFriend(friendId);
+      return Right(response);
+    } on Object {
+      return const Left(ServerFailure('Failed to delete friend'));
     }
   }
 

@@ -403,4 +403,76 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get enterBackendBaseUrl =>
       'バックエンドのベースURLを入力 (例: http://10.0.2.2:8080/api/v1):';
+
+  @override
+  String get pending => '保留中';
+
+  @override
+  String get egUsernameHint => '例: johndoe';
+
+  @override
+  String friendRequestSentTo(String username) {
+    return '@$username に友達リクエストを送信しました';
+  }
+
+  @override
+  String get failedToSendRequest => 'リクエストの送信に失敗しました';
+
+  @override
+  String get searchFriends => '友達を検索...';
+
+  @override
+  String get myFriends => 'マイフレンド';
+
+  @override
+  String get allFriends => 'すべての友達';
+
+  @override
+  String get globalSearchAddFriends => 'グローバル検索 / 友達追加';
+
+  @override
+  String get requested => 'リクエスト済み';
+
+  @override
+  String get friendRequestAccepted => '友達リクエストを承認しました！';
+
+  @override
+  String get failedToAcceptRequest => 'リクエストの承認に失敗しました';
+
+  @override
+  String get friendRequestRejected => '友達リクエストを拒否しました！';
+
+  @override
+  String get failedToRejectRequest => 'リクエストの拒否に失敗しました';
+
+  @override
+  String get noContactsFound => '連絡先が見つかりません';
+
+  @override
+  String get noMatchingResults => '一致する結果は見つかりませんでした。';
+
+  @override
+  String get sendFriendRequestsPrompt => '友達リクエストを送信してチャットや通話を始めましょう。';
+
+  @override
+  String get noPendingRequests => '保留中のリクエストはありません';
+
+  @override
+  String get online => 'オンライン';
+
+  @override
+  String get unknownUser => '不明なユーザー';
+
+  @override
+  String get unfriend => 'Unfriend';
+
+  @override
+  String get unfriendConfirmation =>
+      'Are you sure you want to remove this friend?';
+
+  @override
+  String get friendRemoved => 'Friend removed successfully';
+
+  @override
+  String get failedToRemoveFriend => 'Failed to remove friend';
 }

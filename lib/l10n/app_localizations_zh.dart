@@ -401,4 +401,76 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get enterBackendBaseUrl =>
       '输入后端基础 URL (例: http://10.0.2.2:8080/api/v1):';
+
+  @override
+  String get pending => '待处理';
+
+  @override
+  String get egUsernameHint => '例: johndoe';
+
+  @override
+  String friendRequestSentTo(String username) {
+    return '已向 @$username 发送好友申请';
+  }
+
+  @override
+  String get failedToSendRequest => '发送请求失败';
+
+  @override
+  String get searchFriends => '搜索好友...';
+
+  @override
+  String get myFriends => '我的好友';
+
+  @override
+  String get allFriends => '所有好友';
+
+  @override
+  String get globalSearchAddFriends => '全局搜索 / 添加好友';
+
+  @override
+  String get requested => '已申请';
+
+  @override
+  String get friendRequestAccepted => '已接受好友申请！';
+
+  @override
+  String get failedToAcceptRequest => '接受请求失败';
+
+  @override
+  String get friendRequestRejected => '已拒绝好友申请！';
+
+  @override
+  String get failedToRejectRequest => '拒绝请求失败';
+
+  @override
+  String get noContactsFound => '未找到联系人';
+
+  @override
+  String get noMatchingResults => '没有匹配的搜索结果。';
+
+  @override
+  String get sendFriendRequestsPrompt => '发送好友申请以开始聊天和通话。';
+
+  @override
+  String get noPendingRequests => '暂无待处理申请';
+
+  @override
+  String get online => '在线';
+
+  @override
+  String get unknownUser => '未知用户';
+
+  @override
+  String get unfriend => 'Unfriend';
+
+  @override
+  String get unfriendConfirmation =>
+      'Are you sure you want to remove this friend?';
+
+  @override
+  String get friendRemoved => 'Friend removed successfully';
+
+  @override
+  String get failedToRemoveFriend => 'Failed to remove friend';
 }

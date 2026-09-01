@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_provider.dart';
-import 'package:lotus_connect/features/contacts/domain/usecases/accept_friend_request_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/delete_friend_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/get_contacts_usecase.dart';
-import 'package:lotus_connect/features/contacts/domain/usecases/get_friend_requests_usecase.dart';
-import 'package:lotus_connect/features/contacts/domain/usecases/reject_friend_request_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/search_user_usecase.dart';
-import 'package:lotus_connect/features/contacts/domain/usecases/send_friend_request_usecase.dart';
 
 class ContactsState {
   const ContactsState({
@@ -45,27 +41,18 @@ class ContactsState {
 class ContactsNotifier extends StateNotifier<ContactsState> {
   ContactsNotifier({
     required GetContactsUseCase getContactsUseCase,
-    required SendFriendRequestUseCase sendFriendRequestUseCase,
-    required AcceptFriendRequestUseCase acceptFriendRequestUseCase,
-    required RejectFriendRequestUseCase rejectFriendRequestUseCase,
-    required GetFriendRequestsUseCase getFriendRequestsUseCase,
     required SearchUserUseCase searchUserUseCase,
+    required DeleteFriendUseCase deleteFriendUseCase,
   })  : _getContactsUseCase = getContactsUseCase,
-        _sendFriendRequestUseCase = sendFriendRequestUseCase,
-        _acceptFriendRequestUseCase = acceptFriendRequestUseCase,
-        _rejectFriendRequestUseCase = rejectFriendRequestUseCase,
-        _getFriendRequestsUseCase = getFriendRequestsUseCase,
         _searchUserUseCase = searchUserUseCase,
+        _deleteFriendUseCase = deleteFriendUseCase,
         super(const ContactsState()) {
     loadFriends();
   }
 
   final GetContactsUseCase _getContactsUseCase;
-  final SendFriendRequestUseCase _sendFriendRequestUseCase;
-  final AcceptFriendRequestUseCase _acceptFriendRequestUseCase;
-  final RejectFriendRequestUseCase _rejectFriendRequestUseCase;
-  final GetFriendRequestsUseCase _getFriendRequestsUseCase;
   final SearchUserUseCase _searchUserUseCase;
+  final DeleteFriendUseCase _deleteFriendUseCase;
 
   Future<void> loadFriends() async {
     state = state.copyWith(isLoading: true);
@@ -75,7 +62,6 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
       friendsList.fold((error) {
         state = state.copyWith(errorMessage: error.message);
       }, (friends) {
-        debugPrint('check load friend: ${friends.length}');
         state = state.copyWith(
           friends: friends,
           isLoading: false,
@@ -86,6 +72,39 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
       );
+    }
+  }
+
+  Future<bool> deleteFriend(String friendId) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final result = await _deleteFriendUseCase(
+        DeleteFriendParam(friendId: friendId),
+      );
+      return result.fold(
+        (error) {
+          state = state.copyWith(
+            isLoading: false,
+            errorMessage: error.message,
+          );
+          return false;
+        },
+        (_) {
+          final updatedFriends =
+              state.friends.where((friend) => friend.id != friendId).toList();
+          state = state.copyWith(
+            friends: updatedFriends,
+            isLoading: false,
+          );
+          return true;
+        },
+      );
+    } on Object catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll('ServerException: ', ''),
+      );
+      return false;
     }
   }
 
@@ -113,73 +132,6 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
   void clearSearch() {
     state = state.copyWith(searchResults: const []);
   }
-
-  Future<bool> sendFriendRequest(String username) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final response = await _sendFriendRequestUseCase(
-        SendFriendRequestParam(username: username),
-      );
-      response.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
-      }, (success) {
-        state = state.copyWith(isLoading: false);
-        return true;
-      });
-      return false;
-    } on Object catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString().replaceAll('ServerException: ', ''),
-      );
-      return false;
-    }
-  }
-
-  Future<bool> acceptFriendRequest(String friendId) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final response = await _acceptFriendRequestUseCase(
-        AcceptFriendRequestParam(targetId: friendId),
-      );
-
-      await response.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
-      }, (success) async {
-        await loadFriends();
-        return true;
-      });
-      return false;
-    } on Object catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString().replaceAll('ServerException: ', ''),
-      );
-      return false;
-    }
-  }
-
-  Future<bool> rejectFriendRequest(String friendId) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final response = await _rejectFriendRequestUseCase(
-        RejectFriendRequestParam(targetId: friendId),
-      );
-      await response.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
-      }, (success) async {
-        await loadFriends();
-        return true;
-      });
-      return false;
-    } on Object catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString().replaceAll('ServerException: ', ''),
-      );
-      return false;
-    }
-  }
 }
 
 /// Global provider for ContactsNotifier.
@@ -187,10 +139,7 @@ final contactsProvider =
     StateNotifierProvider<ContactsNotifier, ContactsState>((ref) {
   return ContactsNotifier(
     getContactsUseCase: ref.watch(getContactsUseCaseProvider),
-    sendFriendRequestUseCase: ref.watch(sendFriendRequestUseCaseProvider),
-    acceptFriendRequestUseCase: ref.watch(acceptFriendRequestUseCaseProvider),
-    rejectFriendRequestUseCase: ref.watch(rejectFriendRequestUseCaseProvider),
-    getFriendRequestsUseCase: ref.watch(getFriendRequestsUseCaseProvider),
     searchUserUseCase: ref.watch(searchUserUseCaseProvider),
+    deleteFriendUseCase: ref.watch(deleteFriendUseCaseProvider),
   );
 });

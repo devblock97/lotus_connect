@@ -411,4 +411,77 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get enterBackendBaseUrl =>
       'Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get egUsernameHint => 'e.g. johndoe';
+
+  @override
+  String friendRequestSentTo(String username) {
+    return 'Friend request sent to @$username';
+  }
+
+  @override
+  String get failedToSendRequest => 'Failed to send request';
+
+  @override
+  String get searchFriends => 'Search friends...';
+
+  @override
+  String get myFriends => 'MY FRIENDS';
+
+  @override
+  String get allFriends => 'ALL FRIENDS';
+
+  @override
+  String get globalSearchAddFriends => 'GLOBAL SEARCH / ADD FRIENDS';
+
+  @override
+  String get requested => 'Requested';
+
+  @override
+  String get friendRequestAccepted => 'Friend request accepted!';
+
+  @override
+  String get failedToAcceptRequest => 'Failed to accept request';
+
+  @override
+  String get friendRequestRejected => 'Friend request rejected!';
+
+  @override
+  String get failedToRejectRequest => 'Failed to reject request';
+
+  @override
+  String get noContactsFound => 'No Contacts found';
+
+  @override
+  String get noMatchingResults => 'No matching results for your query.';
+
+  @override
+  String get sendFriendRequestsPrompt =>
+      'Send friend requests to start chatting and calling.';
+
+  @override
+  String get noPendingRequests => 'No pending requests';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get unknownUser => 'Unknown User';
+
+  @override
+  String get unfriend => 'Unfriend';
+
+  @override
+  String get unfriendConfirmation =>
+      'Are you sure you want to remove this friend?';
+
+  @override
+  String get friendRemoved => 'Friend removed successfully';
+
+  @override
+  String get failedToRemoveFriend => 'Failed to remove friend';
 }

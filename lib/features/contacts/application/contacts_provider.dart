@@ -4,6 +4,7 @@ import 'package:lotus_connect/features/contacts/data/datasources/contacts_remote
 import 'package:lotus_connect/features/contacts/data/repositories/contacts_repository_impl.dart';
 import 'package:lotus_connect/features/contacts/domain/repositories/contacts_repository.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/accept_friend_request_usecase.dart';
+import 'package:lotus_connect/features/contacts/domain/usecases/delete_friend_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/get_contacts_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/get_friend_requests_usecase.dart';
 import 'package:lotus_connect/features/contacts/domain/usecases/reject_friend_request_usecase.dart';
@@ -44,6 +45,12 @@ final acceptFriendRequestUseCaseProvider =
 final rejectFriendRequestUseCaseProvider =
     Provider<RejectFriendRequestUseCase>((ref) {
   return RejectFriendRequestUseCase(
+    repository: ref.watch(contactRepositoryProvider),
+  );
+});
+
+final deleteFriendUseCaseProvider = Provider<DeleteFriendUseCase>((ref) {
+  return DeleteFriendUseCase(
     repository: ref.watch(contactRepositoryProvider),
   );
 });

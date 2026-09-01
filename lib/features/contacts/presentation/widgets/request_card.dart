@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class RequestCard extends ConsumerWidget {
@@ -70,15 +70,15 @@ class RequestCard extends ConsumerWidget {
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
               onPressed: () async {
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .acceptFriendRequest(user.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
                         success
-                            ? 'Friend request accepted!'
-                            : 'Failed to accept request',
+                            ? loc.friendRequestAccepted
+                            : loc.failedToAcceptRequest,
                       ),
                       backgroundColor: success ? Colors.green : Colors.red,
                     ),
@@ -91,15 +91,15 @@ class RequestCard extends ConsumerWidget {
               icon: const Icon(Icons.cancel_outlined, color: Colors.red),
               onPressed: () async {
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .rejectFriendRequest(user.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
                         success
-                            ? 'Friend request rejected!'
-                            : 'Failed to reject request',
+                            ? loc.friendRequestRejected
+                            : loc.failedToRejectRequest,
                       ),
                       backgroundColor: success ? Colors.green : Colors.red,
                     ),

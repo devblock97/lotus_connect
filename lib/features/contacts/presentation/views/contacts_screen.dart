@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/friend_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/history_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/request_friend_screen.dart';
@@ -52,19 +53,19 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               tooltip: loc.refreshContacts,
             ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Text('Friends'),
-              Text('History'),
-              Text('Pending'),
+              Tab(text: loc.friends),
+              Tab(text: loc.history),
+              Tab(text: loc.pending),
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
-            const FriendScreen(),
+            FriendScreen(),
             HistoryScreen(),
-            const AllFriendRequestsScreen(),
+            AllFriendRequestsScreen(),
           ],
         ),
       ),
@@ -89,10 +90,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               const SizedBox(height: 12),
               TextField(
                 controller: _addFriendController,
-                decoration: const InputDecoration(
-                  hintText: 'e.g. johndoe',
-                  prefixIcon: Icon(Icons.alternate_email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: loc.egUsernameHint,
+                  prefixIcon: const Icon(Icons.alternate_email),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -109,14 +110,14 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
 
                 Navigator.pop(context);
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .sendFriendRequest(username);
 
                 if (context.mounted) {
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Friend request sent to @$username'),
+                        content: Text(loc.friendRequestSentTo(username)),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -125,7 +126,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     final err = ref.read(contactsProvider).errorMessage;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(err ?? 'Failed to send request'),
+                        content: Text(err ?? loc.failedToSendRequest),
                         backgroundColor: Colors.red,
                       ),
                     );
