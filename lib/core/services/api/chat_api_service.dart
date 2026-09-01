@@ -9,40 +9,6 @@ class ChatApiService {
 
   final DioClient dioClient;
 
-  /// Registers a FCM/APNS push token for background notifications.
-  Future<void> registerDeviceToken({
-    required String token,
-    required String platform, // "ios" or "android"
-  }) async {
-    try {
-      await dioClient.post(
-        '/users/devices',
-        data: {
-          'token': token,
-          'platform': platform,
-        },
-      );
-    } catch (e) {
-      throw ServerException('Failed to register device token: $e');
-    }
-  }
-
-  /// Unregisters/deactivates a FCM/APNS push token upon user logout.
-  Future<void> unregisterDeviceToken({
-    required String token,
-  }) async {
-    try {
-      await dioClient.delete(
-        '/users/devices',
-        data: {
-          'token': token,
-        },
-      );
-    } on Object {
-      // Degrade gracefully if backend endpoint is unavailable during logout
-    }
-  }
-
   /// Fetches call logs history for the authenticated user.
   Future<List<Map<String, dynamic>>> getCallHistory() async {
     try {
@@ -51,26 +17,6 @@ class ChatApiService {
       return list.map((item) => item as Map<String, dynamic>).toList();
     } catch (e) {
       throw ServerException('Failed to fetch call history: $e');
-    }
-  }
-
-  /// Fetches the user's notification list.
-  Future<List<Map<String, dynamic>>> getNotifications() async {
-    try {
-      final response = await dioClient.get('/users/notifications');
-      final list = response.data as List<dynamic>;
-      return list.map((item) => item as Map<String, dynamic>).toList();
-    } catch (e) {
-      throw ServerException('Failed to get notifications: $e');
-    }
-  }
-
-  /// Marks all notifications as read.
-  Future<void> markNotificationsRead() async {
-    try {
-      await dioClient.post('/users/notifications/read');
-    } catch (e) {
-      throw ServerException('Failed to mark notifications as read: $e');
     }
   }
 }

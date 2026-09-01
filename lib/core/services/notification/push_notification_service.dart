@@ -4,8 +4,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/core/services/callkit/callkit_service.dart';
+import 'package:lotus_connect/features/notfications/application/notification_provider.dart';
+import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
 import 'package:lotus_connect/firebase_options.dart';
 import 'package:uuid/uuid.dart';
 
@@ -24,13 +27,13 @@ final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
 Future<void> firebaseMessagingBackgroundEntryPoint(
   RemoteMessage message,
 ) async {
-  debugPrint('FCM: Background entry point message ${message.messageId}');
+  AppLogger.debug('FCM: Background entry point message ${message.messageId}');
   try {
     if (Firebase.apps.isEmpty) {
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         try {
           await Firebase.initializeApp();
-        } catch (_) {
+        } on Object catch (_) {
           await Firebase.initializeApp(
             options: DefaultFirebaseOptions.currentPlatform,
           );
@@ -42,28 +45,29 @@ Future<void> firebaseMessagingBackgroundEntryPoint(
       }
     }
   } on Object catch (e) {
-    debugPrint('FCM Background entry point initialization note: $e');
+    AppLogger.debug('FCM Background entry point initialization note: $e');
   }
 
   final data = message.data;
   final type = data['type'] as String? ?? '';
 
-  debugPrint('====================================================');
-  debugPrint('[FCM BACKGROUND/TERMINATED PUSH RECEIVED]');
-  debugPrint('Message ID: ${message.messageId}');
-  debugPrint('Data Payload: $data');
-  debugPrint('Notification Title: ${message.notification?.title}');
-  debugPrint('Notification Body: ${message.notification?.body}');
-  debugPrint('Parsed Event Type: "$type"');
-  debugPrint('====================================================');
+  AppLogger.debug('====================================================');
+  AppLogger.debug('[FCM BACKGROUND/TERMINATED PUSH RECEIVED]');
+  AppLogger.debug('Message ID: ${message.messageId}');
+  AppLogger.debug('Data Payload: $data');
+  AppLogger.debug('Notification Title: ${message.notification?.title}');
+  AppLogger.debug('Notification Body: ${message.notification?.body}');
+  AppLogger.debug('Parsed Event Type: "$type"');
+  AppLogger.debug('====================================================');
 
   if (type == 'call_invite') {
     final callId = data['callId'] as String? ?? const Uuid().v4();
     final callerName = data['callerName'] as String? ?? 'Incoming Call';
     final isVideo = data['isVideo'] == 'true';
 
-    debugPrint(
-      '[FCM Background] Triggering CallKit Incoming UI for callId: $callId, caller: $callerName',
+    AppLogger.debug(
+      '[FCM Background] Triggering CallKit Incoming UI '
+      'for callId: $callId, caller: $callerName',
     );
     await CallKitService.showCallkitIncoming(
       callId: callId,
@@ -83,7 +87,7 @@ Future<void> firebaseMessagingBackgroundEntryPoint(
         data['content'] as String? ??
         'New message received';
 
-    debugPrint(
+    AppLogger.debug(
       '[FCM Background] Displaying Chat Banner -> Title: "$title", Body: "$body"',
     );
     await _showLocalNotificationBanner(
@@ -134,12 +138,12 @@ Future<void> _showLocalNotificationBanner({
 
 class PushNotificationService {
   PushNotificationService({
-    required this.chatApiService,
     required this.callKitService,
+    required this.notificationRepository,
   });
 
-  final ChatApiService chatApiService;
   final CallKitService callKitService;
+  final NotificationRepository notificationRepository;
 
   Future<void> initialize({
     void Function(Map<String, dynamic> data)? onNotificationTap,
@@ -319,7 +323,8 @@ class PushNotificationService {
         .timeout(const Duration(seconds: 2), onTimeout: () => null);
     if (initialMessage != null) {
       debugPrint(
-        '[FCM Initial Notification Tapped] Cold Start from Terminated State -> Data: ${initialMessage.data}',
+        '[FCM Initial Notification Tapped] Cold Start from Terminated State '
+        '-> Data: ${initialMessage.data}',
       );
       await callKitService.bringAppToForeground();
       onNotificationTap?.call(initialMessage.data);
@@ -332,7 +337,8 @@ class PushNotificationService {
       debugPrint('[FCM Token Sync] Fetching FCM device token...');
 
       // On iOS (especially Simulators or prior to APNS registration),
-      // verify APNS token availability first to avoid apns-token-not-set exception or freezing
+      // verify APNS token availability first to avoid
+      // apns-token-not-set exception or freezing
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         final apnsToken =
             await FirebaseMessaging.instance.getAPNSToken().timeout(
@@ -340,8 +346,9 @@ class PushNotificationService {
                   onTimeout: () => null,
                 );
         if (apnsToken == null) {
-          debugPrint(
-            '[FCM Token Sync] APNS token not available yet (iOS Simulator or pending APNS). Skipping FCM token fetch.',
+          AppLogger.debug(
+            '[FCM Token Sync] APNS token not available yet '
+            '(iOS Simulator or pending APNS). Skipping FCM token fetch.',
           );
           return;
         }
@@ -369,7 +376,7 @@ class PushNotificationService {
       debugPrint(
         '[FCM Token Sync] Registering token with backend POST /users/devices ($platform)...',
       );
-      await chatApiService.registerDeviceToken(
+      await notificationRepository.registerDeviceToken(
         token: token,
         platform: platform,
       );
@@ -402,7 +409,7 @@ class PushNotificationService {
         debugPrint(
           '[FCM Token Unregister] Unregistering token from backend...',
         );
-        await chatApiService.unregisterDeviceToken(token: token);
+        await notificationRepository.unregisterDeviceToken(token: token);
         debugPrint(
           '[FCM Token Unregister Success] Token unregistered from backend',
         );
@@ -418,7 +425,7 @@ final pushNotificationServiceProvider =
   final chatApiService = ref.watch(chatApiServiceProvider);
   final callKitService = ref.watch(callKitServiceProvider);
   return PushNotificationService(
-    chatApiService: chatApiService,
     callKitService: callKitService,
+    notificationRepository: ref.watch(notificationRepositoryProvider),
   );
 });
