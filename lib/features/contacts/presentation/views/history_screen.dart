@@ -7,14 +7,13 @@ import 'package:lotus_connect/features/contacts/presentation/widgets/history_car
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class HistoryScreen extends ConsumerWidget {
-  HistoryScreen({super.key});
-
-  final todayLogs = <CallLog>[];
-  final yesterdayLogs = <CallLog>[];
-  final olderLogs = <CallLog>[];
+  const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final todayLogs = <CallLog>[];
+    final yesterdayLogs = <CallLog>[];
+    final olderLogs = <CallLog>[];
     final historyState = ref.watch(callHistoryProvider);
     final friendsState = ref.watch(contactsProvider);
 

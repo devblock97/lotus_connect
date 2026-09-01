@@ -7,6 +7,7 @@ import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dar
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
+import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/request_card.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -25,6 +26,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     final state = ref.watch(contactsProvider);
@@ -61,7 +63,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                 ref.read(contactsProvider.notifier).searchUsers(val);
               },
               decoration: InputDecoration(
-                hintText: 'Search friends...',
+                hintText: loc.searchFriends,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -91,7 +93,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     state.searchResults.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : (_searchQuery.isEmpty && filteredFriends.isEmpty)
-                    ? _buildEmptyState(theme)
+                    ? _buildEmptyState(theme, loc)
                     : ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(
@@ -107,7 +109,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                 horizontal: 8,
                               ),
                               child: Text(
-                                'MY FRIENDS',
+                                loc.myFriends,
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -127,7 +129,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                 horizontal: 8,
                               ),
                               child: Text(
-                                'ALL FRIENDS',
+                                loc.allFriends,
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -151,6 +153,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                     isVideo: true,
                                   );
                                 },
+                                onDelete: () {
+                                  _showDeleteFriendDialog(context, friend);
+                                },
                               ),
                             ),
                           ],
@@ -162,7 +167,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                 horizontal: 8,
                               ),
                               child: Text(
-                                'GLOBAL SEARCH / ADD FRIENDS',
+                                loc.globalSearchAddFriends,
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -180,7 +185,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                               globalResults.isEmpty)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 40),
-                              child: _buildEmptyState(theme),
+                              child: _buildEmptyState(theme, loc),
                             ),
                         ],
                       ),
@@ -212,7 +217,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             border: Border.all(color: Colors.amber.shade200),
           ),
           child: Text(
-            'Requested',
+            loc.requested,
             style: TextStyle(
               color: Colors.amber.shade800,
               fontSize: 12,
@@ -228,20 +233,19 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
               icon: const Icon(Icons.check_circle_outline, color: Colors.green),
               onPressed: () async {
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .acceptFriendRequest(user.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'Friend request accepted!'
-                            : 'Failed to accept request',
-                      ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? loc.friendRequestAccepted
+                          : loc.failedToAcceptRequest,
                     ),
-                  );
-                }
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
               },
               tooltip: loc.accept,
             ),
@@ -249,20 +253,19 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
               icon: const Icon(Icons.cancel_outlined, color: Colors.red),
               onPressed: () async {
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .rejectFriendRequest(user.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'Friend request rejected!'
-                            : 'Failed to reject request',
-                      ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? loc.friendRequestRejected
+                          : loc.failedToRejectRequest,
                     ),
-                  );
-                }
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
               },
               tooltip: loc.reject,
             ),
@@ -273,20 +276,19 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       trailingWidget = ElevatedButton.icon(
         onPressed: () async {
           final success = await ref
-              .read(contactsProvider.notifier)
+              .read(friendRequestProvider.notifier)
               .sendFriendRequest(user.username);
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  success
-                      ? 'Friend request sent to @${user.username}'
-                      : 'Failed to send request',
-                ),
-                backgroundColor: success ? Colors.green : Colors.red,
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                success
+                    ? loc.friendRequestSentTo(user.username)
+                    : loc.failedToSendRequest,
               ),
-            );
-          }
+              backgroundColor: success ? Colors.green : Colors.red,
+            ),
+          );
         },
         icon: const Icon(Icons.person_add_alt_1, size: 16),
         label: Text(loc.add, style: const TextStyle(fontSize: 12)),
@@ -323,7 +325,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
+  Widget _buildEmptyState(ThemeData theme, AppLocalizations loc) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -334,15 +336,15 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             color: Colors.grey.shade400,
           ),
           const SizedBox(height: 16),
-          const Text(
-            'No Contacts found',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            loc.noContactsFound,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             _searchQuery.isNotEmpty
-                ? 'No matching results for your query.'
-                : 'Send friend requests to start chatting and calling.',
+                ? loc.noMatchingResults
+                : loc.sendFriendRequestsPrompt,
             style: const TextStyle(color: Colors.grey),
             textAlign: TextAlign.center,
           ),
@@ -350,7 +352,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
           ElevatedButton.icon(
             onPressed: () => _showAddFriendDialog(context),
             icon: const Icon(Icons.person_add_alt_1),
-            label: const Text('Add Friend'),
+            label: Text(loc.addFriend),
           ),
         ],
       ),
@@ -361,7 +363,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     final callRequest = CallRequest(recipientId: recipientId, isVideo: isVideo);
     Navigator.push(
       context,
-      MaterialPageRoute(
+      MaterialPageRoute<void>(
         builder: (_) => CallsScreen(callRequest: callRequest),
       ),
     );
@@ -385,10 +387,10 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
               const SizedBox(height: 12),
               TextField(
                 controller: _addFriendController,
-                decoration: const InputDecoration(
-                  hintText: 'e.g. johndoe',
-                  prefixIcon: Icon(Icons.alternate_email),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: loc.egUsernameHint,
+                  prefixIcon: const Icon(Icons.alternate_email),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -405,14 +407,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
 
                 Navigator.pop(context);
                 final success = await ref
-                    .read(contactsProvider.notifier)
+                    .read(friendRequestProvider.notifier)
                     .sendFriendRequest(username);
 
                 if (context.mounted) {
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Friend request sent to @$username'),
+                        content: Text(loc.friendRequestSentTo(username)),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -421,7 +423,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     final err = ref.read(contactsProvider).errorMessage;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(err ?? 'Failed to send request'),
+                        content: Text(err ?? loc.failedToSendRequest),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -434,5 +436,51 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showDeleteFriendDialog(
+    BuildContext context,
+    User friend,
+  ) async {
+    final loc = AppLocalizations.of(context)!;
+    final displayName = friend.fullName ?? friend.username;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(loc.unfriend),
+        content: Text(
+          loc.unfriendConfirmation.replaceAll('{name}', displayName),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(loc.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(loc.unfriend),
+          ),
+        ],
+      ),
+    );
+
+    if ((confirmed ?? false) && mounted) {
+      final messenger = ScaffoldMessenger.of(context);
+      final success =
+          await ref.read(contactsProvider.notifier).deleteFriend(friend.id);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            success ? loc.friendRemoved : loc.failedToRemoveFriend,
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+        ),
+      );
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class ContactCard extends ConsumerWidget {
   const ContactCard({
@@ -10,6 +11,7 @@ class ContactCard extends ConsumerWidget {
     this.voiceCall,
     this.videoCall,
     this.startChat,
+    this.onDelete,
     super.key,
   });
 
@@ -17,12 +19,14 @@ class ContactCard extends ConsumerWidget {
   final VoidCallback? startChat;
   final VoidCallback? voiceCall;
   final VoidCallback? videoCall;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final presenceColor = _getPresenceColor(ref, friend.id);
-    final presenceText = _getPresenceStatusText(ref, friend.id);
+    final presenceText = _getPresenceStatusText(ref, friend.id, loc);
     final displayName = friend.fullName ?? friend.username;
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
@@ -81,6 +85,7 @@ class ContactCard extends ConsumerWidget {
                 color: theme.colorScheme.primary,
                 size: 22,
               ),
+              tooltip: loc.chat,
               onPressed: startChat,
             ),
             IconButton(
@@ -89,10 +94,9 @@ class ContactCard extends ConsumerWidget {
                 color: Colors.blue,
                 size: 22,
               ),
+              tooltip: loc.voiceCall,
               onPressed: () {
                 voiceCall?.call();
-                // _peerIdController.text = friend.id;
-                // _startCall(isVideo: false);
               },
             ),
             IconButton(
@@ -101,25 +105,63 @@ class ContactCard extends ConsumerWidget {
                 color: Colors.green,
                 size: 22,
               ),
+              tooltip: loc.videoCall,
               onPressed: () {
                 videoCall?.call();
-                // _peerIdController.text = friend.id;
-                // _startCall(isVideo: true);
               },
             ),
+            if (onDelete != null)
+              PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: Colors.grey.shade600,
+                  size: 20,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                onSelected: (value) {
+                  if (value == 'unfriend') {
+                    onDelete?.call();
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'unfriend',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.person_remove_outlined,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          loc.unfriend,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 
-  String _getPresenceStatusText(WidgetRef ref, String peerId) {
+  String _getPresenceStatusText(
+    WidgetRef ref,
+    String peerId,
+    AppLocalizations loc,
+  ) {
     final presenceMap = ref.watch(presenceProvider);
     final peerPresence = presenceMap[peerId];
     final isOnline = peerPresence?.isOnline ?? false;
     final lastSeen = peerPresence?.lastSeen ?? DateTime.now();
     if (isOnline) {
-      return 'Online';
+      return loc.online;
     } else {
       return formatLastSeen(isOnline, lastSeen);
     }

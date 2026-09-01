@@ -21,8 +21,11 @@ class HistoryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final peerName = log.hostName ?? log.username;
-    final initials = peerName?.substring(0, 1).toUpperCase();
+    final peerName = log.hostName ??
+        log.username ??
+        _resolvePeerName(context, log, friends, ref);
+    final initials =
+        peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
 
     final isMissed = log.status == 'missed' || log.status == 'rejected';
     final timeText = DateFormat('h:mm a').format(log.createdAt.toLocal());
@@ -54,7 +57,7 @@ class HistoryCard extends ConsumerWidget {
               backgroundColor:
                   isMissed ? Colors.red.shade50 : Colors.grey.shade100,
               child: Text(
-                initials!,
+                initials,
                 style: TextStyle(
                   color: isMissed ? Colors.red : Colors.grey.shade800,
                   fontWeight: FontWeight.bold,
@@ -78,7 +81,7 @@ class HistoryCard extends ConsumerWidget {
           ],
         ),
         title: Text(
-          peerName!,
+          peerName,
           style: theme.textTheme.titleMedium,
         ),
         subtitle: Row(
@@ -121,6 +124,7 @@ class HistoryCard extends ConsumerWidget {
                   size: 16,
                   color: Colors.black87,
                 ),
+                tooltip: log.isVideo ? loc.videoCall : loc.voiceCall,
                 onPressed: () {
                   final targetPeerId = _resolvePeerId(log, ref);
                   if (targetPeerId.isNotEmpty) {
@@ -166,7 +170,12 @@ class HistoryCard extends ConsumerWidget {
     return '${s}s';
   }
 
-  String _resolvePeerName(CallLog log, List<User> friends, WidgetRef ref) {
+  String _resolvePeerName(
+    BuildContext context,
+    CallLog log,
+    List<User> friends,
+    WidgetRef ref,
+  ) {
     final targetId = _resolvePeerId(log, ref);
     if (targetId.isNotEmpty) {
       for (final f in friends) {
@@ -176,6 +185,7 @@ class HistoryCard extends ConsumerWidget {
       }
       return 'User ${targetId.substring(0, 8)}';
     }
-    return 'Unknown User';
+    final loc = AppLocalizations.of(context)!;
+    return loc.unknownUser;
   }
 }

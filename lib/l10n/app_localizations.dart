@@ -887,6 +887,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):'**
   String get enterBackendBaseUrl;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @egUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. johndoe'**
+  String get egUsernameHint;
+
+  /// Notification when a friend request is sent
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request sent to @{username}'**
+  String friendRequestSentTo(String username);
+
+  /// No description provided for @failedToSendRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send request'**
+  String get failedToSendRequest;
+
+  /// No description provided for @searchFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Search friends...'**
+  String get searchFriends;
+
+  /// No description provided for @myFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'MY FRIENDS'**
+  String get myFriends;
+
+  /// No description provided for @allFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL FRIENDS'**
+  String get allFriends;
+
+  /// No description provided for @globalSearchAddFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'GLOBAL SEARCH / ADD FRIENDS'**
+  String get globalSearchAddFriends;
+
+  /// No description provided for @requested.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested'**
+  String get requested;
+
+  /// No description provided for @friendRequestAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request accepted!'**
+  String get friendRequestAccepted;
+
+  /// No description provided for @failedToAcceptRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to accept request'**
+  String get failedToAcceptRequest;
+
+  /// No description provided for @friendRequestRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend request rejected!'**
+  String get friendRequestRejected;
+
+  /// No description provided for @failedToRejectRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reject request'**
+  String get failedToRejectRequest;
+
+  /// No description provided for @noContactsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Contacts found'**
+  String get noContactsFound;
+
+  /// No description provided for @noMatchingResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching results for your query.'**
+  String get noMatchingResults;
+
+  /// No description provided for @sendFriendRequestsPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send friend requests to start chatting and calling.'**
+  String get sendFriendRequestsPrompt;
+
+  /// No description provided for @noPendingRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending requests'**
+  String get noPendingRequests;
+
+  /// No description provided for @online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get online;
+
+  /// No description provided for @unknownUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown User'**
+  String get unknownUser;
+
+  /// No description provided for @unfriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfriend'**
+  String get unfriend;
+
+  /// No description provided for @unfriendConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove this friend?'**
+  String get unfriendConfirmation;
+
+  /// No description provided for @friendRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend removed successfully'**
+  String get friendRemoved;
+
+  /// No description provided for @failedToRemoveFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove friend'**
+  String get failedToRemoveFriend;
 }
 
 class _AppLocalizationsDelegate

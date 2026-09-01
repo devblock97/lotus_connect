@@ -129,5 +129,36 @@
   "registrationSuccess": "Registration successful! Please login.",
   "authenticationFailed": "Authentication failed",
   "configureServerHost": "Configure Server Host",
-  "enterBackendBaseUrl": "Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):"
+  "enterBackendBaseUrl": "Enter the backend base URL (e.g. http://10.0.2.2:8080/api/v1):",
+  "pending": "Pending",
+  "egUsernameHint": "e.g. johndoe",
+  "friendRequestSentTo": "Friend request sent to @{username}",
+  "@friendRequestSentTo": {
+    "description": "Notification when a friend request is sent",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSendRequest": "Failed to send request",
+  "searchFriends": "Search friends...",
+  "myFriends": "MY FRIENDS",
+  "allFriends": "ALL FRIENDS",
+  "globalSearchAddFriends": "GLOBAL SEARCH / ADD FRIENDS",
+  "requested": "Requested",
+  "friendRequestAccepted": "Friend request accepted!",
+  "failedToAcceptRequest": "Failed to accept request",
+  "friendRequestRejected": "Friend request rejected!",
+  "failedToRejectRequest": "Failed to reject request",
+  "noContactsFound": "No Contacts found",
+  "noMatchingResults": "No matching results for your query.",
+  "sendFriendRequestsPrompt": "Send friend requests to start chatting and calling.",
+  "noPendingRequests": "No pending requests",
+  "online": "Online",
+  "unknownUser": "Unknown User",
+  "unfriend": "Unfriend",
+  "unfriendConfirmation": "Are you sure you want to remove this friend?",
+  "friendRemoved": "Friend removed successfully",
+  "failedToRemoveFriend": "Failed to remove friend"
 }

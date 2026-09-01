@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
@@ -6,9 +7,11 @@ abstract class ContactsRemoteDataSource {
   Future<List<User>> contactsList() => throw UnimplementedError('Stub');
   Future<void> sendFriendRequest(String username) =>
       throw UnimplementedError('Stub');
-  Future<void> acceptFriendRequest(String targetId) =>
+  Future<ResponseEntityBase> acceptFriendRequest(String targetId) =>
       throw UnimplementedError('Stub');
-  Future<void> rejectFriendRequest(String targetId) =>
+  Future<ResponseEntityBase> rejectFriendRequest(String targetId) =>
+      throw UnimplementedError('Stub');
+  Future<ResponseEntityBase> deleteFriend(String friendId) =>
       throw UnimplementedError('Stub');
   Future<List<User>> getFriendRequests() => throw UnimplementedError('Stub');
   Future<List<User>> searchUsers(String query) =>
@@ -47,26 +50,40 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   }
 
   @override
-  Future<void> acceptFriendRequest(String targetId) async {
+  Future<ResponseEntityBase> acceptFriendRequest(String targetId) async {
     try {
-      await _dioClient.post(
+      final response = await _dioClient.post(
         '/users/friends/accept',
         data: {'friendId': targetId},
       );
+      return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
       throw ServerException('Failed to accept friend request: $e');
     }
   }
 
   @override
-  Future<void> rejectFriendRequest(String friendId) async {
+  Future<ResponseEntityBase> rejectFriendRequest(String friendId) async {
     try {
-      await _dioClient.post(
+      final response = await _dioClient.post(
         '/users/friends/reject',
         data: {'friendId': friendId},
       );
+      return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
       throw ServerException('Failed to reject friend request: $e');
+    }
+  }
+
+  @override
+  Future<ResponseEntityBase> deleteFriend(String friendId) async {
+    try {
+      final response = await _dioClient.delete(
+        '/users/friends/$friendId',
+      );
+      return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      throw ServerException('Failed to delete friend: $e');
     }
   }
 
