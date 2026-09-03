@@ -30,12 +30,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _scrollController = ScrollController();
   late final WebSocketService _webSocketService;
 
+  double _previousMaxScroll = 0;
+  double _previousPixels = 0;
+
+  OverlayEntry? _newMessageOverlay;
+
   @override
   void initState() {
     super.initState();
     _webSocketService = ref.read(webSocketServiceProvider);
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
       try {
         ref
             .read(privateConversationListProvider.notifier)
@@ -56,6 +62,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       AppLogger.error('Error in ChatScreen dispose callback: $e');
     }
     _scrollController.dispose();
+    _hideNewMessageAlert();
     super.dispose();
   }
 
@@ -79,13 +86,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final isPeerTyping = typingMap[widget.conversationId] ?? false;
 
     ref.listen<PrivateActiveConversationState>(
-        privateActiveConversationProvider, (_, next) {
-      if (next.conversationId == widget.conversationId &&
-          next.messages.isNotEmpty) {
-        // WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-        if (_isTop) {
-          debugPrint('should display move down icon');
-        }
+        privateActiveConversationProvider, (prev, next) {
+      if (prev != null &&
+          next.messages.length > prev.messages.length &&
+          _previousMaxScroll > 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!_scrollController.hasClients) return;
+          final newMaxScroll = _scrollController.position.maxScrollExtent;
+          final delta = newMaxScroll - _previousMaxScroll;
+          debugPrint('delta: $delta');
+          if (delta > 50) {
+            _showNewMessageAlert(context, 150, 120, delta + 20);
+          }
+          _previousPixels = 0.0;
+        });
       }
 
       final peerMessages = next.messages.where((m) => m.role.isAssistant);
@@ -182,10 +196,39 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.symmetric(vertical: 12),
-              itemCount: activeState.conversationId == widget.conversationId
-                  ? activeState.messages.length
-                  : 0,
+              itemCount: activeState.messages.length +
+                  (activeState.hasLoadMore || activeState.hasReachedMax
+                      ? 1
+                      : 0),
               itemBuilder: (_, index) {
+                if (index == activeState.messages.length) {
+                  if (activeState.hasLoadMore) {
+                    return const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  if (activeState.hasReachedMax &&
+                      activeState.messages.length >= 25) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: Text(
+                          'Beginning of conversation',
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade500,),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                }
+
                 final message = activeState.messages[index];
                 final repliedTo = message.replyToId != null
                     ? activeState.messages
@@ -230,6 +273,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ChatInputField(
             isGenerating: false,
             onSend: (message, file) {
+              _scrollToBottom();
               activeNotifier.sendMessage(message, file?.path);
             },
             onStop: () {},
@@ -243,6 +287,47 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ],
       ),
     );
+  }
+
+  void _showNewMessageAlert(BuildContext context, double bottom, double left,
+      [double offset = 0,]) {
+    if (_newMessageOverlay != null || _isBottom) return;
+
+    final overlay = Overlay.of(context);
+
+    _newMessageOverlay = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: bottom,
+        left: left,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _hideNewMessageAlert,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'New message',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(_newMessageOverlay!);
+  }
+
+  void _hideNewMessageAlert([double offset = 0]) {
+    debugPrint('hide nef :)');
+    if (_newMessageOverlay == null) return;
+    _newMessageOverlay?.remove();
+    _newMessageOverlay = null;
+    _scrollToBottom(offset);
   }
 
   Widget _buildReplyPreview(
@@ -302,11 +387,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  void _scrollToBottom() {
+  void _scrollToBottom([double offset = 0]) {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200),
+        _scrollController.position.maxScrollExtent + offset,
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
       );
     }
@@ -323,20 +408,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final currPixel = _scrollController.position.pixels;
     final maxPixel = _scrollController.position.maxScrollExtent;
 
-    return currPixel <= maxPixel * 0.1;
+    return currPixel <= maxPixel * 0.2;
   }
 
   void _onScroll() {
-    // if (_isBottom) {
-    //   ref
-    //       .read(privateActiveConversationProvider.notifier)
-    //       .loadMoreMessage(widget.conversationId, true);
-    // }
+    if (!_scrollController.hasClients) return;
+
     if (_isTop) {
       debugPrint("hello, it's me");
-      ref
-          .read(privateActiveConversationProvider.notifier)
-          .loadMoreMessage(widget.conversationId, false);
+      final state = ref.read(privateActiveConversationProvider);
+      if (!state.hasLoadMore && !state.hasReachedMax) {
+        _previousPixels = _scrollController.position.pixels;
+        _previousMaxScroll = _scrollController.position.maxScrollExtent;
+
+        ref
+            .read(privateActiveConversationProvider.notifier)
+            .loadMoreMessage(widget.conversationId);
+      }
     }
   }
 

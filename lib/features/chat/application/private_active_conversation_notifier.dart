@@ -239,33 +239,26 @@ class PrivateActiveConversationNotifier
     }
   }
 
-  Future<void> loadMoreMessage(String conversationId, bool isBottom) async {
-    final currentUserId = _ref.read(settingsProvider).userId;
-    if (currentUserId.isEmpty) return;
-
-    debugPrint(
-      'state.hasLoadMore: ${state.hasLoadMore}; state.hasReachedMax: ${state.hasReachedMax}',
-    );
-    if (!state.hasLoadMore) {
-      state = state.copyWith(
-        hasLoadMore: false,
-        hasReachedMax: true,
-      );
+  Future<void> loadMoreMessage(String conversationId) async {
+    if (state.hasLoadMore || state.hasReachedMax || state.messages.isEmpty) {
       return;
     }
 
-    final oldestMessage = state.messages.first;
-    final newestMessage = state.messages.last;
-    debugPrint(
-      'check oldest message: ${oldestMessage.id}; ${oldestMessage.content}',
-    );
+    final currentUserId = _ref.read(settingsProvider).userId;
+    if (currentUserId.isEmpty) return;
+
+    state = state.copyWith(hasLoadMore: true);
+
+    const pageSize = 25;
+
+    final lastMessage = state.messages.first;
+    final cursor = lastMessage.id;
 
     final result = await _getRemoteMessageUseCase(
       GetRemoteMessageParam(
         conversationId: conversationId,
         userId: currentUserId,
-        cursor: isBottom ? newestMessage.id : oldestMessage.id,
-        limit: 10,
+        cursor: cursor,
       ),
     );
 
@@ -278,7 +271,7 @@ class PrivateActiveConversationNotifier
         );
       }
 
-      final hasReachedMax = newMessages.length >= 10;
+      final hasReachedMax = newMessages.length < pageSize;
 
       state = state.copyWith(
         hasLoadMore: false,

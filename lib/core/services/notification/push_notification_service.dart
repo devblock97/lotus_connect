@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
-import 'package:lotus_connect/core/services/api/chat_api_service.dart';
 import 'package:lotus_connect/core/services/callkit/callkit_service.dart';
 import 'package:lotus_connect/features/notfications/application/notification_provider.dart';
 import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
@@ -184,19 +183,6 @@ class PushNotificationService {
   Future<void> _initializeFirebaseSafely() async {
     try {
       if (Firebase.apps.isEmpty) {
-        // if (defaultTargetPlatform == TargetPlatform.iOS) {
-        //   try {
-        //     await Firebase.initializeApp();
-        //   } on Object catch (_) {
-        //     await Firebase.initializeApp(
-        //       options: DefaultFirebaseOptions.currentPlatform,
-        //     );
-        //   }
-        // } else {
-        //   await Firebase.initializeApp(
-        //     options: DefaultFirebaseOptions.currentPlatform,
-        //   );
-        // }
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
@@ -422,7 +408,6 @@ class PushNotificationService {
 
 final pushNotificationServiceProvider =
     Provider<PushNotificationService>((ref) {
-  final chatApiService = ref.watch(chatApiServiceProvider);
   final callKitService = ref.watch(callKitServiceProvider);
   return PushNotificationService(
     callKitService: callKitService,
