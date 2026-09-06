@@ -1,4 +1,5 @@
 import 'package:lotus_connect/core/utils/typedefs.dart';
+import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -20,6 +21,7 @@ abstract class PrivateChatRepository {
     String? messageType,
     String? mimeType,
     String? fileName,
+    List<MediaModel>? mediaItems,
   }) =>
       throw UnimplementedError('Stub');
 
@@ -45,5 +47,5 @@ abstract class PrivateChatRepository {
     String reaction,
   );
 
-  FutureResult<String> uploadFiles(String path);
+  FutureResult<FileUploadResponseModel> uploadFiles(List<String> path);
 }

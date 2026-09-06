@@ -13,6 +13,7 @@ class SendMessageParams {
     this.fileName,
     this.messageType,
     this.mimeType,
+    this.mediaItems = const [],
   });
 
   final String conversationId;
@@ -23,6 +24,7 @@ class SendMessageParams {
   final String? fileName;
   final String? messageType;
   final String? mimeType;
+  final List<MediaModel> mediaItems;
 }
 
 class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
@@ -43,6 +45,7 @@ class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
       thumbnailUrl: params.thumbnailUrl,
       fileName: params.fileName,
       mimeType: params.mimeType,
+      mediaItems: params.mediaItems,
     );
   }
 }

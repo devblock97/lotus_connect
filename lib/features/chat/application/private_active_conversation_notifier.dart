@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
 import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
@@ -33,6 +35,8 @@ class PrivateActiveConversationState {
     this.replyingToMessage,
     this.hasLoadMore = false,
     this.hasReachedMax = false,
+    this.isMediaLoading = false,
+    this.mediaLength = 0,
     this.status = Status.initialize,
   });
 
@@ -44,6 +48,8 @@ class PrivateActiveConversationState {
   final Message? replyingToMessage;
   final bool hasLoadMore;
   final bool hasReachedMax;
+  final bool isMediaLoading;
+  final int mediaLength;
   final Status status;
 
   PrivateActiveConversationState copyWith({
@@ -55,6 +61,8 @@ class PrivateActiveConversationState {
     bool clearReplyingTo = false,
     bool? hasLoadMore,
     bool? hasReachedMax,
+    bool? isMediaLoading,
+    int? mediaLength,
     Status? status,
     Message? message,
   }) {
@@ -68,6 +76,8 @@ class PrivateActiveConversationState {
           : (replyingToMessage ?? this.replyingToMessage),
       hasLoadMore: hasLoadMore ?? this.hasLoadMore,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isMediaLoading: isMediaLoading ?? this.isMediaLoading,
+      mediaLength: mediaLength ?? this.mediaLength,
       status: status ?? this.status,
       message: message ?? this.message,
     );
@@ -103,6 +113,8 @@ class PrivateActiveConversationNotifier
     _init();
   }
 
+  static const String _tag = 'PrivateActiveConversationNotifier';
+
   final GetRemoteMessageUseCase _getRemoteMessageUseCase;
   final GetLocalMessageUseCase _getLocalMessageUseCase;
   final SaveLocalMessageUseCase _saveLocalMessageUseCase;
@@ -123,6 +135,11 @@ class PrivateActiveConversationNotifier
   void _init() {
     final currentSelectedId =
         _ref.read(privateConversationListProvider).selectedConversationId;
+
+    AppLogger.debug(
+      '$_tag ==> [_init()]: [currentSelectedId: $currentSelectedId]',
+    );
+
     if (currentSelectedId != null) {
       _subscribeToConversation(currentSelectedId);
     }
@@ -158,13 +175,11 @@ class PrivateActiveConversationNotifier
       final currentUserId = _ref.read(settingsProvider).userId;
       if (currentUserId.isEmpty) return;
 
-      // final messageCursor = state.messages.last.id;
-
       final remoteResult = await _getRemoteMessageUseCase(
         GetRemoteMessageParam(
           conversationId: conversationId,
           userId: currentUserId,
-          limit: 10,
+          limit: 15,
         ),
       );
 
@@ -281,7 +296,7 @@ class PrivateActiveConversationNotifier
   }
 
   /// Sends a message over the WebSocket tunnel.
-  Future<void> sendMessage(String text, [String? path]) async {
+  Future<void> sendMessage(String text, [List<XFile> medias = const []]) async {
     final trimmedText = text.trim();
     if (trimmedText.isEmpty) {
       state = state.copyWith(
@@ -314,24 +329,40 @@ class PrivateActiveConversationNotifier
       SaveDraftMessageParams(conversationId: convId, draft: ''),
     );
 
-    if (path != null) {
+    if (medias.isNotEmpty) {
+      state = state.copyWith(
+        isMediaLoading: true,
+        mediaLength: medias.length,
+      );
+      final paths = medias.map((f) => f.path).toList();
       final uploadFileResult = await _uploadFileUseCase(
-        UploadFileParam(path: path),
+        UploadFileParam(paths: paths),
       );
 
       await uploadFileResult.fold((error) {
         state = state.copyWith(errorMessage: error.message);
       }, (fileUrl) async {
+        state = state.copyWith(isMediaLoading: false);
+
+        final medias = fileUrl.files
+            .map(
+              (f) => MediaModel(
+                url: f.url,
+                fileName: f.fileName,
+                fileSize: f.fileSize,
+                thumbnailUrl: f.thumbnailUrl,
+                mimeType: f.mimeType,
+              ),
+            )
+            .toList();
+
         final result = await _sendMessageUseCase(
           SendMessageParams(
             conversationId: convId,
             text: trimmedText,
             replyToId: replyToId,
-            fileName: fileUrl.split('/').last,
             messageType: 'image',
-            thumbnailUrl: fileUrl,
-            mediaUrl: fileUrl,
-            mimeType: 'image/png',
+            mediaItems: medias,
           ),
         );
 
@@ -345,9 +376,6 @@ class PrivateActiveConversationNotifier
             await deleteMessage(optimisticId);
             await _saveLocalMessageUseCase(
               SaveLocalMessageParam(message: remoteMessage),
-            );
-            state = state.copyWith(
-              messages: [...state.messages, remoteMessage],
             );
           },
         );
@@ -487,16 +515,16 @@ class PrivateActiveConversationNotifier
     });
   }
 
-  Future<void> uploadFile(String message, String path) async {
+  Future<void> uploadFile(String message, List<String> path) async {
     final result = await _uploadFileUseCase(
-      UploadFileParam(path: path),
+      UploadFileParam(paths: path),
     );
 
     result.fold((error) {
       state = state.copyWith(errorMessage: error.message);
     }, (fileUrl) {
       debugPrint('file url response: $fileUrl');
-      sendMessage(message, fileUrl);
+      // sendMessage(message, fileUrl);
     });
   }
 

@@ -1,13 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
 import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Compact, conversational bubble used only for person-to-person messages.
-class PersonMessageBubble extends ConsumerWidget {
+class PersonMessageBubble extends ConsumerStatefulWidget {
   const PersonMessageBubble({
     required this.message,
     required this.peerName,
@@ -20,6 +22,275 @@ class PersonMessageBubble extends ConsumerWidget {
   final String peerName;
   final Message? repliedToMessage;
   final void Function(Message message, String emoji)? onSelectReaction;
+
+  @override
+  ConsumerState<PersonMessageBubble> createState() =>
+      _PersonMessageBubbleState();
+}
+
+class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(privateActiveConversationProvider);
+    final theme = Theme.of(context);
+    final isMine = widget.message.role.isUser;
+    final time = DateFormat('h:mm a').format(widget.message.timestamp);
+    final foreground = isMine
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurfaceVariant;
+    final background = isMine
+        ? theme.colorScheme.primary
+        : theme.colorScheme.surfaceContainerHighest;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(isMine ? 72 : 16, 6, isMine ? 16 : 72, 6),
+      child: Column(
+        crossAxisAlignment:
+            isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          if (!isMine) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 4),
+              child: Text(
+                widget.peerName,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: theme.textTheme.bodySmall?.color,
+                ),
+              ),
+            ),
+          ],
+          if (widget.message.medias.isNotEmpty) ...[
+            GridView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.message.medias.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.message.medias.length >= 4
+                    ? 4
+                    : widget.message.medias.length,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+              ),
+              itemBuilder: (context, index) {
+                final media = widget.message.medias[index];
+                if (media.mimeType!.contains('video')) {
+                  return MediaVideoThumbnail(url: media.url);
+                }
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: CachedNetworkImage(
+                    imageUrl: media.thumbnailUrl ?? media.url,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => const Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (_, __, dynamic ___) =>
+                        const Icon(Icons.broken_image),
+                  ),
+                );
+              },
+            ),
+          ],
+          GestureDetector(
+            onLongPress: () => _showOptionsDialog(context, ref),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isMine ? 18 : 4),
+                  bottomRight: Radius.circular(isMine ? 4 : 18),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.repliedToMessage != null) ...[
+                    _buildBubbleReplyHeader(
+                      context,
+                      widget.repliedToMessage!,
+                      theme,
+                      isMine,
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  if (widget.message.content.isNotEmpty)
+                    Text(
+                      widget.message.content,
+                      style: TextStyle(
+                        color: foreground,
+                        fontSize: 15,
+                        height: 1.35,
+                      ),
+                    ),
+                  if (widget.message.reactions.isNotEmpty)
+                    _buildReactionBadges(context, theme, isMine),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                time,
+                style: TextStyle(
+                  fontSize: 11,
+                  color:
+                      theme.textTheme.bodySmall?.color?.withValues(alpha: .65),
+                ),
+              ),
+              if (isMine) ...[
+                const SizedBox(width: 3),
+                Icon(
+                  widget.message.isError
+                      ? Icons.error_outline
+                      : Icons.done_all_rounded,
+                  size: 14,
+                  color: widget.message.isError
+                      ? theme.colorScheme.error
+                      : (widget.message.status == MessageStatus.read
+                          ? AppColors.primaryLight
+                          : theme.disabledColor.withValues(alpha: 0.6)),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextAndMediaMessage(
+    bool isMediaLoading,
+    int mediaLength,
+    Color background,
+    Color foreground,
+    bool isMine,
+    ThemeData theme,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.repliedToMessage != null) ...[
+            _buildBubbleReplyHeader(
+              context,
+              widget.repliedToMessage!,
+              theme,
+              isMine,
+            ),
+            const SizedBox(height: 6),
+          ],
+          if (isMediaLoading)
+            GridView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: mediaLength,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: mediaLength >= 4 ? 4 : mediaLength,
+                crossAxisSpacing: 4,
+                mainAxisSpacing: 4,
+              ),
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            ),
+          Container(
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(18),
+                topRight: const Radius.circular(18),
+                bottomLeft: Radius.circular(isMine ? 18 : 4),
+                bottomRight: Radius.circular(isMine ? 4 : 18),
+              ),
+            ),
+            child: Text(
+              widget.message.content,
+              style: TextStyle(
+                color: foreground,
+                fontSize: 15,
+                height: 1.35,
+              ),
+            ),
+          ),
+          if (widget.message.reactions.isNotEmpty)
+            _buildReactionBadges(context, theme, isMine),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextMessage(
+    Color background,
+    Color foreground,
+    bool isMine,
+    ThemeData theme,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMine ? 18 : 4),
+          bottomRight: Radius.circular(isMine ? 4 : 18),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.repliedToMessage != null) ...[
+            _buildBubbleReplyHeader(
+              context,
+              widget.repliedToMessage!,
+              theme,
+              isMine,
+            ),
+            const SizedBox(height: 6),
+          ],
+          Text(
+            widget.message.content,
+            style: TextStyle(
+              color: foreground,
+              fontSize: 15,
+              height: 1.35,
+            ),
+          ),
+          if (widget.message.reactions.isNotEmpty)
+            _buildReactionBadges(context, theme, isMine),
+        ],
+      ),
+    );
+  }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
@@ -38,7 +309,7 @@ class PersonMessageBubble extends ConsumerWidget {
               onPressed: () {
                 ref
                     .read(privateActiveConversationProvider.notifier)
-                    .deleteMessage(message.id);
+                    .deleteMessage(widget.message.id);
                 Navigator.of(context).pop();
               },
               child: Text(
@@ -54,7 +325,7 @@ class PersonMessageBubble extends ConsumerWidget {
 
   void _showOptionsDialog(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
-    final isMine = message.role.isUser;
+    final isMine = widget.message.role.isUser;
     final defaultEmojis = ['👍', '❤️', '😂', '😮', '😢', '🔥', '🙏'];
 
     showDialog<void>(
@@ -89,7 +360,8 @@ class PersonMessageBubble extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
                                 Navigator.of(context).pop();
-                                onSelectReaction?.call(message, emoji);
+                                widget.onSelectReaction
+                                    ?.call(widget.message, emoji);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -119,7 +391,7 @@ class PersonMessageBubble extends ConsumerWidget {
                     Navigator.of(context).pop();
                     ref
                         .read(privateActiveConversationProvider.notifier)
-                        .setReplyingToMessage(message);
+                        .setReplyingToMessage(widget.message);
                   },
                 ),
                 if (isMine) ...[
@@ -162,7 +434,7 @@ class PersonMessageBubble extends ConsumerWidget {
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: message.content);
+    final controller = TextEditingController(text: widget.message.content);
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -184,10 +456,11 @@ class PersonMessageBubble extends ConsumerWidget {
             TextButton(
               onPressed: () {
                 final newContent = controller.text.trim();
-                if (newContent.isNotEmpty && newContent != message.content) {
+                if (newContent.isNotEmpty &&
+                    newContent != widget.message.content) {
                   ref
                       .read(privateActiveConversationProvider.notifier)
-                      .updateMessage(message.id, newContent);
+                      .updateMessage(widget.message.id, newContent);
                 }
                 Navigator.of(context).pop();
               },
@@ -199,130 +472,12 @@ class PersonMessageBubble extends ConsumerWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final isMine = message.role.isUser;
-    final time = DateFormat('h:mm a').format(message.timestamp);
-    final foreground = isMine
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurfaceVariant;
-    final background = isMine
-        ? theme.colorScheme.primary
-        : theme.colorScheme.surfaceContainerHighest;
-
-    return Padding(
-      padding: EdgeInsets.fromLTRB(isMine ? 72 : 16, 6, isMine ? 16 : 72, 6),
-      child: Column(
-        crossAxisAlignment:
-            isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          if (!isMine) ...[
-            Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 4),
-              child: Text(
-                peerName,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.textTheme.bodySmall?.color,
-                ),
-              ),
-            ),
-          ],
-          GestureDetector(
-            onLongPress: () => _showOptionsDialog(context, ref),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isMine ? 18 : 4),
-                  bottomRight: Radius.circular(isMine ? 4 : 18),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (repliedToMessage != null) ...[
-                    _buildBubbleReplyHeader(
-                      context,
-                      repliedToMessage!,
-                      theme,
-                      isMine,
-                    ),
-                    const SizedBox(height: 6),
-                  ],
-                  if (message.thumbnailUrl != null)
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Image.network(
-                        message.thumbnailUrl!,
-                        width: 150,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  Text(
-                    message.content,
-                    style: TextStyle(
-                      color: foreground,
-                      fontSize: 15,
-                      height: 1.35,
-                    ),
-                  ),
-                  if (message.reactions.isNotEmpty)
-                    _buildReactionBadges(context, theme, isMine),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 3),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                time,
-                style: TextStyle(
-                  fontSize: 11,
-                  color:
-                      theme.textTheme.bodySmall?.color?.withValues(alpha: .65),
-                ),
-              ),
-              if (isMine) ...[
-                const SizedBox(width: 3),
-                Icon(
-                  message.isError
-                      ? Icons.error_outline
-                      : Icons.done_all_rounded,
-                  size: 14,
-                  color: message.isError
-                      ? theme.colorScheme.error
-                      : (message.status == MessageStatus.read
-                          ? AppColors.primaryLight
-                          : theme.disabledColor.withValues(alpha: 0.6)),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildReactionBadges(
     BuildContext context,
     ThemeData theme,
     bool isMine,
   ) {
-    if (message.reactions.isEmpty) {
+    if (widget.message.reactions.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -331,9 +486,10 @@ class PersonMessageBubble extends ConsumerWidget {
       child: Wrap(
         spacing: 4,
         runSpacing: 4,
-        children: message.reactions.map((entry) {
+        children: widget.message.reactions.map((entry) {
           return GestureDetector(
-            onTap: () => onSelectReaction?.call(message, entry.reaction),
+            onTap: () =>
+                widget.onSelectReaction?.call(widget.message, entry.reaction),
             child: Stack(
               children: [
                 Container(
@@ -388,7 +544,7 @@ class PersonMessageBubble extends ConsumerWidget {
     bool isMine,
   ) {
     final repliedIsMine = repliedTo.role.isUser;
-    final senderName = repliedIsMine ? 'You' : peerName;
+    final senderName = repliedIsMine ? 'You' : widget.peerName;
     final barColor = isMine
         ? theme.colorScheme.onPrimary.withValues(alpha: 0.6)
         : theme.colorScheme.primary;
@@ -403,8 +559,7 @@ class PersonMessageBubble extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isMine
             ? theme.colorScheme.onPrimary.withValues(alpha: 0.1)
-            : theme.colorScheme.surfaceContainerLow ??
-                theme.colorScheme.surface,
+            : theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

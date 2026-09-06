@@ -287,7 +287,7 @@ class ConversationListView extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) => ChatScreen(conversationId: conversation.id),
+                    builder: (_) => ChatScreen(conversation: conversation),
                   ),
                 );
               } else {
@@ -370,7 +370,9 @@ class ConversationListView extends ConsumerWidget {
                 if (conv != null && screenContext.mounted) {
                   Navigator.of(screenContext).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => ChatScreen(conversationId: conv.id),
+                      builder: (_) => ChatScreen(
+                        conversation: conv,
+                      ),
                     ),
                   );
                 } else {

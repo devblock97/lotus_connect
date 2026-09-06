@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
+import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/data/models/reaction_message_model.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
@@ -19,6 +20,7 @@ abstract class PrivateChatRemoteDataSource {
     String? messageType,
     String? mimeType,
     String? fileName,
+    List<MediaModel> mediaItems,
   });
 
   Future<void> deleteMessage(String messageId);
@@ -36,7 +38,7 @@ abstract class PrivateChatRemoteDataSource {
 
   Future<ReactionMessageEntity> reactMessage(String messageId, String reaction);
 
-  Future<String> uploadFile({required String path});
+  Future<FileUploadResponseModel> uploadFile({required List<String> paths});
 }
 
 class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
@@ -73,6 +75,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
     String? messageType,
     String? mimeType,
     String? fileName,
+    List<MediaModel>? mediaItems,
   }) async {
     try {
       final response = await _dioClient.post(
@@ -85,6 +88,12 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
           if (mediaUrl != null) 'mediaUrl': mediaUrl,
           if (fileName != null) 'fileName': fileName,
           if (mimeType != null) 'mimeType': mimeType,
+          'mediaItems': mediaItems
+                  ?.map(
+                    (m) => m.toJson(),
+                  )
+                  .toList() ??
+              [],
         },
       );
 
@@ -108,7 +117,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
     required String conversationId,
     required String currentUserId,
     String? cursor,
-    int limit = 100,
+    int limit = 25,
   }) async {
     try {
       debugPrint('fetch remote messages cursor: $cursor; limit: $limit');
@@ -124,6 +133,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
 
       return data.map((item) {
         final jsonMap = item as Map<String, dynamic>;
+        debugPrint('media message: ${jsonMap['media_items']}');
         final senderId =
             (jsonMap['sender_id'] ?? jsonMap['senderId']) as String? ?? '';
         final role = senderId == currentUserId
@@ -133,7 +143,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         return Message.fromJson(jsonMap, role);
       }).toList();
     } catch (e) {
-      throw Exception(e);
+      throw Exception('PrivateChatRemoteDataSource error: $e');
     }
   }
 
@@ -207,19 +217,28 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   }
 
   @override
-  Future<String> uploadFile({required String path}) async {
+  Future<FileUploadResponseModel> uploadFile({
+    required List<String> paths,
+  }) async {
     try {
-      final fileName = path.split('/').last;
+      final files = await Future.wait(
+        paths.map((path) async {
+          final fileName = path.split('/').last;
+          return MultipartFile.fromFile(path, filename: fileName);
+        }),
+      );
+
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(path, filename: fileName),
+        'files': files,
       });
+
       final response = await _dioClient.post(
-        '/uploads',
+        '/uploads/multiple',
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
       final data = response.data as Map<String, dynamic>;
-      return data['fileUrl'] as String;
+      return FileUploadResponseModel.fromJson(data);
     } catch (e) {
       throw ServerException('Failed to upload file: $e');
     }

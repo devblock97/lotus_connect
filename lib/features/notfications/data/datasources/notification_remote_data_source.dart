@@ -14,6 +14,8 @@ abstract class NotificationRemoteDataSource {
   Future<List<AppNotification>> getNotifications();
 
   Future<ResponseEntityBase> markNotificationRead();
+
+  Future<ResponseEntityBase> readNotification(String notificationId);
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -93,6 +95,21 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       throw Exception(const ServerFailure('Failed to unregister device token'));
     } on Object catch (_) {
       throw Exception(const ServerFailure('Failed to unregister device token'));
+    }
+  }
+
+  @override
+  Future<ResponseEntityBase> readNotification(String notificationId) async {
+    try {
+      final response =
+          await _dioClient.post('/users/notifications/$notificationId/read');
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return ResponseEntityBase.fromJson(data);
+      }
+      throw Exception(const ServerFailure('Failed to read notification'));
+    } on Object catch (_) {
+      throw Exception(const ServerFailure('Failed to read notification'));
     }
   }
 }

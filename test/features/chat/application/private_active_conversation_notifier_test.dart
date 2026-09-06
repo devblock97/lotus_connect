@@ -311,10 +311,29 @@ void main() {
       content: 'Hello, parent message',
       timestamp: DateTime.now(),
       mediaUrl: 'file_path',
+      medias: const [
+        MediaModel(
+          url: 'https://devblock.com/uploads/image1.png',
+          thumbnailUrl: 'https://devblock.com/uploads/thumbnail1.png',
+          fileSize: 1234567,
+          fileName: 'image.png',
+          mimeType: 'image/png',
+        ),
+      ],
     );
 
     when(() => mockChatCoreRepo.watchMessages('test_conv_id'))
         .thenAnswer((_) => Stream.value(const Right([])));
+    when(() => mockChatCoreRepo.getLocalMessages(any()))
+        .thenAnswer((_) async => const Right([]));
+    when(
+      () => mockPrivateChatRepo.fetchRemoteMessages(
+        conversationId: any(named: 'conversationId'),
+        currentUserId: any(named: 'currentUserId'),
+        cursor: any(named: 'cursor', that: isNull),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) async => const Right([]));
 
     final container = ProviderContainer(
       overrides: [
@@ -357,10 +376,25 @@ void main() {
     when(() => mockChatCoreRepo.saveDraftMessage(any(), any()))
         .thenAnswer((_) async => const Right(null));
     when(
+      () => mockPrivateChatRepo.fetchRemoteMessages(
+        conversationId: any(named: 'conversationId'),
+        currentUserId: any(named: 'currentUserId'),
+        cursor: any(named: 'cursor', that: isNull),
+        limit: any(named: 'limit'),
+      ),
+    ).thenAnswer((_) async => const Right([]));
+
+    when(
       () => mockPrivateChatRepo.sendMessage(
         conversationId: 'test_conv_id',
         content: 'Reply content',
         replyToId: 'parent_id_123',
+        messageType: any(named: 'messageType'),
+        mediaUrl: any(named: 'mediaUrl'),
+        thumbnailUrl: any(named: 'thumbnailUrl'),
+        fileName: any(named: 'fileName'),
+        mimeType: any(named: 'mimeType'),
+        mediaItems: any(named: 'mediaItems'),
       ),
     ).thenAnswer(
       (_) async => Right(
@@ -392,6 +426,12 @@ void main() {
         conversationId: 'test_conv_id',
         content: 'Reply content',
         replyToId: 'parent_id_123',
+        messageType: any(named: 'messageType'),
+        mediaUrl: any(named: 'mediaUrl'),
+        thumbnailUrl: any(named: 'thumbnailUrl'),
+        fileName: any(named: 'fileName'),
+        mimeType: any(named: 'mimeType'),
+        mediaItems: any(named: 'mediaItems'),
       ),
     ).called(1);
   });

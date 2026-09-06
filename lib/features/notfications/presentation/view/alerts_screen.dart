@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
 
 class AlertsScreen extends ConsumerWidget {
@@ -83,33 +80,34 @@ class AlertsScreen extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          // Mark all read or call API to mark this one read (we just mark all read or auto-load)
           if (!notification.isRead) {
-            ref.read(notificationsProvider.notifier).markAllRead();
+            ref
+                .read(notificationsProvider.notifier)
+                .readNotification(notification.id);
           }
 
           final data = notification.data;
-          if (data != null) {
-            if (data['type'] == 'chat') {
-              final conversationId = data['conversationId'] as String?;
-              if (conversationId != null) {
-                // Select conversation and route to it
-                ref
-                    .read(privateConversationListProvider.notifier)
-                    .selectConversation(conversationId);
-                ref.read(shellIndexProvider.notifier).state =
-                    1; // Switch bottom tab to Chats
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => ChatScreen(conversationId: conversationId),
-                  ),
-                );
-              }
-            } else if (data['type'] == 'missed_call') {
-              ref.read(shellIndexProvider.notifier).state =
-                  2; // Switch bottom tab to Calls history
-            }
-          }
+          // if (data != null) {
+          //   if (data['type'] == 'chat') {
+          //     final conversationId = data['conversationId'] as String?;
+          //     if (conversationId != null) {
+          //       // Select conversation and route to it
+          //       ref
+          //           .read(privateConversationListProvider.notifier)
+          //           .selectConversation(conversationId);
+          //       ref.read(shellIndexProvider.notifier).state =
+          //           1; // Switch bottom tab to Chats
+          //       Navigator.of(context).push(
+          //         MaterialPageRoute<void>(
+          //           builder: (_) => ChatScreen(conversationId: conversationId),
+          //         ),
+          //       );
+          //     }
+          //   } else if (data['type'] == 'missed_call') {
+          //     ref.read(shellIndexProvider.notifier).state =
+          //         2; // Switch bottom tab to Calls history
+          //   }
+          // }
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

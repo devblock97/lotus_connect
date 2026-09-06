@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:lotus_connect/core/database/app_database.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
@@ -47,6 +48,21 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             .toList();
       }
     } on Object catch (_) {}
+    return const [];
+  }
+
+  List<MediaModel> _parseMedias(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map<String, dynamic>>()
+            .map(MediaModel.fromJson)
+            .toList();
+      }
+    } on Object catch (_) {}
+
     return const [];
   }
 
@@ -126,6 +142,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
                   duration: row.duration,
                   isEdited: row.isEdited,
                   reactions: _parseReactions(row.reactions),
+                  medias: _parseMedias(row.medias),
                 ),
               )
               .toList(),
@@ -235,6 +252,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
 
   @override
   Future<void> saveMessage(Message message) async {
+    AppLogger.debug('ChatCoreLocalDataSource ==> [saveMessage]: triggered');
     await _db.into(_db.messageTable).insertOnConflictUpdate(
           MessageTableCompanion.insert(
             id: message.id,
@@ -253,6 +271,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             duration: Value(message.duration),
             isEdited: Value(message.isEdited),
             reactions: Value(message.serializedReactions),
+            medias: Value(message.serializedMedias),
           ),
         );
   }
@@ -294,6 +313,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
             duration: row.duration,
             isEdited: row.isEdited,
             reactions: _parseReactions(row.reactions),
+            medias: _parseMedias(row.medias),
           ),
         )
         .toList();
@@ -328,6 +348,7 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
       duration: row.duration,
       isEdited: row.isEdited,
       reactions: _parseReactions(row.reactions),
+      medias: _parseMedias(row.medias),
     );
   }
 

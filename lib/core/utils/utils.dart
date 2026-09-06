@@ -23,3 +23,7 @@ String formatLastSeen(bool isOnline, DateTime lastSeen) {
     }
   }
 }
+
+bool isVideo(String path) {
+  return path.contains('mp4') || path.contains('mov');
+}

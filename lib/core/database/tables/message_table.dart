@@ -39,6 +39,8 @@ class MessageTable extends Table {
 
   TextColumn get reactions => text().nullable()();
 
+  TextColumn get medias => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }

@@ -61,4 +61,16 @@ class NotificationRepositoryImpl implements NotificationRepository {
       return const Left(ServerFailure('Failed to unregister device token'));
     }
   }
+
+  @override
+  FutureResult<ResponseEntityBase> readNotification(
+    String notificationId,
+  ) async {
+    try {
+      final result = await _remoteDataSource.readNotification(notificationId);
+      return Right(result);
+    } on Object catch (_) {
+      return const Left(ServerFailure('Failed to read notification'));
+    }
+  }
 }
