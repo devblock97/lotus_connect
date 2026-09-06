@@ -4,6 +4,7 @@ import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
@@ -50,6 +51,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
     String? messageType,
     String? mimeType,
     String? fileName,
+    List<MediaModel>? mediaItems,
   }) async {
     try {
       final remoteMessage = await _remoteDataSource.sendMessage(
@@ -61,6 +63,7 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
         messageType: messageType,
         fileName: fileName,
         mimeType: mimeType,
+        mediaItems: mediaItems ?? [],
       );
       return Right(remoteMessage);
     } on Object catch (e) {
@@ -136,9 +139,9 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   }
 
   @override
-  FutureResult<String> uploadFiles(String path) async {
+  FutureResult<FileUploadResponseModel> uploadFiles(List<String> paths) async {
     try {
-      final fileUrl = await _remoteDataSource.uploadFile(path: path);
+      final fileUrl = await _remoteDataSource.uploadFile(paths: paths);
       return Right(fileUrl);
     } on Object catch (e) {
       return Left(ServerFailure('Failed to upload file: $e'));

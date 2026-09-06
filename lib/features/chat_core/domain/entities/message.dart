@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 
 enum MessageRole {
   user,
@@ -42,6 +43,7 @@ class Message extends Equatable {
     this.updatedAt,
     this.reactions = const [],
     this.isEdited = false,
+    this.medias = const [],
   });
 
   factory Message.fromJson(Map<String, dynamic> json, MessageRole role) {
@@ -101,6 +103,11 @@ class Message extends Equatable {
       reactions: parseReactions(json['reactions']),
       isEdited:
           json['isEdited'] as bool? ?? json['is_edited'] as bool? ?? false,
+      medias: (json['media_items'] as List? ?? [])
+          .map(
+            (m) => MediaModel.fromJson(m as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 
@@ -122,9 +129,14 @@ class Message extends Equatable {
   final List<Reaction> reactions;
   final bool isEdited;
   final String? messageType;
+  final List<MediaModel> medias;
 
   String? get serializedReactions => reactions.isNotEmpty
       ? jsonEncode(reactions.map((e) => e.toJson()).toList())
+      : null;
+
+  String? get serializedMedias => medias.isNotEmpty
+      ? jsonEncode(medias.map((m) => m.toJson()).toList())
       : null;
 
   Message copyWith({
@@ -188,6 +200,95 @@ class Message extends Equatable {
         updatedAt,
         reactions,
         isEdited,
+      ];
+}
+
+class MediaModel extends MediaEntity {
+  const MediaModel({
+    required super.url,
+    super.thumbnailUrl,
+    super.fileSize,
+    super.mimeType,
+    super.fileName,
+    this.duration,
+    this.width,
+    this.height,
+  });
+
+  factory MediaModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return MediaModel(
+        url: json['url'] as String,
+        thumbnailUrl: json['thumbnailUrl'] as String?,
+        fileName: json['fileName'] as String,
+        fileSize: json['fileSize'] as int,
+        mimeType: json['mimeType'] as String,
+        duration: json['duration'] as int?,
+        width: json['width'] as int?,
+        height: json['height'] as int?,
+      );
+    } catch (e, stackTrace) {
+      throw Exception('check media from json: $e; $stackTrace');
+    }
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'url': url,
+        'thumbnailUrl': thumbnailUrl,
+        'fileName': fileName,
+        'fileSize': fileSize,
+        'mimeType': mimeType,
+        'duration': duration,
+        'width': width,
+        'height': height,
+      };
+
+  MediaEntity toEntity() {
+    return MediaEntity(
+      url: url,
+      thumbnailUrl: thumbnailUrl,
+      fileSize: fileSize,
+      mimeType: mimeType,
+    );
+  }
+
+  MediaModel copyWith({
+    String? url,
+    String? thumbnailUrl,
+    String? fileName,
+    int? fileSize,
+    String? mimeType,
+    int? duration,
+    int? width,
+    int? height,
+  }) {
+    return MediaModel(
+      url: url ?? this.url,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      fileName: fileName ?? this.fileName,
+      fileSize: fileSize ?? this.fileSize,
+      mimeType: mimeType ?? this.mimeType,
+      duration: duration ?? this.duration,
+      width: width ?? this.width,
+      height: height ?? this.height,
+    );
+  }
+
+  final int? duration;
+  final int? width;
+  final int? height;
+
+  @override
+  List<Object?> get props => [
+        fileName,
+        fileSize,
+        thumbnailUrl,
+        url,
+        mimeType,
+        width,
+        height,
+        duration,
       ];
 }
 

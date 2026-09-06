@@ -5,6 +5,7 @@ import 'package:lotus_connect/features/notfications/data/repositories/notificati
 import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/get_notifications_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/mark_notification_read_use_case.dart';
+import 'package:lotus_connect/features/notfications/domain/usecase/read_notification_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/register_device_token_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/unregister_device_token_use_case.dart';
 
@@ -44,6 +45,13 @@ final registerDeviceTokenUseCaseProvider =
 final unregisterDeviceTokenUseCaseProvider =
     Provider<UnregisterDeviceTokenUseCase>((ref) {
   return UnregisterDeviceTokenUseCase(
+    repository: ref.watch(notificationRepositoryProvider),
+  );
+});
+
+final readNotificationUseCaseProvider =
+    Provider<ReadNotificationUseCase>((ref) {
+  return ReadNotificationUseCase(
     repository: ref.watch(notificationRepositoryProvider),
   );
 });

@@ -13,11 +13,11 @@ import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/alerts_screen.dart';
 import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notfications/presentation/view/alerts_screen.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 

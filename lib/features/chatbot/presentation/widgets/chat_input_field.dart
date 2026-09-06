@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 
 /// Bottom chat input field widget matching modern ChatGPT / Telegram styling.
 class ChatInputField extends StatefulWidget {
@@ -16,7 +18,7 @@ class ChatInputField extends StatefulWidget {
     super.key,
   });
 
-  final void Function(String, XFile?) onSend;
+  final void Function(String, List<XFile>) onSend;
   final bool isGenerating;
   final VoidCallback onStop;
   final String initialText;
@@ -31,7 +33,7 @@ class ChatInputField extends StatefulWidget {
 class _ChatInputFieldState extends State<ChatInputField> {
   late TextEditingController _controller;
 
-  XFile? files;
+  List<XFile>? files;
 
   @override
   void initState() {
@@ -57,7 +59,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
   void _handleSend() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
-      widget.onSend(text, files);
+      widget.onSend(text, files ?? []);
       _controller.clear();
       files = null;
     }
@@ -86,44 +88,58 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (files != null)
-                    Container(
-                      height: 70,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.outline.withAlpha(45),
-                            blurRadius: 0.3,
-                            spreadRadius: 0.2,
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          ClipRect(
-                            child: Center(
-                              child: Image.file(
-                                File(files!.path),
-                                fit: BoxFit.cover,
+                    SingleChildScrollView(
+                      child: Row(
+                        children: files!
+                            .map(
+                              (f) => Container(
                                 height: 70,
-                                width: 70,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: theme.colorScheme.outline
+                                          .withAlpha(45),
+                                      blurRadius: 0.3,
+                                      spreadRadius: 0.2,
+                                    ),
+                                  ],
+                                ),
+                                child: Stack(
+                                  children: [
+                                    ClipRect(
+                                      child: Center(
+                                        child: isVideo(f.path)
+                                            ? MediaVideoThumbnail(url: f.path)
+                                            : Image.file(
+                                                File(f.path),
+                                                fit: BoxFit.cover,
+                                                height: 70,
+                                                width: 70,
+                                              ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 3,
+                                      right: 3,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            files = null;
+                                          });
+                                        },
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 3,
-                            right: 3,
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  files = null;
-                                });
-                              },
-                              child: const Icon(Icons.close, color: Colors.red),
-                            ),
-                          ),
-                        ],
+                            )
+                            .toList(),
                       ),
                     ),
                   Padding(
@@ -156,17 +172,12 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         IconButton(
                           icon: const Icon(Icons.image_outlined, size: 22),
                           onPressed: () async {
-                            debugPrint('picker image');
                             final picker = ImagePicker();
-                            final image = await picker.pickImage(
-                              source: ImageSource.gallery,
-                            );
-                            if (image != null) {
-                              debugPrint('image here: ${image.path}');
+                            final medias = await picker.pickMultipleMedia();
+                            if (medias.isNotEmpty) {
                               setState(() {
-                                files = image;
+                                files = medias;
                               });
-                              debugPrint('file here: ${image.path}');
                             }
                           },
                           tooltip: 'Attach Image',

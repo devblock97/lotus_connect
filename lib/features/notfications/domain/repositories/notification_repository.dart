@@ -13,4 +13,6 @@ abstract class NotificationRepository {
   FutureResult<List<AppNotification>> getNotifications();
 
   FutureResult<ResponseEntityBase> markNotificationRead();
+
+  FutureResult<ResponseEntityBase> readNotification(String notificationId);
 }

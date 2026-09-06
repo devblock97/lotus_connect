@@ -704,6 +704,11 @@ class $MessageTableTable extends MessageTable
   late final GeneratedColumn<String> reactions = GeneratedColumn<String>(
       'reactions', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _mediasMeta = const VerificationMeta('medias');
+  @override
+  late final GeneratedColumn<String> medias = GeneratedColumn<String>(
+      'medias', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -721,7 +726,8 @@ class $MessageTableTable extends MessageTable
         mimeType,
         duration,
         isEdited,
-        reactions
+        reactions,
+        medias
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -814,6 +820,10 @@ class $MessageTableTable extends MessageTable
       context.handle(_reactionsMeta,
           reactions.isAcceptableOrUnknown(data['reactions']!, _reactionsMeta));
     }
+    if (data.containsKey('medias')) {
+      context.handle(_mediasMeta,
+          medias.isAcceptableOrUnknown(data['medias']!, _mediasMeta));
+    }
     return context;
   }
 
@@ -855,6 +865,8 @@ class $MessageTableTable extends MessageTable
           .read(DriftSqlType.bool, data['${effectivePrefix}is_edited'])!,
       reactions: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}reactions']),
+      medias: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}medias']),
     );
   }
 
@@ -871,48 +883,23 @@ class MessageTableData extends DataClass
 
   /// Foreign key referencing [ConversationTable.id].
   final String conversationId;
-
-  /// Sender role: 'user', 'assistant', 'system'.
   final String senderRole;
-
-  /// Text content of message.
   final String content;
-
-  /// Message timestamp.
   final DateTime timestamp;
-
-  /// Error status flag.
   final bool isError;
 
   /// Detailed status string: 'sending', 'sent', 'streaming', 'failed'.
   final String status;
-
-  /// Nullable ID of the message this message is replying to.
   final String? replyToId;
-
-  /// Nullable media URL.
   final String? mediaUrl;
-
-  /// Nullable thumbnail URL.
   final String? thumbnailUrl;
-
-  /// Nullable file name.
   final String? fileName;
-
-  /// Nullable file size.
   final int? fileSize;
-
-  /// Nullable MIME type.
   final String? mimeType;
-
-  /// Nullable duration.
   final int? duration;
-
-  /// Flag indicating if the message was edited.
   final bool isEdited;
-
-  /// Nullable string containing serialized reactions.
   final String? reactions;
+  final String? medias;
   const MessageTableData(
       {required this.id,
       required this.conversationId,
@@ -929,7 +916,8 @@ class MessageTableData extends DataClass
       this.mimeType,
       this.duration,
       required this.isEdited,
-      this.reactions});
+      this.reactions,
+      this.medias});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -964,6 +952,9 @@ class MessageTableData extends DataClass
     map['is_edited'] = Variable<bool>(isEdited);
     if (!nullToAbsent || reactions != null) {
       map['reactions'] = Variable<String>(reactions);
+    }
+    if (!nullToAbsent || medias != null) {
+      map['medias'] = Variable<String>(medias);
     }
     return map;
   }
@@ -1002,6 +993,8 @@ class MessageTableData extends DataClass
       reactions: reactions == null && nullToAbsent
           ? const Value.absent()
           : Value(reactions),
+      medias:
+          medias == null && nullToAbsent ? const Value.absent() : Value(medias),
     );
   }
 
@@ -1025,6 +1018,7 @@ class MessageTableData extends DataClass
       duration: serializer.fromJson<int?>(json['duration']),
       isEdited: serializer.fromJson<bool>(json['isEdited']),
       reactions: serializer.fromJson<String?>(json['reactions']),
+      medias: serializer.fromJson<String?>(json['medias']),
     );
   }
   @override
@@ -1047,6 +1041,7 @@ class MessageTableData extends DataClass
       'duration': serializer.toJson<int?>(duration),
       'isEdited': serializer.toJson<bool>(isEdited),
       'reactions': serializer.toJson<String?>(reactions),
+      'medias': serializer.toJson<String?>(medias),
     };
   }
 
@@ -1066,7 +1061,8 @@ class MessageTableData extends DataClass
           Value<String?> mimeType = const Value.absent(),
           Value<int?> duration = const Value.absent(),
           bool? isEdited,
-          Value<String?> reactions = const Value.absent()}) =>
+          Value<String?> reactions = const Value.absent(),
+          Value<String?> medias = const Value.absent()}) =>
       MessageTableData(
         id: id ?? this.id,
         conversationId: conversationId ?? this.conversationId,
@@ -1085,6 +1081,7 @@ class MessageTableData extends DataClass
         duration: duration.present ? duration.value : this.duration,
         isEdited: isEdited ?? this.isEdited,
         reactions: reactions.present ? reactions.value : this.reactions,
+        medias: medias.present ? medias.value : this.medias,
       );
   MessageTableData copyWithCompanion(MessageTableCompanion data) {
     return MessageTableData(
@@ -1109,6 +1106,7 @@ class MessageTableData extends DataClass
       duration: data.duration.present ? data.duration.value : this.duration,
       isEdited: data.isEdited.present ? data.isEdited.value : this.isEdited,
       reactions: data.reactions.present ? data.reactions.value : this.reactions,
+      medias: data.medias.present ? data.medias.value : this.medias,
     );
   }
 
@@ -1130,7 +1128,8 @@ class MessageTableData extends DataClass
           ..write('mimeType: $mimeType, ')
           ..write('duration: $duration, ')
           ..write('isEdited: $isEdited, ')
-          ..write('reactions: $reactions')
+          ..write('reactions: $reactions, ')
+          ..write('medias: $medias')
           ..write(')'))
         .toString();
   }
@@ -1152,7 +1151,8 @@ class MessageTableData extends DataClass
       mimeType,
       duration,
       isEdited,
-      reactions);
+      reactions,
+      medias);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1172,7 +1172,8 @@ class MessageTableData extends DataClass
           other.mimeType == this.mimeType &&
           other.duration == this.duration &&
           other.isEdited == this.isEdited &&
-          other.reactions == this.reactions);
+          other.reactions == this.reactions &&
+          other.medias == this.medias);
 }
 
 class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
@@ -1192,6 +1193,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
   final Value<int?> duration;
   final Value<bool> isEdited;
   final Value<String?> reactions;
+  final Value<String?> medias;
   final Value<int> rowid;
   const MessageTableCompanion({
     this.id = const Value.absent(),
@@ -1210,6 +1212,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     this.duration = const Value.absent(),
     this.isEdited = const Value.absent(),
     this.reactions = const Value.absent(),
+    this.medias = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   MessageTableCompanion.insert({
@@ -1229,6 +1232,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     this.duration = const Value.absent(),
     this.isEdited = const Value.absent(),
     this.reactions = const Value.absent(),
+    this.medias = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         conversationId = Value(conversationId),
@@ -1252,6 +1256,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     Expression<int>? duration,
     Expression<bool>? isEdited,
     Expression<String>? reactions,
+    Expression<String>? medias,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1271,6 +1276,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       if (duration != null) 'duration': duration,
       if (isEdited != null) 'is_edited': isEdited,
       if (reactions != null) 'reactions': reactions,
+      if (medias != null) 'medias': medias,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1292,6 +1298,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       Value<int?>? duration,
       Value<bool>? isEdited,
       Value<String?>? reactions,
+      Value<String?>? medias,
       Value<int>? rowid}) {
     return MessageTableCompanion(
       id: id ?? this.id,
@@ -1310,6 +1317,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
       duration: duration ?? this.duration,
       isEdited: isEdited ?? this.isEdited,
       reactions: reactions ?? this.reactions,
+      medias: medias ?? this.medias,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1365,6 +1373,9 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
     if (reactions.present) {
       map['reactions'] = Variable<String>(reactions.value);
     }
+    if (medias.present) {
+      map['medias'] = Variable<String>(medias.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1390,6 +1401,7 @@ class MessageTableCompanion extends UpdateCompanion<MessageTableData> {
           ..write('duration: $duration, ')
           ..write('isEdited: $isEdited, ')
           ..write('reactions: $reactions, ')
+          ..write('medias: $medias, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2512,6 +2524,7 @@ typedef $$MessageTableTableCreateCompanionBuilder = MessageTableCompanion
   Value<int?> duration,
   Value<bool> isEdited,
   Value<String?> reactions,
+  Value<String?> medias,
   Value<int> rowid,
 });
 typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
@@ -2532,6 +2545,7 @@ typedef $$MessageTableTableUpdateCompanionBuilder = MessageTableCompanion
   Value<int?> duration,
   Value<bool> isEdited,
   Value<String?> reactions,
+  Value<String?> medias,
   Value<int> rowid,
 });
 
@@ -2610,6 +2624,9 @@ class $$MessageTableTableFilterComposer
   ColumnFilters<String> get reactions => $composableBuilder(
       column: $table.reactions, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get medias => $composableBuilder(
+      column: $table.medias, builder: (column) => ColumnFilters(column));
+
   $$ConversationTableTableFilterComposer get conversationId {
     final $$ConversationTableTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -2686,6 +2703,9 @@ class $$MessageTableTableOrderingComposer
   ColumnOrderings<String> get reactions => $composableBuilder(
       column: $table.reactions, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get medias => $composableBuilder(
+      column: $table.medias, builder: (column) => ColumnOrderings(column));
+
   $$ConversationTableTableOrderingComposer get conversationId {
     final $$ConversationTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -2761,6 +2781,9 @@ class $$MessageTableTableAnnotationComposer
   GeneratedColumn<String> get reactions =>
       $composableBuilder(column: $table.reactions, builder: (column) => column);
 
+  GeneratedColumn<String> get medias =>
+      $composableBuilder(column: $table.medias, builder: (column) => column);
+
   $$ConversationTableTableAnnotationComposer get conversationId {
     final $$ConversationTableTableAnnotationComposer composer =
         $composerBuilder(
@@ -2822,6 +2845,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             Value<int?> duration = const Value.absent(),
             Value<bool> isEdited = const Value.absent(),
             Value<String?> reactions = const Value.absent(),
+            Value<String?> medias = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion(
@@ -2841,6 +2865,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             duration: duration,
             isEdited: isEdited,
             reactions: reactions,
+            medias: medias,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2860,6 +2885,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             Value<int?> duration = const Value.absent(),
             Value<bool> isEdited = const Value.absent(),
             Value<String?> reactions = const Value.absent(),
+            Value<String?> medias = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               MessageTableCompanion.insert(
@@ -2879,6 +2905,7 @@ class $$MessageTableTableTableManager extends RootTableManager<
             duration: duration,
             isEdited: isEdited,
             reactions: reactions,
+            medias: medias,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/notfications/application/notification_provider.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/get_notifications_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/mark_notification_read_use_case.dart';
+import 'package:lotus_connect/features/notfications/domain/usecase/read_notification_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/register_device_token_use_case.dart';
 import 'package:lotus_connect/features/notfications/domain/usecase/unregister_device_token_use_case.dart';
 
@@ -41,6 +43,25 @@ class AppNotification {
   final Map<String, dynamic>? data;
   final bool isRead;
   final DateTime createdAt;
+
+  AppNotification copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? body,
+    bool? isRead,
+    Map<String, dynamic>? data,
+    DateTime? createdAt,
+  }) {
+    return AppNotification(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }
 
 class NotificationsState {
@@ -73,10 +94,12 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     required MarkNotificationReadUseCase markNotificationReadUseCase,
     required RegisterDeviceTokenUseCase registerDeviceTokenUseCase,
     required UnregisterDeviceTokenUseCase unregisterDeviceTokenUseCase,
+    required ReadNotificationUseCase readNotificationUseCase,
   })  : _getNotificationsUseCase = getNotificationUseCase,
         _markNotificationReadUseCase = markNotificationReadUseCase,
         _registerDeviceTokenUseCase = registerDeviceTokenUseCase,
         _unregisterDeviceTokenUseCase = unregisterDeviceTokenUseCase,
+        _readNotificationUseCase = readNotificationUseCase,
         super(const NotificationsState()) {
     loadNotifications();
   }
@@ -85,6 +108,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   final MarkNotificationReadUseCase _markNotificationReadUseCase;
   final RegisterDeviceTokenUseCase _registerDeviceTokenUseCase;
   final UnregisterDeviceTokenUseCase _unregisterDeviceTokenUseCase;
+  final ReadNotificationUseCase _readNotificationUseCase;
 
   Future<void> loadNotifications() async {
     state = state.copyWith(isLoading: true);
@@ -99,6 +123,33 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
+      );
+    }
+  }
+
+  Future<void> readNotification(String notificationId) async {
+    try {
+      final result = await _readNotificationUseCase(
+        ReadNotificationParam(notificationId: notificationId),
+      );
+      result.fold((error) {
+        AppLogger.debug('read notification error: ${error.message}');
+        state = state.copyWith(errorMessage: error.message);
+      }, (success) {
+        AppLogger.debug('read notification success: ${success.message}');
+        final updated = state.notifications.map((n) {
+          if (n.id == notificationId) {
+            return n.copyWith(isRead: true);
+          }
+          return n;
+        }).toList();
+
+        state = state.copyWith(notifications: updated);
+      });
+    } on Object {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Something went wrong, please try again!',
       );
     }
   }
@@ -152,5 +203,6 @@ final notificationsProvider =
     registerDeviceTokenUseCase: ref.watch(registerDeviceTokenUseCaseProvider),
     unregisterDeviceTokenUseCase:
         ref.watch(unregisterDeviceTokenUseCaseProvider),
+    readNotificationUseCase: ref.watch(readNotificationUseCaseProvider),
   );
 });
