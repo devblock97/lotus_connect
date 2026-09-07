@@ -1,0 +1,61 @@
+[
+  {
+    "id": "01a06cc7-b276-7ac3-8a39-1b01d69ccc13",
+    "conversation_id": "01a0332c-b962-7991-afab-f1a94ba71350",
+    "sender_id": "01a0332c-14e9-7ba2-b033-15dade02062b",
+    "content": "That kind of corporate myopia almost inevitably invites long-term obsolescence.",
+    "message_type": "text",
+    "reply_to_id": null,
+    "media_url": null,
+    "thumbnail_url": null,
+    "file_name": null,
+    "file_size": null,
+    "mime_type": null,
+    "duration": null,
+    "media_items": [],
+    "is_edited": false,
+    "created_at": "2026-09-04T14:17:01.815562Z",
+    "updated_at": "2026-09-04T14:17:01.815562Z",
+    "reactions": null
+  },
+  {
+    "id": "01a075dc-9fe0-7022-85fc-87bcd57459f9",
+    "conversation_id": "01a0332c-b962-7991-afab-f1a94ba71350",
+    "sender_id": "01a03314-af86-72f3-b270-d5642b05fbdc",
+    "content": "hello world :)",
+    "message_type": "image",
+    "reply_to_id": null,
+    "media_url": "https://ef21-2001-ee0-26e-7703-64c2-be98-cc71-71d6.ngrok-free.app/uploads/01a075dc-9b5d-7b50-9106-f5dc8fb03018-lotus_connect_video_call.mp4",
+    "thumbnail_url": null,
+    "file_name": "lotus_connect_video_call.mp4",
+    "file_size": 37955482,
+    "mime_type": "video/mp4",
+    "duration": null,
+    "media_items": [
+      {
+        "url": "https://ef21-2001-ee0-26e-7703-64c2-be98-cc71-71d6.ngrok-free.app/uploads/01a075dc-9b5d-7b50-9106-f5dc8fb03018-lotus_connect_video_call.mp4",
+        "thumbnailUrl": null,
+        "fileName": "lotus_connect_video_call.mp4",
+        "fileSize": 37955482,
+        "mimeType": "video/mp4",
+        "duration": null,
+        "width": null,
+        "height": null
+      },
+      {
+        "url": "https://ef21-2001-ee0-26e-7703-64c2-be98-cc71-71d6.ngrok-free.app/uploads/01a075dc-9efb-7d50-b1f3-44cc3e65af5f-Simulator Screenshot - iPhone 17 - 2026-07-19 at 19.51.30.png",
+        "thumbnailUrl": null,
+        "fileName": "Simulator Screenshot - iPhone 17 - 2026-07-19 at 19.51.30.png",
+        "fileSize": 1982351,
+        "mimeType": "image/png",
+        "duration": null,
+        "width": null,
+        "height": null
+      }
+    ],
+    "is_edited": false,
+    "created_at": "2026-09-06T08:36:28.257289Z",
+    "updated_at": "2026-09-06T08:36:28.257289Z",
+    "reactions": null
+  }
+]
