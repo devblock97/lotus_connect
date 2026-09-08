@@ -200,6 +200,8 @@ class Message extends Equatable {
         updatedAt,
         reactions,
         isEdited,
+        medias,
+        messageType,
       ];
 }
 
