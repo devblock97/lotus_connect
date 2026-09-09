@@ -244,15 +244,6 @@ class PushNotificationService {
       final data = message.data;
       final type = data['type'] as String? ?? '';
 
-      debugPrint('====================================================');
-      debugPrint('[FCM FOREGROUND PUSH RECEIVED]');
-      debugPrint('Message ID: ${message.messageId}');
-      debugPrint('Data Payload: $data');
-      debugPrint('Notification Title: ${message.notification?.title}');
-      debugPrint('Notification Body: ${message.notification?.body}');
-      debugPrint('Parsed Event Type: "$type"');
-      debugPrint('====================================================');
-
       if (type == 'call_invite') {
         final callId = data['callId'] as String? ?? const Uuid().v4();
         final callerName = data['callerName'] as String? ?? 'Incoming Call';
