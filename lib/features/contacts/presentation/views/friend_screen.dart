@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
+import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -141,6 +143,28 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                             ...filteredFriends.map(
                               (friend) => ContactCard(
                                 friend: friend,
+                                startChat: () async {
+                                  final convId = await ref
+                                      .read(
+                                        privateConversationListProvider
+                                            .notifier,
+                                      )
+                                      .createNewPrivateChat(
+                                        friendId: friend.id,
+                                        title:
+                                            friend.fullName ?? friend.username,
+                                      );
+                                  if (convId != null) {
+                                    if (!context.mounted) return;
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ChatScreen(conversation: convId),
+                                      ),
+                                    );
+                                  }
+                                },
                                 voiceCall: () {
                                   _startCall(
                                     recipientId: friend.id,

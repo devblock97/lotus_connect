@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -244,15 +245,6 @@ class PushNotificationService {
       final data = message.data;
       final type = data['type'] as String? ?? '';
 
-      debugPrint('====================================================');
-      debugPrint('[FCM FOREGROUND PUSH RECEIVED]');
-      debugPrint('Message ID: ${message.messageId}');
-      debugPrint('Data Payload: $data');
-      debugPrint('Notification Title: ${message.notification?.title}');
-      debugPrint('Notification Body: ${message.notification?.body}');
-      debugPrint('Parsed Event Type: "$type"');
-      debugPrint('====================================================');
-
       if (type == 'call_invite') {
         final callId = data['callId'] as String? ?? const Uuid().v4();
         final callerName = data['callerName'] as String? ?? 'Incoming Call';
@@ -317,39 +309,42 @@ class PushNotificationService {
     }
   }
 
+  bool get _isIOSSimulator =>
+      !kIsWeb &&
+      defaultTargetPlatform == TargetPlatform.iOS &&
+      (Platform.environment.containsKey('SIMULATOR_DEVICE_NAME') ||
+          Platform.environment.containsKey('SIMULATOR_ROOT'));
+
   /// Syncs current FCM token to backend database.
   Future<void> syncDeviceToken() async {
     try {
+      // 1. Bypass immediately on iOS Simulator
+      if (_isIOSSimulator) {
+        AppLogger.debug(
+          '[FCM Token Sync] Running on iOS Simulator. APNs is not available — skipping FCM token sync.',
+        );
+        return;
+      }
       debugPrint('[FCM Token Sync] Fetching FCM device token...');
-
-      // On iOS (especially Simulators or prior to APNS registration),
-      // verify APNS token availability first to avoid
-      // apns-token-not-set exception or freezing
+      // 2. On physical iOS devices: wait for APNs token
       if (defaultTargetPlatform == TargetPlatform.iOS) {
-        final apnsToken =
-            await FirebaseMessaging.instance.getAPNSToken().timeout(
-                  const Duration(seconds: 3),
-                  onTimeout: () => null,
-                );
+        final apnsToken = await FirebaseMessaging.instance
+            .getAPNSToken()
+            .timeout(const Duration(seconds: 5), onTimeout: () => null);
         if (apnsToken == null) {
           AppLogger.debug(
-            '[FCM Token Sync] APNS token not available yet '
-            '(iOS Simulator or pending APNS). Skipping FCM token fetch.',
+            '[FCM Token Sync] APNS token not available yet. Skipping FCM token fetch.',
           );
           return;
         }
       }
-
       final token = await FirebaseMessaging.instance.getToken().timeout(
             const Duration(seconds: 5),
             onTimeout: () => null,
           );
-
       if (token != null && token.isNotEmpty) {
         debugPrint('[FCM Token Sync] Retrieved token: $token');
         await _registerTokenToBackend(token);
-      } else {
-        debugPrint('[FCM Token Sync] Token is null or timed out');
       }
     } on Object catch (e) {
       debugPrint('[FCM Token Sync Error]: $e');

@@ -1,5 +1,4 @@
-import 'package:fpdart/fpdart.dart';
-import 'package:lotus_connect/core/errors/failure.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
@@ -12,7 +11,8 @@ class UpdateMessageParam {
   final String content;
 }
 
-class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
+class UpdateMessageUseCase
+    extends UseCase<ResponseEntityBase, UpdateMessageParam> {
   UpdateMessageUseCase({
     required ChatCoreRepository chatCoreRepository,
     required PrivateChatRepository privateChatRepository,
@@ -23,43 +23,10 @@ class UpdateMessageUseCase extends UseCase<void, UpdateMessageParam> {
   final PrivateChatRepository _privateChatRepository;
 
   @override
-  FutureResult<void> call(UpdateMessageParam params) async {
-    final uuidRegex = RegExp(
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
-      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-    );
-
-    if (!uuidRegex.hasMatch(params.messageId)) {
-      // Legacy optimistic message. Update locally only.
-      return _updateLocally(params.messageId, params.content);
-    }
-
-    final updateResult = await _privateChatRepository.updateMessage(
+  FutureResult<ResponseEntityBase> call(UpdateMessageParam params) async {
+    return _privateChatRepository.updateMessage(
       messageId: params.messageId,
       content: params.content,
     );
-
-    return updateResult.fold(
-      Left.new,
-      (_) => _updateLocally(params.messageId, params.content),
-    );
-  }
-
-  FutureResult<void> _updateLocally(String messageId, String content) async {
-    try {
-      final getResult = await _chatCoreRepository.getMessage(messageId);
-      return await getResult.fold(
-        Left.new,
-        (msg) async {
-          if (msg != null) {
-            final updatedMsg = msg.copyWith(content: content);
-            await _chatCoreRepository.saveMessage(updatedMsg);
-          }
-          return const Right(null);
-        },
-      );
-    } on Object catch (e) {
-      return Left(DatabaseFailure('Failed to update message locally: $e', e));
-    }
   }
 }

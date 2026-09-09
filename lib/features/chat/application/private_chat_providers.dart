@@ -13,6 +13,7 @@ import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 
 /// Provider for PrivateChatRemoteDataSource.
@@ -104,4 +105,9 @@ final uploadFileUseCaseProvider = Provider<UploadFileUseCase>((ref) {
   return UploadFileUseCase(
     repository: ref.watch(privateChatRepositoryProvider),
   );
+});
+
+/// Provider for GetMessageUseCase
+final getMessageUseCaseProvider = Provider<GetMessageUseCase>((ref) {
+  return GetMessageUseCase(repository: ref.watch(chatCoreRepositoryProvider));
 });

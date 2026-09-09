@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
@@ -53,6 +54,11 @@ void main() {
     role: MessageRole.user,
     content: testContent,
     timestamp: DateTime.now(),
+  );
+
+  const testMessageResponse = ResponseEntityBase(
+    isSuccess: true,
+    message: 'Message updated',
   );
 
   group('createPrivateChat', () {
@@ -145,7 +151,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Left(ServerFailure) when fetchRemoteMessaes fails',
+    test('should return Left(ServerFailure) when fetchRemoteMessage fails',
         () async {
       when(
         () => mockChatRemoteDataSource.fetchRemoteMessages(
@@ -275,11 +281,14 @@ void main() {
     test('should return Right(null) when deleteMessage succeeds', () async {
       when(
         () => mockChatRemoteDataSource.deleteMessage(testMessageId),
-      ).thenAnswer((_) async => Future.value());
+      ).thenAnswer((_) async => testMessageResponse);
 
       final result = await repository.deleteMessage(testMessageId);
 
-      expect(result, const Right<Failure, void>(null));
+      expect(
+        result,
+        const Right<Failure, ResponseEntityBase>(testMessageResponse),
+      );
       verify(() => mockChatRemoteDataSource.deleteMessage(testMessageId))
           .called(1);
     });
@@ -301,18 +310,22 @@ void main() {
   });
 
   group('updateMessage', () {
-    test('should return Right(null) when updateMessage succeeds', () async {
+    test('should return Right(ResponseEntityBase) when updateMessage succeeds',
+        () async {
       when(
         () =>
             mockChatRemoteDataSource.updateMessage(testMessageId, testContent),
-      ).thenAnswer((_) async => Future.value());
+      ).thenAnswer((_) async => testMessageResponse);
 
       final result = await repository.updateMessage(
         messageId: testMessageId,
         content: testContent,
       );
 
-      expect(result, const Right<Failure, void>(null));
+      expect(
+        result,
+        const Right<Failure, ResponseEntityBase>(testMessageResponse),
+      );
       verify(
         () =>
             mockChatRemoteDataSource.updateMessage(testMessageId, testContent),

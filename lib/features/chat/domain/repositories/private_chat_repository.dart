@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
@@ -25,9 +26,9 @@ abstract class PrivateChatRepository {
   }) =>
       throw UnimplementedError('Stub');
 
-  FutureResult<void> deleteMessage(String messageId);
+  FutureResult<ResponseEntityBase> deleteMessage(String messageId);
 
-  FutureResult<void> updateMessage({
+  FutureResult<ResponseEntityBase> updateMessage({
     required String messageId,
     required String content,
   }) =>

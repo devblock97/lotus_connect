@@ -18,6 +18,7 @@ import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -99,6 +100,7 @@ class PrivateActiveConversationNotifier
     required SendMessageUseCase sendMessageUseCase,
     required ReactionMessageUseCase reactionMessageUseCase,
     required UploadFileUseCase uploadFileUseCase,
+    required GetMessageUseCase getMessageUseCase,
   })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
         _getLocalMessageUseCase = getLocalMessageUseCase,
         _saveLocalMessageUseCase = saveLocalMessageUseCase,
@@ -109,6 +111,7 @@ class PrivateActiveConversationNotifier
         _sendMessageUseCase = sendMessageUseCase,
         _reactionMessageUseCase = reactionMessageUseCase,
         _uploadFileUseCase = uploadFileUseCase,
+        _getMessagesUseCase = getMessageUseCase,
         super(const PrivateActiveConversationState()) {
     _init();
   }
@@ -125,6 +128,7 @@ class PrivateActiveConversationNotifier
   final SendMessageUseCase _sendMessageUseCase;
   final ReactionMessageUseCase _reactionMessageUseCase;
   final UploadFileUseCase _uploadFileUseCase;
+  final GetMessageUseCase _getMessagesUseCase;
 
   Timer? _typingTimer;
   bool _isCurrentlyTyping = false;
@@ -488,14 +492,50 @@ class PrivateActiveConversationNotifier
   }
 
   Future<void> updateMessage(String messageId, String content) async {
+    final uuidRegex = RegExp(
+      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+
+    if (!uuidRegex.hasMatch(messageId)) {
+      // Legacy optimistic message. Update locally only.
+      try {
+        final getMessageResult = await _getMessagesUseCase(
+          GetMessageParam(messageId: messageId),
+        );
+        await getMessageResult.fold((error) {}, (message) async {
+          if (message != null) {
+            final updateMessage = message.copyWith(content: content);
+            await _saveLocalMessageUseCase(
+              SaveLocalMessageParam(message: updateMessage),
+            );
+          }
+        });
+        return;
+      } on Object {
+        state =
+            state.copyWith(errorMessage: 'Failed to update message locally');
+      }
+    }
+
     final params = UpdateMessageParam(messageId: messageId, content: content);
     final result = await _updateMessageUseCase(params);
-    result.fold(
+    await result.fold(
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
       },
-      (_) {
-        // State updates reactively via watched database query streams
+      (message) async {
+        final getMessageResult = await _getMessagesUseCase(
+          GetMessageParam(messageId: messageId),
+        );
+        await getMessageResult.fold((error) {}, (message) async {
+          if (message != null) {
+            final updateMessage = message.copyWith(content: content);
+            await _saveLocalMessageUseCase(
+              SaveLocalMessageParam(message: updateMessage),
+            );
+          }
+        });
       },
     );
   }
@@ -551,5 +591,6 @@ final privateActiveConversationProvider = StateNotifierProvider<
     sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
     reactionMessageUseCase: ref.watch(reactionMessageUseCaseProvider),
     uploadFileUseCase: ref.watch(uploadFileUseCaseProvider),
+    getMessageUseCase: ref.watch(getMessageUseCaseProvider),
   );
 });
