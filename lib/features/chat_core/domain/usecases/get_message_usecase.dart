@@ -14,9 +14,8 @@ class GetMessageParam extends Equatable {
 }
 
 class GetMessageUseCase extends UseCase<Message?, GetMessageParam> {
-
-  GetMessageUseCase({required ChatCoreRepository repository}) :
-      _repository = repository;
+  GetMessageUseCase({required ChatCoreRepository repository})
+      : _repository = repository;
 
   final ChatCoreRepository _repository;
 

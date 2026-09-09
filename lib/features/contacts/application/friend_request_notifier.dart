@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
@@ -92,12 +93,15 @@ class FriendRequestNotifier extends StateNotifier<FriendRequestState> {
         SendFriendRequestParam(username: username),
       );
       response.fold((error) {
-        state = state.copyWith(message: error.message);
+        debugPrint('check send friend error: ${error.message}');
+        state = state.copyWith(message: error.message, isLoading: false);
+        return false;
       }, (success) {
+        debugPrint('check send friend success');
         state = state.copyWith(isLoading: false);
         return true;
       });
-      return false;
+      return true;
     } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,

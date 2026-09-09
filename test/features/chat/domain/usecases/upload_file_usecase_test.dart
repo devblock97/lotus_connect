@@ -19,59 +19,78 @@ void main() {
   });
 
   const testFileUpload = FileUploadResponseModel(
-      files: [
-        MediaModel(
-          url: 'https://lotusconnect.com/uploads/file1.png',
-          thumbnailUrl: 'https://lotusconnect.com/uploads/thumbnail.png',
-          fileName: 'file1.png',
-          mimeType: 'image/png',
-        ),
-      ],
-      fileUrls: [
-        'https://lotusconnect.com/uploads/thumbnail.png',
-      ],
+    files: [
+      MediaModel(
+        url: 'https://lotusconnect.com/uploads/file1.png',
+        thumbnailUrl: 'https://lotusconnect.com/uploads/thumbnail.png',
+        fileName: 'file1.png',
+        mimeType: 'image/png',
+      ),
+    ],
+    fileUrls: [
+      'https://lotusconnect.com/uploads/thumbnail.png',
+    ],
   );
 
   group('uploadFileUseCase', () {
-    test('should return FileUploadResponseModel when uploadFile succeeds', () async {
-      when (
-          () => mockChatRepo.uploadFiles(['/path/to/file1.png']),
+    test('should return FileUploadResponseModel when uploadFile succeeds',
+        () async {
+      when(
+        () => mockChatRepo.uploadFiles(['/path/to/file1.png']),
       ).thenAnswer((_) async => const Right(testFileUpload));
 
       final result = await useCase(
-        const UploadFileParam(paths: ['/path/to/file1.png'],),
+        const UploadFileParam(
+          paths: ['/path/to/file1.png'],
+        ),
       );
 
-      expect(result, const Right<Failure, FileUploadResponseModel>(testFileUpload));
+      expect(
+        result,
+        const Right<Failure, FileUploadResponseModel>(testFileUpload),
+      );
       verify(() => mockChatRepo.uploadFiles(['/path/to/file1.png'])).called(1);
       verifyNoMoreInteractions(mockChatRepo);
     });
 
     test('should return ServerFailure when uploadFile fails', () async {
       const serverFailure = ServerFailure('Failed to upload media from server');
-      when(() => mockChatRepo.uploadFiles(['/path/to/file1.png']),)
-          .thenAnswer((_) async =>
-      const Left(serverFailure),);
-
-      final result = await useCase(
-        const UploadFileParam(paths: ['/path/to/file1.png'],),
+      when(
+        () => mockChatRepo.uploadFiles(['/path/to/file1.png']),
+      ).thenAnswer(
+        (_) async => const Left(serverFailure),
       );
 
-      expect(result, const Left<Failure, FileUploadResponseModel>(serverFailure));
+      final result = await useCase(
+        const UploadFileParam(
+          paths: ['/path/to/file1.png'],
+        ),
+      );
+
+      expect(
+        result,
+        const Left<Failure, FileUploadResponseModel>(serverFailure),
+      );
       verify(() => mockChatRepo.uploadFiles(['/path/to/file1.png'])).called(1);
       verifyNoMoreInteractions(mockChatRepo);
     });
 
-    test('should return NetworkFailure when device has no internet connection', () async {
+    test('should return NetworkFailure when device has no internet connection',
+        () async {
       const networkFailure = NetworkFailure('No internet connection');
       when(() => mockChatRepo.uploadFiles(['/path/to/file1.png']))
-      .thenAnswer((_) async => const Left(networkFailure));
+          .thenAnswer((_) async => const Left(networkFailure));
 
       final result = await useCase(
-        const UploadFileParam(paths: ['/path/to/file1.png'],),
+        const UploadFileParam(
+          paths: ['/path/to/file1.png'],
+        ),
       );
 
-      expect(result, const Left<Failure, FileUploadResponseModel>(networkFailure));
+      expect(
+        result,
+        const Left<Failure, FileUploadResponseModel>(networkFailure),
+      );
       verify(() => mockChatRepo.uploadFiles(['/path/to/file1.png']));
       verifyNoMoreInteractions(mockChatRepo);
     });

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
@@ -18,6 +19,10 @@ void main() {
 
   const testMessageId = '00000000-0000-0000-0000-000000000001';
   const testParams = DeleteRemoteMessageParam(messageId: testMessageId);
+  const testMessageResponse = ResponseEntityBase(
+    isSuccess: true,
+    message: 'Message updated',
+  );
 
   group('DeleteRemoteMessageUseCase', () {
     test('should return ServerFailure when repository fails', () async {
@@ -38,14 +43,18 @@ void main() {
       verifyNoMoreInteractions(mockPrivateChatRepo);
     });
 
-    test('should forward call to repository and return Right(null) on success',
+    test(
+        'should forward call to repository and return Right(ResponseEntityBase) on success',
         () async {
       when(() => mockPrivateChatRepo.deleteMessage(testMessageId))
-          .thenAnswer((_) async => const Right(null));
+          .thenAnswer((_) async => const Right(testMessageResponse));
 
       final result = await useCase(testParams);
 
-      expect(result, const Right<Failure, void>(null));
+      expect(
+        result,
+        const Right<Failure, ResponseEntityBase>(testMessageResponse),
+      );
       verify(() => mockPrivateChatRepo.deleteMessage(testMessageId)).called(1);
       verifyNoMoreInteractions(mockPrivateChatRepo);
     });

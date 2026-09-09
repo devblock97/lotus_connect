@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -16,18 +16,6 @@ void main() {
   late MockChatCoreRepository mockChatCoreRepo;
   late UpdateMessageUseCase useCase;
 
-  setUpAll(() {
-    registerFallbackValue(
-      Message(
-        id: '',
-        conversationId: '',
-        role: MessageRole.user,
-        content: '',
-        timestamp: DateTime.now(),
-      ),
-    );
-  });
-
   setUp(() {
     mockPrivateChatRepo = MockPrivateChatRepository();
     mockChatCoreRepo = MockChatCoreRepository();
@@ -37,106 +25,96 @@ void main() {
     );
   });
 
-  const testUuid = '00000000-0000-0000-0000-000000000001';
-  const testLegacyId = '1234567890';
+  const testMessageId = '00000000-0000-0000-0000-000000000001';
   const testContent = 'Updated Content';
-
-  final baseMessage = Message(
-    id: testUuid,
-    conversationId: 'test_conv',
-    role: MessageRole.user,
-    content: 'Old Content',
-    timestamp: DateTime.now(),
+  const testParams = UpdateMessageParam(
+    messageId: testMessageId,
+    content: testContent,
   );
 
-  test('should update message remotely and locally when ID is a valid UUID',
-      () async {
-    when(
-      () => mockPrivateChatRepo.updateMessage(
-        messageId: testUuid,
-        content: testContent,
-      ),
-    ).thenAnswer((_) async => const Right(null));
+  const testMessageResponse = ResponseEntityBase(
+    isSuccess: true,
+    message: 'Message updated',
+  );
 
-    when(() => mockChatCoreRepo.getMessage(testUuid))
-        .thenAnswer((_) async => Right(baseMessage));
-
-    when(() => mockChatCoreRepo.saveMessage(any()))
-        .thenAnswer((_) async => const Right(null));
-
-    final result = await useCase(
-      const UpdateMessageParam(messageId: testUuid, content: testContent),
-    );
-
-    expect(result, const Right<Failure, void>(null));
-
-    verify(
-      () => mockPrivateChatRepo.updateMessage(
-        messageId: testUuid,
-        content: testContent,
-      ),
-    ).called(1);
-
-    verify(() => mockChatCoreRepo.getMessage(testUuid)).called(1);
-    verify(
-      () => mockChatCoreRepo.saveMessage(
-        any(
-          that: isA<Message>().having((m) => m.content, 'content', testContent),
+  group('UpdateMessageUseCase', () {
+    test('should return ResponseEntityBase when repository update succeeds',
+        () async {
+      // Arrange
+      when(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
         ),
-      ),
-    ).called(1);
-  });
+      ).thenAnswer((_) async => const Right(testMessageResponse));
 
-  test('should only update message locally when ID is a legacy non-UUID',
-      () async {
-    final legacyMessage = baseMessage.copyWith(id: testLegacyId);
+      // Act
+      final result = await useCase(testParams);
 
-    when(() => mockChatCoreRepo.getMessage(testLegacyId))
-        .thenAnswer((_) async => Right(legacyMessage));
-
-    when(() => mockChatCoreRepo.saveMessage(any()))
-        .thenAnswer((_) async => const Right(null));
-
-    final result = await useCase(
-      const UpdateMessageParam(messageId: testLegacyId, content: testContent),
-    );
-
-    expect(result, const Right<Failure, void>(null));
-
-    verifyNever(
-      () => mockPrivateChatRepo.updateMessage(
-        messageId: any(named: 'messageId'),
-        content: any(named: 'content'),
-      ),
-    );
-
-    verify(() => mockChatCoreRepo.getMessage(testLegacyId)).called(1);
-    verify(
-      () => mockChatCoreRepo.saveMessage(
-        any(
-          that: isA<Message>().having((m) => m.content, 'content', testContent),
+      // Assert
+      expect(
+        result,
+        const Right<Failure, ResponseEntityBase>(testMessageResponse),
+      );
+      verify(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
         ),
-      ),
-    ).called(1);
-  });
+      ).called(1);
+      verifyNoMoreInteractions(mockPrivateChatRepo);
+      verifyZeroInteractions(mockChatCoreRepo);
+    });
 
-  test('should return failure when remote update fails', () async {
-    const serverFailure = ServerFailure('API Error');
+    test('should return ServerFailure when repository update fails', () async {
+      // Arrange
+      const serverFailure = ServerFailure('Failed to update message on server');
+      when(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
+        ),
+      ).thenAnswer((_) async => const Left(serverFailure));
 
-    when(
-      () => mockPrivateChatRepo.updateMessage(
-        messageId: testUuid,
-        content: testContent,
-      ),
-    ).thenAnswer((_) async => const Left(serverFailure));
+      // Act
+      final result = await useCase(testParams);
 
-    final result = await useCase(
-      const UpdateMessageParam(messageId: testUuid, content: testContent),
-    );
+      // Assert
+      expect(result, const Left<Failure, ResponseEntityBase>(serverFailure));
+      verify(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockPrivateChatRepo);
+      verifyZeroInteractions(mockChatCoreRepo);
+    });
 
-    expect(result, const Left<Failure, void>(serverFailure));
+    test('should return NetworkFailure when device has no internet connection',
+        () async {
+      // Arrange
+      const networkFailure = NetworkFailure('No internet connection');
+      when(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
+        ),
+      ).thenAnswer((_) async => const Left(networkFailure));
 
-    verifyNever(() => mockChatCoreRepo.getMessage(any()));
-    verifyNever(() => mockChatCoreRepo.saveMessage(any()));
+      // Act
+      final result = await useCase(testParams);
+
+      // Assert
+      expect(result, const Left<Failure, ResponseEntityBase>(networkFailure));
+      verify(
+        () => mockPrivateChatRepo.updateMessage(
+          messageId: testMessageId,
+          content: testContent,
+        ),
+      ).called(1);
+      verifyNoMoreInteractions(mockPrivateChatRepo);
+      verifyZeroInteractions(mockChatCoreRepo);
+    });
   });
 }

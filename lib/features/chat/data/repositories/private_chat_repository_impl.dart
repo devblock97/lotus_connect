@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
@@ -72,23 +73,24 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   }
 
   @override
-  FutureResult<void> deleteMessage(String messageId) async {
+  FutureResult<ResponseEntityBase> deleteMessage(String messageId) async {
     try {
-      await _remoteDataSource.deleteMessage(messageId);
-      return const Right(null);
+      final response = await _remoteDataSource.deleteMessage(messageId);
+      return Right(response);
     } on Object catch (e) {
       return Left(ServerFailure('Failed to delete message: $e', e));
     }
   }
 
   @override
-  FutureResult<void> updateMessage({
+  FutureResult<ResponseEntityBase> updateMessage({
     required String messageId,
     required String content,
   }) async {
     try {
-      await _remoteDataSource.updateMessage(messageId, content);
-      return const Right(null);
+      final response =
+          await _remoteDataSource.updateMessage(messageId, content);
+      return Right(response);
     } on Object catch (e) {
       return Left(ServerFailure('Failed to update message: $e', e));
     }

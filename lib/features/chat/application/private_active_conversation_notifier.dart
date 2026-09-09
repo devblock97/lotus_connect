@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
@@ -21,7 +19,6 @@ import 'package:lotus_connect/features/chat_core/application/chat_core_providers
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/usecases/get_messages_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -506,20 +503,18 @@ class PrivateActiveConversationNotifier
         final getMessageResult = await _getMessagesUseCase(
           GetMessageParam(messageId: messageId),
         );
-        await getMessageResult.fold(
-          (error) {},
-          (message) async {
-            if (message != null) {
-              final updateMessage = message.copyWith(content: content);
-              await _saveLocalMessageUseCase(
-                SaveLocalMessageParam(message: updateMessage),
-              );
-            }
+        await getMessageResult.fold((error) {}, (message) async {
+          if (message != null) {
+            final updateMessage = message.copyWith(content: content);
+            await _saveLocalMessageUseCase(
+              SaveLocalMessageParam(message: updateMessage),
+            );
           }
-        );
+        });
         return;
-      } on Object catch (e) {
-        state = state.copyWith(errorMessage: 'Failed to update message locally');
+      } on Object {
+        state =
+            state.copyWith(errorMessage: 'Failed to update message locally');
       }
     }
 
@@ -533,17 +528,14 @@ class PrivateActiveConversationNotifier
         final getMessageResult = await _getMessagesUseCase(
           GetMessageParam(messageId: messageId),
         );
-        await getMessageResult.fold(
-          (error) {},
-          (message) async {
-            if (message != null) {
-              final updateMessage = message.copyWith(content: content);
-              await _saveLocalMessageUseCase(
-                SaveLocalMessageParam(message: updateMessage),
-              );
-            }
+        await getMessageResult.fold((error) {}, (message) async {
+          if (message != null) {
+            final updateMessage = message.copyWith(content: content);
+            await _saveLocalMessageUseCase(
+              SaveLocalMessageParam(message: updateMessage),
+            );
           }
-        );
+        });
       },
     );
   }

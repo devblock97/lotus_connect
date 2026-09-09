@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
@@ -23,9 +24,9 @@ abstract class PrivateChatRemoteDataSource {
     List<MediaModel> mediaItems,
   });
 
-  Future<void> deleteMessage(String messageId);
+  Future<ResponseEntityBase> deleteMessage(String messageId);
 
-  Future<void> updateMessage(String messageId, String content);
+  Future<ResponseEntityBase> updateMessage(String messageId, String content);
 
   Future<List<Message>> fetchRemoteMessages({
     required String conversationId,
@@ -148,25 +149,32 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   }
 
   @override
-  Future<void> deleteMessage(String messageId) async {
+  Future<ResponseEntityBase> deleteMessage(String messageId) async {
     try {
-      await _dioClient.delete(
+      final response = await _dioClient.delete(
         '/chats/messages/$messageId',
       );
+      final data = response.data as Map<String, dynamic>;
+      return ResponseEntityBase.fromJson(data);
     } catch (e) {
       throw Exception(e);
     }
   }
 
   @override
-  Future<void> updateMessage(String messageId, String content) async {
+  Future<ResponseEntityBase> updateMessage(
+    String messageId,
+    String content,
+  ) async {
     try {
-      await _dioClient.put(
+      final response = await _dioClient.put(
         '/chats/messages/$messageId',
         data: {
           'content': content,
         },
       );
+      final data = response.data as Map<String, dynamic>;
+      return ResponseEntityBase.fromJson(data);
     } catch (e) {
       throw Exception(e);
     }
