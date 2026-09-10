@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
 import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -61,46 +62,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
               ),
             ),
           ],
-          if (widget.message.medias.isNotEmpty) ...[
-            GridView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.message.medias.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: widget.message.medias.length >= 4
-                    ? 4
-                    : widget.message.medias.length,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-              ),
-              itemBuilder: (context, index) {
-                final media = widget.message.medias[index];
-                if (media.mimeType!.contains('video')) {
-                  return MediaVideoThumbnail(url: media.url);
-                }
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: CachedNetworkImage(
-                    imageUrl: media.thumbnailUrl ?? media.url,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) => const Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    ),
-                    errorWidget: (_, __, dynamic ___) =>
-                        const Icon(Icons.broken_image),
-                  ),
-                );
-              },
-            ),
-          ],
+          if (widget.message.medias.isNotEmpty) _buildMediaGridView(),
           GestureDetector(
             onLongPress: () => _showOptionsDialog(context, ref),
             child: Container(
@@ -172,6 +134,61 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMediaGridView() {
+    return GridView.builder(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: widget.message.medias.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: widget.message.medias.length >= 4
+            ? 4
+            : widget.message.medias.length,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+      ),
+      itemBuilder: (context, index) {
+        final media = widget.message.medias[index];
+        final isVideo = media.mimeType?.toLowerCase().contains('video') ??
+            media.url.toLowerCase().endsWith('.mp4');
+
+        return GestureDetector(
+          onTap: () {
+            FullScreenMediaViewer.show(
+              context,
+              medias: widget.message.medias,
+              initialIndex: index,
+            );
+          },
+          child: isVideo
+              ? MediaVideoThumbnail(url: media.url)
+              : Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Hero(
+                    tag: media.url,
+                    child: CachedNetworkImage(
+                      imageUrl: media.thumbnailUrl ?? media.url,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (_, __, dynamic ___) =>
+                          const Icon(Icons.broken_image),
+                    ),
+                  ),
+                ),
+        );
+      },
     );
   }
 
