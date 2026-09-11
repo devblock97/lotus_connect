@@ -58,7 +58,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
 
   void _handleSend() {
     final text = _controller.text.trim();
-    if (text.isNotEmpty) {
+    if (text.isNotEmpty || files != null) {
       widget.onSend(text, files ?? []);
       _controller.clear();
       files = null;

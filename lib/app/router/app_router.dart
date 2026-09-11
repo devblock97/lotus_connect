@@ -15,10 +15,11 @@ class AppRouter {
 
   static const String home = '/';
   static const String login = '/login';
-  static const String chat = '/chat';
+  static const String chatbot = '/chatbot';
   static const String conversations = '/conversations';
   static const String settings = '/settings';
   static const String contacts = '/contacts';
+  static const String chat = '/chats';
 }
 
 /// Global provider exposing the reactive GoRouter configuration.
@@ -53,7 +54,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             const LoginScreen(),
       ),
       GoRoute(
-        path: AppRouter.chat,
+        path: AppRouter.chatbot,
         builder: (BuildContext context, GoRouterState state) =>
             const ChatbotScreen(),
       ),
@@ -72,6 +73,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const ContactsScreen(),
       ),
+      // GoRoute(
+      //   path: AppRouter.chat,
+      //   builder: (BuildContext context, GoRouterState state) {
+      //     final c = state.extra
+      //     final conversation = Conversation(
+      //       id: id,
+      //       title: title,
+      //       createdAt: createdAt,
+      //       updatedAt: updatedAt,
+      //     );
+      //     return ChatScreen(conversation: conversation);
+      //   },
+      // ),
     ],
   );
 });

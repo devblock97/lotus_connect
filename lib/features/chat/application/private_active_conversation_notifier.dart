@@ -302,7 +302,7 @@ class PrivateActiveConversationNotifier
   /// Sends a message over the WebSocket tunnel.
   Future<void> sendMessage(String text, [List<XFile> medias = const []]) async {
     final trimmedText = text.trim();
-    if (trimmedText.isEmpty) {
+    if (trimmedText.isEmpty && medias.isEmpty) {
       state = state.copyWith(
         errorMessage: 'Message content cannot be empty',
       );
@@ -369,12 +369,14 @@ class PrivateActiveConversationNotifier
             mediaItems: medias,
           ),
         );
+        debugPrint('send media image without text');
 
         await result.fold(
           (failure) {
             state = state.copyWith(errorMessage: failure.message);
           },
           (remoteMessage) async {
+            debugPrint('send media image without text success');
             // Delete optimistic message and save the permanent
             // server-synchronized message
             await deleteMessage(optimisticId);

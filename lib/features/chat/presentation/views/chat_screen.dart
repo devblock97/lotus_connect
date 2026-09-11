@@ -230,7 +230,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ChatInputField(
             isGenerating: false,
             onSend: (message, medias) {
-              debugPrint('check media message input: ${medias.length}');
+              debugPrint(
+                'check media message input: message: $message; ${medias.length}',
+              );
               activeNotifier.sendMessage(message, medias);
               _scrollToBottom();
             },
