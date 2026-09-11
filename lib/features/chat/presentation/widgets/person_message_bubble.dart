@@ -62,48 +62,22 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
               ),
             ),
           ],
-          if (widget.message.medias.isNotEmpty) _buildMediaGridView(),
-          GestureDetector(
-            onLongPress: () => _showOptionsDialog(context, ref),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isMine ? 18 : 4),
-                  bottomRight: Radius.circular(isMine ? 4 : 18),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.repliedToMessage != null) ...[
-                    _buildBubbleReplyHeader(
-                      context,
-                      widget.repliedToMessage!,
-                      theme,
-                      isMine,
-                    ),
-                    const SizedBox(height: 6),
-                  ],
-                  if (widget.message.content.isNotEmpty)
-                    Text(
-                      widget.message.content,
-                      style: TextStyle(
-                        color: foreground,
-                        fontSize: 15,
-                        height: 1.35,
-                      ),
-                    ),
-                  if (widget.message.reactions.isNotEmpty)
-                    _buildReactionBadges(context, theme, isMine),
-                ],
-              ),
+          if (widget.message.medias.isNotEmpty &&
+              widget.message.content.isNotEmpty)
+            _buildTextAndMediaMessage(
+              state.isMediaLoading,
+              state.mediaLength,
+              background,
+              foreground,
+              isMine,
+              theme,
             ),
-          ),
+          if (widget.message.medias.isNotEmpty &&
+              widget.message.content.isEmpty)
+            _buildMediaMessage(isMine, foreground, background, theme),
+          if (widget.message.medias.isEmpty &&
+              widget.message.content.isNotEmpty)
+            _buildTextMessage(background, foreground, isMine, theme),
           const SizedBox(height: 3),
           Row(
             mainAxisSize: MainAxisSize.min,
@@ -156,6 +130,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
             media.url.toLowerCase().endsWith('.mp4');
 
         return GestureDetector(
+          onLongPress: () => _showOptionsDialog(context, ref),
           onTap: () {
             FullScreenMediaViewer.show(
               context,
@@ -192,6 +167,32 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     );
   }
 
+  Widget _buildMediaMessage(
+    bool isMine,
+    Color foreground,
+    Color background,
+    ThemeData theme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (widget.repliedToMessage != null) ...[
+          _buildBubbleReplyHeader(
+            context,
+            widget.repliedToMessage!,
+            theme,
+            isMine,
+          ),
+          const SizedBox(height: 6),
+        ],
+        _buildMediaGridView(),
+        if (widget.message.reactions.isNotEmpty)
+          _buildReactionBadges(context, theme, isMine),
+      ],
+    );
+  }
+
   Widget _buildTextAndMediaMessage(
     bool isMediaLoading,
     int mediaLength,
@@ -203,7 +204,8 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.repliedToMessage != null) ...[
@@ -238,22 +240,27 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                 );
               },
             ),
-          Container(
-            decoration: BoxDecoration(
-              color: background,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(18),
-                topRight: const Radius.circular(18),
-                bottomLeft: Radius.circular(isMine ? 18 : 4),
-                bottomRight: Radius.circular(isMine ? 4 : 18),
+          if (!isMediaLoading) _buildMediaGridView(),
+          GestureDetector(
+            onLongPress: () => _showOptionsDialog(context, ref),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isMine ? 18 : 4),
+                  bottomRight: Radius.circular(isMine ? 4 : 18),
+                ),
               ),
-            ),
-            child: Text(
-              widget.message.content,
-              style: TextStyle(
-                color: foreground,
-                fontSize: 15,
-                height: 1.35,
+              child: Text(
+                widget.message.content,
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: 15,
+                  height: 1.35,
+                ),
               ),
             ),
           ),
@@ -270,41 +277,44 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     bool isMine,
     ThemeData theme,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(18),
-          topRight: const Radius.circular(18),
-          bottomLeft: Radius.circular(isMine ? 18 : 4),
-          bottomRight: Radius.circular(isMine ? 4 : 18),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.repliedToMessage != null) ...[
-            _buildBubbleReplyHeader(
-              context,
-              widget.repliedToMessage!,
-              theme,
-              isMine,
-            ),
-            const SizedBox(height: 6),
-          ],
-          Text(
-            widget.message.content,
-            style: TextStyle(
-              color: foreground,
-              fontSize: 15,
-              height: 1.35,
-            ),
+    return GestureDetector(
+      onLongPress: () => _showOptionsDialog(context, ref),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isMine ? 18 : 4),
+            bottomRight: Radius.circular(isMine ? 4 : 18),
           ),
-          if (widget.message.reactions.isNotEmpty)
-            _buildReactionBadges(context, theme, isMine),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.repliedToMessage != null) ...[
+              _buildBubbleReplyHeader(
+                context,
+                widget.repliedToMessage!,
+                theme,
+                isMine,
+              ),
+              const SizedBox(height: 6),
+            ],
+            Text(
+              widget.message.content,
+              style: TextStyle(
+                color: foreground,
+                fontSize: 15,
+                height: 1.35,
+              ),
+            ),
+            if (widget.message.reactions.isNotEmpty)
+              _buildReactionBadges(context, theme, isMine),
+          ],
+        ),
       ),
     );
   }

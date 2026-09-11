@@ -144,7 +144,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                               (friend) => ContactCard(
                                 friend: friend,
                                 startChat: () async {
-                                  final convId = await ref
+                                  final conversation = await ref
                                       .read(
                                         privateConversationListProvider
                                             .notifier,
@@ -154,13 +154,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                         title:
                                             friend.fullName ?? friend.username,
                                       );
-                                  if (convId != null) {
+                                  if (conversation != null) {
                                     if (!context.mounted) return;
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            ChatScreen(conversation: convId),
+                                        builder: (_) => ChatScreen(
+                                          conversation: conversation,
+                                        ),
                                       ),
                                     );
                                   }

@@ -93,14 +93,9 @@ class Conversation extends Equatable {
   List<Object?> get props => [
         id,
         title,
+        peerId,
         createdAt,
         updatedAt,
-        isPinned,
-        isFavourite,
-        modelName,
-        draftMessage,
-        systemPrompt,
         isUserToUser,
-        peerId,
       ];
 }
