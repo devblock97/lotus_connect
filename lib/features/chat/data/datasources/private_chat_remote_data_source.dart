@@ -80,7 +80,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   }) async {
     try {
       final response = await _dioClient.post(
-        'chats/$conversationId/messages',
+        '/chats/$conversationId/messages',
         data: {
           'content': content,
           if (messageType != null) 'messageType': messageType,
@@ -215,11 +215,15 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
         '/chats/messages/$messageId/reactions',
         data: {'reaction': reaction},
       );
-      final data = ReactionMessageModel.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-      return data.toEntity();
-    } catch (e) {
+      if (response.statusCode == 200) {
+        final data = ReactionMessageModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+        return data.toEntity();
+      }
+      throw const ServerException('React message failed. Please try again!');
+    } on Object catch (e) {
+      if (e is ServerException || e is NetworkException) rethrow;
       throw Exception(e);
     }
   }
