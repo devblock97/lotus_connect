@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/delete_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_favourite_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_pin_conversation_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/domain/usecases/create_conversation_usecase.dart';
 
@@ -53,11 +56,27 @@ class ConversationListState {
 
 /// Notifier managing AI chatbot conversation lists and search state.
 class ConversationListNotifier extends StateNotifier<ConversationListState> {
-  ConversationListNotifier(this._ref) : super(const ConversationListState()) {
+  ConversationListNotifier(
+    this._ref, {
+    required RenameConversationUseCase renameConversationUseCase,
+    required TogglePinConversationUseCase togglePinConversationUseCase,
+    required ToggleFavouriteConversationUseCase
+        toggleFavouriteConversationUseCase,
+    required DeleteConversationUseCase deleteConversationUseCase,
+  })  : _renameConversationUseCase = renameConversationUseCase,
+        _togglePinConversationUseCase = togglePinConversationUseCase,
+        _toggleFavouriteConversationUseCase =
+            toggleFavouriteConversationUseCase,
+        _deleteConversationUseCase = deleteConversationUseCase,
+        super(const ConversationListState()) {
     _initStream();
   }
 
   final Ref _ref;
+  final RenameConversationUseCase _renameConversationUseCase;
+  final TogglePinConversationUseCase _togglePinConversationUseCase;
+  final ToggleFavouriteConversationUseCase _toggleFavouriteConversationUseCase;
+  final DeleteConversationUseCase _deleteConversationUseCase;
 
   void _initStream() {
     state = state.copyWith(isLoading: true);
@@ -122,21 +141,23 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
   }
 
   Future<void> renameConversation(String id, String newTitle) async {
-    await _ref.read(renameConversationUseCaseProvider)(
+    await _renameConversationUseCase(
       RenameConversationParams(conversationId: id, newTitle: newTitle),
     );
   }
 
   Future<void> deleteConversation(String id) async {
-    await _ref.read(deleteConversationUseCaseProvider)(id);
+    await _deleteConversationUseCase(DeleteConversationParam(id: id));
   }
 
   Future<void> togglePinConversation(String id) async {
-    await _ref.read(togglePinConversationUseCaseProvider)(id);
+    await _togglePinConversationUseCase(TogglePinConversationParam(id: id));
   }
 
   Future<void> toggleFavouriteConversation(String id) async {
-    await _ref.read(toggleFavouriteConversationUseCaseProvider)(id);
+    await _toggleFavouriteConversationUseCase(
+      ToggleFavouriteConversationParam(id: id),
+    );
   }
 }
 
@@ -144,5 +165,13 @@ class ConversationListNotifier extends StateNotifier<ConversationListState> {
 final conversationListProvider =
     StateNotifierProvider<ConversationListNotifier, ConversationListState>(
         (ref) {
-  return ConversationListNotifier(ref);
+  return ConversationListNotifier(
+    ref,
+    renameConversationUseCase: ref.watch(renameConversationUseCaseProvider),
+    togglePinConversationUseCase:
+        ref.watch(togglePinConversationUseCaseProvider),
+    toggleFavouriteConversationUseCase:
+        ref.watch(toggleFavouriteConversationUseCaseProvider),
+    deleteConversationUseCase: ref.watch(deleteConversationUseCaseProvider),
+  );
 });

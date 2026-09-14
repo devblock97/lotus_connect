@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockChatRepository extends Mock implements PrivateChatRepository {}
+class MockChatRepository extends Mock implements ChatRepository {}
 
 void main() {
   late MockChatRepository mockChatRepo;

@@ -10,7 +10,7 @@ import 'package:lotus_connect/features/chat_core/domain/entities/conversation.da
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 abstract class PrivateChatRemoteDataSource {
-  Future<Conversation> createPrivateChat(String friendId);
+  Future<Conversation> createConversation(String friendId);
 
   Future<Message> sendMessage({
     required String conversationId,
@@ -48,7 +48,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   final DioClient _dioClient;
 
   @override
-  Future<Conversation> createPrivateChat(String friendId) async {
+  Future<Conversation> createConversation(String friendId) async {
     try {
       final response = await _dioClient.post(
         '/chats/private',

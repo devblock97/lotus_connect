@@ -2,10 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_local_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
-import 'package:lotus_connect/features/chat/data/repositories/private_chat_repository_impl.dart';
+import 'package:lotus_connect/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
@@ -21,12 +21,12 @@ class MockChatLocalDataSource extends Mock
 void main() {
   late MockChatRemoteDataSource mockChatRemoteDataSource;
   late MockChatLocalDataSource mockChatLocalDataSource;
-  late PrivateChatRepositoryImpl repository;
+  late ChatRepositoryImpl repository;
 
   setUp(() {
     mockChatRemoteDataSource = MockChatRemoteDataSource();
     mockChatLocalDataSource = MockChatLocalDataSource();
-    repository = PrivateChatRepositoryImpl(
+    repository = ChatRepositoryImpl(
       remoteDataSource: mockChatRemoteDataSource,
       localDataSource: mockChatLocalDataSource,
     );
@@ -65,7 +65,7 @@ void main() {
     test('should return Right(Conversation) when createPrivateChat succeeds',
         () async {
       when(
-        () => mockChatRemoteDataSource.createPrivateChat(testFriendId),
+        () => mockChatRemoteDataSource.createConversation(testFriendId),
       ).thenAnswer((_) async => testConversation);
 
       when(
@@ -77,13 +77,13 @@ void main() {
         ),
       ).thenAnswer((_) async => testConversation);
 
-      final result = await repository.createPrivateChat(
+      final result = await repository.createConversation(
         friendId: testFriendId,
         title: testTitle,
       );
 
       expect(result, Right<Failure, Conversation>(testConversation));
-      verify(() => mockChatRemoteDataSource.createPrivateChat(testFriendId))
+      verify(() => mockChatRemoteDataSource.createConversation(testFriendId))
           .called(1);
       verify(
         () => mockChatLocalDataSource.saveLocalConversation(
@@ -98,10 +98,10 @@ void main() {
     test(
         'should return Left(DatabaseFailure) when remote '
         'or local creation fails', () async {
-      when(() => mockChatRemoteDataSource.createPrivateChat(testFriendId))
+      when(() => mockChatRemoteDataSource.createConversation(testFriendId))
           .thenThrow(Exception('Network error'));
 
-      final result = await repository.createPrivateChat(
+      final result = await repository.createConversation(
         friendId: testFriendId,
         title: testTitle,
       );
@@ -111,7 +111,7 @@ void main() {
         (failure) => expect(failure, isA<DatabaseFailure>()),
         (_) => fail('Should not be Right'),
       );
-      verify(() => mockChatRemoteDataSource.createPrivateChat(testFriendId))
+      verify(() => mockChatRemoteDataSource.createConversation(testFriendId))
           .called(1);
       verifyNoMoreInteractions(mockChatLocalDataSource);
     });

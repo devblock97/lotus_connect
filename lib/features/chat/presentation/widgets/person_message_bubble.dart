@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
-import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
+import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';

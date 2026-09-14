@@ -1,7 +1,7 @@
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
 
 class UpdateMessageParam {
@@ -15,12 +15,12 @@ class UpdateMessageUseCase
     extends UseCase<ResponseEntityBase, UpdateMessageParam> {
   UpdateMessageUseCase({
     required ChatCoreRepository chatCoreRepository,
-    required PrivateChatRepository privateChatRepository,
+    required ChatRepository privateChatRepository,
   })  : _chatCoreRepository = chatCoreRepository,
         _privateChatRepository = privateChatRepository;
 
   final ChatCoreRepository _chatCoreRepository;
-  final PrivateChatRepository _privateChatRepository;
+  final ChatRepository _privateChatRepository;
 
   @override
   FutureResult<ResponseEntityBase> call(UpdateMessageParam params) async {

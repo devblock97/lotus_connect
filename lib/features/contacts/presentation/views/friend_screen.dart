@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';

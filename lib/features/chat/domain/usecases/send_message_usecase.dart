@@ -1,6 +1,6 @@
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 class SendMessageParams {
@@ -29,10 +29,10 @@ class SendMessageParams {
 
 class SendMessageUseCase implements UseCase<Message, SendMessageParams> {
   const SendMessageUseCase({
-    required PrivateChatRepository privateChatRepository,
+    required ChatRepository privateChatRepository,
   }) : _privateChatRepository = privateChatRepository;
 
-  final PrivateChatRepository _privateChatRepository;
+  final ChatRepository _privateChatRepository;
 
   @override
   FutureResult<Message> call(SendMessageParams params) async {

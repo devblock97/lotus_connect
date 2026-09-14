@@ -11,7 +11,7 @@ import 'package:lotus_connect/features/calls/application/call_history_notifier.d
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/connected_screen.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';

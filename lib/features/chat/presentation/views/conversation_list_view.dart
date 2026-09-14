@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
