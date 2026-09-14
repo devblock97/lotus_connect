@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 
 class ReactionMessageParam extends Equatable {
   const ReactionMessageParam({required this.messageId, required this.reaction});
@@ -19,10 +19,10 @@ class ReactionMessageParam extends Equatable {
 
 class ReactionMessageUseCase
     implements UseCase<ReactionMessageEntity, ReactionMessageParam> {
-  const ReactionMessageUseCase({required PrivateChatRepository repository})
+  const ReactionMessageUseCase({required ChatRepository repository})
       : _repository = repository;
 
-  final PrivateChatRepository _repository;
+  final ChatRepository _repository;
 
   @override
   FutureResult<ReactionMessageEntity> call(ReactionMessageParam params) async {

@@ -5,10 +5,10 @@ import 'package:lotus_connect/features/chat/domain/entities/reaction_message_ent
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
-abstract class PrivateChatRepository {
+abstract class ChatRepository {
   /// Calls remote REST endpoint to create private chat conversation,
   /// and saves it locally inside Drift SQLite.
-  FutureResult<Conversation> createPrivateChat({
+  FutureResult<Conversation> createConversation({
     required String friendId,
     required String title,
   });

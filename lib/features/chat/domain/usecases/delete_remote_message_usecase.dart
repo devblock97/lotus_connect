@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 
 class DeleteRemoteMessageParam extends Equatable {
   const DeleteRemoteMessageParam({required this.messageId});
@@ -15,10 +15,10 @@ class DeleteRemoteMessageParam extends Equatable {
 
 class DeleteRemoteMessageUseCase
     implements UseCase<ResponseEntityBase, DeleteRemoteMessageParam> {
-  const DeleteRemoteMessageUseCase({required PrivateChatRepository repository})
+  const DeleteRemoteMessageUseCase({required ChatRepository repository})
       : _repository = repository;
 
-  final PrivateChatRepository _repository;
+  final ChatRepository _repository;
 
   @override
   FutureResult<ResponseEntityBase> call(DeleteRemoteMessageParam params) async {

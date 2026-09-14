@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
-import 'package:lotus_connect/features/chat/data/repositories/private_chat_repository_impl.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_local_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/create_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_conversation_usecase.dart';
@@ -33,17 +33,17 @@ final privateChatLocalDataSourceProvider =
 });
 
 /// Provider for PrivateChatRepository.
-final privateChatRepositoryProvider = Provider<PrivateChatRepository>((ref) {
-  return PrivateChatRepositoryImpl(
+final privateChatRepositoryProvider = Provider<ChatRepository>((ref) {
+  return ChatRepositoryImpl(
     remoteDataSource: ref.watch(privateChatRemoteDataSourceProvider),
     localDataSource: ref.watch(privateChatLocalDataSourceProvider),
   );
 });
 
 /// Provider for CreatePrivateChatUseCase.
-final createPrivateChatUseCaseProvider =
-    Provider<CreatePrivateChatUseCase>((ref) {
-  return CreatePrivateChatUseCase(ref.watch(privateChatRepositoryProvider));
+final createConversationUseCaseProvider =
+    Provider<CreateConversationUseCase>((ref) {
+  return CreateConversationUseCase(ref.watch(privateChatRepositoryProvider));
 });
 
 /// Provider for SendMessageUseCase.

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:lotus_connect/features/chat/application/private_active_conversation_notifier.dart';
-import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
-import 'package:lotus_connect/features/chat/application/private_conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/application/chat_providers.dart';
+import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
+import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
@@ -14,7 +14,7 @@ import 'package:lotus_connect/features/chatbot/application/settings_notifier.dar
 import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockPrivateChatRepository extends Mock implements PrivateChatRepository {}
+class MockChatRepository extends Mock implements ChatRepository {}
 
 class MockChatCoreRepository extends Mock implements ChatCoreRepository {}
 
@@ -32,7 +32,7 @@ class MockPrivateConversationListNotifier
 }
 
 void main() {
-  late MockPrivateChatRepository mockPrivateChatRepo;
+  late MockChatRepository mockPrivateChatRepo;
   late MockChatCoreRepository mockChatCoreRepo;
   late MockSettingsNotifier mockSettingsNotifier;
   late MockPrivateConversationListNotifier mockListNotifier;
@@ -50,7 +50,7 @@ void main() {
   });
 
   setUp(() {
-    mockPrivateChatRepo = MockPrivateChatRepository();
+    mockPrivateChatRepo = MockChatRepository();
     mockChatCoreRepo = MockChatCoreRepository();
 
     mockSettingsNotifier = MockSettingsNotifier(

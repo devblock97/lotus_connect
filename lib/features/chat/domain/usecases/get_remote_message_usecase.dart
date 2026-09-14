@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
 class GetRemoteMessageParam extends Equatable {
@@ -26,10 +26,10 @@ class GetRemoteMessageParam extends Equatable {
 
 class GetRemoteMessageUseCase
     implements UseCase<List<Message>, GetRemoteMessageParam> {
-  const GetRemoteMessageUseCase({required PrivateChatRepository repository})
+  const GetRemoteMessageUseCase({required ChatRepository repository})
       : _repository = repository;
 
-  final PrivateChatRepository _repository;
+  final ChatRepository _repository;
 
   @override
   FutureResult<List<Message>> call(GetRemoteMessageParam params) async {

@@ -3,11 +3,16 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
-import 'package:lotus_connect/features/chat/application/private_chat_providers.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/create_private_chat_usecase.dart';
+import 'package:lotus_connect/features/chat/application/chat_providers.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/create_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat/domain/usecases/get_remote_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/delete_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_conversations_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_favourite_conversation_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/toggle_pin_conversation_usecase.dart';
 
 /// UI state for private human-to-human conversation history list.
 class PrivateConversationListState {
@@ -55,12 +60,36 @@ class PrivateConversationListState {
 /// Notifier managing private conversation list and search state.
 class PrivateConversationListNotifier
     extends StateNotifier<PrivateConversationListState> {
-  PrivateConversationListNotifier(this._ref)
-      : super(const PrivateConversationListState()) {
+  PrivateConversationListNotifier(
+    this._ref, {
+    required GetRemoteConversationUseCase getRemoteConversationUseCase,
+    required CreateConversationUseCase createConversationUseCase,
+    required GetConversationsUseCase getLocalConversationUseCase,
+    required RenameConversationUseCase renameConversationUseCase,
+    required DeleteConversationUseCase deleteConversationUseCase,
+    required TogglePinConversationUseCase togglePinConversationUseCase,
+    required ToggleFavouriteConversationUseCase
+        toggleFavouriteConversationUseCase,
+  })  : _getRemoteConversationUseCase = getRemoteConversationUseCase,
+        _createConversationUseCase = createConversationUseCase,
+        _getLocalConversationsUseCase = getLocalConversationUseCase,
+        _renameConversationUseCase = renameConversationUseCase,
+        _deleteConversationUseCase = deleteConversationUseCase,
+        _togglePinConversationUseCase = togglePinConversationUseCase,
+        _toggleFavouriteConversationUseCase =
+            toggleFavouriteConversationUseCase,
+        super(const PrivateConversationListState()) {
     _initStream();
   }
 
   final Ref _ref;
+  final GetRemoteConversationUseCase _getRemoteConversationUseCase;
+  final CreateConversationUseCase _createConversationUseCase;
+  final GetConversationsUseCase _getLocalConversationsUseCase;
+  final RenameConversationUseCase _renameConversationUseCase;
+  final DeleteConversationUseCase _deleteConversationUseCase;
+  final TogglePinConversationUseCase _togglePinConversationUseCase;
+  final ToggleFavouriteConversationUseCase _toggleFavouriteConversationUseCase;
 
   void _initStream() {
     state = state.copyWith(isLoading: true);
@@ -98,11 +127,10 @@ class PrivateConversationListNotifier
     try {
       final localDataSource = _ref.read(chatCoreLocalDataSourceProvider);
 
-      final getConversationListUseCase =
-          _ref.read(getRemoteConversationUseCaseProvider);
-      final remoteList = await getConversationListUseCase(const NoParams());
+      final remoteList = await _getRemoteConversationUseCase(const NoParams());
 
       await remoteList.fold((error) {}, (conversations) async {
+        final result = _getLocalConversationsUseCase(const NoParams());
         final existing = await localDataSource.getConversations();
         for (final item in conversations) {
           if (item.id.isNotEmpty) {
@@ -137,9 +165,8 @@ class PrivateConversationListNotifier
     required String friendId,
     required String title,
   }) async {
-    final useCase = _ref.read(createPrivateChatUseCaseProvider);
-    final result = await useCase(
-      CreatePrivateChatParams(
+    final result = await _createConversationUseCase(
+      CreateConversationParams(
         friendId: friendId,
         title: title,
       ),
@@ -157,26 +184,43 @@ class PrivateConversationListNotifier
   }
 
   Future<void> renameConversation(String id, String newTitle) async {
-    await _ref.read(renameConversationUseCaseProvider)(
-      RenameConversationParams(conversationId: id, newTitle: newTitle),
+    await _renameConversationUseCase(
+      RenameConversationParams(
+        conversationId: id,
+        newTitle: newTitle,
+      ),
     );
   }
 
   Future<void> deleteConversation(String id) async {
-    await _ref.read(deleteConversationUseCaseProvider)(id);
+    await _deleteConversationUseCase(DeleteConversationParam(id: id));
   }
 
   Future<void> togglePinConversation(String id) async {
-    await _ref.read(togglePinConversationUseCaseProvider)(id);
+    await _togglePinConversationUseCase(TogglePinConversationParam(id: id));
   }
 
   Future<void> toggleFavouriteConversation(String id) async {
-    await _ref.read(toggleFavouriteConversationUseCaseProvider)(id);
+    await _toggleFavouriteConversationUseCase(
+      ToggleFavouriteConversationParam(id: id),
+    );
   }
 }
 
 /// Provider for PrivateConversationListNotifier.
 final privateConversationListProvider = StateNotifierProvider<
     PrivateConversationListNotifier, PrivateConversationListState>((ref) {
-  return PrivateConversationListNotifier(ref);
+  return PrivateConversationListNotifier(
+    ref,
+    getRemoteConversationUseCase:
+        ref.watch(getRemoteConversationUseCaseProvider),
+    createConversationUseCase: ref.watch(createConversationUseCaseProvider),
+    getLocalConversationUseCase: ref.watch(getConversationsUseCaseProvider),
+    renameConversationUseCase: ref.watch(renameConversationUseCaseProvider),
+    deleteConversationUseCase: ref.watch(deleteConversationUseCaseProvider),
+    togglePinConversationUseCase:
+        ref.watch(togglePinConversationUseCaseProvider),
+    toggleFavouriteConversationUseCase:
+        ref.watch(toggleFavouriteConversationUseCaseProvider),
+  );
 });

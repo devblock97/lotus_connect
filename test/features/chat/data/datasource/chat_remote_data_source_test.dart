@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -120,7 +120,7 @@ void main() {
         ),
       );
 
-      final result = await dataSource.createPrivateChat(testFriendId);
+      final result = await dataSource.createConversation(testFriendId);
 
       expect(result, isA<Conversation>());
       expect(result.id, testConvId);
@@ -148,7 +148,7 @@ void main() {
       );
 
       expect(
-        () => dataSource.createPrivateChat(testFriendId),
+        () => dataSource.createConversation(testFriendId),
         throwsA(isA<ServerException>()),
       );
     });
@@ -163,7 +163,7 @@ void main() {
       ).thenThrow(const NetworkException('No internet'));
 
       expect(
-        () => dataSource.createPrivateChat(testFriendId),
+        () => dataSource.createConversation(testFriendId),
         throwsA(isA<NetworkException>()),
       );
     });

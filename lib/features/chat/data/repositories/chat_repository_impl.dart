@@ -3,16 +3,16 @@ import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_local_data_source.dart';
-import 'package:lotus_connect/features/chat/data/datasources/private_chat_remote_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_local_data_source.dart';
+import 'package:lotus_connect/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/domain/entities/reaction_message_entity.dart';
-import 'package:lotus_connect/features/chat/domain/repositories/private_chat_repository.dart';
+import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 
-class PrivateChatRepositoryImpl implements PrivateChatRepository {
-  PrivateChatRepositoryImpl({
+class ChatRepositoryImpl implements ChatRepository {
+  ChatRepositoryImpl({
     required PrivateChatRemoteDataSource remoteDataSource,
     required PrivateChatLocalDataSource localDataSource,
   })  : _remoteDataSource = remoteDataSource,
@@ -22,12 +22,12 @@ class PrivateChatRepositoryImpl implements PrivateChatRepository {
   final PrivateChatLocalDataSource _localDataSource;
 
   @override
-  FutureResult<Conversation> createPrivateChat({
+  FutureResult<Conversation> createConversation({
     required String friendId,
     required String title,
   }) async {
     try {
-      final chatData = await _remoteDataSource.createPrivateChat(friendId);
+      final chatData = await _remoteDataSource.createConversation(friendId);
       final id = chatData.id;
 
       final conversation = await _localDataSource.saveLocalConversation(
