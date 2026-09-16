@@ -29,7 +29,6 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       if (token.isNotEmpty) {
         ref.read(webSocketServiceProvider).connect();
       }
-      ref.watch(webSocketSyncCoordinatorProvider);
     });
   }
 
@@ -40,6 +39,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(webSocketSyncCoordinatorProvider);
+
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
 

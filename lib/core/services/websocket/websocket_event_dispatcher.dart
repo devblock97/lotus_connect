@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
+import 'package:lotus_connect/core/services/websocket/handler/chat_delete_handler.dart';
+import 'package:lotus_connect/core/services/websocket/handler/chat_edit_handler.dart';
 import 'package:lotus_connect/core/services/websocket/handler/chat_message_handler.dart';
+import 'package:lotus_connect/core/services/websocket/handler/chat_reaction_add_handler.dart';
+import 'package:lotus_connect/core/services/websocket/handler/chat_reaction_remove_handler.dart';
+import 'package:lotus_connect/core/services/websocket/handler/chat_read_handler.dart';
 import 'package:lotus_connect/core/services/websocket/handler/presence_handler.dart';
 import 'package:lotus_connect/core/services/websocket/handler/typing_handler.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_event_handler.dart';
@@ -41,6 +46,11 @@ final webSocketEventDispatcherProvider =
     ref.watch(chatMessageHandler),
     ref.watch(typingStatusHandler),
     ref.watch(presenceHandler),
+    ref.watch(chatReactionAddHandler),
+    ref.watch(chatReactionRemoveHandler),
+    ref.watch(chatDeleteHandler),
+    ref.watch(chatReadHandler),
+    ref.watch(chatEditHandler),
   ];
   return WebSocketEventDispatcher(handlers);
 });
