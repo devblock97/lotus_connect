@@ -13,5 +13,5 @@ class AppConfig {
 
   /// Default backend server host URL.
   static const String defaultServerHost =
-      'https://ef21-2001-ee0-26e-7703-64c2-be98-cc71-71d6.ngrok-free.app/api/v1';
+      'https://988d-2001-ee0-1b08-ffd0-25be-640e-98fe-1197.ngrok-free.app/api/v1';
 }
