@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/message_body_factory.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -30,6 +32,8 @@ class PersonMessageBubble extends ConsumerStatefulWidget {
 }
 
 class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
+  static final _bodyFactory = MessageBodyFactory();
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(privateActiveConversationProvider);
@@ -42,6 +46,19 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     final background = isMine
         ? theme.colorScheme.primary
         : theme.colorScheme.surfaceContainerHighest;
+
+    final renderContext = MessageRenderContext(
+      background: background,
+      foreground: foreground,
+      isMine: isMine,
+      isMediaLoading: state.isMediaLoading,
+      mediaLength: state.mediaLength,
+      onLongPress: () => _showOptionsDialog(context, ref),
+      onSelectReaction: widget.onSelectReaction != null
+          ? (emoji) => widget.onSelectReaction!(widget.message, emoji)
+          : null,
+      theme: theme,
+    );
 
     return Padding(
       padding: EdgeInsets.fromLTRB(isMine ? 72 : 16, 6, isMine ? 16 : 72, 6),
@@ -62,22 +79,22 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
               ),
             ),
           ],
-          if (widget.message.medias.isNotEmpty &&
-              widget.message.content.isNotEmpty)
-            _buildTextAndMediaMessage(
-              state.isMediaLoading,
-              state.mediaLength,
-              background,
-              foreground,
-              isMine,
+          if (widget.repliedToMessage != null) ...[
+            _buildBubbleReplyHeader(
+              context,
+              widget.repliedToMessage!,
               theme,
+              isMine,
             ),
-          if (widget.message.medias.isNotEmpty &&
-              widget.message.content.isEmpty)
-            _buildMediaMessage(isMine, foreground, background, theme),
-          if (widget.message.medias.isEmpty &&
-              widget.message.content.isNotEmpty)
-            _buildTextMessage(background, foreground, isMine, theme),
+            const SizedBox(height: 6),
+          ],
+          _bodyFactory.createBody(
+            context,
+            message: widget.message,
+            renderContext: renderContext,
+          ),
+          if (widget.message.reactions.isNotEmpty)
+            _buildReactionBadges(context, theme, isMine),
           const SizedBox(height: 3),
           Row(
             mainAxisSize: MainAxisSize.min,
