@@ -4,21 +4,18 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
+import 'package:lotus_connect/features/chat/application/chat_application.dart';
 import 'package:lotus_connect/features/chat/application/chat_providers.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/delete_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
-import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
@@ -92,26 +89,28 @@ class PrivateActiveConversationNotifier
     this._ref, {
     required GetRemoteMessageUseCase getRemoteMessageUseCase,
     required GetLocalMessageUseCase getLocalMessageUseCase,
+    required ChatCommandFactory commandFactory,
     required SaveLocalMessageUseCase saveLocalMessageUseCase,
     required DeleteLocalMessageUseCase deleteLocalMessageUseCase,
-    required DeleteRemoteMessageUseCase deleteRemoteMessageUseCase,
-    required UpdateMessageUseCase updateMessageUseCase,
+    // required DeleteRemoteMessageUseCase deleteRemoteMessageUseCase,
+    // required UpdateMessageUseCase updateMessageUseCase,
     required SaveDraftMessageUseCase saveDraftMessageUseCase,
-    required SendMessageUseCase sendMessageUseCase,
+    // required SendMessageUseCase sendMessageUseCase,
     required ReactionMessageUseCase reactionMessageUseCase,
     required UploadFileUseCase uploadFileUseCase,
-    required GetMessageUseCase getMessageUseCase,
+    // required GetMessageUseCase getMessageUseCase,
   })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
         _getLocalMessageUseCase = getLocalMessageUseCase,
+        _commandFactory = commandFactory,
         _saveLocalMessageUseCase = saveLocalMessageUseCase,
         _deleteLocalMessageUseCase = deleteLocalMessageUseCase,
-        _deleteRemoteMessageUseCase = deleteRemoteMessageUseCase,
-        _updateMessageUseCase = updateMessageUseCase,
+        // _deleteRemoteMessageUseCase = deleteRemoteMessageUseCase,
+        // _updateMessageUseCase = updateMessageUseCase,
         _saveDraftMessageUseCase = saveDraftMessageUseCase,
-        _sendMessageUseCase = sendMessageUseCase,
+        // _sendMessageUseCase = sendMessageUseCase,
         _reactionMessageUseCase = reactionMessageUseCase,
         _uploadFileUseCase = uploadFileUseCase,
-        _getMessagesUseCase = getMessageUseCase,
+        // _getMessagesUseCase = getMessageUseCase,
         super(const PrivateActiveConversationState()) {
     _init();
   }
@@ -122,13 +121,15 @@ class PrivateActiveConversationNotifier
   final GetLocalMessageUseCase _getLocalMessageUseCase;
   final SaveLocalMessageUseCase _saveLocalMessageUseCase;
   final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
-  final DeleteRemoteMessageUseCase _deleteRemoteMessageUseCase;
-  final UpdateMessageUseCase _updateMessageUseCase;
+  // final DeleteRemoteMessageUseCase _deleteRemoteMessageUseCase;
+  // final UpdateMessageUseCase _updateMessageUseCase;
   final SaveDraftMessageUseCase _saveDraftMessageUseCase;
-  final SendMessageUseCase _sendMessageUseCase;
+  // final SendMessageUseCase _sendMessageUseCase;
   final ReactionMessageUseCase _reactionMessageUseCase;
   final UploadFileUseCase _uploadFileUseCase;
-  final GetMessageUseCase _getMessagesUseCase;
+  // final GetMessageUseCase _getMessagesUseCase;
+
+  final ChatCommandFactory _commandFactory;
 
   Timer? _typingTimer;
   bool _isCurrentlyTyping = false;
@@ -139,10 +140,6 @@ class PrivateActiveConversationNotifier
   void _init() {
     final currentSelectedId =
         _ref.read(privateConversationListProvider).selectedConversationId;
-
-    AppLogger.debug(
-      '$_tag ==> [_init()]: [currentSelectedId: $currentSelectedId]',
-    );
 
     if (currentSelectedId != null) {
       _subscribeToConversation(currentSelectedId);
@@ -204,11 +201,6 @@ class PrivateActiveConversationNotifier
           await localResult.fold(
             (failure) async {},
             (localMessages) async {
-              final uuidRegex = RegExp(
-                '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
-                r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-              );
-
               final remoteIds = remoteMessages.map((m) => m.id).toSet();
 
               if (remoteMessages.length < 100) {
@@ -312,105 +304,49 @@ class PrivateActiveConversationNotifier
     final convId = state.conversationId;
     if (convId == null) return;
 
-    final replyToId = state.replyingToMessage?.id;
-    final optimisticId = DateTime.now().millisecondsSinceEpoch.toString();
-    final userMessage = Message(
-      id: optimisticId,
+    final command = _commandFactory.createSendMessageCommand(
       conversationId: convId,
-      role: MessageRole.user,
-      content: trimmedText,
-      timestamp: DateTime.now(),
-      replyToId: replyToId,
+      text: trimmedText,
+      replyToId: state.replyingToMessage?.id,
+      medias: medias,
     );
+
+    final optimisticMessage = command.createOptimisticMessage();
 
     // Update UI immediately and clear active reply preview
     state = state.copyWith(
-      messages: [...state.messages, userMessage],
+      messages: [...state.messages, optimisticMessage],
       clearReplyingTo: true,
+      isMediaLoading: medias.isNotEmpty,
+      mediaLength: medias.length,
     );
 
-    await _saveDraftMessageUseCase(
-      SaveDraftMessageParams(conversationId: convId, draft: ''),
+    await _saveLocalMessageUseCase(
+      SaveLocalMessageParam(message: optimisticMessage),
     );
+    await updateDraft('');
 
-    if (medias.isNotEmpty) {
-      state = state.copyWith(
-        isMediaLoading: true,
-        mediaLength: medias.length,
-      );
-      final paths = medias.map((f) => f.path).toList();
-      final uploadFileResult = await _uploadFileUseCase(
-        UploadFileParam(paths: paths),
-      );
+    final result = await command.execute();
 
-      await uploadFileResult.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
-      }, (fileUrl) async {
-        state = state.copyWith(isMediaLoading: false);
+    state = state.copyWith(isMediaLoading: false);
 
-        final medias = fileUrl.files
-            .map(
-              (f) => MediaModel(
-                url: f.url,
-                fileName: f.fileName,
-                fileSize: f.fileSize,
-                thumbnailUrl: f.thumbnailUrl,
-                mimeType: f.mimeType,
-              ),
-            )
-            .toList();
-
-        final result = await _sendMessageUseCase(
-          SendMessageParams(
-            conversationId: convId,
-            text: trimmedText,
-            replyToId: replyToId,
-            messageType: 'image',
-            mediaItems: medias,
-          ),
-        );
-        debugPrint('send media image without text');
-
-        await result.fold(
-          (failure) {
-            state = state.copyWith(errorMessage: failure.message);
-          },
-          (remoteMessage) async {
-            debugPrint('send media image without text success');
-            // Delete optimistic message and save the permanent
-            // server-synchronized message
-            await deleteMessage(optimisticId);
-            await _saveLocalMessageUseCase(
-              SaveLocalMessageParam(message: remoteMessage),
-            );
-          },
-        );
-      });
-
-      return;
-    }
-
-    final result = await _sendMessageUseCase(
-      SendMessageParams(
-        conversationId: convId,
-        text: trimmedText,
-        replyToId: replyToId,
-      ),
-    );
-
-    await result.fold(
+    result.fold(
       (failure) {
-        state = state.copyWith(errorMessage: failure.message);
-      },
-      (remoteMessage) async {
-        // Delete optimistic message and save the permanent
-        // server-synchronized message
-        await deleteMessage(optimisticId);
-        await _saveLocalMessageUseCase(
-          SaveLocalMessageParam(message: remoteMessage),
-        );
         state = state.copyWith(
-          messages: [...state.messages, remoteMessage],
+          messages: state.messages
+              .where((message) => message.id != command.id)
+              .toList(),
+          errorMessage: failure.message,
+        );
+      },
+      (confirmedMessage) {
+        state = state.copyWith(
+          messages: state.messages
+              .map(
+                (message) =>
+                    message.id == command.id ? confirmedMessage : message,
+              )
+              .toList(),
         );
       },
     );
@@ -429,7 +365,9 @@ class PrivateActiveConversationNotifier
     final convId = state.conversationId;
     if (convId == null) return;
     state = state.copyWith(draftInput: draft);
-    await _ref.read(chatCoreRepositoryProvider).saveDraftMessage(convId, draft);
+    await _saveDraftMessageUseCase(
+      SaveDraftMessageParams(conversationId: convId, draft: draft),
+    );
 
     _sendTypingStatus(draft.trim().isNotEmpty);
   }
@@ -461,100 +399,56 @@ class PrivateActiveConversationNotifier
 
   /// Deletes a message by its ID.
   Future<void> deleteMessage(String messageId) async {
-    final uuidRegex = RegExp(
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
-      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    final index =
+        state.messages.indexWhere((message) => message.id == messageId);
+    if (index == -1) return;
+
+    final deletedMessage = state.messages[index];
+    state = state.copyWith(
+      messages:
+          state.messages.where((message) => message.id != messageId).toList(),
     );
 
-    if (!uuidRegex.hasMatch(messageId)) {
-      try {
-        final result = await _deleteLocalMessageUseCase(messageId);
-        await result.fold((error) {
-          state = state.copyWith(
-            errorMessage: "Can't delete message. Please try again",
-          );
-        }, (success) async {
-          state = state.copyWith();
-        });
-      } on Object catch (e) {
-        throw Exception(e.toString());
-      }
-      return;
-    }
-    final result = await _deleteRemoteMessageUseCase(
-      DeleteRemoteMessageParam(messageId: messageId),
+    final result =
+        await _commandFactory.createDeleteMessageCommand(messageId).execute();
+
+    result.fold(
+      (failure) {
+        final messages = [...state.messages];
+        messages.insert(index.clamp(0, messages.length), deletedMessage);
+        state = state.copyWith(
+          messages: messages,
+          errorMessage: failure.message,
+        );
+      },
+      (_) {},
     );
-    await result.fold((remoteError) {
-      state = state.copyWith(
-        errorMessage: "Can't delete message. Please try again",
-      );
-    }, (remoteSuccess) async {
-      await _deleteLocalMessageUseCase(messageId);
-    });
   }
 
   Future<void> updateMessage(String messageId, String content) async {
-    final uuidRegex = RegExp(
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
-      r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-    );
+    final result = await _commandFactory
+        .createUpdateMessageCommand(messageId, content)
+        .execute();
 
-    if (!uuidRegex.hasMatch(messageId)) {
-      // Legacy optimistic message. Update locally only.
-      try {
-        final getMessageResult = await _getMessagesUseCase(
-          GetMessageParam(messageId: messageId),
-        );
-        await getMessageResult.fold((error) {}, (message) async {
-          if (message != null) {
-            final updateMessage = message.copyWith(content: content);
-            await _saveLocalMessageUseCase(
-              SaveLocalMessageParam(message: updateMessage),
-            );
-          }
-        });
-        return;
-      } on Object {
-        state =
-            state.copyWith(errorMessage: 'Failed to update message locally');
-      }
-    }
-
-    final params = UpdateMessageParam(messageId: messageId, content: content);
-    final result = await _updateMessageUseCase(params);
-    await result.fold(
+    result.fold(
       (failure) {
         state = state.copyWith(errorMessage: failure.message);
       },
-      (message) async {
-        final getMessageResult = await _getMessagesUseCase(
-          GetMessageParam(messageId: messageId),
-        );
-        await getMessageResult.fold((error) {}, (message) async {
-          if (message != null) {
-            final updateMessage = message.copyWith(content: content);
-            await _saveLocalMessageUseCase(
-              SaveLocalMessageParam(message: updateMessage),
-            );
-          }
-        });
-      },
+      (_) {},
     );
   }
 
   Future<void> reactMessage(String messageId, String reaction) async {
-    final result = await _reactionMessageUseCase(
-      ReactionMessageParam(
-        messageId: messageId,
-        reaction: reaction,
-      ),
-    );
+    final result = await _commandFactory
+        .createReactionMessageCommand(messageId, reaction)
+        .execute();
 
-    result.fold((error) {
-      state = state.copyWith(errorMessage: error.message);
-    }, (reaction) {
-      state = state.copyWith(status: Status.success);
-    });
+    result.fold(
+      (failure) {
+        state = state.copyWith(errorMessage: failure.message);
+      },
+      (_) {},
+    );
   }
 
   Future<void> uploadFile(String message, List<String> path) async {
@@ -565,7 +459,6 @@ class PrivateActiveConversationNotifier
     result.fold((error) {
       state = state.copyWith(errorMessage: error.message);
     }, (fileUrl) {
-      debugPrint('file url response: $fileUrl');
       // sendMessage(message, fileUrl);
     });
   }
@@ -587,12 +480,13 @@ final privateActiveConversationProvider = StateNotifierProvider<
     getLocalMessageUseCase: ref.watch(getLocalMessageUseCaseProvider),
     saveLocalMessageUseCase: ref.watch(saveMessageUseCaseProvider),
     deleteLocalMessageUseCase: ref.watch(deleteLocalMessageUseCaseProvider),
-    deleteRemoteMessageUseCase: ref.watch(deleteRemoteMessageUseCaseProvider),
-    updateMessageUseCase: ref.watch(updateMessageUseCaseProvider),
+    // deleteRemoteMessageUseCase: ref.watch(deleteRemoteMessageUseCaseProvider),
+    // updateMessageUseCase: ref.watch(updateMessageUseCaseProvider),
     saveDraftMessageUseCase: ref.watch(saveDraftMessageUseCaseProvider),
-    sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
+    // sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
     reactionMessageUseCase: ref.watch(reactionMessageUseCaseProvider),
     uploadFileUseCase: ref.watch(uploadFileUseCaseProvider),
-    getMessageUseCase: ref.watch(getMessageUseCaseProvider),
+    // getMessageUseCase: ref.watch(getMessageUseCaseProvider),
+    commandFactory: ref.watch(chatCommandFactoryProvider),
   );
 });

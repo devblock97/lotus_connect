@@ -27,3 +27,9 @@ String formatLastSeen(bool isOnline, DateTime lastSeen) {
 bool isVideo(String path) {
   return path.contains('mp4') || path.contains('mov');
 }
+
+/// If optimistic message (not a server UUID), local delete is enough
+final uuidRegex = RegExp(
+  '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+  r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+);

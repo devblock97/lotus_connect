@@ -1,13 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
-import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_factory.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
-import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -80,19 +77,42 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
             ),
           ],
           if (widget.repliedToMessage != null) ...[
-            _buildBubbleReplyHeader(
-              context,
-              widget.repliedToMessage!,
-              theme,
-              isMine,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isMine ? 18 : 4),
+                  bottomRight: Radius.circular(isMine ? 4 : 18),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildBubbleReplyHeader(
+                    context,
+                    widget.repliedToMessage!,
+                    theme,
+                    isMine,
+                  ),
+                  _bodyFactory.createBody(
+                    context,
+                    message: widget.message,
+                    renderContext: renderContext,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 6),
+          ] else ...[
+            _bodyFactory.createBody(
+              context,
+              message: widget.message,
+              renderContext: renderContext,
+            ),
           ],
-          _bodyFactory.createBody(
-            context,
-            message: widget.message,
-            renderContext: renderContext,
-          ),
           if (widget.message.reactions.isNotEmpty)
             _buildReactionBadges(context, theme, isMine),
           const SizedBox(height: 3),
@@ -124,214 +144,6 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMediaGridView() {
-    return GridView.builder(
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.message.medias.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: widget.message.medias.length >= 4
-            ? 4
-            : widget.message.medias.length,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemBuilder: (context, index) {
-        final media = widget.message.medias[index];
-        final isVideo = media.mimeType?.toLowerCase().contains('video') ??
-            media.url.toLowerCase().endsWith('.mp4');
-
-        return GestureDetector(
-          onLongPress: () => _showOptionsDialog(context, ref),
-          onTap: () {
-            FullScreenMediaViewer.show(
-              context,
-              medias: widget.message.medias,
-              initialIndex: index,
-            );
-          },
-          child: isVideo
-              ? MediaVideoThumbnail(url: media.url)
-              : Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Hero(
-                    tag: media.url,
-                    child: CachedNetworkImage(
-                      imageUrl: media.thumbnailUrl ?? media.url,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (_, __, dynamic ___) =>
-                          const Icon(Icons.broken_image),
-                    ),
-                  ),
-                ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMediaMessage(
-    bool isMine,
-    Color foreground,
-    Color background,
-    ThemeData theme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.repliedToMessage != null) ...[
-          _buildBubbleReplyHeader(
-            context,
-            widget.repliedToMessage!,
-            theme,
-            isMine,
-          ),
-          const SizedBox(height: 6),
-        ],
-        _buildMediaGridView(),
-        if (widget.message.reactions.isNotEmpty)
-          _buildReactionBadges(context, theme, isMine),
-      ],
-    );
-  }
-
-  Widget _buildTextAndMediaMessage(
-    bool isMediaLoading,
-    int mediaLength,
-    Color background,
-    Color foreground,
-    bool isMine,
-    ThemeData theme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Column(
-        crossAxisAlignment:
-            isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.repliedToMessage != null) ...[
-            _buildBubbleReplyHeader(
-              context,
-              widget.repliedToMessage!,
-              theme,
-              isMine,
-            ),
-            const SizedBox(height: 6),
-          ],
-          if (isMediaLoading)
-            GridView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: mediaLength,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: mediaLength >= 4 ? 4 : mediaLength,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-              ),
-              itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              },
-            ),
-          if (!isMediaLoading) _buildMediaGridView(),
-          GestureDetector(
-            onLongPress: () => _showOptionsDialog(context, ref),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isMine ? 18 : 4),
-                  bottomRight: Radius.circular(isMine ? 4 : 18),
-                ),
-              ),
-              child: Text(
-                widget.message.content,
-                style: TextStyle(
-                  color: foreground,
-                  fontSize: 15,
-                  height: 1.35,
-                ),
-              ),
-            ),
-          ),
-          if (widget.message.reactions.isNotEmpty)
-            _buildReactionBadges(context, theme, isMine),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextMessage(
-    Color background,
-    Color foreground,
-    bool isMine,
-    ThemeData theme,
-  ) {
-    return GestureDetector(
-      onLongPress: () => _showOptionsDialog(context, ref),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(18),
-            topRight: const Radius.circular(18),
-            bottomLeft: Radius.circular(isMine ? 18 : 4),
-            bottomRight: Radius.circular(isMine ? 4 : 18),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.repliedToMessage != null) ...[
-              _buildBubbleReplyHeader(
-                context,
-                widget.repliedToMessage!,
-                theme,
-                isMine,
-              ),
-              const SizedBox(height: 6),
-            ],
-            Text(
-              widget.message.content,
-              style: TextStyle(
-                color: foreground,
-                fontSize: 15,
-                height: 1.35,
-              ),
-            ),
-            if (widget.message.reactions.isNotEmpty)
-              _buildReactionBadges(context, theme, isMine),
-          ],
-        ),
       ),
     );
   }
