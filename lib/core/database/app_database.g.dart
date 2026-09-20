@@ -1506,11 +1506,27 @@ class $AppSettingsTableTable extends AppSettingsTable
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant(''));
+  static const VerificationMeta _fullNameMeta =
+      const VerificationMeta('fullName');
+  @override
+  late final GeneratedColumn<String> fullName = GeneratedColumn<String>(
+      'full_name', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
   static const VerificationMeta _usernameMeta =
       const VerificationMeta('username');
   @override
   late final GeneratedColumn<String> username = GeneratedColumn<String>(
       'username', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _avatarUrlMeta =
+      const VerificationMeta('avatarUrl');
+  @override
+  late final GeneratedColumn<String> avatarUrl = GeneratedColumn<String>(
+      'avatar_url', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant(''));
@@ -1535,7 +1551,9 @@ class $AppSettingsTableTable extends AppSettingsTable
         refreshToken,
         serverHost,
         userId,
+        fullName,
         username,
+        avatarUrl,
         email
       ];
   @override
@@ -1616,9 +1634,17 @@ class $AppSettingsTableTable extends AppSettingsTable
       context.handle(_userIdMeta,
           userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
     }
+    if (data.containsKey('full_name')) {
+      context.handle(_fullNameMeta,
+          fullName.isAcceptableOrUnknown(data['full_name']!, _fullNameMeta));
+    }
     if (data.containsKey('username')) {
       context.handle(_usernameMeta,
           username.isAcceptableOrUnknown(data['username']!, _usernameMeta));
+    }
+    if (data.containsKey('avatar_url')) {
+      context.handle(_avatarUrlMeta,
+          avatarUrl.isAcceptableOrUnknown(data['avatar_url']!, _avatarUrlMeta));
     }
     if (data.containsKey('email')) {
       context.handle(
@@ -1657,8 +1683,12 @@ class $AppSettingsTableTable extends AppSettingsTable
           .read(DriftSqlType.string, data['${effectivePrefix}server_host'])!,
       userId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      fullName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}full_name'])!,
       username: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}username'])!,
+      avatarUrl: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}avatar_url'])!,
       email: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}email'])!,
     );
@@ -1708,8 +1738,14 @@ class AppSettingsTableData extends DataClass
   /// Persistent logged-in user ID.
   final String userId;
 
+  /// Full name of the logged-in user.
+  final String fullName;
+
   /// Persistent logged-in username.
   final String username;
+
+  /// URL or path to the user's profile image.
+  final String avatarUrl;
 
   /// Persistent logged-in email.
   final String email;
@@ -1726,7 +1762,9 @@ class AppSettingsTableData extends DataClass
       required this.refreshToken,
       required this.serverHost,
       required this.userId,
+      required this.fullName,
       required this.username,
+      required this.avatarUrl,
       required this.email});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1743,7 +1781,9 @@ class AppSettingsTableData extends DataClass
     map['refresh_token'] = Variable<String>(refreshToken);
     map['server_host'] = Variable<String>(serverHost);
     map['user_id'] = Variable<String>(userId);
+    map['full_name'] = Variable<String>(fullName);
     map['username'] = Variable<String>(username);
+    map['avatar_url'] = Variable<String>(avatarUrl);
     map['email'] = Variable<String>(email);
     return map;
   }
@@ -1762,7 +1802,9 @@ class AppSettingsTableData extends DataClass
       refreshToken: Value(refreshToken),
       serverHost: Value(serverHost),
       userId: Value(userId),
+      fullName: Value(fullName),
       username: Value(username),
+      avatarUrl: Value(avatarUrl),
       email: Value(email),
     );
   }
@@ -1783,7 +1825,9 @@ class AppSettingsTableData extends DataClass
       refreshToken: serializer.fromJson<String>(json['refreshToken']),
       serverHost: serializer.fromJson<String>(json['serverHost']),
       userId: serializer.fromJson<String>(json['userId']),
+      fullName: serializer.fromJson<String>(json['fullName']),
       username: serializer.fromJson<String>(json['username']),
+      avatarUrl: serializer.fromJson<String>(json['avatarUrl']),
       email: serializer.fromJson<String>(json['email']),
     );
   }
@@ -1803,7 +1847,9 @@ class AppSettingsTableData extends DataClass
       'refreshToken': serializer.toJson<String>(refreshToken),
       'serverHost': serializer.toJson<String>(serverHost),
       'userId': serializer.toJson<String>(userId),
+      'fullName': serializer.toJson<String>(fullName),
       'username': serializer.toJson<String>(username),
+      'avatarUrl': serializer.toJson<String>(avatarUrl),
       'email': serializer.toJson<String>(email),
     };
   }
@@ -1821,7 +1867,9 @@ class AppSettingsTableData extends DataClass
           String? refreshToken,
           String? serverHost,
           String? userId,
+          String? fullName,
           String? username,
+          String? avatarUrl,
           String? email}) =>
       AppSettingsTableData(
         id: id ?? this.id,
@@ -1836,7 +1884,9 @@ class AppSettingsTableData extends DataClass
         refreshToken: refreshToken ?? this.refreshToken,
         serverHost: serverHost ?? this.serverHost,
         userId: userId ?? this.userId,
+        fullName: fullName ?? this.fullName,
         username: username ?? this.username,
+        avatarUrl: avatarUrl ?? this.avatarUrl,
         email: email ?? this.email,
       );
   AppSettingsTableData copyWithCompanion(AppSettingsTableCompanion data) {
@@ -1869,7 +1919,9 @@ class AppSettingsTableData extends DataClass
       serverHost:
           data.serverHost.present ? data.serverHost.value : this.serverHost,
       userId: data.userId.present ? data.userId.value : this.userId,
+      fullName: data.fullName.present ? data.fullName.value : this.fullName,
       username: data.username.present ? data.username.value : this.username,
+      avatarUrl: data.avatarUrl.present ? data.avatarUrl.value : this.avatarUrl,
       email: data.email.present ? data.email.value : this.email,
     );
   }
@@ -1889,7 +1941,9 @@ class AppSettingsTableData extends DataClass
           ..write('refreshToken: $refreshToken, ')
           ..write('serverHost: $serverHost, ')
           ..write('userId: $userId, ')
+          ..write('fullName: $fullName, ')
           ..write('username: $username, ')
+          ..write('avatarUrl: $avatarUrl, ')
           ..write('email: $email')
           ..write(')'))
         .toString();
@@ -1909,7 +1963,9 @@ class AppSettingsTableData extends DataClass
       refreshToken,
       serverHost,
       userId,
+      fullName,
       username,
+      avatarUrl,
       email);
   @override
   bool operator ==(Object other) =>
@@ -1927,7 +1983,9 @@ class AppSettingsTableData extends DataClass
           other.refreshToken == this.refreshToken &&
           other.serverHost == this.serverHost &&
           other.userId == this.userId &&
+          other.fullName == this.fullName &&
           other.username == this.username &&
+          other.avatarUrl == this.avatarUrl &&
           other.email == this.email);
 }
 
@@ -1944,7 +2002,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
   final Value<String> refreshToken;
   final Value<String> serverHost;
   final Value<String> userId;
+  final Value<String> fullName;
   final Value<String> username;
+  final Value<String> avatarUrl;
   final Value<String> email;
   final Value<int> rowid;
   const AppSettingsTableCompanion({
@@ -1960,7 +2020,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.refreshToken = const Value.absent(),
     this.serverHost = const Value.absent(),
     this.userId = const Value.absent(),
+    this.fullName = const Value.absent(),
     this.username = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
     this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1977,7 +2039,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     this.refreshToken = const Value.absent(),
     this.serverHost = const Value.absent(),
     this.userId = const Value.absent(),
+    this.fullName = const Value.absent(),
     this.username = const Value.absent(),
+    this.avatarUrl = const Value.absent(),
     this.email = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
@@ -1994,7 +2058,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     Expression<String>? refreshToken,
     Expression<String>? serverHost,
     Expression<String>? userId,
+    Expression<String>? fullName,
     Expression<String>? username,
+    Expression<String>? avatarUrl,
     Expression<String>? email,
     Expression<int>? rowid,
   }) {
@@ -2011,7 +2077,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       if (refreshToken != null) 'refresh_token': refreshToken,
       if (serverHost != null) 'server_host': serverHost,
       if (userId != null) 'user_id': userId,
+      if (fullName != null) 'full_name': fullName,
       if (username != null) 'username': username,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (email != null) 'email': email,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2030,7 +2098,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       Value<String>? refreshToken,
       Value<String>? serverHost,
       Value<String>? userId,
+      Value<String>? fullName,
       Value<String>? username,
+      Value<String>? avatarUrl,
       Value<String>? email,
       Value<int>? rowid}) {
     return AppSettingsTableCompanion(
@@ -2046,7 +2116,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
       refreshToken: refreshToken ?? this.refreshToken,
       serverHost: serverHost ?? this.serverHost,
       userId: userId ?? this.userId,
+      fullName: fullName ?? this.fullName,
       username: username ?? this.username,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       email: email ?? this.email,
       rowid: rowid ?? this.rowid,
     );
@@ -2091,8 +2163,14 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
     if (userId.present) {
       map['user_id'] = Variable<String>(userId.value);
     }
+    if (fullName.present) {
+      map['full_name'] = Variable<String>(fullName.value);
+    }
     if (username.present) {
       map['username'] = Variable<String>(username.value);
+    }
+    if (avatarUrl.present) {
+      map['avatar_url'] = Variable<String>(avatarUrl.value);
     }
     if (email.present) {
       map['email'] = Variable<String>(email.value);
@@ -2118,7 +2196,9 @@ class AppSettingsTableCompanion extends UpdateCompanion<AppSettingsTableData> {
           ..write('refreshToken: $refreshToken, ')
           ..write('serverHost: $serverHost, ')
           ..write('userId: $userId, ')
+          ..write('fullName: $fullName, ')
           ..write('username: $username, ')
+          ..write('avatarUrl: $avatarUrl, ')
           ..write('email: $email, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2979,7 +3059,9 @@ typedef $$AppSettingsTableTableCreateCompanionBuilder
   Value<String> refreshToken,
   Value<String> serverHost,
   Value<String> userId,
+  Value<String> fullName,
   Value<String> username,
+  Value<String> avatarUrl,
   Value<String> email,
   Value<int> rowid,
 });
@@ -2997,7 +3079,9 @@ typedef $$AppSettingsTableTableUpdateCompanionBuilder
   Value<String> refreshToken,
   Value<String> serverHost,
   Value<String> userId,
+  Value<String> fullName,
   Value<String> username,
+  Value<String> avatarUrl,
   Value<String> email,
   Value<int> rowid,
 });
@@ -3049,8 +3133,14 @@ class $$AppSettingsTableTableFilterComposer
   ColumnFilters<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<String> get username => $composableBuilder(
       column: $table.username, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnFilters(column));
@@ -3108,8 +3198,14 @@ class $$AppSettingsTableTableOrderingComposer
   ColumnOrderings<String> get userId => $composableBuilder(
       column: $table.userId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get fullName => $composableBuilder(
+      column: $table.fullName, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get username => $composableBuilder(
       column: $table.username, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get avatarUrl => $composableBuilder(
+      column: $table.avatarUrl, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get email => $composableBuilder(
       column: $table.email, builder: (column) => ColumnOrderings(column));
@@ -3160,8 +3256,14 @@ class $$AppSettingsTableTableAnnotationComposer
   GeneratedColumn<String> get userId =>
       $composableBuilder(column: $table.userId, builder: (column) => column);
 
+  GeneratedColumn<String> get fullName =>
+      $composableBuilder(column: $table.fullName, builder: (column) => column);
+
   GeneratedColumn<String> get username =>
       $composableBuilder(column: $table.username, builder: (column) => column);
+
+  GeneratedColumn<String> get avatarUrl =>
+      $composableBuilder(column: $table.avatarUrl, builder: (column) => column);
 
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
@@ -3207,7 +3309,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> refreshToken = const Value.absent(),
             Value<String> serverHost = const Value.absent(),
             Value<String> userId = const Value.absent(),
+            Value<String> fullName = const Value.absent(),
             Value<String> username = const Value.absent(),
+            Value<String> avatarUrl = const Value.absent(),
             Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -3224,7 +3328,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             refreshToken: refreshToken,
             serverHost: serverHost,
             userId: userId,
+            fullName: fullName,
             username: username,
+            avatarUrl: avatarUrl,
             email: email,
             rowid: rowid,
           ),
@@ -3241,7 +3347,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             Value<String> refreshToken = const Value.absent(),
             Value<String> serverHost = const Value.absent(),
             Value<String> userId = const Value.absent(),
+            Value<String> fullName = const Value.absent(),
             Value<String> username = const Value.absent(),
+            Value<String> avatarUrl = const Value.absent(),
             Value<String> email = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -3258,7 +3366,9 @@ class $$AppSettingsTableTableTableManager extends RootTableManager<
             refreshToken: refreshToken,
             serverHost: serverHost,
             userId: userId,
+            fullName: fullName,
             username: username,
+            avatarUrl: avatarUrl,
             email: email,
             rowid: rowid,
           ),

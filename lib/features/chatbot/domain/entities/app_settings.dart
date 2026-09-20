@@ -21,6 +21,8 @@ class AppSettings extends Equatable {
     this.userId = '',
     this.username = '',
     this.email = '',
+    this.fullName = '',
+    this.avatarUrl = '',
   }) : _serverHost = serverHost;
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -46,44 +48,34 @@ class AppSettings extends Equatable {
       userId: json['userId'] as String? ?? '',
       username: json['username'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      avatarUrl: json['avatarUrl'] as String? ?? '',
     );
   }
 
-  /// Selected theme mode.
   final AppThemeMode themeMode;
 
-  /// Selected language code.
   final String languageCode;
 
-  /// Active AI provider ID.
   final String activeAiProvider;
 
-  /// Active AI model name.
   final String activeAiModel;
 
-  /// Google AI Studio API Key.
   final String geminiApiKey;
 
-  /// Local LLM Base URL (e.g. Ollama).
   final String localLlmBaseUrl;
 
-  /// Default system prompt.
   final String systemPrompt;
 
-  /// Access Token for backend calls.
   final String accessToken;
 
-  /// Refresh Token for backend token updates.
   final String refreshToken;
 
-  /// Raw Server host base URL.
   final String _serverHost;
 
-  /// Server host base URL, falling back to AppConfig.defaultServerHost.
   String get serverHost {
     var host =
         _serverHost.isNotEmpty ? _serverHost : AppConfig.defaultServerHost;
-    // Auto-migrate any legacy localhost, 10.0.2.2, or dynamic ngrok subdomains to the central active ngrok tunnel domain
     if (host == 'http://localhost:8080/api/v1' ||
         host == 'http://10.0.2.2:8080/api/v1' ||
         host.contains('localhost') ||
@@ -94,14 +86,15 @@ class AppSettings extends Equatable {
     return host;
   }
 
-  /// Persisted User ID.
   final String userId;
 
-  /// Persisted Username.
+  final String fullName;
+
   final String username;
 
-  /// Persisted Email.
   final String email;
+
+  final String avatarUrl;
 
   Map<String, dynamic> toJson() {
     return {
@@ -118,10 +111,11 @@ class AppSettings extends Equatable {
       'userId': userId,
       'username': username,
       'email': email,
+      'fullName': fullName,
+      'avatarUrl': avatarUrl,
     };
   }
 
-  /// Returns a copy of [AppSettings] with updated values.
   AppSettings copyWith({
     AppThemeMode? themeMode,
     String? languageCode,
@@ -136,6 +130,8 @@ class AppSettings extends Equatable {
     String? userId,
     String? username,
     String? email,
+    String? fullName,
+    String? avatarUrl,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
@@ -151,6 +147,8 @@ class AppSettings extends Equatable {
       userId: userId ?? this.userId,
       username: username ?? this.username,
       email: email ?? this.email,
+      fullName: fullName ?? this.fullName,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
@@ -169,5 +167,7 @@ class AppSettings extends Equatable {
         userId,
         username,
         email,
+        fullName,
+        avatarUrl,
       ];
 }

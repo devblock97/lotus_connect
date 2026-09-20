@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/features/chatbot/application/providers.dart';
@@ -15,6 +16,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     try {
       final settings = await localDataSource.getSettings();
+      debugPrint(
+        'check app setting: ${settings.fullName}; ${settings.avatarUrl}',
+      );
       state = settings;
     } on Object catch (_) {
       // Retain default AppSettings
@@ -84,6 +88,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     required String userId,
     required String username,
     required String email,
+    required String fullName,
+    required String avatarUrl,
   }) async {
     state = state.copyWith(
       accessToken: accessToken,
@@ -91,6 +97,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       userId: userId,
       username: username,
       email: email,
+      fullName: fullName,
+      avatarUrl: avatarUrl,
     );
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     await localDataSource.updateSettings(state);
@@ -111,6 +119,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       userId: '',
       username: '',
       email: '',
+      fullName: '',
+      avatarUrl: '',
     );
     final localDataSource = _ref.read(chatbotLocalDataSourceProvider);
     await localDataSource.updateSettings(state);

@@ -81,7 +81,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get themeSelection => '主题选择';
 
   @override
+  String get themeLight => '浅色';
+
+  @override
+  String get themeDark => '深色';
+
+  @override
+  String get themeSepia => '复古';
+
+  @override
   String get general => '通用设置';
+
+  @override
+  String get notificationSettings => '通知设置';
 
   @override
   String get language => '语言';
