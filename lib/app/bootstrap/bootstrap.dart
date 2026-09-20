@@ -7,7 +7,7 @@ import 'package:lotus_connect/app/router/app_router.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/core/services/callkit/callkit_service.dart';
 import 'package:lotus_connect/core/services/notification/push_notification_service.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Bootstraps Lotus Connect application with
@@ -70,10 +70,10 @@ class LotusConnectApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider);
+    final settings = ref.watch(settingsNotifierProvider);
 
     ThemeData activeTheme;
-    switch (settings.themeMode) {
+    switch (settings.settings.themeMode) {
       case AppThemeMode.light:
         activeTheme = AppTheme.lightTheme;
       case AppThemeMode.dark:
@@ -89,7 +89,7 @@ class LotusConnectApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: activeTheme,
       routerConfig: router,
-      locale: Locale(settings.languageCode),
+      locale: Locale(settings.settings.languageCode),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -3,20 +3,20 @@ import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/core/database/app_database.dart';
 import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 
-/// Local data source interface for AI chatbot settings.
-abstract class ChatbotLocalDataSource {
-  Future<AppSettings> getSettings();
-  Future<void> updateSettings(AppSettings settings);
+abstract class SettingLocalDataSource {
+  Future<AppSettings> getAppSettings();
+
+  Future<void> updateAppSettings(AppSettings settings);
 }
 
-/// Concrete implementation of [ChatbotLocalDataSource] via Drift database.
-class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
-  ChatbotLocalDataSourceImpl(this._db);
+typedef SettingsLocalDataSource = SettingLocalDataSource;
 
+class SettingsLocalDataSourceImpl implements SettingLocalDataSource {
+  SettingsLocalDataSourceImpl(this._db);
   final AppDatabase _db;
 
   @override
-  Future<AppSettings> getSettings() async {
+  Future<AppSettings> getAppSettings() async {
     final row = await (_db.select(_db.appSettingsTable)
           ..where((tbl) => tbl.id.equals('default')))
         .getSingleOrNull();
@@ -48,7 +48,7 @@ class ChatbotLocalDataSourceImpl implements ChatbotLocalDataSource {
   }
 
   @override
-  Future<void> updateSettings(AppSettings settings) async {
+  Future<void> updateAppSettings(AppSettings settings) async {
     await _db.into(_db.appSettingsTable).insertOnConflictUpdate(
           AppSettingsTableCompanion.insert(
             id: 'default',

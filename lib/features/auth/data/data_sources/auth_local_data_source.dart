@@ -11,6 +11,8 @@ abstract class AuthLocalDataSource {
     required String userId,
     required String username,
     required String email,
+    required String fullName,
+    required String avatarUrl,
   });
 
   /// Clears stored authentication tokens and resets session.
@@ -39,6 +41,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     required String userId,
     required String username,
     required String email,
+    required String fullName,
+    required String avatarUrl,
   }) async {
     await _ref.read(settingsProvider.notifier).setSession(
           accessToken: accessToken,
@@ -46,6 +50,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
           userId: userId,
           username: username,
           email: email,
+          fullName: fullName,
+          avatarUrl: avatarUrl,
         );
   }
 
@@ -62,6 +68,8 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
         id: settings.userId,
         username: settings.username,
         email: settings.email,
+        fullName: settings.fullName,
+        avatarUrl: settings.avatarUrl,
       );
     }
     return null;

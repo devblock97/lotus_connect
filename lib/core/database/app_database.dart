@@ -23,7 +23,8 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 10; // Incremented schema version for medias column
+  int get schemaVersion =>
+      11; // Added fullName and profileImageUrl to AppSettingsTable
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

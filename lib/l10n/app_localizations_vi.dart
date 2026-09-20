@@ -84,7 +84,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get themeSelection => 'Lựa chọn chủ đề';
 
   @override
+  String get themeLight => 'Sáng';
+
+  @override
+  String get themeDark => 'Tối';
+
+  @override
+  String get themeSepia => 'Sepia';
+
+  @override
   String get general => 'CÀI ĐẶT CHUNG';
+
+  @override
+  String get notificationSettings => 'Cài đặt thông báo';
 
   @override
   String get language => 'Ngôn ngữ';

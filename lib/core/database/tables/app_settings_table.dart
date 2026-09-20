@@ -45,8 +45,14 @@ class AppSettingsTable extends Table {
   /// Persistent logged-in user ID.
   TextColumn get userId => text().withDefault(const Constant(''))();
 
+  /// Full name of the logged-in user.
+  TextColumn get fullName => text().withDefault(const Constant(''))();
+
   /// Persistent logged-in username.
   TextColumn get username => text().withDefault(const Constant(''))();
+
+  /// URL or path to the user's profile image.
+  TextColumn get avatarUrl => text().withDefault(const Constant(''))();
 
   /// Persistent logged-in email.
   TextColumn get email => text().withDefault(const Constant(''))();

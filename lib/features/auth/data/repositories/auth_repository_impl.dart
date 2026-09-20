@@ -67,6 +67,8 @@ class AuthRepositoryImpl implements AuthRepository {
         userId: authResponse.user.id,
         username: authResponse.user.username,
         email: authResponse.user.email,
+        fullName: authResponse.user.fullName ?? '',
+        avatarUrl: authResponse.user.avatarUrl ?? '',
       );
 
       // Sync FCM token to backend database for newly authenticated user

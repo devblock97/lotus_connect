@@ -8,6 +8,7 @@ class UserModel extends User {
     super.fullName,
     super.friendshipStatus,
     super.friendshipSenderId,
+    super.avatarUrl,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class UserModel extends User {
       fullName: json['fullName'] as String?,
       friendshipStatus: json['friendshipStatus'] as String?,
       friendshipSenderId: json['friendshipSenderId'] as String?,
+      avatarUrl: json['avatarUrl'] as String?,
     );
   }
 
@@ -30,6 +32,7 @@ class UserModel extends User {
       if (fullName != null) 'fullName': fullName,
       if (friendshipStatus != null) 'friendshipStatus': friendshipStatus,
       if (friendshipSenderId != null) 'friendshipSenderId': friendshipSenderId,
+      if (avatarUrl != null) 'avatarUrl': avatarUrl,
     };
   }
 }
