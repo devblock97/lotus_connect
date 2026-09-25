@@ -90,10 +90,10 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         },
         indicatorColor: theme.colorScheme.primaryContainer,
         destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.psychology_outlined),
-            selectedIcon: const Icon(Icons.psychology),
-            label: loc.tabAi,
+          const NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_filled),
+            label: 'Home',
           ),
           NavigationDestination(
             icon: const Icon(Icons.chat_bubble_outline),
