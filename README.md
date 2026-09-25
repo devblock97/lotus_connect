@@ -1,6 +1,6 @@
 # Lotus Connect
 
-A production-ready Flutter communication and AI platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and multi-engine LLM capabilities.
+A production-ready Flutter communication and AI platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and multi-engine LLM capabilities. The application is crafted with an **Instagram-style design**—aiming to replicate the core Instagram experience—to master and demonstrate best practices in Flutter, reactive UI engineering, and Clean Architecture.
 
 ---
 
@@ -23,6 +23,7 @@ Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, op
 
 ## 🚀 Key Features
 
+- **Instagram-Style Social Feed & Stories**: Rich interactive social feed replicating the Instagram experience with story rings, multi-photo/video carousels, inline video playback with thumbnail fallbacks, bursting double-tap heart reactions, and high-performance lazy loading via `ListView.builder`.
 - **P2P Real-Time Chat**: Direct person-to-person messaging with message reactions, media sharing (images/videos), full-screen media viewer, and optimistic UI updates.
 - **AI Chatbot (Multi-Engine)**:
   - Google Gemini API (Cloud LLM)

@@ -24,6 +24,9 @@ class DynamicBaseUrlInterceptor extends Interceptor {
     if (!path.startsWith('/')) {
       path = '/$path';
     }
+    if (host.endsWith('/api/v1') && path.startsWith('/api/v1')) {
+      path = path.substring('/api/v1'.length);
+    }
     options
       ..path = '$host$path'
       ..baseUrl = '';
