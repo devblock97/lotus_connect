@@ -32,7 +32,7 @@ class WebSocketEventDispatcher {
       try {
         await handler.handle(event, payload);
       } on Object catch (e, stack) {
-        AppLogger.error('Error handling ws event "$event": $e', stack);
+        AppLogger.error('Error handling ws event "$event"', e, stack);
       }
     } else {
       AppLogger.debug('No handler registered for WS event: $event');

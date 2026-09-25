@@ -10,18 +10,34 @@ class AppLogger {
   );
 
   static void debug(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.d(message, error: error, stackTrace: stackTrace);
+    if (error is StackTrace && stackTrace == null) {
+      _logger.d(message, stackTrace: error);
+    } else {
+      _logger.d(message, error: error, stackTrace: stackTrace);
+    }
   }
 
   static void info(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.i(message, error: error, stackTrace: stackTrace);
+    if (error is StackTrace && stackTrace == null) {
+      _logger.i(message, stackTrace: error);
+    } else {
+      _logger.i(message, error: error, stackTrace: stackTrace);
+    }
   }
 
   static void warning(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.w(message, error: error, stackTrace: stackTrace);
+    if (error is StackTrace && stackTrace == null) {
+      _logger.w(message, stackTrace: error);
+    } else {
+      _logger.w(message, error: error, stackTrace: stackTrace);
+    }
   }
 
   static void error(String message, [dynamic error, StackTrace? stackTrace]) {
-    _logger.e(message, error: error, stackTrace: stackTrace);
+    if (error is StackTrace && stackTrace == null) {
+      _logger.e(message, stackTrace: error);
+    } else {
+      _logger.e(message, error: error, stackTrace: stackTrace);
+    }
   }
 }
