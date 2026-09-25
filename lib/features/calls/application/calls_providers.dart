@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/calls/data/datasources/calls_remote_data_source.dart';
 import 'package:lotus_connect/features/calls/data/datasources/calls_signaling_data_source.dart';
@@ -9,7 +10,6 @@ import 'package:lotus_connect/features/calls/domain/usecases/end_call_usecase.da
 import 'package:lotus_connect/features/calls/domain/usecases/get_call_history_usecase.dart';
 import 'package:lotus_connect/features/calls/domain/usecases/initiate_call_usecase.dart';
 import 'package:lotus_connect/features/calls/domain/usecases/send_sdp_usecase.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
 
 /// Provider for CallsRemoteDataSource.
 final callsRemoteDataSourceProvider = Provider<CallsRemoteDataSource>((ref) {
@@ -57,4 +57,10 @@ final endCallUseCaseProvider = Provider<EndCallUseCase>((ref) {
 /// Provider for SendSdpUseCase.
 final sendSdpUseCaseProvider = Provider<SendSdpUseSase>((ref) {
   return SendSdpUseSase(repository: ref.watch(callsRepositoryProvider));
+});
+
+/// StreamProvider yielding incoming call invitations.
+final incomingCallProvider = StreamProvider<WebRTCCallInvitation>((ref) {
+  final signaling = ref.watch(webrtcSignalingServiceProvider);
+  return signaling.invitationStream;
 });

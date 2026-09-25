@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/chat/data/datasources/chat_local_data_source.dart';
 import 'package:lotus_connect/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:lotus_connect/features/chat/data/repositories/chat_repository_impl.dart';
@@ -14,7 +15,6 @@ import 'package:lotus_connect/features/chat/domain/usecases/update_message_useca
 import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
 
 /// Provider for PrivateChatRemoteDataSource.
 final privateChatRemoteDataSourceProvider =

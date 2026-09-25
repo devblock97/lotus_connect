@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 /// Local data source contract for authentication session & token persistence.
 abstract class AuthLocalDataSource {
@@ -44,7 +44,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     required String fullName,
     required String avatarUrl,
   }) async {
-    await _ref.read(settingsProvider.notifier).setSession(
+    await _ref.read(settingsNotifierProvider.notifier).setSession(
           accessToken: accessToken,
           refreshToken: refreshToken,
           userId: userId,
@@ -57,19 +57,20 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearSession() async {
-    await _ref.read(settingsProvider.notifier).clearTokens();
+    await _ref.read(settingsNotifierProvider.notifier).clearTokens();
   }
 
   @override
   Future<User?> getCachedUser() async {
-    final settings = _ref.read(settingsProvider);
-    if (settings.accessToken.isNotEmpty && settings.username.isNotEmpty) {
+    final notifier = _ref.read(settingsNotifierProvider);
+    if (notifier.settings.accessToken.isNotEmpty &&
+        notifier.settings.username.isNotEmpty) {
       return User(
-        id: settings.userId,
-        username: settings.username,
-        email: settings.email,
-        fullName: settings.fullName,
-        avatarUrl: settings.avatarUrl,
+        id: notifier.settings.userId,
+        username: notifier.settings.username,
+        email: notifier.settings.email,
+        fullName: notifier.settings.fullName,
+        avatarUrl: notifier.settings.avatarUrl,
       );
     }
     return null;
@@ -77,13 +78,13 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<String?> getAccessToken() async {
-    final token = _ref.read(settingsProvider).accessToken;
+    final token = _ref.read(settingsNotifierProvider).settings.accessToken;
     return token.isNotEmpty ? token : null;
   }
 
   @override
   Future<String?> getRefreshToken() async {
-    final token = _ref.read(settingsProvider).refreshToken;
+    final token = _ref.read(settingsNotifierProvider).settings.refreshToken;
     return token.isNotEmpty ? token : null;
   }
 }

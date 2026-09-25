@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/theme_extensions.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/markdown_message_view.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chatbot/presentation/widgets/markdown_message_view.dart';
 
 /// Message bubble widget supporting Markdown, syntax highlighting, and actions.
 class MessageBubble extends StatelessWidget {

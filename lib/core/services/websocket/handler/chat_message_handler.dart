@@ -4,7 +4,7 @@ import 'package:lotus_connect/features/chat_core/application/chat_core_providers
 import 'package:lotus_connect/features/chat_core/data/datasources/chat_core_local_data_source.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class ChatMessageWebSocketHandler implements WebSocketEventHandler {
   ChatMessageWebSocketHandler({
@@ -117,6 +117,7 @@ class ChatMessageWebSocketHandler implements WebSocketEventHandler {
 final chatMessageHandler = Provider<ChatMessageWebSocketHandler>((ref) {
   return ChatMessageWebSocketHandler(
     localDataSource: ref.watch(chatCoreLocalDataSourceProvider),
-    currentUserIdGetter: () => ref.watch(settingsProvider).userId,
+    currentUserIdGetter: () =>
+        ref.watch(settingsNotifierProvider).settings.userId,
   );
 });

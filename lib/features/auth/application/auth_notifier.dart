@@ -7,7 +7,7 @@ import 'package:lotus_connect/features/auth/domain/usecases/get_current_user_use
 import 'package:lotus_connect/features/auth/domain/usecases/login_usecase.dart';
 import 'package:lotus_connect/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:lotus_connect/features/auth/domain/usecases/register_usecase.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class AuthState {
   const AuthState({this.user, this.isLoading = false, this.errorMessage});
@@ -44,7 +44,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         _getCurrentUserUseCase = getCurrentUserUseCase,
         super(const AuthState()) {
     _ref.listen<String>(
-      settingsProvider.select((s) => s.accessToken),
+      settingsNotifierProvider.select((s) => s.settings.accessToken),
       (prev, next) {
         if (next.isEmpty && state.user != null) {
           state = const AuthState();

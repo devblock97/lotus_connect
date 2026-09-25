@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_providers.dart';
 
 class WebSocketService {
   WebSocketService(this._ref);
@@ -32,9 +31,9 @@ class WebSocketService {
     if (isConnected) return;
     _cancelReconnect();
 
-    final settings = _ref.read(settingsProvider);
-    final token = settings.accessToken;
-    final serverHost = settings.serverHost;
+    final notifier = _ref.read(settingsNotifierProvider);
+    final token = notifier.settings.accessToken;
+    final serverHost = notifier.settings.serverHost;
 
     if (token.isEmpty) {
       AppLogger.warning('WS Connection aborted: Access Token is empty');

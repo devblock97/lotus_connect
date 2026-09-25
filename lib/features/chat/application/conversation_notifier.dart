@@ -18,7 +18,7 @@ import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings//application/settings_notifier.dart';
 
 enum Status { initialize, success, failure, loading }
 
@@ -173,7 +173,7 @@ class PrivateActiveConversationNotifier
 
   Future<void> _syncMessages(String conversationId) async {
     try {
-      final currentUserId = _ref.read(settingsProvider).userId;
+      final currentUserId = _ref.read(settingsNotifierProvider).settings.userId;
       if (currentUserId.isEmpty) return;
 
       final remoteResult = await _getRemoteMessageUseCase(
@@ -255,7 +255,7 @@ class PrivateActiveConversationNotifier
       return;
     }
 
-    final currentUserId = _ref.read(settingsProvider).userId;
+    final currentUserId = _ref.read(settingsNotifierProvider).settings.userId;
     if (currentUserId.isEmpty) return;
 
     state = state.copyWith(hasLoadMore: true);

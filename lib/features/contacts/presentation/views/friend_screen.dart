@@ -1,17 +1,16 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
+import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/request_card.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class FriendScreen extends ConsumerStatefulWidget {
@@ -228,7 +227,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         : '?';
     final avatarColor =
         Colors.primaries[user.username.hashCode % Colors.primaries.length];
-    final currentUserId = ref.watch(settingsProvider).userId;
+    final currentUserId = ref.watch(settingsNotifierProvider).settings.userId;
 
     Widget trailingWidget;
 

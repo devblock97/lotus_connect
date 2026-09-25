@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/interceptors/auth_interceptor.dart';
@@ -7,6 +8,7 @@ import 'package:lotus_connect/core/network/interceptors/dynamic_base_url_interce
 import 'package:lotus_connect/core/network/interceptors/logging_interceptor.dart';
 import 'package:lotus_connect/core/network/interceptors/retry_interceptor.dart';
 import 'package:lotus_connect/core/network/interceptors/token_refresh_interceptor.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 /// Customized Dio HTTP client for network operations.
 class DioClient {
@@ -152,3 +154,21 @@ class DioClient {
     );
   }
 }
+
+final dioClientProvider = Provider<DioClient>((ref) {
+  return DioClient(
+    tokenGetter: () => ref.read(settingsNotifierProvider).settings.accessToken,
+    serverHostGetter: () =>
+        ref.read(settingsNotifierProvider).settings.serverHost,
+    refreshTokenGetter: () =>
+        ref.read(settingsNotifierProvider).settings.refreshToken,
+    onTokensRefreshed: (accessToken, refreshToken) async {
+      await ref
+          .read(settingsNotifierProvider.notifier)
+          .setTokens(accessToken, refreshToken);
+    },
+    onRefreshFailed: () {
+      ref.read(settingsNotifierProvider.notifier).clearTokens();
+    },
+  );
+});

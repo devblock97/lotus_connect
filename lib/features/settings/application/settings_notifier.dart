@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/settings/domain/usecases/get_app_settings_use_case.dart';
 import 'package:lotus_connect/features/settings/domain/usecases/update_app_setting_use_case.dart';
 
