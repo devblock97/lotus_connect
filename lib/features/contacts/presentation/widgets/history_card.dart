@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class HistoryCard extends ConsumerWidget {
@@ -36,7 +36,7 @@ class HistoryCard extends ConsumerWidget {
       badgeIcon = Icons.close;
       badgeColor = Colors.red;
     } else {
-      final currentUserId = ref.read(settingsProvider).userId;
+      final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
       final isOutgoing = log.hostId == currentUserId;
       badgeIcon = isOutgoing ? Icons.arrow_upward : Icons.arrow_downward;
       badgeColor = isOutgoing ? Colors.blue : Colors.green;
@@ -141,7 +141,7 @@ class HistoryCard extends ConsumerWidget {
   }
 
   String _resolvePeerId(CallLog log, WidgetRef ref) {
-    final currentUserId = ref.read(settingsProvider).userId;
+    final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
     if (log.hostId != currentUserId) {
       return log.hostId;
     }

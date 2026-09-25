@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
+import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/notfications/data/datasources/notification_remote_data_source.dart';
 import 'package:lotus_connect/features/notfications/data/repositories/notification_repository_impl.dart';
 import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';

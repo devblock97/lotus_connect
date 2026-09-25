@@ -3,13 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_sync_coordinator.dart';
+import 'package:lotus_connect/features/calls/application/calls_providers.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
-import 'package:lotus_connect/features/chatbot/application/conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_conversation_list_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
+import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 import 'package:lotus_connect/features/notfications/presentation/view/alerts_screen.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -25,7 +24,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final token = ref.read(settingsProvider).accessToken;
+      final token = ref.read(settingsNotifierProvider).settings.accessToken;
       if (token.isNotEmpty) {
         ref.read(webSocketServiceProvider).connect();
       }
@@ -46,7 +45,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
 
     ref
       ..listen<String>(
-        settingsProvider.select((s) => s.accessToken),
+        settingsNotifierProvider.select((s) => s.settings.accessToken),
         (prev, next) {
           if (next.isNotEmpty) {
             ref.read(webSocketServiceProvider).connect();
@@ -68,7 +67,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
     final shellIndex = ref.watch(shellIndexProvider);
 
     final pages = [
-      const ChatbotConversationListScreen(),
+      const HomeScreen(),
       ConversationListView(
         onSelectConversation: () {
           ref.read(shellIndexProvider.notifier).state = 0;
@@ -87,18 +86,6 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: shellIndex,
         onDestinationSelected: (index) {
-          if (index == 0) {
-            final conversations =
-                ref.read(conversationListProvider).conversations;
-            final aiConversations = conversations.where((c) => !c.isUserToUser);
-            final aiConversation =
-                aiConversations.isEmpty ? null : aiConversations.first;
-            if (aiConversation != null) {
-              ref
-                  .read(conversationListProvider.notifier)
-                  .selectConversation(aiConversation.id);
-            }
-          }
           ref.read(shellIndexProvider.notifier).state = index;
         },
         indicatorColor: theme.colorScheme.primaryContainer,
@@ -170,3 +157,6 @@ class PlaceholderTab extends StatelessWidget {
     );
   }
 }
+
+/// StateProvider managing the active tab index inside MainShellScreen.
+final shellIndexProvider = StateProvider<int>((ref) => 0);

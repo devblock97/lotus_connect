@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/presentation/views/login_screen.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/presentation/views/chatbot_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
+import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/main_shell_screen.dart';
 
@@ -15,7 +15,6 @@ class AppRouter {
 
   static const String home = '/';
   static const String login = '/login';
-  static const String chatbot = '/chatbot';
   static const String conversations = '/conversations';
   static const String settings = '/settings';
   static const String contacts = '/contacts';
@@ -24,12 +23,12 @@ class AppRouter {
 
 /// Global provider exposing the reactive GoRouter configuration.
 final routerProvider = Provider<GoRouter>((ref) {
-  final settings = ref.watch(settingsProvider);
+  final notifier = ref.watch(settingsNotifierProvider);
 
   return GoRouter(
     initialLocation: AppRouter.home,
     redirect: (context, state) {
-      final isAuth = settings.accessToken.isNotEmpty;
+      final isAuth = notifier.settings.accessToken.isNotEmpty;
       final goingToAuth = state.matchedLocation == AppRouter.login;
 
       // Force redirection to Login if no access token exists in local SQLite
@@ -54,9 +53,9 @@ final routerProvider = Provider<GoRouter>((ref) {
             const LoginScreen(),
       ),
       GoRoute(
-        path: AppRouter.chatbot,
+        path: AppRouter.home,
         builder: (BuildContext context, GoRouterState state) =>
-            const ChatbotScreen(),
+            const HomeScreen(),
       ),
       GoRoute(
         path: AppRouter.conversations,

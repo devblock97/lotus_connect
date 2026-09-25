@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/settings/domain/repositories/settings_repository.dart';
 
 class UpdateAppSettingParam extends Equatable {

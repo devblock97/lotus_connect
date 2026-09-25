@@ -10,15 +10,15 @@ import 'package:lotus_connect/features/chat/domain/repositories/chat_repository.
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_repository.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockChatRepository extends Mock implements ChatRepository {}
 
 class MockChatCoreRepository extends Mock implements ChatCoreRepository {}
 
-class MockSettingsNotifier extends StateNotifier<AppSettings>
+class MockSettingsNotifier extends StateNotifier<SettingsState>
     with Mock
     implements SettingsNotifier {
   MockSettingsNotifier(super.state);
@@ -54,7 +54,7 @@ void main() {
     mockChatCoreRepo = MockChatCoreRepository();
 
     mockSettingsNotifier = MockSettingsNotifier(
-      const AppSettings(userId: 'test_user_id'),
+      const SettingsState(settings: AppSettings(userId: 'test_user_id')),
     );
     mockListNotifier = MockPrivateConversationListNotifier(
       const PrivateConversationListState(
@@ -156,7 +156,7 @@ void main() {
       overrides: [
         privateChatRepositoryProvider.overrideWithValue(mockPrivateChatRepo),
         chatCoreRepositoryProvider.overrideWithValue(mockChatCoreRepo),
-        settingsProvider.overrideWith((ref) => mockSettingsNotifier),
+        settingsNotifierProvider.overrideWith((ref) => mockSettingsNotifier),
         privateConversationListProvider.overrideWith((ref) => mockListNotifier),
       ],
     );
@@ -272,7 +272,7 @@ void main() {
       overrides: [
         privateChatRepositoryProvider.overrideWithValue(mockPrivateChatRepo),
         chatCoreRepositoryProvider.overrideWithValue(mockChatCoreRepo),
-        settingsProvider.overrideWith((ref) => mockSettingsNotifier),
+        settingsNotifierProvider.overrideWith((ref) => mockSettingsNotifier),
         privateConversationListProvider.overrideWith((ref) => mockListNotifier),
       ],
     );
@@ -339,7 +339,7 @@ void main() {
       overrides: [
         privateChatRepositoryProvider.overrideWithValue(mockPrivateChatRepo),
         chatCoreRepositoryProvider.overrideWithValue(mockChatCoreRepo),
-        settingsProvider.overrideWith((ref) => mockSettingsNotifier),
+        settingsNotifierProvider.overrideWith((ref) => mockSettingsNotifier),
         privateConversationListProvider.overrideWith((ref) => mockListNotifier),
       ],
     );

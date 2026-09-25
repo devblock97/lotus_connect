@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/core/database/app_database.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 
 abstract class SettingLocalDataSource {
   Future<AppSettings> getAppSettings();

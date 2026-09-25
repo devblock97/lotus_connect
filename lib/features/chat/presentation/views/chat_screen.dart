@@ -8,10 +8,10 @@ import 'package:lotus_connect/features/chat/application/conversation_list_notifi
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/features/chat/application/typing_status_provider.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/person_message_bubble.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/conversation.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
-import 'package:lotus_connect/features/chatbot/presentation/widgets/chat_input_field.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Dedicated screen for private, person-to-person conversations.

@@ -1,8 +1,8 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/settings/data/datasources/settings_local_data_source.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/settings/domain/repositories/settings_repository.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {

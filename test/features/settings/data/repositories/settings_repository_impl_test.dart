@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
-import 'package:lotus_connect/features/chatbot/domain/entities/app_settings.dart';
 import 'package:lotus_connect/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:lotus_connect/features/settings/data/repositories/settings_repository.dart';
+import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSettingLocalDataSource extends Mock

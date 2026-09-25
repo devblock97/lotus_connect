@@ -8,15 +8,16 @@ import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/active_call_notifier.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
+import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/connected_screen.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
-import 'package:lotus_connect/features/chatbot/application/providers.dart';
-import 'package:lotus_connect/features/chatbot/application/settings_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
+import 'package:lotus_connect/main_shell_screen.dart';
 
 enum CallStatus {
   idle,
@@ -542,7 +543,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   String _resolvePeerId(CallLog log) {
-    final currentUserId = ref.read(settingsProvider).userId;
+    final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
     if (log.hostId != currentUserId) {
       return log.hostId;
     }
@@ -704,7 +705,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final loc = AppLocalizations.of(context)!;
     final friendsState = ref.watch(contactsProvider);
     final historyState = ref.watch(callHistoryProvider);
-    final currentUserId = ref.read(settingsProvider).userId;
+    final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
 
     final filteredFriends = friendsState.friends.where((f) {
       final name = (f.fullName ?? '').toLowerCase();
@@ -1067,7 +1068,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       badgeIcon = Icons.close;
       badgeColor = Colors.red;
     } else {
-      final currentUserId = ref.read(settingsProvider).userId;
+      final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
       final isOutgoing = log.hostId == currentUserId;
       badgeIcon = isOutgoing ? Icons.arrow_upward : Icons.arrow_downward;
       badgeColor = isOutgoing ? Colors.blue : Colors.green;
