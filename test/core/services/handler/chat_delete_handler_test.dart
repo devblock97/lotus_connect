@@ -4,7 +4,6 @@ import 'package:lotus_connect/core/services/websocket/handler/chat_delete_handle
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/data/datasources/chat_core_local_data_source.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:riverpod/src/framework.dart';
 
 class MockChatCoreLocalDataSource extends Mock
     implements ChatCoreLocalDataSource {}
