@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Represents a media item (photo or video) attached to a post.
 @immutable
 class PostMediaItem {
   const PostMediaItem({
@@ -47,7 +46,6 @@ class PostMediaItem {
         'height': height,
       };
 
-  /// Returns true if this media item is a video.
   bool get isVideo {
     if (mimeType != null && mimeType!.toLowerCase().startsWith('video/')) {
       return true;
@@ -59,7 +57,6 @@ class PostMediaItem {
         duration != null;
   }
 
-  /// Calculates aspect ratio from width and height, defaulting to 1.0 (square).
   double get aspectRatio {
     if (width != null && height != null && height! > 0) {
       final ratio = width! / height!;
