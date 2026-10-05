@@ -42,25 +42,44 @@ class HistoryCard extends ConsumerWidget {
       badgeColor = isOutgoing ? Colors.blue : Colors.green;
     }
 
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      shape: RoundedRectangleBorder(
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor =
+        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final borderColor = isDark
+        ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
+        : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade100),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         leading: Stack(
           children: [
             CircleAvatar(
-              backgroundColor:
-                  isMissed ? Colors.red.shade50 : Colors.grey.shade100,
+              radius: 22,
+              backgroundColor: isMissed
+                  ? Colors.red.withValues(alpha: 0.12)
+                  : theme.colorScheme.primaryContainer,
               child: Text(
                 initials,
                 style: TextStyle(
-                  color: isMissed ? Colors.red : Colors.grey.shade800,
+                  color: isMissed
+                      ? Colors.red
+                      : theme.colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -73,7 +92,7 @@ class HistoryCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: badgeColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: Border.all(color: cardColor, width: 2),
                 ),
                 child: Icon(badgeIcon, size: 10, color: Colors.white),
               ),
@@ -82,27 +101,48 @@ class HistoryCard extends ConsumerWidget {
         ),
         title: Text(
           peerName,
-          style: theme.textTheme.titleMedium,
+          style: const TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
+          ),
         ),
         subtitle: Row(
           children: [
             Icon(
               log.isVideo ? Icons.videocam_outlined : Icons.phone_outlined,
               size: 14,
-              color: Colors.grey.shade600,
+              color: isMissed
+                  ? Colors.red.shade400
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
             ),
             const SizedBox(width: 4),
             Text(
               log.isVideo ? loc.videoCall : loc.voiceCall,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              style: TextStyle(
+                color: isMissed
+                    ? Colors.red.shade400
+                    : theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.75),
+                fontSize: 13,
+              ),
             ),
             if (log.durationSeconds > 0) ...[
               const SizedBox(width: 8),
-              const Icon(Icons.circle, size: 4, color: Colors.grey),
+              Icon(
+                Icons.circle,
+                size: 4,
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
               const SizedBox(width: 8),
               Text(
                 _formatDurationText(context, log.durationSeconds),
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant
+                      .withValues(alpha: 0.75),
+                  fontSize: 13,
+                ),
               ),
             ],
           ],
@@ -112,17 +152,22 @@ class HistoryCard extends ConsumerWidget {
           children: [
             Text(
               timeText,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+              style: TextStyle(
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                fontSize: 12,
+              ),
             ),
             const SizedBox(width: 10),
             CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.grey.shade100,
+              radius: 18,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest
+                  .withValues(alpha: 0.7),
               child: IconButton(
                 icon: Icon(
-                  log.isVideo ? Icons.videocam : Icons.phone,
+                  log.isVideo ? Icons.videocam_rounded : Icons.phone_rounded,
                   size: 16,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
                 tooltip: log.isVideo ? loc.videoCall : loc.voiceCall,
                 onPressed: () {

@@ -9,7 +9,6 @@ import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart'
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
-import 'package:lotus_connect/features/contacts/presentation/widgets/request_card.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -54,36 +53,79 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (val) {
-                setState(() {
-                  _searchQuery = val;
-                });
-                ref.read(contactsProvider.notifier).searchUsers(val);
-              },
-              decoration: InputDecoration(
-                hintText: loc.searchFriends,
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          ref.read(contactsProvider.notifier).clearSearch();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: theme.brightness == Brightness.dark ? 0.2 : 0.03,
+                    ),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  setState(() {
+                    _searchQuery = val;
+                  });
+                  ref.read(contactsProvider.notifier).searchUsers(val);
+                },
+                decoration: InputDecoration(
+                  hintText: loc.searchFriends,
+                  hintStyle: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.7),
+                    size: 22,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 20),
+                          onPressed: () {
+                            _searchController.clear();
+                            ref.read(contactsProvider.notifier).clearSearch();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: theme.brightness == Brightness.dark
+                      ? theme.colorScheme.surfaceContainer
+                      : Colors.white,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.45),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.45),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 1.5,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -105,99 +147,137 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                           if (_searchQuery.isNotEmpty &&
                               filteredFriends.isNotEmpty) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 8,
+                              padding: const EdgeInsets.only(
+                                left: 4,
+                                right: 4,
+                                top: 8,
+                                bottom: 4,
                               ),
-                              child: Text(
-                                loc.myFriends,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
-                                  letterSpacing: 1,
-                                ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    loc.myFriends.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.primary,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '${filteredFriends.length}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            ...filteredFriends.map(
-                              (friend) => RequestCard(user: friend),
-                            ),
+                            ...filteredFriends.map(_buildFriendCard),
                             const SizedBox(height: 16),
                           ] else if (_searchQuery.isEmpty) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 8,
+                              padding: const EdgeInsets.only(
+                                left: 4,
+                                right: 4,
+                                top: 8,
+                                bottom: 4,
                               ),
-                              child: Text(
-                                loc.allFriends,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade600,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                            ),
-                            ...filteredFriends.map(
-                              (friend) => ContactCard(
-                                friend: friend,
-                                startChat: () async {
-                                  final conversation = await ref
-                                      .read(
-                                        privateConversationListProvider
-                                            .notifier,
-                                      )
-                                      .createNewPrivateChat(
-                                        friendId: friend.id,
-                                        title:
-                                            friend.fullName ?? friend.username,
-                                      );
-                                  if (conversation != null) {
-                                    if (!context.mounted) return;
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ChatScreen(
-                                          conversation: conversation,
-                                        ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    loc.allFriends.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.onSurfaceVariant
+                                          .withValues(alpha: 0.8),
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme
+                                          .colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.6),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '${filteredFriends.length}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.primary,
                                       ),
-                                    );
-                                  }
-                                },
-                                voiceCall: () {
-                                  _startCall(
-                                    recipientId: friend.id,
-                                    isVideo: false,
-                                  );
-                                },
-                                videoCall: () {
-                                  _startCall(
-                                    recipientId: friend.id,
-                                    isVideo: true,
-                                  );
-                                },
-                                onDelete: () {
-                                  _showDeleteFriendDialog(context, friend);
-                                },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            ...filteredFriends.map(_buildFriendCard),
                           ],
                           if (_searchQuery.isNotEmpty &&
                               globalResults.isNotEmpty) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 8,
+                              padding: const EdgeInsets.only(
+                                left: 4,
+                                right: 4,
+                                top: 12,
+                                bottom: 4,
                               ),
-                              child: Text(
-                                loc.globalSearchAddFriends,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade600,
-                                  letterSpacing: 1,
-                                ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    loc.globalSearchAddFriends.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.onSurfaceVariant
+                                          .withValues(alpha: 0.8),
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 1.5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: theme
+                                          .colorScheme.surfaceContainerHighest
+                                          .withValues(alpha: 0.6),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      '${globalResults.length}',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             ...globalResults.map(
@@ -219,8 +299,51 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     );
   }
 
+  Widget _buildFriendCard(User friend) {
+    return ContactCard(
+      friend: friend,
+      startChat: () async {
+        final conversation = await ref
+            .read(
+              privateConversationListProvider.notifier,
+            )
+            .createNewPrivateChat(
+              friendId: friend.id,
+              title: friend.fullName ?? friend.username,
+            );
+        if (conversation != null) {
+          if (!mounted) return;
+          await Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => ChatScreen(
+                conversation: conversation,
+              ),
+            ),
+          );
+        }
+      },
+      voiceCall: () {
+        _startCall(
+          recipientId: friend.id,
+          isVideo: false,
+        );
+      },
+      videoCall: () {
+        _startCall(
+          recipientId: friend.id,
+          isVideo: true,
+        );
+      },
+      onDelete: () {
+        _showDeleteFriendDialog(context, friend);
+      },
+    );
+  }
+
   Widget _buildGlobalUserItem(ThemeData theme, User user) {
     final loc = AppLocalizations.of(context)!;
+    final isDark = theme.brightness == Brightness.dark;
     final displayName = user.fullName ?? user.username;
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
@@ -228,6 +351,12 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     final avatarColor =
         Colors.primaries[user.username.hashCode % Colors.primaries.length];
     final currentUserId = ref.watch(settingsNotifierProvider).settings.userId;
+
+    final cardColor =
+        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final borderColor = isDark
+        ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
+        : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
 
     Widget trailingWidget;
 
@@ -328,24 +457,43 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       );
     }
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-      leading: CircleAvatar(
-        backgroundColor: avatarColor.withValues(alpha: 0.15),
-        child: Text(
-          initials,
-          style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        leading: CircleAvatar(
+          radius: 22,
+          backgroundColor: avatarColor.withValues(alpha: 0.15),
+          child: Text(
+            initials,
+            style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
+          ),
         ),
+        title: Text(
+          displayName,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        subtitle: Text(
+          '@${user.username}',
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+            fontSize: 13,
+          ),
+        ),
+        trailing: trailingWidget,
       ),
-      title: Text(
-        displayName,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-      ),
-      subtitle: Text(
-        '@${user.username}',
-        style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-      ),
-      trailing: trailingWidget,
     );
   }
 
@@ -493,7 +641,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     );
 
     if ((confirmed ?? false) && mounted) {
-      final messenger = ScaffoldMessenger.of(context);
+      final messenger = ScaffoldMessenger.of(this.context);
       final success =
           await ref.read(contactsProvider.notifier).deleteFriend(friend.id);
       if (!mounted) return;
