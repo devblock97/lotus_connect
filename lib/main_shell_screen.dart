@@ -88,6 +88,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         onDestinationSelected: (index) {
           ref.read(shellIndexProvider.notifier).state = index;
         },
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         indicatorColor: theme.colorScheme.primaryContainer,
         destinations: [
           const NavigationDestination(

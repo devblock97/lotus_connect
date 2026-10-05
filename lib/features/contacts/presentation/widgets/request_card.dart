@@ -29,45 +29,83 @@ class RequestCard extends ConsumerWidget {
         ? displayName.substring(0, 1).toUpperCase()
         : '?';
 
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor =
+        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final borderColor = isDark
+        ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
+        : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
+
     return Container(
-      margin: const EdgeInsets.all(8),
+      margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: avatarColor.withValues(alpha: 0.7),
-          strokeAlign: 1,
-        ),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         leading: CircleAvatar(
+          radius: 22,
           backgroundColor: avatarColor.withValues(alpha: 0.15),
-          child: Text(
-            initials,
-            style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
-          ),
+          backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
+              ? NetworkImage(user.avatarUrl!)
+              : null,
+          child: user.avatarUrl == null || user.avatarUrl!.isEmpty
+              ? Text(
+                  initials,
+                  style: TextStyle(
+                    color: avatarColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                )
+              : null,
         ),
         title: Text(
           displayName,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          style: const TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.2,
+          ),
         ),
         subtitle: Text(
           '@${user.username}',
-          style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+            fontSize: 13,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.chat_bubble_outline,
-                color: theme.colorScheme.primary,
+            if (startChat != null)
+              IconButton(
+                icon: Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 21,
+                ),
+                onPressed: startChat,
+                tooltip: loc.chat,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.all(6),
+                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
               ),
-              onPressed: startChat,
-              tooltip: loc.chat,
-            ),
             IconButton(
-              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: Color(0xFF16A34A),
+                size: 24,
+              ),
               onPressed: () async {
                 final success = await ref
                     .read(friendRequestProvider.notifier)
@@ -86,9 +124,16 @@ class RequestCard extends ConsumerWidget {
                 }
               },
               tooltip: loc.accept,
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.all(6),
+              constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
             ),
             IconButton(
-              icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+              icon: Icon(
+                Icons.cancel_rounded,
+                color: Colors.red.shade400,
+                size: 24,
+              ),
               onPressed: () async {
                 final success = await ref
                     .read(friendRequestProvider.notifier)
@@ -107,6 +152,9 @@ class RequestCard extends ConsumerWidget {
                 }
               },
               tooltip: loc.reject,
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.all(6),
+              constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
             ),
           ],
         ),

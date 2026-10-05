@@ -27,37 +27,59 @@ class _AllFriendRequestsScreenState
     final loc = AppLocalizations.of(context)!;
     final state = ref.watch(friendRequestProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          loc.friendRequests,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        elevation: 0,
-      ),
-      body: RefreshIndicator(
+    final theme = Theme.of(context);
+
+    if (state.isLoading && state.requests.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.requests.isEmpty) {
+      return RefreshIndicator(
         onRefresh: () =>
             ref.read(friendRequestProvider.notifier).loadFriendRequests(),
-        child: state.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : state.requests.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 64),
-                      child: Center(
-                        child: Text(
-                          loc.noPendingRequests,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.person_add_disabled_outlined,
+                      size: 64,
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      loc.noPendingRequests,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                  )
-                : ListView.builder(
-                    itemCount: state.requests.length,
-                    itemBuilder: (context, index) {
-                      return RequestCard(user: state.requests[index]);
-                    },
-                  ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(friendRequestProvider.notifier).loadFriendRequests(),
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        itemCount: state.requests.length,
+        itemBuilder: (context, index) {
+          return RequestCard(user: state.requests[index]);
+        },
       ),
     );
   }
