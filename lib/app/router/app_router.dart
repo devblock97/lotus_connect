@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/features/auth/presentation/views/login_screen.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
+import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
@@ -19,6 +20,7 @@ class AppRouter {
   static const String settings = '/settings';
   static const String contacts = '/contacts';
   static const String chat = '/chats';
+  static const String createPost = '/create-post';
 }
 
 /// Global provider exposing the reactive GoRouter configuration.
@@ -71,6 +73,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.contacts,
         builder: (BuildContext context, GoRouterState state) =>
             const ContactsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.createPost,
+        builder: (BuildContext context, GoRouterState state) =>
+            const CreatePostScreen(),
       ),
       // GoRoute(
       //   path: AppRouter.chat,
