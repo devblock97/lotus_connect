@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
+import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/create_post_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/post_options_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 /// Home feed screen displaying Instagram-style stories and live posts.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -23,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final feedState = ref.watch(feedNotifierProvider);
     final notifier = ref.read(feedNotifierProvider.notifier);
+    final settings = ref.watch(settingsNotifierProvider).settings;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -41,6 +46,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              CupertinoIcons.plus_app,
+              color: primaryTextColor,
+              size: 24,
+            ),
+            splashRadius: 20,
+            tooltip: 'Create post',
+            onPressed: () {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => const CreatePostScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(
               CupertinoIcons.heart,
@@ -81,6 +102,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: theme.dividerColor.withValues(alpha: 0.15),
               ),
             ),
+            const SliverToBoxAdapter(
+              child: CreatePostBar(),
+            ),
+            SliverToBoxAdapter(
+              child: Divider(
+                height: 1,
+                thickness: 0.5,
+                color: theme.dividerColor.withValues(alpha: 0.15),
+              ),
+            ),
             if (feedState.isLoading && feedState.posts.isEmpty)
               const SliverPostListSkeleton()
             else if (feedState.posts.isEmpty)
@@ -101,6 +132,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 itemCount: feedState.posts.length,
                 itemBuilder: (context, index) {
                   final post = feedState.posts[index];
+                  final isAuthor = (settings.userId.isNotEmpty &&
+                          settings.userId == post.author.id) ||
+                      (settings.username.isNotEmpty &&
+                          settings.username.toLowerCase() ==
+                              post.author.username.toLowerCase());
+
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -116,6 +153,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           notifier.toggleSave(
                             post.id,
                             isSaved: isSaved,
+                          );
+                        },
+                        onMoreOptionsTap: () {
+                          PostOptionsSheet.show(
+                            context,
+                            post: post,
+                            isAuthor: isAuthor,
+                            onEdit: () {
+                              Navigator.of(context).push<void>(
+                                MaterialPageRoute(
+                                  builder: (_) => CreatePostScreen(
+                                    postToEdit: post,
+                                  ),
+                                ),
+                              );
+                            },
+                            onDelete: () async {
+                              final success = await notifier.deletePost(
+                                post.id,
+                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      success
+                                          ? 'Post deleted successfully.'
+                                          : 'Failed to delete post.',
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            },
                           );
                         },
                       ),

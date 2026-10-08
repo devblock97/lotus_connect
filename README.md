@@ -4,6 +4,14 @@ A production-ready Flutter communication and AI platform built with **Clean Arch
 
 ---
 
+## 📱 Screenshots
+
+| Home Feed | Create Post Screen |
+|:---:|:---:|
+| <img src="docs/screenshots/home_screen.png" width="260"/> | <img src="docs/screenshots/create_post_screen.png" width="260"/> |
+
+---
+
 ## 🎬 Demos
 
 ### Chatbot
