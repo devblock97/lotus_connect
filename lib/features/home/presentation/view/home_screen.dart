@@ -7,11 +7,11 @@ import 'package:lotus_connect/features/home/presentation/view/create_post_screen
 import 'package:lotus_connect/features/home/presentation/widgets/create_post_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/post_comments_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_options_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
-/// Home feed screen displaying Instagram-style stories and live posts.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -153,6 +153,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           notifier.toggleSave(
                             post.id,
                             isSaved: isSaved,
+                          );
+                        },
+                        onCommentTap: () {
+                          PostCommentsSheet.show(
+                            context,
+                            post: post,
+                          );
+                        },
+                        onViewCommentsTap: () {
+                          PostCommentsSheet.show(
+                            context,
+                            post: post,
                           );
                         },
                         onMoreOptionsTap: () {

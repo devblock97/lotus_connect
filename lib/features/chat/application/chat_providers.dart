@@ -16,7 +16,6 @@ import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
 
-/// Provider for PrivateChatRemoteDataSource.
 final privateChatRemoteDataSourceProvider =
     Provider<PrivateChatRemoteDataSource>((ref) {
   return PrivateChatRemoteDataSourceImpl(
@@ -24,7 +23,6 @@ final privateChatRemoteDataSourceProvider =
   );
 });
 
-/// Provider for PrivateChatLocalDataSource.
 final privateChatLocalDataSourceProvider =
     Provider<PrivateChatLocalDataSource>((ref) {
   return PrivateChatLocalDataSourceImpl(
@@ -32,7 +30,6 @@ final privateChatLocalDataSourceProvider =
   );
 });
 
-/// Provider for PrivateChatRepository.
 final privateChatRepositoryProvider = Provider<ChatRepository>((ref) {
   return ChatRepositoryImpl(
     remoteDataSource: ref.watch(privateChatRemoteDataSourceProvider),
@@ -40,20 +37,17 @@ final privateChatRepositoryProvider = Provider<ChatRepository>((ref) {
   );
 });
 
-/// Provider for CreatePrivateChatUseCase.
 final createConversationUseCaseProvider =
     Provider<CreateConversationUseCase>((ref) {
   return CreateConversationUseCase(ref.watch(privateChatRepositoryProvider));
 });
 
-/// Provider for SendMessageUseCase.
 final sendMessageUseCaseProvider = Provider<SendMessageUseCase>((ref) {
   return SendMessageUseCase(
     privateChatRepository: ref.watch(privateChatRepositoryProvider),
   );
 });
 
-/// Provider for DeleteMessageUseCase.
 final deleteLocalMessageUseCaseProvider =
     Provider<DeleteLocalMessageUseCase>((ref) {
   return DeleteLocalMessageUseCase(
@@ -61,7 +55,6 @@ final deleteLocalMessageUseCaseProvider =
   );
 });
 
-/// Provider for UpdateMessageUseCase.
 final updateMessageUseCaseProvider = Provider<UpdateMessageUseCase>((ref) {
   return UpdateMessageUseCase(
     chatCoreRepository: ref.watch(chatCoreRepositoryProvider),
@@ -69,7 +62,6 @@ final updateMessageUseCaseProvider = Provider<UpdateMessageUseCase>((ref) {
   );
 });
 
-/// Provider for GetConversationUseCase.
 final getRemoteConversationUseCaseProvider =
     Provider<GetRemoteConversationUseCase>((ref) {
   return GetRemoteConversationUseCase(
@@ -77,7 +69,6 @@ final getRemoteConversationUseCaseProvider =
   );
 });
 
-/// Provider for GetRemoteMessageUseCase
 final getRemoteMessageUseCaseProvider =
     Provider<GetRemoteMessageUseCase>((ref) {
   return GetRemoteMessageUseCase(
@@ -85,7 +76,6 @@ final getRemoteMessageUseCaseProvider =
   );
 });
 
-/// Provider for DeleteRemoteMessageUseCase
 final deleteRemoteMessageUseCaseProvider =
     Provider<DeleteRemoteMessageUseCase>((ref) {
   return DeleteRemoteMessageUseCase(
@@ -93,21 +83,18 @@ final deleteRemoteMessageUseCaseProvider =
   );
 });
 
-/// Provider for ReactionMessageUseCase
 final reactionMessageUseCaseProvider = Provider<ReactionMessageUseCase>((ref) {
   return ReactionMessageUseCase(
     repository: ref.watch(privateChatRepositoryProvider),
   );
 });
 
-/// Provider for UploadFileUseCase
 final uploadFileUseCaseProvider = Provider<UploadFileUseCase>((ref) {
   return UploadFileUseCase(
     repository: ref.watch(privateChatRepositoryProvider),
   );
 });
 
-/// Provider for GetMessageUseCase
 final getMessageUseCaseProvider = Provider<GetMessageUseCase>((ref) {
   return GetMessageUseCase(repository: ref.watch(chatCoreRepositoryProvider));
 });

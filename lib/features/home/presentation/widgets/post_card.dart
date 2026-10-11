@@ -4,10 +4,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/feed_video_player.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/post_comments_sheet.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -320,7 +323,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
   Widget _buildAvatar(ThemeData theme) {
     final hasStory = widget.post.hasStory;
-    final isMarvel = widget.post.username.toLowerCase() == 'marvel';
     final avatarUrl = widget.post.userAvatarUrl;
 
     return Container(
@@ -328,20 +330,14 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       height: 38,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: hasStory
-            ? isMarvel
-                ? const LinearGradient(
-                    colors: [Color(0xFFE23636), Color(0xFFC41212)],
-                  )
-                : const SweepGradient(
-                    colors: [
-                      Color(0xFFFBAA47),
-                      Color(0xFFD91A46),
-                      Color(0xFFA60F93),
-                      Color(0xFFFBAA47),
-                    ],
-                  )
-            : null,
+        gradient: const SweepGradient(
+          colors: [
+            Color(0xFFFBAA47),
+            Color(0xFFD91A46),
+            Color(0xFFA60F93),
+            Color(0xFFFBAA47),
+          ],
+        ),
         border: !hasStory
             ? Border.all(
                 color: theme.dividerColor.withValues(alpha: 0.2),
@@ -356,22 +352,20 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         ),
         padding: EdgeInsets.all(hasStory ? 1.5 : 0),
         child: ClipOval(
-          child: isMarvel
-              ? _buildMarvelAvatarBadge()
-              : (avatarUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: avatarUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => _buildInitialsAvatar(
-                        widget.post.author,
-                        theme,
-                      ),
-                      errorWidget: (_, __, dynamic ___) => _buildInitialsAvatar(
-                        widget.post.author,
-                        theme,
-                      ),
-                    )
-                  : _buildInitialsAvatar(widget.post.author, theme)),
+          child: avatarUrl.isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: avatarUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => _buildInitialsAvatar(
+                    widget.post.author,
+                    theme,
+                  ),
+                  errorWidget: (_, __, dynamic ___) => _buildInitialsAvatar(
+                    widget.post.author,
+                    theme,
+                  ),
+                )
+              : _buildInitialsAvatar(widget.post.author, theme),
         ),
       ),
     );
@@ -401,22 +395,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMarvelAvatarBadge() {
-    return Container(
-      color: const Color(0xFFE23636),
-      alignment: Alignment.center,
-      child: const Text(
-        'MARVEL',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 7.5,
-          fontWeight: FontWeight.w900,
-          letterSpacing: -0.5,
-        ),
-      ),
-    );
-  }
-
   Widget _buildMediaSection(ThemeData theme) {
     final mediaItems = widget.post.mediaItems;
 
@@ -428,10 +406,12 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     // Carousel or single media
     final firstItem = mediaItems.first;
     final aspectRatio = firstItem.aspectRatio;
+    final medias = mediaItems.map((m) => MediaEntity(url: m.url)).toList();
 
     return GestureDetector(
       onDoubleTap: _handleDoubleTap,
-      onTap: widget.onMediaTap,
+      onTap: widget.onMediaTap ??
+          () => FullScreenMediaViewer.show(context, medias: medias),
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -538,7 +518,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Clean, elegant card for posts without attached media
   Widget _buildTextOnlyMedia(ThemeData theme) {
     final isDark = theme.brightness == Brightness.dark;
     return GestureDetector(
@@ -601,10 +580,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   }
 
   Widget _buildFallbackMedia(PostMediaItem item) {
-    if (widget.post.username.toLowerCase() == 'marvel') {
-      return _buildLokiPosterFallback();
-    }
-
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -636,112 +611,6 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Authentic cinematic Loki poster fallback that replicates reference image.
-  Widget _buildLokiPosterFallback() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment(0, -0.1),
-          radius: 0.9,
-          colors: [
-            Color(0xFFE89A24),
-            Color(0xFF8C5311),
-            Color(0xFF2E1705),
-            Color(0xFF0D0A07),
-          ],
-        ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CustomPaint(
-            painter: _ClockGearPainter(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(flex: 2),
-                Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFD54F).withValues(alpha: 0.4),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    size: 80,
-                    color: Color(0xFFF3E5AB),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: const Color(0xFFFF5722)),
-                  ),
-                  child: const Text(
-                    'TVA COLLAR',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF5722),
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-                const Spacer(flex: 3),
-                Container(
-                  color: const Color(0xFFE23636),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  child: const Text(
-                    'MARVEL STUDIOS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'LOKI',
-                  style: TextStyle(
-                    fontFamily: 'serif',
-                    fontSize: 42,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 4,
-                    color: Color(0xFFC0CA33),
-                    shadows: [
-                      Shadow(
-                        blurRadius: 10,
-                        offset: Offset(2, 2),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionBar(Color primaryColor) {
     final mediaCount = widget.post.mediaItems.length;
 
@@ -768,7 +637,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
           // Comment Button
           GestureDetector(
-            onTap: widget.onCommentTap,
+            onTap: widget.onCommentTap ??
+                () => PostCommentsSheet.show(context, post: widget.post),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.only(right: 14),
@@ -993,7 +863,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       child: GestureDetector(
-        onTap: widget.onViewCommentsTap,
+        onTap: widget.onViewCommentsTap ??
+            () => PostCommentsSheet.show(context, post: widget.post),
         child: Text(
           count > 0 ? 'View all $count comments' : 'Add a comment...',
           style: TextStyle(
@@ -1019,39 +890,4 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       ),
     );
   }
-}
-
-/// Custom painter for the clock gear background seen in the Loki poster
-class _ClockGearPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.45);
-    final paint = Paint()
-      ..color = const Color(0xFFFFD54F).withValues(alpha: 0.15)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    // Radiating clock hands / spikes
-    for (var i = 0; i < 12; i++) {
-      final angle = (i * 30) * 3.14159 / 180;
-      final p1 = Offset(
-        center.dx + 40 * (angle == 0 ? 0 : (angle / 1.5)),
-        center.dy + 40 * (angle == 0 ? 0 : (angle / 1.5)),
-      );
-      final p2 = Offset(
-        center.dx + 160 * (angle > 1.5 ? -1 : 1),
-        center.dy + 160 * (angle < 3 ? -1 : 1),
-      );
-      canvas.drawLine(p1, p2, paint);
-    }
-
-    // Concentric clock rings
-    canvas
-      ..drawCircle(center, 50, paint)
-      ..drawCircle(center, 90, paint)
-      ..drawCircle(center, 140, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -24,6 +24,14 @@ class ApiConstants {
   static String postById(String postId) => '/posts/$postId';
   static String postReactions(String postId) => '/posts/$postId/reactions';
   static String postComments(String postId) => '/posts/$postId/comments';
+  static String postCommentById(String postId, String commentId) =>
+      '/posts/$postId/comments/$commentId';
+  static String postCommentReplies(String postId, String commentId) =>
+      '/posts/$postId/comments/$commentId/replies';
+  static String postCommentReactions(String postId, String commentId) =>
+      '/posts/$postId/comments/$commentId/reactions';
+  static String postCommentPin(String postId, String commentId) =>
+      '/posts/$postId/comments/$commentId/pin';
 
   /// Upload endpoints
   static const String uploadMultiple = '/uploads/multiple';
