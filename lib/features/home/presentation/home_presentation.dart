@@ -1,6 +1,14 @@
+export 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 export 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 export 'package:lotus_connect/features/home/presentation/view/story_viewer_screen.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_empty_state.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_input_bar.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_item_tile.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_sheet.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/feed_video_player.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/post_comments_sheet.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
