@@ -1,5 +1,5 @@
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
-import 'package:lotus_connect/core/errors/failure.dart';
+import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
 
@@ -36,9 +36,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             )
             .toList();
       }
-      throw Exception(const ServerFailure('Failed to load notifications'));
-    } on Object catch (_) {
-      throw Exception(const ServerFailure('Failed to load notifications'));
+      throw ServerException(
+        'Failed to load notifications: status ${response.statusCode}',
+      );
+    } on AppException {
+      rethrow;
+    } on Object catch (e) {
+      throw ServerException('Failed to load notifications: $e');
     }
   }
 
@@ -50,9 +54,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);
       }
-      throw Exception(const ServerFailure('Failed to mark notification read'));
-    } on Object catch (_) {
-      throw Exception(const ServerFailure('Failed to mark notification read'));
+      throw ServerException(
+        'Failed to mark notification read: status ${response.statusCode}',
+      );
+    } on AppException {
+      rethrow;
+    } on Object catch (e) {
+      throw ServerException('Failed to mark notification read: $e');
     }
   }
 
@@ -73,9 +81,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);
       }
-      throw Exception(const ServerFailure('Failed to register device token'));
-    } on Object catch (_) {
-      throw Exception(const ServerFailure('Failed to register device token'));
+      throw ServerException(
+        'Failed to register device token: status ${response.statusCode}',
+      );
+    } on AppException {
+      rethrow;
+    } on Object catch (e) {
+      throw ServerException('Failed to register device token: $e');
     }
   }
 
@@ -92,9 +104,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);
       }
-      throw Exception(const ServerFailure('Failed to unregister device token'));
-    } on Object catch (_) {
-      throw Exception(const ServerFailure('Failed to unregister device token'));
+      throw ServerException(
+        'Failed to unregister device token: status ${response.statusCode}',
+      );
+    } on AppException {
+      rethrow;
+    } on Object catch (e) {
+      throw ServerException('Failed to unregister device token: $e');
     }
   }
 
@@ -107,9 +123,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);
       }
-      throw Exception(const ServerFailure('Failed to read notification'));
-    } on Object catch (_) {
-      throw Exception(const ServerFailure('Failed to read notification'));
+      throw ServerException(
+        'Failed to read notification: status ${response.statusCode}',
+      );
+    } on AppException {
+      rethrow;
+    } on Object catch (e) {
+      throw ServerException('Failed to read notification: $e');
     }
   }
 }

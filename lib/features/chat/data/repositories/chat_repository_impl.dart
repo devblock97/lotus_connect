@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
+import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/chat/data/datasources/chat_local_data_source.dart';
@@ -28,15 +29,21 @@ class ChatRepositoryImpl implements ChatRepository {
   }) async {
     try {
       final chatData = await _remoteDataSource.createConversation(friendId);
-      final id = chatData.id;
-
-      final conversation = await _localDataSource.saveLocalConversation(
-        title: title,
-        isUserToUser: true,
-        peerId: friendId,
-        id: id,
-      );
-      return Right(conversation);
+      try {
+        final conversation = await _localDataSource.saveLocalConversation(
+          title: title,
+          isUserToUser: true,
+          peerId: friendId,
+          id: chatData.id,
+        );
+        return Right(conversation);
+      } on Object catch (e) {
+        return Left(DatabaseFailure('Failed to save conversation locally: $e'));
+      }
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
     } on Object catch (e) {
       return Left(DatabaseFailure('Failed to create private chat: $e', e));
     }

@@ -60,7 +60,10 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
       final friendsList = await _getContactsUseCase(const NoParams());
 
       friendsList.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
+        state = state.copyWith(
+          errorMessage: error.message,
+          isLoading: false,
+        );
       }, (friends) {
         state = state.copyWith(
           friends: friends,
@@ -81,7 +84,7 @@ class ContactsNotifier extends StateNotifier<ContactsState> {
       final result = await _deleteFriendUseCase(
         DeleteFriendParam(friendId: friendId),
       );
-      return result.fold(
+      return await result.fold(
         (error) {
           state = state.copyWith(
             isLoading: false,

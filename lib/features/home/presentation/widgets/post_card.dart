@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
@@ -881,7 +882,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       child: Text(
-        widget.post.timeAgo,
+        timeAgo(widget.post.createdAt),
         style: TextStyle(
           fontSize: 11,
           color: secondaryColor,

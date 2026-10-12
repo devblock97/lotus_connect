@@ -80,14 +80,18 @@ class ActiveCallNotifier extends StateNotifier<CallSession> {
     String sdpType,
     String sdpDescription,
   ) async {
-    await _sendSdpUseSase(
+    final result = await _sendSdpUseSase(
       SendSdpParam(
         recipientId: recipientId,
         sdpType: sdpType,
         sdpDescription: sdpDescription,
       ),
     );
-    state = const CallSession();
+
+    result.fold(
+      (failure) => state = state.copyWith(errorMessage: failure.message),
+      (_) => null,
+    );
   }
 
   void toggleMute() {

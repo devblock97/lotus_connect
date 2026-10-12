@@ -189,12 +189,12 @@ class PrivateActiveConversationNotifier
           // Keep local messages if network/fetch fails
         },
         (remoteMessages) async {
-          // 1. Save all remote messages locally
+          // Save all remote messages locally
           for (final msg in remoteMessages) {
             await _saveLocalMessageUseCase(SaveLocalMessageParam(message: msg));
           }
 
-          // 2. Reconcile deleted messages
+          // Reconcile deleted messages
           final localResult = await _getLocalMessageUseCase(
             GetLocalMessageParam(conversationId: conversationId),
           );
@@ -330,13 +330,28 @@ class PrivateActiveConversationNotifier
 
     state = state.copyWith(isMediaLoading: false);
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
+        final failedList = state.messages.map((m) {
+          if (m.id == command.id) {
+            return m.copyWith(status: MessageStatus.failed, isError: true);
+          }
+          return m;
+        }).toList();
+
         state = state.copyWith(
-          messages: state.messages
-              .where((message) => message.id != command.id)
-              .toList(),
+          messages: failedList,
           errorMessage: failure.message,
+        );
+
+        // Persist failed status in SQLite rather than leaving phantom messages
+        await _saveLocalMessageUseCase(
+          SaveLocalMessageParam(
+            message: optimisticMessage.copyWith(
+              status: MessageStatus.failed,
+              isError: true,
+            ),
+          ),
         );
       },
       (confirmedMessage) {
