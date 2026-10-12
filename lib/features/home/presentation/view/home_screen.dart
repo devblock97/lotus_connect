@@ -10,6 +10,8 @@ import 'package:lotus_connect/features/home/presentation/widgets/post_card_skele
 import 'package:lotus_connect/features/home/presentation/widgets/post_comments_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_options_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
+import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
+import 'package:lotus_connect/features/livestream/presentation/views/livestream_explore_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -47,6 +49,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(
+              Icons.sensors,
+              color: Color(0xFFFF0844),
+              size: 24,
+            ),
+            splashRadius: 20,
+            tooltip: 'Live streams',
+            onPressed: () {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => const LiveStreamExploreScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: Icon(
               CupertinoIcons.plus_app,
               color: primaryTextColor,
@@ -61,15 +79,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               );
             },
-          ),
-          IconButton(
-            icon: Icon(
-              CupertinoIcons.heart,
-              color: primaryTextColor,
-              size: 24,
-            ),
-            splashRadius: 20,
-            onPressed: () {},
           ),
           IconButton(
             icon: Icon(
@@ -88,6 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           await Future.wait([
             notifier.refreshFeed(),
             ref.read(storiesNotifierProvider.notifier).refreshStories(),
+            ref.read(liveStreamFeedProvider.notifier).refresh(),
           ]);
         },
         child: CustomScrollView(

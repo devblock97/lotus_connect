@@ -6,6 +6,10 @@ import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_story_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/story_viewer_screen.dart';
+import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
+import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
+import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
+import 'package:lotus_connect/features/livestream/presentation/widgets/live_badge.dart';
 
 class StoriesTray extends ConsumerWidget {
   const StoriesTray({super.key});
@@ -18,14 +22,21 @@ class StoriesTray extends ConsumerWidget {
 
     final storiesState = ref.watch(storiesNotifierProvider);
     final groups = storiesState.storyGroups;
+    final liveStreams = ref
+        .watch(liveStreamFeedProvider)
+        .streams
+        .where((s) => s.isLive)
+        .toList();
 
-    if (storiesState.isLoading && groups.isEmpty) {
+    if (storiesState.isLoading && groups.isEmpty && liveStreams.isEmpty) {
       return _buildSkeletonTray(theme);
     }
 
-    if (groups.isEmpty) {
+    if (groups.isEmpty && liveStreams.isEmpty) {
       return const SizedBox.shrink();
     }
+
+    final totalCount = liveStreams.length + groups.length;
 
     return SizedBox(
       height: 104,
@@ -33,9 +44,52 @@ class StoriesTray extends ConsumerWidget {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        itemCount: groups.length,
+        itemCount: totalCount,
         itemBuilder: (context, index) {
-          final userStory = groups[index];
+          if (index < liveStreams.length) {
+            final liveStream = liveStreams[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context)
+                      .push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          LiveStreamPlayerScreen(initialStream: liveStream),
+                    ),
+                  )
+                      .then((_) {
+                    ref.read(liveStreamFeedProvider.notifier).refresh();
+                  });
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildLiveAvatar(liveStream, theme),
+                    const SizedBox(height: 5),
+                    SizedBox(
+                      width: 68,
+                      child: Text(
+                        liveStream.host.username,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final storyIndex = index - liveStreams.length;
+          final userStory = groups[storyIndex];
           final isMe = userStory.isSelf;
 
           return Padding(
@@ -114,6 +168,65 @@ class StoriesTray extends ConsumerWidget {
     } else if (tapped.isSelf) {
       _openCreateStory(context);
     }
+  }
+
+  Widget _buildLiveAvatar(LiveStream stream, ThemeData theme) {
+    final host = stream.host;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        // Glowing Neon Gradient Ring
+        Container(
+          width: 64,
+          height: 64,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: SweepGradient(
+              colors: [
+                Color(0xFFFF0844),
+                Color(0xFFFF4E50),
+                Color(0xFFFFB199),
+                Color(0xFFFF0844),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0x66FF0844),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(2.5),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.scaffoldBackgroundColor,
+            ),
+            padding: const EdgeInsets.all(2),
+            child: ClipOval(
+              child: host.avatarUrl != null && host.avatarUrl!.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: host.avatarUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => _buildInitials(host, theme),
+                      errorWidget: (_, __, dynamic ___) =>
+                          _buildInitials(host, theme),
+                    )
+                  : _buildInitials(host, theme),
+            ),
+          ),
+        ),
+
+        // Overlapping Pulsing LIVE badge at bottom center
+        const Positioned(
+          bottom: -4,
+          child: LiveBadge(isCompact: true),
+        ),
+      ],
+    );
   }
 
   Widget _buildStoryAvatar(
