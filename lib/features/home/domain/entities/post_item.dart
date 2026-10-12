@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 
-/// Represents a social media post item from the feed API.
 @immutable
 class PostItem {
   const PostItem({
@@ -23,7 +22,6 @@ class PostItem {
     this.likedByUsername,
   });
 
-  /// Factory constructor to parse backend Feed JSON directly.
   factory PostItem.fromJson(Map<String, dynamic> json) {
     DateTime? parseDate(dynamic val) {
       if (val is String && val.isNotEmpty) {
@@ -93,35 +91,6 @@ class PostItem {
       mediaItems.isNotEmpty ? mediaItems.first : null;
 
   String get mediaUrl => primaryMedia?.url ?? '';
-
-  /// Computes human-friendly relative time (e.g., '4d ago', '2h ago')
-  String get timeAgo {
-    if (createdAt == null) return 'recently';
-    final diff = DateTime.now().difference(createdAt!);
-
-    if (diff.inDays >= 365) {
-      final years = (diff.inDays / 365).floor();
-      return '$years ${years == 1 ? 'year' : 'years'} ago';
-    }
-    if (diff.inDays >= 30) {
-      final months = (diff.inDays / 30).floor();
-      return '$months ${months == 1 ? 'month' : 'months'} ago';
-    }
-    if (diff.inDays >= 7) {
-      final weeks = (diff.inDays / 7).floor();
-      return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
-    }
-    if (diff.inDays >= 1) {
-      return '${diff.inDays} ${diff.inDays == 1 ? 'day' : 'days'} ago';
-    }
-    if (diff.inHours >= 1) {
-      return '${diff.inHours} ${diff.inHours == 1 ? 'hour' : 'hours'} ago';
-    }
-    if (diff.inMinutes >= 1) {
-      return '${diff.inMinutes}m ago';
-    }
-    return 'Just now';
-  }
 
   /// Formatted date string (e.g. 'September 21, 2026')
   String get formattedDate {

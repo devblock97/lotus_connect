@@ -133,7 +133,7 @@ class DioClient {
     }
   }
 
-  NetworkException _handleDioException(DioException e) {
+  AppException _handleDioException(DioException e) {
     var message = 'Network error occurred';
     final data = e.response?.data;
     if (data is Map<String, dynamic>) {
@@ -145,6 +145,28 @@ class DioClient {
       message = data;
     } else if (e.message != null && e.message!.isNotEmpty) {
       message = e.message!;
+    }
+
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.sendTimeout) {
+      return TimeoutException('Connection timed out: $message');
+    }
+
+    final statusCode = e.response?.statusCode;
+    if (statusCode != null) {
+      if (statusCode == 401 || statusCode == 403) {
+        return AuthException(message, e);
+      }
+      if (statusCode == 404) {
+        return NotFoundException(message, e);
+      }
+      if (statusCode == 400 || statusCode == 422) {
+        return ValidationException(message, e);
+      }
+      if (statusCode >= 500) {
+        return ServerException(message);
+      }
     }
 
     return NetworkException(

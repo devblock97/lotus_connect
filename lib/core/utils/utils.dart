@@ -1,27 +1,36 @@
-import 'package:intl/intl.dart';
-
 String formatLastSeen(bool isOnline, DateTime lastSeen) {
   if (isOnline) {
     return 'Online';
   } else {
-    final now = DateTime.now();
-    final difference = now.difference(lastSeen);
-
-    if (difference.inSeconds < 60) {
-      return 'just now';
-    } else if (difference.inMinutes < 60) {
-      final minutes = difference.inMinutes;
-      return '$minutes minute${minutes == 1 ? '' : 's'} ago';
-    } else if (difference.inHours < 24) {
-      final hours = difference.inHours;
-      return '$hours hour${hours == 1 ? '' : 's'} ago';
-    } else if (difference.inDays < 30) {
-      final days = difference.inDays;
-      return '$days day${days == 1 ? '' : 's'} ago';
-    } else {
-      return DateFormat('MMM d, yyyy').format(lastSeen);
-    }
+    return timeAgo(lastSeen);
   }
+}
+
+String timeAgo(DateTime? date) {
+  if (date == null) return 'recently';
+  final diff = DateTime.now().difference(date);
+  if (diff.isNegative || diff.inSeconds < 60) {
+    return 'Just now';
+  }
+  if (diff.inMinutes < 60) {
+    return '${diff.inMinutes}m ago';
+  }
+  if (diff.inHours < 24) {
+    return '${diff.inHours}h ago';
+  }
+  if (diff.inDays < 7) {
+    return '${diff.inDays}d ago';
+  }
+  if (diff.inDays < 30) {
+    final weeks = (diff.inDays / 7).floor();
+    return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
+  }
+  if (diff.inDays < 365) {
+    final months = (diff.inDays / 30).floor();
+    return '$months ${months == 1 ? 'month' : 'months'} ago';
+  }
+  final years = (diff.inDays / 365).floor();
+  return '$years ${years == 1 ? 'year' : 'years'} ago';
 }
 
 bool isVideo(String path) {

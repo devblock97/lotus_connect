@@ -23,7 +23,9 @@ class RetryInterceptor extends Interceptor {
     final extra = err.requestOptions.extra;
     final retryCount = extra['retry_count'] as int? ?? 0;
 
-    if (_shouldRetry(err) && retryCount < maxRetries) {
+    final isFormData = err.requestOptions.data is FormData;
+
+    if (!isFormData && _shouldRetry(err) && retryCount < maxRetries) {
       extra['retry_count'] = retryCount + 1;
       try {
         final options = err.requestOptions;

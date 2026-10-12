@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Base Failure class for Clean Architecture domain error handling.
 @immutable
 abstract class Failure {
   /// Constructor taking an optional human-readable message and error cause.
@@ -52,33 +51,23 @@ class ApiFailure extends Failure {
   final int? statusCode;
 }
 
-/// Represents caching layer failures.
 class CacheFailure extends Failure {
-  /// Creates a [CacheFailure].
   const CacheFailure(super.message, [super.cause]);
 }
 
-/// Represents SQLite / Drift local database failures.
 class DatabaseFailure extends Failure {
-  /// Creates a [DatabaseFailure].
   const DatabaseFailure(super.message, [super.cause]);
 }
 
-/// Represents authentication or authorization failures.
 class AuthenticationFailure extends Failure {
-  /// Creates an [AuthenticationFailure].
   const AuthenticationFailure(super.message, [super.cause]);
 }
 
-/// Represents input validation or domain invariant failures.
 class ValidationFailure extends Failure {
-  /// Creates a [ValidationFailure].
   const ValidationFailure(super.message, [super.cause]);
 }
 
-/// Represents unexpected or unhandled errors.
 class UnknownFailure extends Failure {
-  /// Creates an [UnknownFailure].
   const UnknownFailure(super.message, [super.cause]);
 }
 

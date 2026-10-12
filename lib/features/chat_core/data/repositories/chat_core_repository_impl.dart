@@ -13,7 +13,14 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
 
   @override
   StreamResult<List<Conversation>> watchConversations() {
-    return _localDataSource.watchConversations().map(Right.new);
+    return _localDataSource
+        .watchConversations()
+        .map<Result<List<Conversation>>>(Right.new)
+        .handleError(
+          (Object error, StackTrace stack) => Left<Failure, List<Conversation>>(
+            DatabaseFailure('Database watch error: $error', error),
+          ),
+        );
   }
 
   @override
@@ -28,7 +35,14 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
 
   @override
   StreamResult<List<Message>> watchMessages(String conversationId) {
-    return _localDataSource.watchMessages(conversationId).map(Right.new);
+    return _localDataSource
+        .watchMessages(conversationId)
+        .map<Result<List<Message>>>(Right.new)
+        .handleError(
+          (Object error, StackTrace stack) => Left<Failure, List<Message>>(
+            DatabaseFailure('Database message watch error: $error', error),
+          ),
+        );
   }
 
   @override

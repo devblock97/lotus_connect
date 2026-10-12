@@ -118,7 +118,10 @@ class FriendRequestNotifier extends StateNotifier<FriendRequestState> {
         AcceptFriendRequestParam(targetId: friendId),
       );
       response.fold((error) {
-        state = state.copyWith(message: error.message);
+        state = state.copyWith(
+          message: error.message,
+          isLoading: false,
+        );
         return false;
       }, (data) async {
         await loadFriendRequests();

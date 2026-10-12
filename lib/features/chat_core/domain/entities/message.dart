@@ -20,6 +20,7 @@ enum MessageStatus {
   read,
   streaming,
   error,
+  failed,
 }
 
 @immutable
