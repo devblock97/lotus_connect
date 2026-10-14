@@ -12,9 +12,9 @@ A production-ready Flutter communication and AI platform built with **Clean Arch
 
 
 | Comment Screen                 |
-|:--------------------------------------------------------------:|:--------------------------------------------------------------:|
-| <img src="docs/screenshots/comment_screen_1.png" width="260"/> | <img src="docs/screenshots/comment_screen_2.png" width="260"/> |
-
+|:------------------------------:|
+| <img src="docs/screenshots/comment_screen_1.png" width="260"/> |
+| <img src="docs/screenshots/comment_screen_2.png" width="260"/> |
 ---
 
 ## 🎬 Demos
