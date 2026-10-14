@@ -496,4 +496,155 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToRemoveFriend => 'Failed to remove friend';
+
+  @override
+  String get commentsTitle => 'Comments';
+
+  @override
+  String get topComments => 'Top comments';
+
+  @override
+  String get newestFirst => 'Newest first';
+
+  @override
+  String get oldestFirst => 'Oldest first';
+
+  @override
+  String get noCommentsYet => 'No comments yet';
+
+  @override
+  String get startConversationPrompt =>
+      'Start the conversation and share what you think!';
+
+  @override
+  String get saySomethingNice => 'Say something nice';
+
+  @override
+  String get addCommentHint => 'Add a comment...';
+
+  @override
+  String replyToUserHint(String username) {
+    return 'Reply to @$username...';
+  }
+
+  @override
+  String get replyingTo => 'Replying to ';
+
+  @override
+  String get replyAction => 'Reply';
+
+  @override
+  String get likeAction => 'Like';
+
+  @override
+  String get loveAction => 'Love';
+
+  @override
+  String get hahaAction => 'Haha';
+
+  @override
+  String get fireAction => 'Fire';
+
+  @override
+  String get wowAction => 'Wow';
+
+  @override
+  String get sadAction => 'Sad';
+
+  @override
+  String get editedTag => 'edited';
+
+  @override
+  String get authorBadge => 'Author';
+
+  @override
+  String get pinnedBadge => 'Pinned';
+
+  @override
+  String get pinnedByCreator => 'Pinned by creator';
+
+  @override
+  String get pinComment => 'Pin comment';
+
+  @override
+  String get unpinComment => 'Unpin comment';
+
+  @override
+  String get editComment => 'Edit comment';
+
+  @override
+  String get editCommentHint => 'Edit your comment...';
+
+  @override
+  String get deleteComment => 'Delete comment';
+
+  @override
+  String get deleteCommentConfirmTitle => 'Delete comment?';
+
+  @override
+  String get deleteCommentConfirmMessage =>
+      'Are you sure you want to delete this comment? This cannot be undone.';
+
+  @override
+  String get copyText => 'Copy text';
+
+  @override
+  String get commentCopied => 'Comment copied to clipboard';
+
+  @override
+  String get reportComment => 'Report comment';
+
+  @override
+  String get reportSubmitted => 'Report submitted';
+
+  @override
+  String get seeMore => 'See more';
+
+  @override
+  String get seeLess => 'See less';
+
+  @override
+  String get viewOneReply => 'View 1 reply';
+
+  @override
+  String viewReplies(int count) {
+    return 'View $count replies';
+  }
+
+  @override
+  String get viewMoreReplies => 'View more replies...';
+
+  @override
+  String get hideReplies => 'Hide replies';
+
+  @override
+  String viewAllComments(int count) {
+    return 'View all $count comments';
+  }
+
+  @override
+  String reactionsCount(int count) {
+    return 'Reactions ($count)';
+  }
+
+  @override
+  String allReactionsCount(int count) {
+    return 'All ($count)';
+  }
+
+  @override
+  String get noReactionsInCategory => 'No reactions in this category';
+
+  @override
+  String replyToUserAction(String username) {
+    return 'Reply to @$username';
+  }
+
+  @override
+  String get likeCountSingular => '1 like';
+
+  @override
+  String likeCountPlural(int count) {
+    return '$count likes';
+  }
 }

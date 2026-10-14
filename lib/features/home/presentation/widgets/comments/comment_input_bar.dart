@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 const List<String> kQuickCommentEmojis = [
   '❤️',
@@ -193,6 +194,7 @@ class _CommentInputBarState extends State<CommentInputBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surfaceColor = isDark ? const Color(0xFF1E1E22) : Colors.white;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
@@ -258,7 +260,9 @@ class _CommentInputBarState extends State<CommentInputBar> {
                           color: primaryTextColor,
                         ),
                         children: [
-                          const TextSpan(text: 'Replying to '),
+                          TextSpan(
+                            text: loc?.replyingTo ?? 'Replying to ',
+                          ),
                           TextSpan(
                             text: '@${widget.replyingTo!.author.username}',
                             style: TextStyle(
@@ -424,9 +428,14 @@ class _CommentInputBarState extends State<CommentInputBar> {
                           decoration: InputDecoration(
                             isDense: true,
                             hintText: widget.replyingTo != null
-                                ? 'Reply to '
-                                    '@${widget.replyingTo!.author.username}...'
-                                : 'Add a comment...',
+                                ? (loc?.replyToUserHint(
+                                      widget.replyingTo!.author.username,
+                                    ) ??
+                                    'Reply to '
+                                        '@'
+                                        '${widget.replyingTo!.author.username}'
+                                        '...')
+                                : (loc?.addCommentHint ?? 'Add a comment...'),
                             hintStyle: TextStyle(
                               fontSize: 14,
                               color: subtextColor,

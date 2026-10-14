@@ -498,4 +498,155 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get failedToRemoveFriend => 'Không thể xóa bạn bè';
+
+  @override
+  String get commentsTitle => 'Bình luận';
+
+  @override
+  String get topComments => 'Bình luận hàng đầu';
+
+  @override
+  String get newestFirst => 'Mới nhất trước';
+
+  @override
+  String get oldestFirst => 'Cũ nhất trước';
+
+  @override
+  String get noCommentsYet => 'Chưa có bình luận nào';
+
+  @override
+  String get startConversationPrompt =>
+      'Hãy bắt đầu cuộc trò chuyện và chia sẻ suy nghĩ của bạn!';
+
+  @override
+  String get saySomethingNice => 'Viết bình luận...';
+
+  @override
+  String get addCommentHint => 'Thêm bình luận...';
+
+  @override
+  String replyToUserHint(String username) {
+    return 'Trả lời @$username...';
+  }
+
+  @override
+  String get replyingTo => 'Đang trả lời ';
+
+  @override
+  String get replyAction => 'Trả lời';
+
+  @override
+  String get likeAction => 'Thích';
+
+  @override
+  String get loveAction => 'Yêu thích';
+
+  @override
+  String get hahaAction => 'Haha';
+
+  @override
+  String get fireAction => 'Tuyệt vời';
+
+  @override
+  String get wowAction => 'Wow';
+
+  @override
+  String get sadAction => 'Buồn';
+
+  @override
+  String get editedTag => 'đã chỉnh sửa';
+
+  @override
+  String get authorBadge => 'Tác giả';
+
+  @override
+  String get pinnedBadge => 'Đã ghim';
+
+  @override
+  String get pinnedByCreator => 'Được ghim bởi người tạo';
+
+  @override
+  String get pinComment => 'Ghim bình luận';
+
+  @override
+  String get unpinComment => 'Bỏ ghim bình luận';
+
+  @override
+  String get editComment => 'Chỉnh sửa bình luận';
+
+  @override
+  String get editCommentHint => 'Chỉnh sửa bình luận của bạn...';
+
+  @override
+  String get deleteComment => 'Xóa bình luận';
+
+  @override
+  String get deleteCommentConfirmTitle => 'Xóa bình luận?';
+
+  @override
+  String get deleteCommentConfirmMessage =>
+      'Bạn có chắc chắn muốn xóa bình luận này không? Hành động này không thể hoàn tác.';
+
+  @override
+  String get copyText => 'Sao chép văn bản';
+
+  @override
+  String get commentCopied => 'Đã sao chép bình luận vào khay nhớ tạm';
+
+  @override
+  String get reportComment => 'Báo cáo bình luận';
+
+  @override
+  String get reportSubmitted => 'Đã gửi báo cáo';
+
+  @override
+  String get seeMore => 'Xem thêm';
+
+  @override
+  String get seeLess => 'Thu gọn';
+
+  @override
+  String get viewOneReply => 'Xem 1 câu trả lời';
+
+  @override
+  String viewReplies(int count) {
+    return 'Xem $count câu trả lời';
+  }
+
+  @override
+  String get viewMoreReplies => 'Xem thêm câu trả lời...';
+
+  @override
+  String get hideReplies => 'Ẩn câu trả lời';
+
+  @override
+  String viewAllComments(int count) {
+    return 'Xem tất cả $count bình luận';
+  }
+
+  @override
+  String reactionsCount(int count) {
+    return 'Cảm xúc ($count)';
+  }
+
+  @override
+  String allReactionsCount(int count) {
+    return 'Tất cả ($count)';
+  }
+
+  @override
+  String get noReactionsInCategory => 'Chưa có cảm xúc nào trong mục này';
+
+  @override
+  String replyToUserAction(String username) {
+    return 'Trả lời @$username';
+  }
+
+  @override
+  String get likeCountSingular => '1 lượt thích';
+
+  @override
+  String likeCountPlural(int count) {
+    return '$count lượt thích';
+  }
 }

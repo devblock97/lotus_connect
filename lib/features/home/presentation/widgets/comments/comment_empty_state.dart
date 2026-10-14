@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Clean, beautiful empty state displayed when there are no comments yet.
 class CommentEmptyState extends StatelessWidget {
@@ -13,6 +14,7 @@ class CommentEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white54 : Colors.black45;
@@ -51,7 +53,7 @@ class CommentEmptyState extends StatelessWidget {
             const SizedBox(height: 18),
 
             Text(
-              'No comments yet',
+              loc?.noCommentsYet ?? 'No comments yet',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -62,7 +64,8 @@ class CommentEmptyState extends StatelessWidget {
             const SizedBox(height: 6),
 
             Text(
-              'Start the conversation and share what you think!',
+              loc?.startConversationPrompt ??
+                  'Start the conversation and share what you think!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,
@@ -93,7 +96,7 @@ class CommentEmptyState extends StatelessWidget {
                   color: theme.primaryColor,
                 ),
                 label: Text(
-                  'Say something nice',
+                  loc?.saySomethingNice ?? 'Say something nice',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

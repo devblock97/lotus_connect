@@ -474,15 +474,163 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unknownUser => '未知用户';
 
   @override
-  String get unfriend => 'Unfriend';
+  String get unfriend => '解除好友';
 
   @override
-  String get unfriendConfirmation =>
-      'Are you sure you want to remove this friend?';
+  String get unfriendConfirmation => '确定要解除此好友关系吗？';
 
   @override
-  String get friendRemoved => 'Friend removed successfully';
+  String get friendRemoved => '已成功解除好友关系';
 
   @override
-  String get failedToRemoveFriend => 'Failed to remove friend';
+  String get failedToRemoveFriend => '解除好友关系失败';
+
+  @override
+  String get commentsTitle => '评论';
+
+  @override
+  String get topComments => '热门评论';
+
+  @override
+  String get newestFirst => '最新优先';
+
+  @override
+  String get oldestFirst => '最早优先';
+
+  @override
+  String get noCommentsYet => '暂无评论';
+
+  @override
+  String get startConversationPrompt => '开始讨论并分享你的想法！';
+
+  @override
+  String get saySomethingNice => '留下友善的评论';
+
+  @override
+  String get addCommentHint => '添加评论...';
+
+  @override
+  String replyToUserHint(String username) {
+    return '回复 @$username...';
+  }
+
+  @override
+  String get replyingTo => '回复 ';
+
+  @override
+  String get replyAction => '回复';
+
+  @override
+  String get likeAction => '赞';
+
+  @override
+  String get loveAction => '爱心';
+
+  @override
+  String get hahaAction => '哈哈';
+
+  @override
+  String get fireAction => '火热';
+
+  @override
+  String get wowAction => '哇';
+
+  @override
+  String get sadAction => '伤心';
+
+  @override
+  String get editedTag => '已编辑';
+
+  @override
+  String get authorBadge => '作者';
+
+  @override
+  String get pinnedBadge => '已置顶';
+
+  @override
+  String get pinnedByCreator => '由创作者置顶';
+
+  @override
+  String get pinComment => '置顶评论';
+
+  @override
+  String get unpinComment => '取消置顶评论';
+
+  @override
+  String get editComment => '编辑评论';
+
+  @override
+  String get editCommentHint => '编辑你的评论...';
+
+  @override
+  String get deleteComment => '删除评论';
+
+  @override
+  String get deleteCommentConfirmTitle => '删除评论？';
+
+  @override
+  String get deleteCommentConfirmMessage => '确定要删除这条评论吗？此操作无法撤销。';
+
+  @override
+  String get copyText => '复制文本';
+
+  @override
+  String get commentCopied => '评论已复制到剪贴板';
+
+  @override
+  String get reportComment => '举报评论';
+
+  @override
+  String get reportSubmitted => '举报已提交';
+
+  @override
+  String get seeMore => '展开';
+
+  @override
+  String get seeLess => '收起';
+
+  @override
+  String get viewOneReply => '查看 1 条回复';
+
+  @override
+  String viewReplies(int count) {
+    return '查看 $count 条回复';
+  }
+
+  @override
+  String get viewMoreReplies => '查看更多回复...';
+
+  @override
+  String get hideReplies => '隐藏回复';
+
+  @override
+  String viewAllComments(int count) {
+    return '查看全部 $count 条评论';
+  }
+
+  @override
+  String reactionsCount(int count) {
+    return '互动 ($count)';
+  }
+
+  @override
+  String allReactionsCount(int count) {
+    return '全部 ($count)';
+  }
+
+  @override
+  String get noReactionsInCategory => '该分类下暂无互动';
+
+  @override
+  String replyToUserAction(String username) {
+    return '回复 @$username';
+  }
+
+  @override
+  String get likeCountSingular => '1 次赞';
+
+  @override
+  String likeCountPlural(int count) {
+    return '$count 次赞';
+  }
 }

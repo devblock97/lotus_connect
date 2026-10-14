@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Modal bottom sheet listing users who reacted to a comment.
 class CommentReactionsSheet extends StatefulWidget {
@@ -99,6 +100,7 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white60 : Colors.black54;
@@ -136,7 +138,8 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Reactions (${widget.reactions.length})',
+                  loc?.reactionsCount(widget.reactions.length) ??
+                      'Reactions (${widget.reactions.length})',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -161,7 +164,9 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                 children: tabs.map((tab) {
                   final isSelected = _selectedTab == tab;
                   final count = counts[tab] ?? 0;
-                  final label = tab == 'all' ? 'All ($count)' : '$tab $count';
+                  final label = tab == 'all'
+                      ? (loc?.allReactionsCount(count) ?? 'All ($count)')
+                      : '$tab $count';
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
@@ -201,7 +206,8 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                 ? Padding(
                     padding: const EdgeInsets.all(32),
                     child: Text(
-                      'No reactions in this category',
+                      loc?.noReactionsInCategory ??
+                          'No reactions in this category',
                       style: TextStyle(color: subtextColor),
                     ),
                   )

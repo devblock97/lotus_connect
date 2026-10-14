@@ -1049,6 +1049,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to remove friend'**
   String get failedToRemoveFriend;
+
+  /// No description provided for @commentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsTitle;
+
+  /// No description provided for @topComments.
+  ///
+  /// In en, this message translates to:
+  /// **'Top comments'**
+  String get topComments;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
+  String get newestFirst;
+
+  /// No description provided for @oldestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
+  String get oldestFirst;
+
+  /// No description provided for @noCommentsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get noCommentsYet;
+
+  /// No description provided for @startConversationPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the conversation and share what you think!'**
+  String get startConversationPrompt;
+
+  /// No description provided for @saySomethingNice.
+  ///
+  /// In en, this message translates to:
+  /// **'Say something nice'**
+  String get saySomethingNice;
+
+  /// No description provided for @addCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment...'**
+  String get addCommentHint;
+
+  /// Hint text when replying to a user in comment bar
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to @{username}...'**
+  String replyToUserHint(String username);
+
+  /// No description provided for @replyingTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Replying to '**
+  String get replyingTo;
+
+  /// No description provided for @replyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get replyAction;
+
+  /// No description provided for @likeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Like'**
+  String get likeAction;
+
+  /// No description provided for @loveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Love'**
+  String get loveAction;
+
+  /// No description provided for @hahaAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Haha'**
+  String get hahaAction;
+
+  /// No description provided for @fireAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire'**
+  String get fireAction;
+
+  /// No description provided for @wowAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Wow'**
+  String get wowAction;
+
+  /// No description provided for @sadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sad'**
+  String get sadAction;
+
+  /// No description provided for @editedTag.
+  ///
+  /// In en, this message translates to:
+  /// **'edited'**
+  String get editedTag;
+
+  /// No description provided for @authorBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get authorBadge;
+
+  /// No description provided for @pinnedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get pinnedBadge;
+
+  /// No description provided for @pinnedByCreator.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned by creator'**
+  String get pinnedByCreator;
+
+  /// No description provided for @pinComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin comment'**
+  String get pinComment;
+
+  /// No description provided for @unpinComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin comment'**
+  String get unpinComment;
+
+  /// No description provided for @editComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit comment'**
+  String get editComment;
+
+  /// No description provided for @editCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your comment...'**
+  String get editCommentHint;
+
+  /// No description provided for @deleteComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete comment'**
+  String get deleteComment;
+
+  /// No description provided for @deleteCommentConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete comment?'**
+  String get deleteCommentConfirmTitle;
+
+  /// No description provided for @deleteCommentConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this comment? This cannot be undone.'**
+  String get deleteCommentConfirmMessage;
+
+  /// No description provided for @copyText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy text'**
+  String get copyText;
+
+  /// No description provided for @commentCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment copied to clipboard'**
+  String get commentCopied;
+
+  /// No description provided for @reportComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Report comment'**
+  String get reportComment;
+
+  /// No description provided for @reportSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report submitted'**
+  String get reportSubmitted;
+
+  /// No description provided for @seeMore.
+  ///
+  /// In en, this message translates to:
+  /// **'See more'**
+  String get seeMore;
+
+  /// No description provided for @seeLess.
+  ///
+  /// In en, this message translates to:
+  /// **'See less'**
+  String get seeLess;
+
+  /// No description provided for @viewOneReply.
+  ///
+  /// In en, this message translates to:
+  /// **'View 1 reply'**
+  String get viewOneReply;
+
+  /// Button to expand multiple replies
+  ///
+  /// In en, this message translates to:
+  /// **'View {count} replies'**
+  String viewReplies(int count);
+
+  /// No description provided for @viewMoreReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'View more replies...'**
+  String get viewMoreReplies;
+
+  /// No description provided for @hideReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide replies'**
+  String get hideReplies;
+
+  /// Prompt on post card to view all comments
+  ///
+  /// In en, this message translates to:
+  /// **'View all {count} comments'**
+  String viewAllComments(int count);
+
+  /// Title in reactions sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Reactions ({count})'**
+  String reactionsCount(int count);
+
+  /// All tab label in reactions sheet
+  ///
+  /// In en, this message translates to:
+  /// **'All ({count})'**
+  String allReactionsCount(int count);
+
+  /// No description provided for @noReactionsInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No reactions in this category'**
+  String get noReactionsInCategory;
+
+  /// Options menu action to reply to user
+  ///
+  /// In en, this message translates to:
+  /// **'Reply to @{username}'**
+  String replyToUserAction(String username);
+
+  /// No description provided for @likeCountSingular.
+  ///
+  /// In en, this message translates to:
+  /// **'1 like'**
+  String get likeCountSingular;
+
+  /// Plural likes label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} likes'**
+  String likeCountPlural(int count);
 }
 
 class _AppLocalizationsDelegate
