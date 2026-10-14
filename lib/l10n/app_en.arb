@@ -164,5 +164,106 @@
   "unfriend": "Unfriend",
   "unfriendConfirmation": "Are you sure you want to remove this friend?",
   "friendRemoved": "Friend removed successfully",
-  "failedToRemoveFriend": "Failed to remove friend"
+  "failedToRemoveFriend": "Failed to remove friend",
+  "commentsTitle": "Comments",
+  "topComments": "Top comments",
+  "newestFirst": "Newest first",
+  "oldestFirst": "Oldest first",
+  "noCommentsYet": "No comments yet",
+  "startConversationPrompt": "Start the conversation and share what you think!",
+  "saySomethingNice": "Say something nice",
+  "addCommentHint": "Add a comment...",
+  "replyToUserHint": "Reply to @{username}...",
+  "@replyToUserHint": {
+    "description": "Hint text when replying to a user in comment bar",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "replyingTo": "Replying to ",
+  "replyAction": "Reply",
+  "likeAction": "Like",
+  "loveAction": "Love",
+  "hahaAction": "Haha",
+  "fireAction": "Fire",
+  "wowAction": "Wow",
+  "sadAction": "Sad",
+  "editedTag": "edited",
+  "authorBadge": "Author",
+  "pinnedBadge": "Pinned",
+  "pinnedByCreator": "Pinned by creator",
+  "pinComment": "Pin comment",
+  "unpinComment": "Unpin comment",
+  "editComment": "Edit comment",
+  "editCommentHint": "Edit your comment...",
+  "deleteComment": "Delete comment",
+  "deleteCommentConfirmTitle": "Delete comment?",
+  "deleteCommentConfirmMessage": "Are you sure you want to delete this comment? This cannot be undone.",
+  "copyText": "Copy text",
+  "commentCopied": "Comment copied to clipboard",
+  "reportComment": "Report comment",
+  "reportSubmitted": "Report submitted",
+  "seeMore": "See more",
+  "seeLess": "See less",
+  "viewOneReply": "View 1 reply",
+  "viewReplies": "View {count} replies",
+  "@viewReplies": {
+    "description": "Button to expand multiple replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "viewMoreReplies": "View more replies...",
+  "hideReplies": "Hide replies",
+  "viewAllComments": "View all {count} comments",
+  "@viewAllComments": {
+    "description": "Prompt on post card to view all comments",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reactionsCount": "Reactions ({count})",
+  "@reactionsCount": {
+    "description": "Title in reactions sheet",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allReactionsCount": "All ({count})",
+  "@allReactionsCount": {
+    "description": "All tab label in reactions sheet",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noReactionsInCategory": "No reactions in this category",
+  "replyToUserAction": "Reply to @{username}",
+  "@replyToUserAction": {
+    "description": "Options menu action to reply to user",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "likeCountSingular": "1 like",
+  "likeCountPlural": "{count} likes",
+  "@likeCountPlural": {
+    "description": "Plural likes label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

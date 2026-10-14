@@ -9,6 +9,7 @@ import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_sheet.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class CommentTree extends StatelessWidget {
   const CommentTree({
@@ -247,6 +248,7 @@ class _CommentNodeState extends State<_CommentNode> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
+    final loc = AppLocalizations.of(context);
 
     showModalBottomSheet<void>(
       context: context,
@@ -282,7 +284,9 @@ class _CommentNodeState extends State<_CommentNode> {
                     color: primaryTextColor,
                   ),
                   title: Text(
-                    widget.comment.isPinned ? 'Unpin comment' : 'Pin comment',
+                    widget.comment.isPinned
+                        ? (loc?.unpinComment ?? 'Unpin comment')
+                        : (loc?.pinComment ?? 'Pin comment'),
                     style: TextStyle(color: primaryTextColor),
                   ),
                   onTap: () {
@@ -294,7 +298,7 @@ class _CommentNodeState extends State<_CommentNode> {
                 ListTile(
                   leading: Icon(Icons.edit_outlined, color: primaryTextColor),
                   title: Text(
-                    'Edit comment',
+                    loc?.editComment ?? 'Edit comment',
                     style: TextStyle(color: primaryTextColor),
                   ),
                   onTap: () {
@@ -305,7 +309,8 @@ class _CommentNodeState extends State<_CommentNode> {
               ListTile(
                 leading: Icon(CupertinoIcons.reply, color: primaryTextColor),
                 title: Text(
-                  'Reply to @${widget.comment.author.username}',
+                  loc?.replyToUserAction(widget.comment.author.username) ??
+                      'Reply to @${widget.comment.author.username}',
                   style: TextStyle(color: primaryTextColor),
                 ),
                 onTap: () {
@@ -316,7 +321,7 @@ class _CommentNodeState extends State<_CommentNode> {
               ListTile(
                 leading: Icon(Icons.copy_rounded, color: primaryTextColor),
                 title: Text(
-                  'Copy text',
+                  loc?.copyText ?? 'Copy text',
                   style: TextStyle(color: primaryTextColor),
                 ),
                 onTap: () {
@@ -325,8 +330,10 @@ class _CommentNodeState extends State<_CommentNode> {
                     ClipboardData(text: widget.comment.content),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Comment copied to clipboard'),
+                    SnackBar(
+                      content: Text(
+                        loc?.commentCopied ?? 'Comment copied to clipboard',
+                      ),
                     ),
                   );
                 },
@@ -337,9 +344,9 @@ class _CommentNodeState extends State<_CommentNode> {
                     Icons.delete_outline_rounded,
                     color: Colors.redAccent,
                   ),
-                  title: const Text(
-                    'Delete comment',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(
+                    loc?.deleteComment ?? 'Delete comment',
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   onTap: () {
                     Navigator.of(ctx).pop();
@@ -352,14 +359,18 @@ class _CommentNodeState extends State<_CommentNode> {
                     Icons.report_problem_outlined,
                     color: Colors.redAccent,
                   ),
-                  title: const Text(
-                    'Report comment',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(
+                    loc?.reportComment ?? 'Report comment',
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report submitted')),
+                      SnackBar(
+                        content: Text(
+                          loc?.reportSubmitted ?? 'Report submitted',
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -371,23 +382,25 @@ class _CommentNodeState extends State<_CommentNode> {
   }
 
   Future<void> _confirmDelete() async {
+    final loc = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete comment?'),
-        content: const Text(
-          'Are you sure you want to delete this comment? '
-          'This cannot be undone.',
+        title: Text(loc?.deleteCommentConfirmTitle ?? 'Delete comment?'),
+        content: Text(
+          loc?.deleteCommentConfirmMessage ??
+              'Are you sure you want to delete this comment? '
+                  'This cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-            child: const Text('Delete'),
+            child: Text(loc?.deleteComment ?? 'Delete'),
           ),
         ],
       ),
@@ -401,6 +414,7 @@ class _CommentNodeState extends State<_CommentNode> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final replies = widget.comment.replies;
     final hasReplies = widget.comment.hasReplies;
@@ -553,7 +567,8 @@ class _CommentNodeState extends State<_CommentNode> {
                                   onTap: () => widget.onLoadMoreReplies
                                       ?.call(widget.comment),
                                   child: Text(
-                                    'View more replies...',
+                                    loc?.viewMoreReplies ??
+                                        'View more replies...',
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w600,
@@ -571,7 +586,7 @@ class _CommentNodeState extends State<_CommentNode> {
                               child: GestureDetector(
                                 onTap: _toggleExpanded,
                                 child: Text(
-                                  'Hide replies',
+                                  loc?.hideReplies ?? 'Hide replies',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -841,7 +856,9 @@ class _CommentBubbleState extends State<_CommentBubble> {
             child: Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(
-                _isTextExpanded ? 'See less' : 'See more',
+                _isTextExpanded
+                    ? (AppLocalizations.of(context)?.seeLess ?? 'See less')
+                    : (AppLocalizations.of(context)?.seeMore ?? 'See more'),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -857,6 +874,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final bubbleColor = isDark
         ? const Color(0xFF3A3B3C)
@@ -912,7 +930,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'Author',
+                          loc?.authorBadge ?? 'Author',
                           style: TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w700,
@@ -930,18 +948,18 @@ class _CommentBubbleState extends State<_CommentBubble> {
                           color: Colors.amber.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               CupertinoIcons.pin_fill,
                               size: 10,
                               color: Colors.amber,
                             ),
-                            SizedBox(width: 3),
+                            const SizedBox(width: 3),
                             Text(
-                              'Pinned',
-                              style: TextStyle(
+                              loc?.pinnedBadge ?? 'Pinned',
+                              style: const TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.amber,
@@ -1087,6 +1105,7 @@ class _CommentMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final subtextColor = theme.colorScheme.onSurfaceVariant;
     final metaStyle = theme.textTheme.labelSmall?.copyWith(
       color: subtextColor,
@@ -1095,35 +1114,35 @@ class _CommentMeta extends StatelessWidget {
     );
 
     // Map active reaction to Facebook text & color
-    var likeText = 'Like';
+    var likeText = loc?.likeAction ?? 'Like';
     Color? likeColor = subtextColor;
 
     if (comment.userReaction != null && comment.userReaction!.isNotEmpty) {
       switch (comment.userReaction) {
         case '❤️':
-          likeText = 'Love';
+          likeText = loc?.loveAction ?? 'Love';
           likeColor = Colors.redAccent;
         case '👍':
-          likeText = 'Like';
+          likeText = loc?.likeAction ?? 'Like';
           likeColor = Colors.blue;
         case '😂':
-          likeText = 'Haha';
+          likeText = loc?.hahaAction ?? 'Haha';
           likeColor = Colors.amber[800];
         case '🔥':
-          likeText = 'Fire';
+          likeText = loc?.fireAction ?? 'Fire';
           likeColor = Colors.deepOrange;
         case '😮':
-          likeText = 'Wow';
+          likeText = loc?.wowAction ?? 'Wow';
           likeColor = Colors.amber[800];
         case '😢':
-          likeText = 'Sad';
+          likeText = loc?.sadAction ?? 'Sad';
           likeColor = Colors.amber[800];
         default:
-          likeText = 'Like';
+          likeText = loc?.likeAction ?? 'Like';
           likeColor = Colors.blue;
       }
     } else if (comment.userHasLiked) {
-      likeText = 'Like';
+      likeText = loc?.likeAction ?? 'Like';
       likeColor = Colors.blue;
     }
 
@@ -1156,7 +1175,7 @@ class _CommentMeta extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Text(
-                'Reply',
+                loc?.replyAction ?? 'Reply',
                 style: metaStyle?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -1165,7 +1184,7 @@ class _CommentMeta extends StatelessWidget {
           ),
           if (comment.isEdited)
             Text(
-              '(edited)',
+              loc != null ? '(${loc.editedTag})' : '(edited)',
               style: metaStyle?.copyWith(
                 fontStyle: FontStyle.italic,
                 fontSize: 11,
@@ -1199,9 +1218,12 @@ class _ViewRepliesButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final count =
         comment.replyCount > 0 ? comment.replyCount : comment.replies.length;
-    final text = count == 1 ? 'View 1 reply' : 'View $count replies';
+    final text = count == 1
+        ? (loc?.viewOneReply ?? 'View 1 reply')
+        : (loc?.viewReplies(count) ?? 'View $count replies');
 
     return GestureDetector(
       onTap: onTap,

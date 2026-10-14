@@ -10,6 +10,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/comments/commen
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class PostCommentsSheet extends ConsumerStatefulWidget {
   const PostCommentsSheet({
@@ -229,26 +230,27 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
   }
 
   void _handleEditComment(CommentUiModel comment) {
+    final loc = AppLocalizations.of(context);
     final textController = TextEditingController(text: comment.content);
 
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit comment'),
+        title: Text(loc?.editComment ?? 'Edit comment'),
         content: TextField(
           controller: textController,
           autofocus: true,
           maxLines: 4,
           minLines: 1,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Edit your comment...',
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: loc?.editCommentHint ?? 'Edit your comment...',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -272,7 +274,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
               }
               Navigator.of(ctx).pop();
             },
-            child: const Text('Save'),
+            child: Text(loc?.save ?? 'Save'),
           ),
         ],
       ),
@@ -302,9 +304,21 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
     widget.onSortChanged?.call(order);
   }
 
+  String _getSortLabel(CommentSortOrder order, AppLocalizations? loc) {
+    switch (order) {
+      case CommentSortOrder.popular:
+        return loc?.topComments ?? order.label;
+      case CommentSortOrder.newest:
+        return loc?.newestFirst ?? order.label;
+      case CommentSortOrder.oldest:
+        return loc?.oldestFirst ?? order.label;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white60 : Colors.black54;
@@ -373,7 +387,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                   children: [
                     // Title and Count
                     Text(
-                      'Comments',
+                      loc?.commentsTitle ?? 'Comments',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -417,7 +431,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              currentSort.label,
+                              _getSortLabel(currentSort, loc),
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -434,33 +448,33 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                         ),
                       ),
                       itemBuilder: (ctx) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: CommentSortOrder.popular,
                           child: Row(
                             children: [
-                              Icon(Icons.whatshot, size: 18),
-                              SizedBox(width: 10),
-                              Text('Top comments'),
+                              const Icon(Icons.whatshot, size: 18),
+                              const SizedBox(width: 10),
+                              Text(loc?.topComments ?? 'Top comments'),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: CommentSortOrder.newest,
                           child: Row(
                             children: [
-                              Icon(Icons.access_time_rounded, size: 18),
-                              SizedBox(width: 10),
-                              Text('Newest first'),
+                              const Icon(Icons.access_time_rounded, size: 18),
+                              const SizedBox(width: 10),
+                              Text(loc?.newestFirst ?? 'Newest first'),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: CommentSortOrder.oldest,
                           child: Row(
                             children: [
-                              Icon(Icons.history_rounded, size: 18),
-                              SizedBox(width: 10),
-                              Text('Oldest first'),
+                              const Icon(Icons.history_rounded, size: 18),
+                              const SizedBox(width: 10),
+                              Text(loc?.oldestFirst ?? 'Oldest first'),
                             ],
                           ),
                         ),

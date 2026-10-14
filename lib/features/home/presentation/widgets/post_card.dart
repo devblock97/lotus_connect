@@ -12,6 +12,7 @@ import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/feed_video_player.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_comments_sheet.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class PostCard extends StatefulWidget {
   const PostCard({
@@ -861,13 +862,17 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
   Widget _buildCommentsPrompt(Color secondaryColor) {
     final count = widget.post.commentsCount;
+    final loc = AppLocalizations.of(context);
+    final promptText = count > 0
+        ? (loc?.viewAllComments(count) ?? 'View all $count comments')
+        : (loc?.addCommentHint ?? 'Add a comment...');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
       child: GestureDetector(
         onTap: widget.onViewCommentsTap ??
             () => PostCommentsSheet.show(context, post: widget.post),
         child: Text(
-          count > 0 ? 'View all $count comments' : 'Add a comment...',
+          promptText,
           style: TextStyle(
             fontSize: 13.5,
             color: secondaryColor,

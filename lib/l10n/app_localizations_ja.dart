@@ -476,15 +476,163 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unknownUser => '不明なユーザー';
 
   @override
-  String get unfriend => 'Unfriend';
+  String get unfriend => '友達を解除';
 
   @override
-  String get unfriendConfirmation =>
-      'Are you sure you want to remove this friend?';
+  String get unfriendConfirmation => 'この友達を解除してもよろしいですか？';
 
   @override
-  String get friendRemoved => 'Friend removed successfully';
+  String get friendRemoved => '友達を正常に解除しました';
 
   @override
-  String get failedToRemoveFriend => 'Failed to remove friend';
+  String get failedToRemoveFriend => '友達の解除に失敗しました';
+
+  @override
+  String get commentsTitle => 'コメント';
+
+  @override
+  String get topComments => '人気のコメント';
+
+  @override
+  String get newestFirst => '新しい順';
+
+  @override
+  String get oldestFirst => '古い順';
+
+  @override
+  String get noCommentsYet => 'コメントはまだありません';
+
+  @override
+  String get startConversationPrompt => '最初のコメントを投稿して会話を始めましょう！';
+
+  @override
+  String get saySomethingNice => '素敵なコメントを残す';
+
+  @override
+  String get addCommentHint => 'コメントを追加...';
+
+  @override
+  String replyToUserHint(String username) {
+    return '@$usernameに返信...';
+  }
+
+  @override
+  String get replyingTo => '返信先: ';
+
+  @override
+  String get replyAction => '返信';
+
+  @override
+  String get likeAction => 'いいね！';
+
+  @override
+  String get loveAction => '超いいね！';
+
+  @override
+  String get hahaAction => 'うけるね';
+
+  @override
+  String get fireAction => 'すごい';
+
+  @override
+  String get wowAction => 'すごいね';
+
+  @override
+  String get sadAction => '悲しいね';
+
+  @override
+  String get editedTag => '編集済み';
+
+  @override
+  String get authorBadge => '投稿者';
+
+  @override
+  String get pinnedBadge => '固定済み';
+
+  @override
+  String get pinnedByCreator => '投稿者によって固定されました';
+
+  @override
+  String get pinComment => 'コメントを固定';
+
+  @override
+  String get unpinComment => 'コメントの固定を解除';
+
+  @override
+  String get editComment => 'コメントを編集';
+
+  @override
+  String get editCommentHint => 'コメントを編集...';
+
+  @override
+  String get deleteComment => 'コメントを削除';
+
+  @override
+  String get deleteCommentConfirmTitle => 'コメントを削除しますか？';
+
+  @override
+  String get deleteCommentConfirmMessage => 'このコメントを削除してもよろしいですか？この操作は取り消せません。';
+
+  @override
+  String get copyText => 'テキストをコピー';
+
+  @override
+  String get commentCopied => 'コメントをクリップボードにコピーしました';
+
+  @override
+  String get reportComment => 'コメントを通報';
+
+  @override
+  String get reportSubmitted => '通報を送信しました';
+
+  @override
+  String get seeMore => 'もっと見る';
+
+  @override
+  String get seeLess => '一部を表示';
+
+  @override
+  String get viewOneReply => '返信1件を表示';
+
+  @override
+  String viewReplies(int count) {
+    return '返信$count件を表示';
+  }
+
+  @override
+  String get viewMoreReplies => '他の返信を表示...';
+
+  @override
+  String get hideReplies => '返信を非表示';
+
+  @override
+  String viewAllComments(int count) {
+    return '$count件のコメントをすべて見る';
+  }
+
+  @override
+  String reactionsCount(int count) {
+    return 'リアクション ($count)';
+  }
+
+  @override
+  String allReactionsCount(int count) {
+    return 'すべて ($count)';
+  }
+
+  @override
+  String get noReactionsInCategory => 'このカテゴリーのリアクションはありません';
+
+  @override
+  String replyToUserAction(String username) {
+    return '@$usernameに返信';
+  }
+
+  @override
+  String get likeCountSingular => 'いいね！ 1件';
+
+  @override
+  String likeCountPlural(int count) {
+    return 'いいね！ $count件';
+  }
 }

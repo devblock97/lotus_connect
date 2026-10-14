@@ -8,6 +8,7 @@ import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_sheet.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class CommentItemTile extends StatefulWidget {
   const CommentItemTile({
@@ -98,6 +99,7 @@ class _CommentItemTileState extends State<CommentItemTile>
   void _showOptionsMenu() {
     HapticFeedback.mediumImpact();
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
 
@@ -137,7 +139,9 @@ class _CommentItemTileState extends State<CommentItemTile>
                     color: primaryTextColor,
                   ),
                   title: Text(
-                    widget.comment.isPinned ? 'Unpin comment' : 'Pin comment',
+                    widget.comment.isPinned
+                        ? (loc?.unpinComment ?? 'Unpin comment')
+                        : (loc?.pinComment ?? 'Pin comment'),
                     style: TextStyle(color: primaryTextColor),
                   ),
                   onTap: () {
@@ -151,7 +155,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                 ListTile(
                   leading: Icon(Icons.edit_outlined, color: primaryTextColor),
                   title: Text(
-                    'Edit comment',
+                    loc?.editComment ?? 'Edit comment',
                     style: TextStyle(color: primaryTextColor),
                   ),
                   onTap: () {
@@ -164,7 +168,8 @@ class _CommentItemTileState extends State<CommentItemTile>
               ListTile(
                 leading: Icon(CupertinoIcons.reply, color: primaryTextColor),
                 title: Text(
-                  'Reply to @${widget.comment.author.username}',
+                  loc?.replyToUserAction(widget.comment.author.username) ??
+                      'Reply to @${widget.comment.author.username}',
                   style: TextStyle(color: primaryTextColor),
                 ),
                 onTap: () {
@@ -177,7 +182,7 @@ class _CommentItemTileState extends State<CommentItemTile>
               ListTile(
                 leading: Icon(Icons.copy_rounded, color: primaryTextColor),
                 title: Text(
-                  'Copy text',
+                  loc?.copyText ?? 'Copy text',
                   style: TextStyle(color: primaryTextColor),
                 ),
                 onTap: () {
@@ -186,8 +191,10 @@ class _CommentItemTileState extends State<CommentItemTile>
                     ClipboardData(text: widget.comment.content),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Comment copied to clipboard'),
+                    SnackBar(
+                      content: Text(
+                        loc?.commentCopied ?? 'Comment copied to clipboard',
+                      ),
                     ),
                   );
                 },
@@ -200,9 +207,9 @@ class _CommentItemTileState extends State<CommentItemTile>
                     Icons.delete_outline_rounded,
                     color: Colors.redAccent,
                   ),
-                  title: const Text(
-                    'Delete comment',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(
+                    loc?.deleteComment ?? 'Delete comment',
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   onTap: () {
                     Navigator.of(ctx).pop();
@@ -215,14 +222,18 @@ class _CommentItemTileState extends State<CommentItemTile>
                     Icons.report_problem_outlined,
                     color: Colors.redAccent,
                   ),
-                  title: const Text(
-                    'Report comment',
-                    style: TextStyle(color: Colors.redAccent),
+                  title: Text(
+                    loc?.reportComment ?? 'Report comment',
+                    style: const TextStyle(color: Colors.redAccent),
                   ),
                   onTap: () {
                     Navigator.of(ctx).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Report submitted')),
+                      SnackBar(
+                        content: Text(
+                          loc?.reportSubmitted ?? 'Report submitted',
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -234,23 +245,25 @@ class _CommentItemTileState extends State<CommentItemTile>
   }
 
   Future<void> _confirmDelete() async {
+    final loc = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete comment?'),
-        content: const Text(
-          'Are you sure you want to delete this comment? '
-          'This cannot be undone.',
+        title: Text(loc?.deleteCommentConfirmTitle ?? 'Delete comment?'),
+        content: Text(
+          loc?.deleteCommentConfirmMessage ??
+              'Are you sure you want to delete this comment? '
+                  'This cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-            child: const Text('Delete'),
+            child: Text(loc?.deleteComment ?? 'Delete'),
           ),
         ],
       ),
@@ -356,6 +369,7 @@ class _CommentItemTileState extends State<CommentItemTile>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white54 : Colors.black45;
@@ -385,18 +399,18 @@ class _CommentItemTileState extends State<CommentItemTile>
                   width: 0.8,
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     CupertinoIcons.pin_fill,
                     size: 11,
                     color: Colors.amber,
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
-                    'Pinned by creator',
-                    style: TextStyle(
+                    loc?.pinnedByCreator ?? 'Pinned by creator',
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: Colors.amber,
@@ -453,7 +467,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                'Author',
+                                loc?.authorBadge ?? 'Author',
                                 style: TextStyle(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
@@ -474,7 +488,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                           // Edited indicator
                           if (comment.isEdited)
                             Text(
-                              '(edited)',
+                              loc != null ? '(${loc.editedTag})' : '(edited)',
                               style: TextStyle(
                                 fontSize: 11,
                                 color: subtextColor,
@@ -532,8 +546,11 @@ class _CommentItemTileState extends State<CommentItemTile>
                                 padding: const EdgeInsets.only(right: 12),
                                 child: Text(
                                   comment.likeCount == 1
-                                      ? '1 like'
-                                      : '${comment.likeCount} likes',
+                                      ? (loc?.likeCountSingular ?? '1 like')
+                                      : (loc?.likeCountPlural(
+                                            comment.likeCount,
+                                          ) ??
+                                          '${comment.likeCount} likes'),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -549,7 +566,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                             child: Padding(
                               padding: const EdgeInsets.only(right: 12),
                               child: Text(
-                                'Reply',
+                                loc?.replyAction ?? 'Reply',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -634,10 +651,11 @@ class _CommentItemTileState extends State<CommentItemTile>
                           const SizedBox(width: 8),
                           Text(
                             comment.isRepliesExpanded
-                                ? 'Hide replies'
+                                ? (loc?.hideReplies ?? 'Hide replies')
                                 : comment.replyCount == 1
-                                    ? 'View 1 reply'
-                                    : 'View ${comment.replyCount} replies',
+                                    ? (loc?.viewOneReply ?? 'View 1 reply')
+                                    : (loc?.viewReplies(comment.replyCount) ??
+                                        'View ${comment.replyCount} replies'),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -686,7 +704,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                           child: Padding(
                             padding: const EdgeInsets.only(top: 4, bottom: 4),
                             child: Text(
-                              'Load more replies...',
+                              loc?.viewMoreReplies ?? 'Load more replies...',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -768,11 +786,11 @@ class _CommentItemTileState extends State<CommentItemTile>
         if (isLong && !_isTextExpanded)
           GestureDetector(
             onTap: () => setState(() => _isTextExpanded = true),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 2),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
               child: Text(
-                'more',
-                style: TextStyle(
+                AppLocalizations.of(context)?.seeMore ?? 'more',
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey,

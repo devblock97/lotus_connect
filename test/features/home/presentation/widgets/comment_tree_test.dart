@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -144,6 +145,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(toggleCallCount, equals(1));
+    });
+
+    testWidgets('renders localized strings in Vietnamese', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('vi'),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: CommentTree(
+                root: testRootComment,
+                currentUserId: 'author_1',
+                postAuthorId: 'author_1',
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify Vietnamese localized author badge
+      expect(find.text('Tác giả'), findsOneWidget);
+
+      // Verify Vietnamese localized action buttons
+      expect(find.text('Thích'), findsWidgets);
+      expect(find.text('Trả lời'), findsWidgets);
     });
   });
 }
