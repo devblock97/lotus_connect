@@ -7,6 +7,7 @@ export 'package:lotus_connect/features/home/presentation/widgets/comments/commen
 export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_sheet.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
+export 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/feed_video_player.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
 export 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';

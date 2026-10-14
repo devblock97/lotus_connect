@@ -7,8 +7,8 @@ import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_empty_state.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_input_bar.dart';
-import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_item_tile.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class PostCommentsSheet extends ConsumerStatefulWidget {
@@ -506,11 +506,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                               itemCount: comments.length,
                               itemBuilder: (context, index) {
                                 final comment = comments[index];
-                                return CommentItemTile(
+                                return CommentTree(
                                   key: ValueKey(comment.id),
-                                  comment: comment,
-                                  postAuthorId: postAuthorId,
+                                  root: comment,
                                   currentUserId: currentUserId,
+                                  postAuthorId: postAuthorId,
                                   onReply: (target) {
                                     notifier.setReplyingTo(target);
                                     _inputFocusNode.requestFocus();
@@ -518,6 +518,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                                   onToggleLike: _handleToggleLike,
                                   onSelectReaction: _handleSelectReaction,
                                   onToggleReplies: _handleToggleReplies,
+                                  onLoadMoreReplies: notifier.loadReplies,
                                   onPinToggle: _handlePinToggle,
                                   onEdit: _handleEditComment,
                                   onDelete: _handleDeleteComment,

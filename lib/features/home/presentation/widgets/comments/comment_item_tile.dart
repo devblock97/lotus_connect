@@ -9,8 +9,6 @@ import 'package:lotus_connect/features/home/presentation/models/comment_ui_model
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_sheet.dart';
 
-/// Single comment or reply tile with reactions, media attachments,
-/// and threaded replies.
 class CommentItemTile extends StatefulWidget {
   const CommentItemTile({
     required this.comment,
@@ -374,7 +372,7 @@ class _CommentItemTileState extends State<CommentItemTile>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Pinned badge banner if comment is pinned
+          // Pinned badge banner if comment is pinned
           if (comment.isPinned && !widget.isReply)
             Container(
               margin: const EdgeInsets.only(bottom: 6),
@@ -408,7 +406,7 @@ class _CommentItemTileState extends State<CommentItemTile>
               ),
             ),
 
-          // 2. Main Comment Row: [Avatar] [Body] [Heart/Reaction]
+          // Main Comment Row: [Avatar] [Body] [Heart/Reaction]
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -612,7 +610,7 @@ class _CommentItemTileState extends State<CommentItemTile>
             ],
           ),
 
-          // 3. Threaded Replies Accordion (if root comment and has replies)
+          // Threaded Replies Accordion (if root comment and has replies)
           if (!widget.isReply && comment.hasReplies) ...[
             const SizedBox(height: 6),
             Padding(
