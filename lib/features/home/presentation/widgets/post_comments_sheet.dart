@@ -9,6 +9,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/comments/commen
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_input_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_item_tile.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
+import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class PostCommentsSheet extends ConsumerStatefulWidget {
@@ -486,45 +487,49 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
               // Comments List View / Skeleton / Empty
               Expanded(
                 child: isLoading
-                    ? const CommentSkeletonList()
-                    : comments.isEmpty
-                        ? CommentEmptyState(
-                            onStartCommentTap: _inputFocusNode.requestFocus,
-                          )
-                        : RefreshIndicator(
-                            onRefresh:
-                                widget.onRefresh ?? notifier.refreshComments,
-                            child: ListView.builder(
-                              controller: scrollController,
-                              physics: const AlwaysScrollableScrollPhysics(
-                                parent: BouncingScrollPhysics(),
-                              ),
-                              padding: const EdgeInsets.only(
-                                top: 8,
-                                bottom: 20,
-                              ),
-                              itemCount: comments.length,
-                              itemBuilder: (context, index) {
-                                final comment = comments[index];
-                                return CommentItemTile(
-                                  key: ValueKey(comment.id),
-                                  comment: comment,
-                                  postAuthorId: postAuthorId,
-                                  currentUserId: currentUserId,
-                                  onReply: (target) {
-                                    notifier.setReplyingTo(target);
-                                    _inputFocusNode.requestFocus();
-                                  },
-                                  onToggleLike: _handleToggleLike,
-                                  onSelectReaction: _handleSelectReaction,
-                                  onToggleReplies: _handleToggleReplies,
-                                  onPinToggle: _handlePinToggle,
-                                  onEdit: _handleEditComment,
-                                  onDelete: _handleDeleteComment,
-                                );
-                              },
+                  ? const CommentSkeletonList()
+                  : comments.isEmpty
+                      ? CommentEmptyState(
+                          onStartCommentTap: _inputFocusNode.requestFocus,
+                        )
+                      : RefreshIndicator(
+                          onRefresh:
+                              widget.onRefresh ?? notifier.refreshComments,
+                          child: ListView.builder(
+                            controller: scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics(),
                             ),
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              bottom: 20,
+                            ),
+                            itemCount: comments.length,
+                            itemBuilder: (context, index) {
+                              final comment = comments[index];
+                              return CommentTree(
+                                root: comment,
+                                currentUserId: currentUserId,
+                              );
+                              return CommentItemTile(
+                                key: ValueKey(comment.id),
+                                comment: comment,
+                                postAuthorId: postAuthorId,
+                                currentUserId: currentUserId,
+                                onReply: (target) {
+                                  notifier.setReplyingTo(target);
+                                  _inputFocusNode.requestFocus();
+                                },
+                                onToggleLike: _handleToggleLike,
+                                onSelectReaction: _handleSelectReaction,
+                                onToggleReplies: _handleToggleReplies,
+                                onPinToggle: _handlePinToggle,
+                                onEdit: _handleEditComment,
+                                onDelete: _handleDeleteComment,
+                              );
+                            },
                           ),
+                        ),
               ),
 
               // Fixed Input Bar anchored at bottom
