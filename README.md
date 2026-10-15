@@ -11,17 +11,14 @@ A production-ready Flutter communication and AI platform built with **Clean Arch
 | <img src="docs/screenshots/home_screen.png" width="260"/> | <img src="docs/screenshots/create_post_screen.png" width="260"/> |
 
 
-| Comment Screen                 |
-|:------------------------------:|
-| <img src="docs/screenshots/comment_screen_1.png" width="260"/> |
-| <img src="docs/screenshots/comment_screen_2.png" width="260"/> |
+| Comment Screen 1 | Comment Screen 2 |
+|:-----------------------:|:-----------------------:|
+| <img src="docs/screenshots/comment_screen_1.png" width="260"/> | <img src="docs/screenshots/comment_screen_2.png" width="260"/> |
 
 
-| Create Story Screen 1 | Create Story Screen 2 | Create Story Screen 3 |
+| Create Story Screen 1 | Create Story Screen 2 | Create Story Screen 3 | Create Story Screen 4 |
 |:-----------------------:|:-----------------------:|:-----------------------:|
-| <img src="docs/screenshots/create_story_1.png" width="260"/> |
-| <img src="docs/screenshots/create_story_2.png" width="260"/> |
-| <img src="docs/screenshots/create_story_3.png" width="260"/> |
+| <img src="docs/screenshots/create_story_1.png" width="260"/> | <img src="docs/screenshots/create_story_2.png" width="260"/> | <img src="docs/screenshots/create_story_3.png" width="260"/> | <img src="docs/screenshots/create_story_4.png" width="260"/> |
 ---
 
 ## 🎬 Demos
