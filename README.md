@@ -17,7 +17,7 @@ A production-ready Flutter communication and AI platform built with **Clean Arch
 
 
 | Create Story Screen 1 | Create Story Screen 2 | Create Story Screen 3 | Create Story Screen 4 |
-|:-----------------------:|:-----------------------:|:-----------------------:|
+|:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
 | <img src="docs/screenshots/create_story_1.png" width="260"/> | <img src="docs/screenshots/create_story_2.png" width="260"/> | <img src="docs/screenshots/create_story_3.png" width="260"/> | <img src="docs/screenshots/create_story_4.png" width="260"/> |
 ---
 
