@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
+import 'package:lotus_connect/features/home/application/create_story_notifier.dart';
+import 'package:lotus_connect/features/home/application/create_story_state.dart';
 import 'package:lotus_connect/features/home/application/story_notifier.dart';
 import 'package:lotus_connect/features/home/data/datasources/story_remote_data_source.dart';
 import 'package:lotus_connect/features/home/data/repositories/story_repository_impl.dart';
 import 'package:lotus_connect/features/home/domain/repositories/story_repository.dart';
+import 'package:lotus_connect/features/home/domain/usecases/create_story_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/get_stories_tray_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/mark_story_viewed_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/react_to_story_usecase.dart';
@@ -51,6 +54,13 @@ final replyToStoryUseCaseProvider = Provider<ReplyToStoryUseCase>((ref) {
   );
 });
 
+/// Provider for [CreateStoryUseCase].
+final createStoryUseCaseProvider = Provider<CreateStoryUseCase>((ref) {
+  return CreateStoryUseCase(
+    repository: ref.watch(storyRepositoryProvider),
+  );
+});
+
 /// Provider managing the active stories tray state.
 final storiesNotifierProvider =
     StateNotifierProvider<StoriesNotifier, StoriesState>((ref) {
@@ -59,5 +69,15 @@ final storiesNotifierProvider =
     markStoryViewedUseCase: ref.watch(markStoryViewedUseCaseProvider),
     reactToStoryUseCase: ref.watch(reactToStoryUseCaseProvider),
     replyToStoryUseCase: ref.watch(replyToStoryUseCaseProvider),
+  );
+});
+
+/// Provider managing story creation state and actions.
+final createStoryNotifierProvider =
+    StateNotifierProvider.autoDispose<CreateStoryNotifier, CreateStoryState>(
+        (ref) {
+  return CreateStoryNotifier(
+    createStoryUseCase: ref.watch(createStoryUseCaseProvider),
+    storiesNotifier: ref.read(storiesNotifierProvider.notifier),
   );
 });

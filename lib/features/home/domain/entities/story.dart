@@ -7,8 +7,8 @@ class Story {
     required this.id,
     required this.author,
     required this.mediaType,
-    required this.mediaUrl,
     required this.createdAt,
+    this.mediaUrl,
     this.thumbnailUrl,
     this.caption,
     this.duration = 5.0,
@@ -46,7 +46,7 @@ class Story {
       id: json['id'] as String? ?? '',
       author: PostAuthor.fromJson(authorData),
       mediaType: json['mediaType'] as String? ?? 'image',
-      mediaUrl: json['mediaUrl'] as String? ?? '',
+      mediaUrl: json['mediaUrl'] as String?,
       thumbnailUrl: json['thumbnailUrl'] as String?,
       caption: json['caption'] as String?,
       duration: (json['duration'] as num?)?.toDouble() ?? 5.0,
@@ -65,7 +65,7 @@ class Story {
   final String id;
   final PostAuthor author;
   final String mediaType;
-  final String mediaUrl;
+  final String? mediaUrl;
   final String? thumbnailUrl;
   final String? caption;
   final double duration;

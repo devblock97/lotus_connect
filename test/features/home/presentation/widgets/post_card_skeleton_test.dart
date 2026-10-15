@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotus_connect/features/home/application/story_notifier.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
+import 'package:lotus_connect/features/home/domain/entities/story.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
 
@@ -24,6 +25,9 @@ class _FakeStoriesNotifier extends StateNotifier<StoriesState>
 
   @override
   Future<void> replyToStory(String storyId, String message) async {}
+
+  @override
+  void addCreatedStory(Story newStory) {}
 }
 
 void main() {
