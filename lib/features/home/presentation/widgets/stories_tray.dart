@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
+import 'package:lotus_connect/features/home/presentation/view/create_story_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/story_viewer_screen.dart';
 
 class StoriesTray extends ConsumerWidget {
@@ -41,10 +42,16 @@ class StoriesTray extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: GestureDetector(
               onTap: () => _onStoryTap(context, ref, groups, index),
+              onLongPress: isMe ? () => _openCreateStory(context) : null,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildStoryAvatar(userStory, theme, isMe),
+                  _buildStoryAvatar(
+                    userStory,
+                    theme,
+                    isMe,
+                    onPlusTap: () => _openCreateStory(context),
+                  ),
                   const SizedBox(height: 5),
                   SizedBox(
                     width: 68,
@@ -67,6 +74,14 @@ class StoriesTray extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _openCreateStory(BuildContext context) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => const CreateStoryScreen(),
       ),
     );
   }
@@ -97,17 +112,16 @@ class StoriesTray extends ConsumerWidget {
         ),
       );
     } else if (tapped.isSelf) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tap to create a new story'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _openCreateStory(context);
     }
   }
 
-  Widget _buildStoryAvatar(UserStory userStory, ThemeData theme, bool isMe) {
+  Widget _buildStoryAvatar(
+    UserStory userStory,
+    ThemeData theme,
+    bool isMe, {
+    VoidCallback? onPlusTap,
+  }) {
     final hasStories = userStory.hasStories;
     final hasUnseen = userStory.hasUnseen;
     final hasCloseFriends = userStory.hasCloseFriendsStory;
@@ -177,27 +191,29 @@ class StoriesTray extends ConsumerWidget {
           ),
         ),
 
-        // Plus icon overlay for logged-in user without stories
-        // or to add stories
-        if (isMe && !hasStories)
+        // Plus icon overlay for logged-in user
+        if (isMe)
           Positioned(
             right: 0,
             bottom: 0,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: const Color(0xFF0095F6),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.scaffoldBackgroundColor,
-                  width: 2,
+            child: GestureDetector(
+              onTap: onPlusTap,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0095F6),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: theme.scaffoldBackgroundColor,
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: const Icon(
-                Icons.add,
-                size: 14,
-                color: Colors.white,
+                child: const Icon(
+                  Icons.add,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

@@ -42,3 +42,8 @@ final uuidRegex = RegExp(
   '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
   r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
 );
+
+bool isValidUrl(String path) {
+  final uri = Uri.tryParse(path);
+  return uri != null && uri.hasAbsolutePath && uri.host.isNotEmpty;
+}

@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 
-/// Parameters for creating a new post matching the lotus_connect_system
-/// API contract.
 @immutable
 class CreatePostParams {
   const CreatePostParams({
@@ -30,7 +28,6 @@ class CreatePostParams {
 
   final String? location;
 
-  /// Returns whether this post has either non-empty content or media attached.
   bool get isValid =>
       (content != null && content!.trim().isNotEmpty) ||
       (mediaItems != null && mediaItems!.isNotEmpty) ||

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
+import 'package:lotus_connect/features/home/domain/entities/story.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
 import 'package:lotus_connect/features/home/domain/usecases/get_stories_tray_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/mark_story_viewed_usecase.dart';
@@ -95,6 +96,40 @@ class StoriesNotifier extends StateNotifier<StoriesState> {
         );
       },
     );
+  }
+
+  /// Optimistically adds a newly published story to the local user story tray.
+  void addCreatedStory(Story newStory) {
+    final selfIndex = state.storyGroups.indexWhere((g) => g.isSelf);
+    final updatedGroups = List<UserStory>.from(state.storyGroups);
+
+    if (selfIndex != -1) {
+      final selfGroup = updatedGroups[selfIndex];
+      final updatedStories = [newStory, ...selfGroup.stories];
+      final isCloseFriends =
+          selfGroup.hasCloseFriendsStory || newStory.isCloseFriendsStory;
+
+      updatedGroups[selfIndex] = selfGroup.copyWith(
+        stories: updatedStories,
+        totalStories: updatedStories.length,
+        hasUnseen: true,
+        latestStoryCreatedAt: newStory.createdAt,
+        hasCloseFriendsStory: isCloseFriends,
+      );
+    } else {
+      final newSelfGroup = UserStory(
+        user: newStory.author,
+        stories: [newStory],
+        hasUnseen: true,
+        totalStories: 1,
+        latestStoryCreatedAt: newStory.createdAt,
+        hasCloseFriendsStory: newStory.isCloseFriendsStory,
+        isSelf: true,
+      );
+      updatedGroups.insert(0, newSelfGroup);
+    }
+
+    state = state.copyWith(storyGroups: updatedGroups);
   }
 
   Future<void> markStoryViewed(String storyId, String userId) async {

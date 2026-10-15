@@ -4,9 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/story.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
+import 'package:lotus_connect/features/home/presentation/models/story_sticker_item.dart';
 import 'package:video_player/video_player.dart';
 
 class StoryViewerScreen extends ConsumerStatefulWidget {
@@ -128,9 +131,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
 
     final durationSec = story.duration > 0 ? story.duration : 5.0;
 
-    if (story.isVideo) {
+    if (story.isVideo && story.mediaUrl != null) {
       try {
-        final videoUri = Uri.parse(story.mediaUrl);
+        final videoUri = Uri.parse(story.mediaUrl!);
         final controller = VideoPlayerController.networkUrl(videoUri);
         await controller.initialize();
         if (!mounted) return;
@@ -310,6 +313,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                 // Media content (Image or Video)
                 _buildStoryMedia(story, isCurrentPage),
 
+                // Positioned Story Stickers and Text Overlays
+                _buildStoryOverlays(story),
+
                 // Touch hitboxes for Left/Right tap navigation
                 Positioned.fill(
                   child: Row(
@@ -361,7 +367,8 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (story.caption != null &&
-                                story.caption!.trim().isNotEmpty)
+                                story.caption!.trim().isNotEmpty &&
+                                story.metadata?['textOffset'] == null)
                               _buildStoryCaption(story.caption!),
                             _buildBottomReplyBar(story),
                           ],
@@ -404,6 +411,10 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   }
 
   Widget _buildStoryMedia(Story story, bool isCurrentPage) {
+    if (story.mediaUrl == null || !isValidUrl(story.mediaUrl ?? '')) {
+      return const SizedBox.shrink();
+    }
+
     if (story.isVideo && isCurrentPage && _videoController != null) {
       if (_videoController!.value.isInitialized) {
         return Center(
@@ -417,7 +428,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
 
     return Center(
       child: CachedNetworkImage(
-        imageUrl: story.mediaUrl,
+        imageUrl: story.mediaUrl!,
         fit: BoxFit.contain,
         placeholder: (_, __) => const Center(
           child: SizedBox(
@@ -639,6 +650,286 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildStoryOverlays(Story story) {
+    final metadata = story.metadata;
+    final rawStickers = metadata?['stickers'] as List<dynamic>?;
+    final textOffsetMap = metadata?['textOffset'] as Map<String, dynamic>?;
+
+    final stickers = <StoryStickerItem>[];
+    if (rawStickers != null) {
+      for (final s in rawStickers) {
+        if (s is Map<String, dynamic>) {
+          try {
+            stickers.add(StoryStickerItem.fromJson(s));
+          } on Object catch (_) {}
+        }
+      }
+    }
+
+    final hasPositionedCaption = story.caption != null &&
+        story.caption!.trim().isNotEmpty &&
+        textOffsetMap != null;
+
+    if (stickers.isEmpty && !hasPositionedCaption) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final canvasSize = Size(constraints.maxWidth, constraints.maxHeight);
+        return IgnorePointer(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              for (final sticker in stickers)
+                _buildPositionedSticker(sticker, canvasSize),
+              if (hasPositionedCaption)
+                _buildPositionedCaption(story, canvasSize, textOffsetMap),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPositionedSticker(StoryStickerItem sticker, Size canvasSize) {
+    final pixelX = sticker.offset.dx * canvasSize.width;
+    final pixelY = sticker.offset.dy * canvasSize.height;
+
+    return Positioned(
+      left: pixelX,
+      top: pixelY,
+      child: FractionalTranslation(
+        translation: const Offset(-0.5, -0.5),
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.diagonal3Values(
+            sticker.scale,
+            sticker.scale,
+            1,
+          )..rotateZ(sticker.rotation),
+          child: _buildStickerBadge(sticker),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPositionedCaption(
+    Story story,
+    Size canvasSize,
+    Map<String, dynamic> textOffsetMap,
+  ) {
+    final metadata = story.metadata ?? const {};
+    final dx = (textOffsetMap['x'] as num?)?.toDouble() ?? 0.5;
+    final dy = (textOffsetMap['y'] as num?)?.toDouble() ?? 0.45;
+    final scale = (metadata['textScale'] as num?)?.toDouble() ?? 1.0;
+    final rotation = (metadata['textRotation'] as num?)?.toDouble() ?? 0.0;
+
+    final fontFamily = metadata['fontFamily'] as String? ?? 'Inter';
+    final hexColor = metadata['textColor'] as String?;
+    final hasHighlight = metadata['hasTextHighlight'] as bool? ?? false;
+    final textAlignStr = metadata['textAlign'] as String? ?? 'center';
+
+    var textColor = Colors.white;
+    if (hexColor != null && hexColor.isNotEmpty) {
+      try {
+        final clean = hexColor.replaceAll('#', '');
+        final hex = clean.length == 6 ? 'FF$clean' : clean;
+        textColor = Color(int.parse(hex, radix: 16));
+      } on Object catch (_) {}
+    }
+
+    var textAlign = TextAlign.center;
+    if (textAlignStr == 'left') {
+      textAlign = TextAlign.left;
+    } else if (textAlignStr == 'right') {
+      textAlign = TextAlign.right;
+    }
+
+    TextStyle base;
+    switch (fontFamily) {
+      case 'RobotoMono':
+        base = GoogleFonts.robotoMono();
+      case 'Caveat':
+        base = GoogleFonts.caveat();
+      case 'PlayfairDisplay':
+        base = GoogleFonts.playfairDisplay();
+      case 'BebasNeue':
+        base = GoogleFonts.bebasNeue();
+      case 'Inter':
+      default:
+        base = GoogleFonts.inter();
+    }
+
+    final effectiveColor =
+        hasHighlight && textColor == Colors.white ? Colors.black : textColor;
+
+    final style = base.copyWith(
+      color: effectiveColor,
+      fontSize: fontFamily == 'Caveat' ? 34 : 26,
+      fontWeight: FontWeight.w700,
+      letterSpacing: fontFamily == 'BebasNeue' ? 1.5 : -0.3,
+      shadows: hasHighlight
+          ? null
+          : const [
+              Shadow(
+                color: Colors.black54,
+                blurRadius: 10,
+                offset: Offset(0, 2),
+              ),
+            ],
+    );
+
+    final pixelX = dx * canvasSize.width;
+    final pixelY = dy * canvasSize.height;
+
+    return Positioned(
+      left: pixelX,
+      top: pixelY,
+      child: FractionalTranslation(
+        translation: const Offset(-0.5, -0.5),
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.diagonal3Values(
+            scale,
+            scale,
+            1,
+          )..rotateZ(rotation),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 320),
+            padding: hasHighlight
+                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
+                : EdgeInsets.zero,
+            decoration: hasHighlight
+                ? BoxDecoration(
+                    color: textColor == Colors.white
+                        ? Colors.white
+                        : Colors.black.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(10),
+                  )
+                : null,
+            child: Text(
+              story.caption ?? '',
+              textAlign: textAlign,
+              style: style,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStickerBadge(StoryStickerItem sticker) {
+    switch (sticker.type) {
+      case StoryStickerType.location:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.location_on,
+                color: Color(0xFFFF3B30),
+                size: 18,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                sticker.text,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        );
+      case StoryStickerType.time:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white30),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(CupertinoIcons.time, color: Colors.white, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                sticker.text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        );
+      case StoryStickerType.mention:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFFFF2D55), Color(0xFFFF9500)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            sticker.text.startsWith('@') ? sticker.text : '@${sticker.text}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        );
+      case StoryStickerType.tag:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            sticker.text,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+        );
+      case StoryStickerType.emoji:
+        return Text(
+          sticker.text,
+          style: const TextStyle(
+            fontSize: 48,
+            shadows: [
+              Shadow(
+                color: Colors.black45,
+                blurRadius: 8,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+        );
+    }
   }
 
   Widget _buildBottomReplyBar(Story story) {
