@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
 import 'package:lotus_connect/features/calls/data/models/call_log_model.dart';
@@ -14,7 +15,7 @@ class CallsRemoteDataSourceImpl implements CallsRemoteDataSource {
   @override
   Future<List<CallLogModel>> getCallHistory() async {
     try {
-      final response = await dioClient.get<dynamic>('/calls/history');
+      final response = await dioClient.get<dynamic>(ApiConstants.callHistory);
       if (response.statusCode == 200) {
         final list = response.data as List<dynamic>;
         return list

@@ -12,6 +12,15 @@ class AppConfig {
   static const String appVersion = 'v1.0.0';
 
   /// Default backend server host URL.
-  static const String defaultServerHost =
-      'https://70f2-112-197-241-28.ngrok-free.app/api/v1';
+  /// Configurable via `--dart-define=API_BASE_URL=...` or
+  /// `--dart-define-from-file=.env`.
+  ///
+  /// Falls back to local development URL if not specified.
+  static const String defaultServerHost = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: String.fromEnvironment(
+      'SERVER_HOST',
+      defaultValue: 'http://localhost:8080/api/v1',
+    ),
+  );
 }

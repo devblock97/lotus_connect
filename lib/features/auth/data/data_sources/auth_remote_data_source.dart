@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -38,7 +39,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await dioClient.post<dynamic>(
-        '/auth/register',
+        ApiConstants.register,
         data: {
           'username': username,
           if (fullName != null) 'fullName': fullName,
@@ -76,7 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       debugPrint('device token: $deviceToken');
       final response = await dioClient.post(
-        '/auth/login',
+        ApiConstants.login,
         data: {
           'email': email,
           'password': password,
@@ -110,7 +111,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<void> logout({required String refreshToken}) async {
     try {
       await dioClient.post<dynamic>(
-        '/auth/logout',
+        ApiConstants.logout,
         data: {'refreshToken': refreshToken},
       );
     } on Object catch (e) {

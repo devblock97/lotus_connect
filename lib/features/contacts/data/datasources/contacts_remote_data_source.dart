@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -27,7 +28,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   @override
   Future<List<User>> contactsList() async {
     try {
-      final response = await _dioClient.get('/users/friends');
+      final response = await _dioClient.get(ApiConstants.friends);
       final list = response.data as List<dynamic>;
       return list
           .map((item) => User.fromJson(item as Map<String, dynamic>))
@@ -41,7 +42,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   Future<void> sendFriendRequest(String username) async {
     try {
       await _dioClient.post(
-        '/users/friends',
+        ApiConstants.friends,
         data: {'username': username},
       );
     } catch (e) {
@@ -53,7 +54,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   Future<ResponseEntityBase> acceptFriendRequest(String targetId) async {
     try {
       final response = await _dioClient.post(
-        '/users/friends/accept',
+        ApiConstants.acceptFriend,
         data: {'friendId': targetId},
       );
       return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
@@ -66,7 +67,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   Future<ResponseEntityBase> rejectFriendRequest(String friendId) async {
     try {
       final response = await _dioClient.post(
-        '/users/friends/reject',
+        ApiConstants.rejectFriend,
         data: {'friendId': friendId},
       );
       return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
@@ -79,7 +80,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   Future<ResponseEntityBase> deleteFriend(String friendId) async {
     try {
       final response = await _dioClient.delete(
-        '/users/friends/$friendId',
+        ApiConstants.deleteFriend(friendId),
       );
       return ResponseEntityBase.fromJson(response.data as Map<String, dynamic>);
     } catch (e) {
@@ -90,7 +91,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   @override
   Future<List<User>> getFriendRequests() async {
     try {
-      final response = await _dioClient.get('/users/friends/requests');
+      final response = await _dioClient.get(ApiConstants.friendRequests);
       final list = response.data as List<dynamic>;
       return list
           .map((item) => User.fromJson(item as Map<String, dynamic>))
@@ -104,7 +105,7 @@ class ContactsRemoteDataSourceImpl implements ContactsRemoteDataSource {
   Future<List<User>> searchUsers(String query) async {
     try {
       final response = await _dioClient.get(
-        '/users/search',
+        ApiConstants.searchUsers,
         queryParameters: {'q': query},
       );
       final list = response.data as List<dynamic>;

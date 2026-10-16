@@ -2,7 +2,7 @@ name: lotus_connect
 description: "A production-ready communication platform combining AI chat and Telegram messaging."
 publish_to: 'none'
 
-version: 1.0.0+4
+version: 1.0.0+7
 
 environment:
   sdk: ^3.5.0

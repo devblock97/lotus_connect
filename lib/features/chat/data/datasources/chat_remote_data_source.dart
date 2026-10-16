@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -51,7 +52,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   Future<Conversation> createConversation(String friendId) async {
     try {
       final response = await _dioClient.post(
-        '/chats/private',
+        ApiConstants.createPrivateChat,
         data: {'friendId': friendId},
       );
       if (response.statusCode == 200) {
@@ -80,7 +81,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   }) async {
     try {
       final response = await _dioClient.post(
-        '/chats/$conversationId/messages',
+        ApiConstants.chatMessages(conversationId),
         data: {
           'content': content,
           if (messageType != null) 'messageType': messageType,
@@ -123,7 +124,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
     try {
       debugPrint('fetch remote messages cursor: $cursor; limit: $limit');
       final response = await _dioClient.get(
-        '/chats/$conversationId/messages',
+        ApiConstants.chatMessages(conversationId),
         queryParameters: {
           if (cursor != null) 'cursor': cursor,
           'limit': limit,
@@ -152,7 +153,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   Future<ResponseEntityBase> deleteMessage(String messageId) async {
     try {
       final response = await _dioClient.delete(
-        '/chats/messages/$messageId',
+        ApiConstants.chatMessageById(messageId),
       );
       final data = response.data as Map<String, dynamic>;
       return ResponseEntityBase.fromJson(data);
@@ -168,7 +169,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   ) async {
     try {
       final response = await _dioClient.put(
-        '/chats/messages/$messageId',
+        ApiConstants.chatMessageById(messageId),
         data: {
           'content': content,
         },
@@ -183,7 +184,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   @override
   Future<List<Conversation>> getConversations() async {
     try {
-      final response = await _dioClient.get('/chats');
+      final response = await _dioClient.get(ApiConstants.chats);
       final list = response.data as List;
       return list.map((c) {
         final id = c['id'] as String;
@@ -212,7 +213,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
   ) async {
     try {
       final response = await _dioClient.post(
-        '/chats/messages/$messageId/reactions',
+        ApiConstants.chatMessageReactions(messageId),
         data: {'reaction': reaction},
       );
       if (response.statusCode == 200) {
@@ -245,7 +246,7 @@ class PrivateChatRemoteDataSourceImpl implements PrivateChatRemoteDataSource {
       });
 
       final response = await _dioClient.post(
-        '/uploads/multiple',
+        ApiConstants.uploadMultiple,
         data: formData,
         options: Options(contentType: 'multipart/form-data'),
       );
