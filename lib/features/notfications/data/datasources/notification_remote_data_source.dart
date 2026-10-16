@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
@@ -27,7 +28,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<List<AppNotification>> getNotifications() async {
     try {
-      final response = await _dioClient.get('/users/notifications');
+      final response = await _dioClient.get(ApiConstants.notifications);
       if (response.statusCode == 200) {
         final data = response.data as List;
         return data
@@ -49,7 +50,9 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   @override
   Future<ResponseEntityBase> markNotificationRead() async {
     try {
-      final response = await _dioClient.get('/users/notifications/read');
+      final response = await _dioClient.get(
+        ApiConstants.markAllNotificationsRead,
+      );
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);
@@ -71,7 +74,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   }) async {
     try {
       final response = await _dioClient.post(
-        '/users/devices',
+        ApiConstants.devices,
         data: {
           'token': token,
           'platform': platform,
@@ -95,7 +98,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   Future<ResponseEntityBase> unregisterDeviceToken({String? token}) async {
     try {
       final response = await _dioClient.delete(
-        '/users/devices',
+        ApiConstants.devices,
         data: {
           'token': token,
         },
@@ -118,7 +121,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   Future<ResponseEntityBase> readNotification(String notificationId) async {
     try {
       final response =
-          await _dioClient.post('/users/notifications/$notificationId/read');
+          await _dioClient.post(ApiConstants.readNotification(notificationId));
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
         return ResponseEntityBase.fromJson(data);

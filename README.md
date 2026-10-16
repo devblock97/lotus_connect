@@ -145,27 +145,38 @@ Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, op
    flutter pub get
    ```
 
-2. **Generate code (Drift, Riverpod, Freezed, JSON serialization)**:
+2. **Configure Environment Variables**:
+   Copy the example environment file and customize your backend URL:
+   ```bash
+   cp .env.example .env
+   # Edit .env to set your API_BASE_URL (e.g. ngrok tunnel or local backend)
+   ```
+
+3. **Generate code (Drift, Riverpod, Freezed, JSON serialization)**:
    ```bash
    dart run build_runner build --delete-conflicting-outputs
    ```
 
-3. **Compile localization keys**:
+4. **Compile localization keys**:
    ```bash
    flutter gen-l10n
    ```
 
-4. **Run static analysis**:
+5. **Run static analysis**:
    ```bash
    flutter analyze
    ```
 
-5. **Run test suite**:
+6. **Run test suite**:
    ```bash
    flutter test
    ```
 
-6. **Launch the application**:
+7. **Launch the application**:
    ```bash
+   # Using .env environment configuration:
+   flutter run --dart-define-from-file=.env
+
+   # Or fallback to default localhost:
    flutter run
    ```

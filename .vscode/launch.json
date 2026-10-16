@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Lotus Connect (Development)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env"
+      ]
+    },
+    {
+      "name": "Lotus Connect (Default Fallback)",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Lotus Connect (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env"
+      ]
+    },
+    {
+      "name": "Lotus Connect (Release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env"
+      ]
+    }
+  ]
+}

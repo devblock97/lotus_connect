@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Interceptor to automatically refresh access tokens
@@ -75,7 +76,7 @@ class TokenRefreshInterceptor extends Interceptor {
           }
 
           final response = await dio.post(
-            '$baseUrl/auth/refresh',
+            '$baseUrl${ApiConstants.refreshToken}',
             data: {'refreshToken': refreshToken},
           );
 

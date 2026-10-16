@@ -1,23 +1,68 @@
+import 'package:lotus_connect/app/config/app_config.dart';
+
 /// Network and API constants for Lotus Connect.
 class ApiConstants {
   const ApiConstants._();
 
   /// Default API base URL for Lotus Connect backend services.
-  static const String baseUrl =
-      'https://70f2-112-197-241-28.ngrok-free.app/api/v1';
+  static const String baseUrl = AppConfig.defaultServerHost;
 
-  /// Gemini API base URL. Use stable v1 endpoint.
-  static const String geminiBaseUrl =
-      'https://generativelanguage.googleapis.com/v1';
+  // ---------------------------------------------------------------------------
+  // Auth endpoints
+  // ---------------------------------------------------------------------------
+  static const String register = '/auth/register';
+  static const String login = '/auth/login';
+  static const String logout = '/auth/logout';
+  static const String refreshToken = '/auth/refresh';
 
-  /// Stories endpoints
+  // ---------------------------------------------------------------------------
+  // Contacts & Friends endpoints
+  // ---------------------------------------------------------------------------
+  static const String friends = '/users/friends';
+  static const String acceptFriend = '/users/friends/accept';
+  static const String rejectFriend = '/users/friends/reject';
+  static String deleteFriend(String friendId) => '/users/friends/$friendId';
+  static const String friendRequests = '/users/friends/requests';
+  static const String searchUsers = '/users/search';
+
+  // ---------------------------------------------------------------------------
+  // Notifications & Devices endpoints
+  // ---------------------------------------------------------------------------
+  static const String notifications = '/users/notifications';
+  static const String markAllNotificationsRead = '/users/notifications/read';
+  static const String devices = '/users/devices';
+  static String readNotification(String notificationId) =>
+      '/users/notifications/$notificationId/read';
+
+  // ---------------------------------------------------------------------------
+  // Chat & Messages endpoints
+  // ---------------------------------------------------------------------------
+  static const String chats = '/chats';
+  static const String createPrivateChat = '/chats/private';
+  static String chatMessages(String conversationId) =>
+      '/chats/$conversationId/messages';
+  static String chatMessageById(String messageId) =>
+      '/chats/messages/$messageId';
+  static String chatMessageReactions(String messageId) =>
+      '/chats/messages/$messageId/reactions';
+
+  // ---------------------------------------------------------------------------
+  // Calls endpoints
+  // ---------------------------------------------------------------------------
+  static const String callHistory = '/calls/history';
+
+  // ---------------------------------------------------------------------------
+  // Stories endpoints
+  // ---------------------------------------------------------------------------
   static const String storiesTray = '/stories/tray';
   static const String stories = '/stories';
   static String markStoryViewed(String storyId) => '/stories/$storyId/view';
   static String storyReactions(String storyId) => '/stories/$storyId/reactions';
   static String replyToStory(String storyId) => '/stories/$storyId/reply';
 
-  /// Feed and Posts endpoints
+  // ---------------------------------------------------------------------------
+  // Feed and Posts endpoints
+  // ---------------------------------------------------------------------------
   static const String feed = '/feed';
   static const String exploreFeed = '/feed/explore';
   static const String posts = '/posts';
@@ -33,10 +78,15 @@ class ApiConstants {
   static String postCommentPin(String postId, String commentId) =>
       '/posts/$postId/comments/$commentId/pin';
 
-  /// Upload endpoints
+  // ---------------------------------------------------------------------------
+  // Upload endpoints
+  // ---------------------------------------------------------------------------
   static const String uploadMultiple = '/uploads/multiple';
   static const String upload = '/uploads';
 
+  // ---------------------------------------------------------------------------
+  // Network configurations
+  // ---------------------------------------------------------------------------
   /// Default connection timeout in milliseconds.
   static const Duration connectTimeout = Duration(seconds: 15);
 
