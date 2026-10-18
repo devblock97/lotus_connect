@@ -26,7 +26,7 @@ class WebRTCSignalingService {
   }
 
   final WebSocketService webSocketService;
-  StreamSubscription? _subscription;
+  StreamSubscription<dynamic>? _subscription;
 
   // Streams for calls UI to listen to call invitation/lifecycle changes
   final _invitationController =
@@ -76,6 +76,7 @@ class WebRTCSignalingService {
           _sdpController.add({
             'type': event.split(':').last,
             'senderId': payload['senderId'],
+            'sessionId': payload['sessionId'],
             'sdp': payload['sdp'],
           });
         case 'signaling:ice-candidate':
@@ -126,9 +127,11 @@ class WebRTCSignalingService {
     required String recipientId,
     required String sdpType, // "offer" or "answer"
     required String sdpDescription,
+    String? sessionId,
   }) {
     webSocketService.send('signaling:$sdpType', {
       'recipientId': recipientId,
+      if (sessionId != null) 'sessionId': sessionId,
       'sdp': {
         'type': sdpType,
         'sdp': sdpDescription,
@@ -142,9 +145,11 @@ class WebRTCSignalingService {
     required String candidate,
     required String sdpMid,
     required int sdpMLineIndex,
+    String? sessionId,
   }) {
     webSocketService.send('signaling:ice-candidate', {
       'recipientId': recipientId,
+      if (sessionId != null) 'sessionId': sessionId,
       'candidate': {
         'candidate': candidate,
         'sdpMid': sdpMid,

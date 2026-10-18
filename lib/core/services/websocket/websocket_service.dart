@@ -179,7 +179,6 @@ class WebSocketService {
     return '${wsBase}ws?token=$token';
   }
 
-  /// Disposes of active resources.
   void dispose() {
     _isDisposed = true;
     disconnect();
@@ -187,7 +186,6 @@ class WebSocketService {
   }
 }
 
-/// Global provider for WebSocket client service.
 final webSocketServiceProvider = Provider<WebSocketService>((ref) {
   final service = WebSocketService(ref);
   ref.onDispose(service.dispose);

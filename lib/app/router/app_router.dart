@@ -7,6 +7,8 @@ import 'package:lotus_connect/features/contacts/presentation/views/contacts_scre
 import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_story_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
+import 'package:lotus_connect/features/livestream/presentation/views/go_live_screen.dart';
+import 'package:lotus_connect/features/livestream/presentation/views/livestream_explore_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/main_shell_screen.dart';
@@ -23,6 +25,8 @@ class AppRouter {
   static const String chat = '/chats';
   static const String createPost = '/create-post';
   static const String createStory = '/create-story';
+  static const String livestreams = '/livestreams';
+  static const String goLive = '/go-live';
 }
 
 /// Global provider exposing the reactive GoRouter configuration.
@@ -86,7 +90,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const CreateStoryScreen(),
       ),
-
+      GoRoute(
+        path: AppRouter.livestreams,
+        builder: (BuildContext context, GoRouterState state) =>
+            const LiveStreamExploreScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.goLive,
+        builder: (BuildContext context, GoRouterState state) =>
+            const GoLiveScreen(),
+      ),
       // GoRoute(
       //   path: AppRouter.chat,
       //   builder: (BuildContext context, GoRouterState state) {

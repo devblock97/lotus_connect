@@ -93,6 +93,38 @@ class ApiConstants {
   /// Default receive timeout in milliseconds.
   static const Duration receiveTimeout = Duration(seconds: 30);
 
+  /// LiveStream endpoints
+  static const String livestreams = '/livestreams';
+  static const String livestreamsMe = '/livestreams/me';
+  static String livestreamById(String streamId) => '/livestreams/$streamId';
+  static String livestreamStart(String streamId) =>
+      '/livestreams/$streamId/start';
+  static String livestreamEnd(String streamId) => '/livestreams/$streamId/end';
+  static String livestreamJoin(String streamId) =>
+      '/livestreams/$streamId/join';
+  static String livestreamLeave(String streamId) =>
+      '/livestreams/$streamId/leave';
+  static String livestreamViewers(String streamId) =>
+      '/livestreams/$streamId/viewers';
+  static String livestreamComments(String streamId) =>
+      '/livestreams/$streamId/comments';
+  static String livestreamPinComment(String streamId, String commentId) =>
+      '/livestreams/$streamId/comments/$commentId/pin';
+  static String livestreamReactions(String streamId) =>
+      '/livestreams/$streamId/reactions';
+  static String livestreamGifts(String streamId) =>
+      '/livestreams/$streamId/gifts';
+  static String livestreamLeaderboard(String streamId) =>
+      '/livestreams/$streamId/leaderboard';
+  static String livestreamCohosts(String streamId) =>
+      '/livestreams/$streamId/cohosts';
+  static String livestreamCohostRequest(String streamId) =>
+      '/livestreams/$streamId/cohost/request';
+  static String livestreamCohostRespond(String streamId) =>
+      '/livestreams/$streamId/cohost/respond';
+  static String livestreamCohostLeave(String streamId) =>
+      '/livestreams/$streamId/cohost/leave';
+
   /// Max retries for failed network operations.
   static const int maxRetries = 3;
 }
