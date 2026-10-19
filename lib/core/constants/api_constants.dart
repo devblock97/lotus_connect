@@ -85,15 +85,8 @@ class ApiConstants {
   static const String upload = '/uploads';
 
   // ---------------------------------------------------------------------------
-  // Network configurations
+  // Live stream endpoints
   // ---------------------------------------------------------------------------
-  /// Default connection timeout in milliseconds.
-  static const Duration connectTimeout = Duration(seconds: 15);
-
-  /// Default receive timeout in milliseconds.
-  static const Duration receiveTimeout = Duration(seconds: 30);
-
-  /// LiveStream endpoints
   static const String livestreams = '/livestreams';
   static const String livestreamsMe = '/livestreams/me';
   static String livestreamById(String streamId) => '/livestreams/$streamId';
@@ -124,6 +117,15 @@ class ApiConstants {
       '/livestreams/$streamId/cohost/respond';
   static String livestreamCohostLeave(String streamId) =>
       '/livestreams/$streamId/cohost/leave';
+
+  // ---------------------------------------------------------------------------
+  // Network configurations
+  // ---------------------------------------------------------------------------
+  /// Default connection timeout in milliseconds.
+  static const Duration connectTimeout = Duration(seconds: 15);
+
+  /// Default receive timeout in milliseconds.
+  static const Duration receiveTimeout = Duration(seconds: 30);
 
   /// Max retries for failed network operations.
   static const int maxRetries = 3;

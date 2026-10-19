@@ -9,6 +9,9 @@ import 'package:lotus_connect/features/livestream/domain/entities/live_leaderboa
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_viewer.dart';
 import 'package:lotus_connect/features/livestream/domain/repositories/livestream_repository.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/create_stream_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/get_streams_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/start_stream_use_case.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
 class LiveStreamRoomState {
@@ -76,15 +79,24 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   LiveStreamRoomNotifier({
     required LiveStream initialStream,
     required LiveStreamRepository repository,
+    required GetStreamUseCase getStreamUseCase,
+    required CreateStreamUseCase createStreamUseCase,
+    required StartStreamUseCase startStreamUseCase,
     required LiveStreamWsService wsService,
     required String currentUserId,
   })  : _repository = repository,
+        _getStreamUseCase = getStreamUseCase,
+        _createStreamUseCase = createStreamUseCase,
+        _startStreamUseCase = startStreamUseCase,
         _wsService = wsService,
         _currentUserId = currentUserId,
         super(LiveStreamRoomState(stream: initialStream)) {
     _initRoom();
   }
 
+  final GetStreamUseCase _getStreamUseCase;
+  final CreateStreamUseCase _createStreamUseCase;
+  final StartStreamUseCase _startStreamUseCase;
   final LiveStreamRepository _repository;
   final LiveStreamWsService _wsService;
   final String _currentUserId;
@@ -250,39 +262,69 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
     );
   }
 
+  Future<LiveStream?> createStream({
+    required String title,
+    String? description,
+    String? thumbnailUrl,
+    String? privacy,
+  }) async {
+    final result = await _createStreamUseCase(
+      CreateStreamParam(
+        title: title,
+        description: description,
+        thumbnailUrl: thumbnailUrl,
+        privacy: privacy,
+      ),
+    );
+
+    return result.fold(
+      (error) {
+        state = state.copyWith(errorMessage: error.message);
+        return null;
+      },
+      (success) => success,
+    );
+  }
+
   Future<void> _loadLatestDetails() async {
     try {
-      final latest = await _repository.getStream(state.stream.id);
-      final isStreamHost = latest.isHost ||
-          state.stream.isHost ||
-          (latest.host.id.isNotEmpty && latest.host.id == _currentUserId);
-      final streamWithHost = latest.copyWith(isHost: isStreamHost);
-      LiveComment? pinned;
-      if (latest.pinnedCommentId != null) {
-        pinned = state.comments.cast<LiveComment?>().firstWhere(
-              (c) => c?.id == latest.pinnedCommentId,
-              orElse: () => null,
-            );
-      }
-      if (latest.isEnded) {
-        state = state.copyWith(
-          stream: streamWithHost,
-          pinnedComment: pinned != null ? () => pinned : null,
-          endedEvent: LiveEndedEvent(
-            streamId: latest.id,
-            duration: latest.durationSeconds,
-            peakViewers: latest.peakViewers,
-            totalViews: latest.totalViews,
-            totalLikes: latest.likeCount,
-            recordingUrl: latest.recordingUrl,
-          ),
-        );
-      } else {
-        state = state.copyWith(
-          stream: streamWithHost,
-          pinnedComment: pinned != null ? () => pinned : null,
-        );
-      }
+      final result = await _getStreamUseCase(
+        GetStreamParam(streamId: state.stream.id),
+      );
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (latest) {
+        final isStreamHost = latest.isHost ||
+            state.stream.isHost ||
+            (latest.host.id.isNotEmpty && latest.host.id == _currentUserId);
+        final streamWithHost = latest.copyWith(isHost: isStreamHost);
+        LiveComment? pinned;
+        if (latest.pinnedCommentId != null) {
+          pinned = state.comments.cast<LiveComment?>().firstWhere(
+                (c) => c?.id == latest.pinnedCommentId,
+                orElse: () => null,
+              );
+        }
+        if (latest.isEnded) {
+          state = state.copyWith(
+            stream: streamWithHost,
+            pinnedComment: pinned != null ? () => pinned : null,
+            endedEvent: LiveEndedEvent(
+              streamId: latest.id,
+              duration: latest.durationSeconds,
+              peakViewers: latest.peakViewers,
+              totalViews: latest.totalViews,
+              totalLikes: latest.likeCount,
+              recordingUrl: latest.recordingUrl,
+            ),
+          );
+        } else {
+          state = state.copyWith(
+            stream: streamWithHost,
+            pinnedComment: pinned != null ? () => pinned : null,
+          );
+        }
+      });
     } on Object catch (e) {
       AppLogger.warning('Failed to load latest stream details: $e');
     }
@@ -409,8 +451,17 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   Future<void> startStream() async {
     if (!isHost) return;
     try {
-      final updated = await _repository.startStream(state.stream.id);
-      state = state.copyWith(stream: updated);
+      final result = await _startStreamUseCase(
+        StartStreamParam(streamId: state.stream.id),
+      );
+      result.fold(
+        (error) {
+          state = state.copyWith(errorMessage: error.message);
+        },
+        (updated) {
+          state = state.copyWith(stream: updated);
+        },
+      );
     } on Object catch (e) {
       AppLogger.error('Failed to start stream: $e');
       state = state.copyWith(errorMessage: 'Failed to go live: $e');
@@ -472,12 +523,18 @@ final liveStreamRoomProvider = StateNotifierProvider.autoDispose
     .family<LiveStreamRoomNotifier, LiveStreamRoomState, LiveStream>(
   (ref, stream) {
     final repository = ref.watch(liveStreamRepositoryProvider);
+    final getStreamUseCase = ref.watch(getStreamUseCaseProvider);
+    final createStreamUseCase = ref.watch(createStreamUseCaseProvider);
+    final startStreamUseCase = ref.watch(startStreamUseCaseProvider);
     final wsService = ref.watch(liveStreamWsServiceProvider);
     final currentUserId = ref.watch(settingsNotifierProvider).settings.userId;
 
     return LiveStreamRoomNotifier(
       initialStream: stream,
       repository: repository,
+      getStreamUseCase: getStreamUseCase,
+      createStreamUseCase: createStreamUseCase,
+      startStreamUseCase: startStreamUseCase,
       wsService: wsService,
       currentUserId: currentUserId,
     );

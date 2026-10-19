@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:lotus_connect/features/livestream/application/go_live_notifier.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
-import 'package:lotus_connect/features/livestream/application/livestream_providers.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
 
 /// Screen allowing users to setup and start broadcasting their live stream.
@@ -100,9 +100,8 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
     setState(() => _isCreating = true);
 
     try {
-      final repository = ref.read(liveStreamRepositoryProvider);
-
-      final created = await repository.createStream(
+      final notifier = ref.read(goLiveNotifierProvider.notifier);
+      final liveStream = await notifier.goLive(
         title: title,
         description: _descriptionController.text.trim().isNotEmpty
             ? _descriptionController.text.trim()
@@ -110,22 +109,34 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
         privacy: _privacy,
       );
 
-      final liveStream = await repository.startStream(created.id);
+      if (!mounted) return;
+
+      if (liveStream == null) {
+        setState(() => _isCreating = false);
+        final error = ref.read(goLiveNotifierProvider).error ??
+            'Failed to start live stream';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
 
       // Refresh explore feed in background
       unawaited(ref.read(liveStreamFeedProvider.notifier).refresh());
 
-      if (mounted) {
-        setState(() => _isCreating = false);
-        // Navigate to live room as host
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute<void>(
-            builder: (_) => LiveStreamPlayerScreen(
-              initialStream: liveStream.copyWith(isHost: true),
-            ),
+      setState(() => _isCreating = false);
+      // Navigate to live room as host
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => LiveStreamPlayerScreen(
+            initialStream: liveStream.copyWith(isHost: true),
           ),
-        );
-      }
+        ),
+      );
     } on Object catch (e) {
       if (mounted) {
         setState(() => _isCreating = false);
@@ -142,6 +153,9 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final goLiveState = ref.watch(goLiveNotifierProvider);
+    final isCreating = _isCreating || goLiveState.isLoading;
+
     return Scaffold(
       backgroundColor: const Color(0xFF10121D),
       body: Stack(
@@ -327,7 +341,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                             ),
                             padding: EdgeInsets.zero,
                           ),
-                          onPressed: _isCreating ? null : _startLiveStream,
+                          onPressed: isCreating ? null : _startLiveStream,
                           child: Ink(
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
@@ -345,7 +359,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                             ),
                             child: Container(
                               alignment: Alignment.center,
-                              child: _isCreating
+                              child: isCreating
                                   ? const SizedBox(
                                       width: 24,
                                       height: 24,

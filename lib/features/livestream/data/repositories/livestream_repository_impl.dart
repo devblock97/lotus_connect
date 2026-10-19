@@ -1,3 +1,7 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/errors/exception.dart';
+import 'package:lotus_connect/core/errors/failure.dart';
+import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/livestream/data/datasources/livestream_remote_data_source.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_cohost.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_comment.dart';
@@ -15,23 +19,41 @@ class LiveStreamRepositoryImpl implements LiveStreamRepository {
   final LiveStreamRemoteDataSource _remoteDataSource;
 
   @override
-  Future<LiveStream> createStream({
+  FutureResult<LiveStream> createStream({
     required String title,
     String? description,
     String? thumbnailUrl,
     String? privacy,
-  }) {
-    return _remoteDataSource.createStream(
-      title: title,
-      description: description,
-      thumbnailUrl: thumbnailUrl,
-      privacy: privacy,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.createStream(
+        title: title,
+        description: description,
+        thumbnailUrl: thumbnailUrl,
+        privacy: privacy,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to create stream: $e', e));
+    }
   }
 
   @override
-  Future<LiveStream> getStream(String streamId) {
-    return _remoteDataSource.getStream(streamId);
+  FutureResult<LiveStream> getStream(String streamId) async {
+    try {
+      final response = await _remoteDataSource.getStream(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to get stream: $e', e));
+    }
   }
 
   @override
@@ -52,8 +74,17 @@ class LiveStreamRepositoryImpl implements LiveStreamRepository {
   }
 
   @override
-  Future<LiveStream> startStream(String streamId) {
-    return _remoteDataSource.startStream(streamId);
+  FutureResult<LiveStream> startStream(String streamId) async {
+    try {
+      final response = await _remoteDataSource.startStream(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to start stream: $e', e));
+    }
   }
 
   @override
