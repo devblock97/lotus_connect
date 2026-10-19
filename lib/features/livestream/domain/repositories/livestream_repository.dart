@@ -1,3 +1,4 @@
+import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_cohost.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_comment.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_gift.dart';
@@ -6,14 +7,14 @@ import 'package:lotus_connect/features/livestream/domain/entities/live_stream.da
 import 'package:lotus_connect/features/livestream/domain/entities/live_viewer.dart';
 
 abstract class LiveStreamRepository {
-  Future<LiveStream> createStream({
+  FutureResult<LiveStream> createStream({
     required String title,
     String? description,
     String? thumbnailUrl,
     String? privacy,
   });
 
-  Future<LiveStream> getStream(String streamId);
+  FutureResult<LiveStream> getStream(String streamId);
 
   Future<LiveStream> updateStream(
     String streamId, {
@@ -23,7 +24,7 @@ abstract class LiveStreamRepository {
     String? privacy,
   });
 
-  Future<LiveStream> startStream(String streamId);
+  FutureResult<LiveStream> startStream(String streamId);
 
   Future<LiveStream> endStream(String streamId, {String? recordingUrl});
 

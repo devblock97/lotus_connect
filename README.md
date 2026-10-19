@@ -1,6 +1,6 @@
 # Lotus Connect
 
-A production-ready Flutter communication and AI platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and multi-engine LLM capabilities. The application is crafted with an **Instagram-style design**—aiming to replicate the core Instagram experience—to master and demonstrate best practices in Flutter, reactive UI engineering, and Clean Architecture.
+A production-ready Flutter communication and social network platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and Live streaming. The application is crafted with an **Instagram-style design**—aiming to replicate the core Instagram, Facebook and Tiktok experience—to master and demonstrate best practices in Flutter, reactive UI engineering, and Clean Architecture.
 
 ---
 
@@ -19,16 +19,14 @@ A production-ready Flutter communication and AI platform built with **Clean Arch
 | Create Story Screen 1 | Create Story Screen 2 | Create Story Screen 3 | Create Story Screen 4 |
 |:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
 | <img src="docs/screenshots/create_story_1.png" width="260"/> | <img src="docs/screenshots/create_story_2.png" width="260"/> | <img src="docs/screenshots/create_story_3.png" width="260"/> | <img src="docs/screenshots/create_story_4.png" width="260"/> |
+
+
+|                        Live Stream Screen 1                        |                        Live Stream Screen 2                        |
+|:------------------------------------------------------------------:|:------------------------------------------------------------------:|
+| <img src="docs/screenshots/live_stream_screen_1.png" width="260"/> | <img src="docs/screenshots/live_stream_screen_2.png" width="260"/> |
 ---
 
 ## 🎬 Demos
-
-### Chatbot
-Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, optimistic UI bubble updates, and multi-engine AI support (live Gemini models & local Ollama models).
-
-<video src="https://devblocks.tech/wp-content/uploads/2026/07/lotus_connect_chatbot_demo.mov" controls width="100%"></video>
-
-- **Video Link**: [Chatbot Demo](https://devblocks.tech/wp-content/uploads/2026/07/lotus_connect_chatbot_demo.mov)
 
 ### Person-to-Person (P2P) Chat
 - **Video Link**: [P2P Chat Demo](https://devblocks.tech/wp-content/uploads/2026/08/chat-p2p.mov)
@@ -42,11 +40,6 @@ Introduce Lotus Connect Chatbot capabilities, featuring smooth SSE streaming, op
 
 - **Instagram-Style Social Feed & Stories**: Rich interactive social feed replicating the Instagram experience with story rings, multi-photo/video carousels, inline video playback with thumbnail fallbacks, bursting double-tap heart reactions, and high-performance lazy loading via `ListView.builder`.
 - **P2P Real-Time Chat**: Direct person-to-person messaging with message reactions, media sharing (images/videos), full-screen media viewer, and optimistic UI updates.
-- **AI Chatbot (Multi-Engine)**:
-  - Google Gemini API (Cloud LLM)
-  - Ollama (Local & offline LLMs)
-  - Mock engine for testing
-  - Token-by-token Server-Sent Events (SSE) streaming with rich Markdown and code syntax highlighting.
 - **WebRTC Audio & Video Calling**: Real-time peer-to-peer voice and video calls powered by `flutter_webrtc`.
 - **Native VoIP & Push Notifications**:
   - Full-screen incoming call UI using `flutter_callkit_incoming` (iOS CallKit & Android ConnectionService).
