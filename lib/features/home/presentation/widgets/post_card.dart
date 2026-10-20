@@ -430,7 +430,11 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                       });
                     },
                     itemBuilder: (context, index) {
-                      return _buildSingleMediaItem(mediaItems[index], theme);
+                      return _buildSingleMediaItem(
+                        mediaItems[index],
+                        theme,
+                        index: index,
+                      );
                     },
                   ),
           ),
@@ -488,9 +492,17 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildSingleMediaItem(PostMediaItem item, ThemeData theme) {
+  Widget _buildSingleMediaItem(
+    PostMediaItem item,
+    ThemeData theme, {
+    int index = 0,
+  }) {
     if (item.isVideo) {
+      final effectivePostId = widget.post.mediaItems.length > 1
+          ? '${widget.post.id}_$index'
+          : widget.post.id;
       return FeedVideoPlayer(
+        postId: effectivePostId,
         media: item,
         onDoubleTap: _handleDoubleTap,
         onTap: widget.onMediaTap,

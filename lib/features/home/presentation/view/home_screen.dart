@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
+import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/create_post_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
@@ -21,9 +23,48 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      ref.read(feedPlaybackCoordinatorProvider.notifier).pauseAll();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Predictive pre-caching for upcoming posts (N+1, N+2) when post N plays
+    ref.listen(
+      feedPlaybackCoordinatorProvider.select((s) => s.activePostId),
+      (previous, activePostId) {
+        if (activePostId != null) {
+          final posts = ref.read(feedNotifierProvider).posts;
+          final activeIndex = posts.indexWhere(
+            (p) => p.id == activePostId || activePostId.startsWith('${p.id}_'),
+          );
+          if (activeIndex != -1) {
+            ref.read(videoPreCacheManagerProvider).preCacheUpcoming(
+                  posts: posts,
+                  currentIndex: activeIndex,
+                );
+          }
+        }
+      },
+    );
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
@@ -94,6 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          ref.read(feedPlaybackCoordinatorProvider.notifier).pauseAll();
           await Future.wait([
             notifier.refreshFeed(),
             ref.read(storiesNotifierProvider.notifier).refreshStories(),

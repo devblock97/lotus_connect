@@ -3,21 +3,28 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
+import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
+import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
+import 'package:lotus_connect/features/home/application/video_player_pool.dart';
+import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
-/// A sleek Instagram-style feed video player supporting:
-/// - Thumbnail display while loading or before playing
-/// - Tap to play/pause with animated central indicator
-/// - Mute/unmute speaker toggle with transient volume indicator
-/// - Continuous video looping
-/// - Thin progress bar tracking playback
-/// - Graceful fallback to thumbnail if video network fails
-class FeedVideoPlayer extends StatefulWidget {
+/// Sleek Instagram/Facebook-grade feed video player featuring:
+/// - Single active player coordination with automated scroll-based auto-play
+/// - Rapid fling debounce (250ms) preventing decoder thrashing
+/// - Immediate auto-pause on scroll-out (<40% visibility)
+/// - Hardware decoder pooling (max 2 active controllers in memory)
+/// - Buttery smooth cross-fade from poster thumbnail to video
+class FeedVideoPlayer extends ConsumerStatefulWidget {
   const FeedVideoPlayer({
     required this.media,
     super.key,
+    this.postId,
     this.autoPlay = false,
     this.aspectRatio,
     this.onDoubleTap,
@@ -25,26 +32,29 @@ class FeedVideoPlayer extends StatefulWidget {
   });
 
   final PostMediaItem media;
+  final String? postId;
   final bool autoPlay;
   final double? aspectRatio;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onTap;
 
   @override
-  State<FeedVideoPlayer> createState() => _FeedVideoPlayerState();
+  ConsumerState<FeedVideoPlayer> createState() => _FeedVideoPlayerState();
 }
 
-class _FeedVideoPlayerState extends State<FeedVideoPlayer>
+class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
     with SingleTickerProviderStateMixin {
+  String get _effectivePostId => widget.postId ?? widget.media.url;
+
   VideoPlayerController? _controller;
-  bool _isInitialized = false;
   bool _isPlaying = false;
-  bool _isMuted = true;
   bool _hasError = false;
+  bool _isVideoVisible = false;
+
   bool _showMuteFeedback = false;
   Timer? _muteFeedbackTimer;
 
-  // Animation controller for play/pause pulse
+  // Pulse animation for play/pause user actions
   late AnimationController _indicatorAnimController;
   late Animation<double> _indicatorScaleAnimation;
   late Animation<double> _indicatorOpacityAnimation;
@@ -69,46 +79,108 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer>
         curve: Curves.easeIn,
       ),
     );
-
-    _initVideoPlayer();
   }
 
-  Future<void> _initVideoPlayer() async {
-    final videoUri = Uri.tryParse(widget.media.url);
-    if (videoUri == null || !videoUri.hasScheme) {
-      if (mounted) setState(() => _hasError = true);
-      return;
+  @override
+  void dispose() {
+    _muteFeedbackTimer?.cancel();
+    _indicatorAnimController.dispose();
+    _detachCurrentController();
+
+    // Notify coordinator of disposal
+    try {
+      ref
+          .read(feedPlaybackCoordinatorProvider.notifier)
+          .reportDisposed(_effectivePostId);
+    } on Object catch (_) {}
+
+    super.dispose();
+  }
+
+  void _onVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    var distanceToCenter = double.infinity;
+
+    if (renderBox != null && renderBox.hasSize) {
+      final position = renderBox.localToGlobal(Offset.zero);
+      final screenHeight = MediaQuery.of(context).size.height;
+      final widgetCenterY = position.dy + (renderBox.size.height / 2);
+      final screenCenterY = screenHeight / 2;
+      distanceToCenter = (widgetCenterY - screenCenterY).abs();
     }
 
-    try {
-      final controller = VideoPlayerController.networkUrl(videoUri);
-      _controller = controller;
+    ref.read(feedPlaybackCoordinatorProvider.notifier).reportVisibility(
+          postId: _effectivePostId,
+          visibleFraction: info.visibleFraction,
+          distanceToCenter: distanceToCenter,
+        );
+  }
 
-      await controller.initialize();
+  Future<void> _activatePlayback({required bool isGloballyMuted}) async {
+    final pool = ref.read(videoPlayerPoolProvider);
+    final preCache = ref.read(videoPreCacheManagerProvider);
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final normalizedUrl = normalizeMediaUrl(
+      widget.media.url,
+      serverHost: settings.serverHost,
+    );
+    final playableUrl = preCache.getPlayableUrl(normalizedUrl);
+
+    try {
+      final controller = await pool.acquireController(
+        postId: _effectivePostId,
+        videoUrl: playableUrl,
+        isMuted: isGloballyMuted,
+      );
+
       if (!mounted) return;
 
-      await controller.setLooping(true);
-      await controller.setVolume(_isMuted ? 0 : 1);
-
-      setState(() {
-        _isInitialized = true;
-        _hasError = false;
-      });
-
-      if (widget.autoPlay) {
-        await controller.play();
-        if (mounted) setState(() => _isPlaying = true);
+      if (controller == null) {
+        setState(() => _hasError = true);
+        return;
       }
 
+      _controller = controller;
       controller.addListener(_videoListener);
+
+      await controller.play();
+      if (!mounted) return;
+
+      setState(() {
+        _hasError = false;
+        _isPlaying = true;
+        _isVideoVisible = true;
+      });
     } on Object catch (e) {
-      AppLogger.error('FeedVideoPlayer failed to initialize: $e');
+      AppLogger.error('FeedVideoPlayer activation failed: $e');
       if (mounted) {
         setState(() {
           _hasError = true;
-          _isInitialized = false;
+          _isVideoVisible = false;
         });
       }
+    }
+  }
+
+  void _deactivatePlayback() {
+    _detachCurrentController();
+    ref.read(videoPlayerPoolProvider).releaseController(_effectivePostId);
+
+    if (mounted) {
+      setState(() {
+        _controller = null;
+        _isPlaying = false;
+        _isVideoVisible = false;
+      });
+    }
+  }
+
+  void _detachCurrentController() {
+    if (_controller != null) {
+      _controller!.removeListener(_videoListener);
+      _controller = null;
     }
   }
 
@@ -122,51 +194,26 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer>
     }
   }
 
-  @override
-  void didUpdateWidget(FeedVideoPlayer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.media.url != widget.media.url) {
-      _controller?.removeListener(_videoListener);
-      _controller?.dispose();
-      _controller = null;
-      _isInitialized = false;
-      _hasError = false;
-      _isPlaying = false;
-      _initVideoPlayer();
-    }
-  }
-
-  @override
-  void dispose() {
-    _muteFeedbackTimer?.cancel();
-    _indicatorAnimController.dispose();
-    _controller?.removeListener(_videoListener);
-    _controller?.dispose();
-    super.dispose();
-  }
-
-  void _togglePlayPause() {
+  void _handleTap() {
     HapticFeedback.selectionClick();
-    if (_controller == null || !_isInitialized) return;
+    final wasPlaying = _isPlaying;
+    ref
+        .read(feedPlaybackCoordinatorProvider.notifier)
+        .togglePlayPause(_effectivePostId);
 
-    if (_isPlaying) {
-      _controller!.pause();
-    } else {
-      _controller!.play();
+    if (!wasPlaying) {
       _indicatorAnimController.forward(from: 0);
     }
-
     widget.onTap?.call();
   }
 
-  void _toggleMute() {
+  void _handleToggleMute() {
     HapticFeedback.selectionClick();
+    ref.read(feedPlaybackCoordinatorProvider.notifier).toggleMute();
+
     setState(() {
-      _isMuted = !_isMuted;
       _showMuteFeedback = true;
     });
-
-    _controller?.setVolume(_isMuted ? 0 : 1);
 
     _muteFeedbackTimer?.cancel();
     _muteFeedbackTimer = Timer(const Duration(milliseconds: 1200), () {
@@ -181,179 +228,207 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final playbackState = ref.watch(feedPlaybackCoordinatorProvider);
+    final isGloballyMuted = playbackState.isGloballyMuted;
+
+    // React to coordinator active state changes
+    ref.listen(
+      feedPlaybackCoordinatorProvider.select(
+        (s) => s.activePostId == _effectivePostId,
+      ),
+      (previous, active) {
+        if (active) {
+          _activatePlayback(isGloballyMuted: isGloballyMuted);
+        } else {
+          _deactivatePlayback();
+        }
+      },
+    );
+
     final effectiveAspectRatio = widget.aspectRatio ??
-        (_isInitialized && _controller != null
+        (_controller != null && _controller!.value.isInitialized
             ? _controller!.value.aspectRatio
             : widget.media.aspectRatio);
 
-    return AspectRatio(
-      aspectRatio: effectiveAspectRatio,
-      child: GestureDetector(
-        onDoubleTap: widget.onDoubleTap,
-        onTap: _togglePlayPause,
-        child: ColoredBox(
-          color: Colors.black,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // 1. Thumbnail Layer (always rendered as background/placeholder)
-              _buildThumbnail(theme),
+    return VisibilityDetector(
+      key: ValueKey('feed_video_${_effectivePostId}_${widget.media.url}'),
+      onVisibilityChanged: _onVisibilityChanged,
+      child: AspectRatio(
+        aspectRatio: effectiveAspectRatio,
+        child: GestureDetector(
+          onDoubleTap: widget.onDoubleTap,
+          onTap: _handleTap,
+          child: ColoredBox(
+            color: Colors.black,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Static Poster Thumbnail (always mounted to prevent blank)
+                _buildThumbnail(theme),
 
-              // 2. Video Player Layer (fades in once initialized)
-              if (_isInitialized && _controller != null && !_hasError)
-                Center(
-                  child: AspectRatio(
-                    aspectRatio: _controller!.value.aspectRatio,
-                    child: VideoPlayer(_controller!),
+                // Video Player Layer with smooth cross-fade animation
+                if (_controller != null &&
+                    _controller!.value.isInitialized &&
+                    !_hasError)
+                  AnimatedOpacity(
+                    opacity: _isVideoVisible ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeIn,
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: _controller!.value.aspectRatio,
+                        child: VideoPlayer(_controller!),
+                      ),
+                    ),
                   ),
+
+                // Center Play Icon Overlay (when paused or error)
+                if (!_isPlaying || _hasError)
+                  Center(
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.55),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _hasError
+                            ? CupertinoIcons.videocam_fill
+                            : CupertinoIcons.play_fill,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+
+                // Center Play Pulse Indicator (flashes when unpaused)
+                AnimatedBuilder(
+                  animation: _indicatorAnimController,
+                  builder: (context, child) {
+                    if (_indicatorAnimController.isDismissed ||
+                        _indicatorAnimController.isCompleted) {
+                      return const SizedBox.shrink();
+                    }
+                    return Center(
+                      child: Opacity(
+                        opacity: _indicatorOpacityAnimation.value,
+                        child: Transform.scale(
+                          scale: _indicatorScaleAnimation.value,
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.play_fill,
+                              color: Colors.white,
+                              size: 36,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
 
-              // 3. Center Play Icon Overlay (when paused or error)
-              if (!_isPlaying || _hasError)
-                Center(
+                // Video Progress Bar (at the bottom)
+                if (_controller != null &&
+                    _controller!.value.isInitialized &&
+                    _isPlaying)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: VideoProgressIndicator(
+                      _controller!,
+                      allowScrubbing: false,
+                      colors: VideoProgressColors(
+                        playedColor: theme.colorScheme.primary,
+                        bufferedColor: Colors.white.withValues(alpha: 0.3),
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                  ),
+
+                Positioned(
+                  top: 12,
+                  right: 12,
                   child: Container(
-                    width: 56,
-                    height: 56,
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.55),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      _hasError
-                          ? CupertinoIcons.videocam_fill
-                          : CupertinoIcons.play_fill,
+                    child: const Icon(
+                      CupertinoIcons.videocam_fill,
                       color: Colors.white,
-                      size: 28,
+                      size: 14,
                     ),
                   ),
                 ),
 
-              // 4. Center Play Pulse Indicator (flashes when unpaused)
-              AnimatedBuilder(
-                animation: _indicatorAnimController,
-                builder: (context, child) {
-                  if (_indicatorAnimController.isDismissed) {
-                    return const SizedBox.shrink();
-                  }
-                  return Center(
-                    child: Opacity(
-                      opacity: _indicatorOpacityAnimation.value,
-                      child: Transform.scale(
-                        scale: _indicatorScaleAnimation.value,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            CupertinoIcons.play_fill,
-                            color: Colors.white,
-                            size: 36,
-                          ),
+                if (!_hasError)
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: _handleToggleMute,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              // 5. Video Progress Bar (at the bottom)
-              if (_isInitialized && _controller != null && _isPlaying)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: VideoProgressIndicator(
-                    _controller!,
-                    allowScrubbing: false,
-                    colors: VideoProgressColors(
-                      playedColor: theme.colorScheme.primary,
-                      bufferedColor: Colors.white.withValues(alpha: 0.3),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                ),
-
-              // 6. Top Right Video Badge (Instagram Reel / Video Icon)
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.videocam_fill,
-                    color: Colors.white,
-                    size: 14,
-                  ),
-                ),
-              ),
-
-              // 7. Bottom Right Mute/Unmute Button
-              if (_isInitialized && !_hasError)
-                Positioned(
-                  bottom: 12,
-                  right: 12,
-                  child: GestureDetector(
-                    onTap: _toggleMute,
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        _isMuted
-                            ? CupertinoIcons.volume_off
-                            : CupertinoIcons.volume_up,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-
-              // 8. Transient Mute Feedback Center Banner
-              if (_showMuteFeedback)
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.75),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _isMuted
+                        child: Icon(
+                          isGloballyMuted
                               ? CupertinoIcons.volume_off
                               : CupertinoIcons.volume_up,
                           color: Colors.white,
-                          size: 18,
+                          size: 16,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _isMuted ? 'Muted' : 'Unmuted',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-            ],
+
+                if (_showMuteFeedback)
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.75),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isGloballyMuted
+                                ? CupertinoIcons.volume_off
+                                : CupertinoIcons.volume_up,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            isGloballyMuted ? 'Muted' : 'Unmuted',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -361,9 +436,17 @@ class _FeedVideoPlayerState extends State<FeedVideoPlayer>
   }
 
   Widget _buildThumbnail(ThemeData theme) {
-    // 1. Try thumbnailUrl first, then fallback to url if it's an image
-    final thumb = widget.media.thumbnailUrl;
-    final primaryUrl = widget.media.url;
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final thumb = widget.media.thumbnailUrl != null
+        ? normalizeMediaUrl(
+            widget.media.thumbnailUrl!,
+            serverHost: settings.serverHost,
+          )
+        : null;
+    final primaryUrl = normalizeMediaUrl(
+      widget.media.url,
+      serverHost: settings.serverHost,
+    );
 
     final targetUrl = (thumb != null && thumb.isNotEmpty)
         ? thumb

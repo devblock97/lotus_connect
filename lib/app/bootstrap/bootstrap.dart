@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,6 +14,8 @@ import 'package:lotus_connect/l10n/app_localizations.dart';
 /// Bootstraps Lotus Connect application with
 /// global error handling and ProviderScope.
 Future<void> bootstrap() async {
+  HttpOverrides.global = DevHttpOverrides();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   final container = ProviderContainer();
@@ -98,5 +101,16 @@ class LotusConnectApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
     );
+  }
+}
+
+class DevHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        // Accept local dev certificates from your Mac
+        return true;
+      };
   }
 }

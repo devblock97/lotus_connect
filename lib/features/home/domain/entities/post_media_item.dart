@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 
 @immutable
 class PostMediaItem {
@@ -47,14 +48,58 @@ class PostMediaItem {
       };
 
   bool get isVideo {
-    if (mimeType != null && mimeType!.toLowerCase().startsWith('video/')) {
+    final mime = mimeType?.toLowerCase() ?? '';
+    if (mime.startsWith('video/') ||
+        mime == 'application/x-mpegurl' ||
+        mime == 'application/vnd.apple.mpegurl') {
       return true;
     }
     final lowerUrl = url.toLowerCase();
     return lowerUrl.endsWith('.mp4') ||
         lowerUrl.endsWith('.mov') ||
         lowerUrl.endsWith('.webm') ||
+        lowerUrl.endsWith('.m3u8') ||
         duration != null;
+  }
+
+  /// Whether this media item is an HLS playlist (.m3u8).
+  bool get isHls {
+    final mime = mimeType?.toLowerCase() ?? '';
+    return mime == 'application/x-mpegurl' ||
+        mime == 'application/vnd.apple.mpegurl' ||
+        url.toLowerCase().endsWith('.m3u8');
+  }
+
+  PostMediaItem copyWith({
+    String? url,
+    String? thumbnailUrl,
+    String? fileName,
+    int? fileSize,
+    String? mimeType,
+    int? duration,
+    int? width,
+    int? height,
+  }) {
+    return PostMediaItem(
+      url: url ?? this.url,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      fileName: fileName ?? this.fileName,
+      fileSize: fileSize ?? this.fileSize,
+      mimeType: mimeType ?? this.mimeType,
+      duration: duration ?? this.duration,
+      width: width ?? this.width,
+      height: height ?? this.height,
+    );
+  }
+
+  /// Resolves this media item's URLs against the active server host.
+  PostMediaItem normalizedForHost(String serverHost) {
+    return copyWith(
+      url: normalizeMediaUrl(url, serverHost: serverHost),
+      thumbnailUrl: thumbnailUrl != null
+          ? normalizeMediaUrl(thumbnailUrl!, serverHost: serverHost)
+          : null,
+    );
   }
 
   double get aspectRatio {
