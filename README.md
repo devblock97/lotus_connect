@@ -1,6 +1,6 @@
 # Lotus Connect
 
-A production-ready Flutter communication and social network platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and Live streaming. The application is crafted with an **Instagram-style design**—aiming to replicate the core Instagram, Facebook and Tiktok experience—to master and demonstrate best practices in Flutter, reactive UI engineering, and Clean Architecture.
+A production-ready Flutter communication and social network platform built with **Clean Architecture**, reactive state management, real-time messaging, WebRTC calling, and Live streaming. The application is crafted with an **Instagram-style design**—aiming to replicate the core Instagram, Facebook and Tiktok demonstrate best practices in Flutter, reactive UI engineering, and Clean Architecture.
 
 ---
 

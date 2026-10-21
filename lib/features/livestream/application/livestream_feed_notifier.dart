@@ -5,6 +5,7 @@ import 'package:lotus_connect/features/livestream/application/livestream_provide
 import 'package:lotus_connect/features/livestream/data/datasources/livestream_ws_service.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
 import 'package:lotus_connect/features/livestream/domain/repositories/livestream_repository.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/get_list_stream_use_case.dart';
 
 class LiveStreamFeedState {
   const LiveStreamFeedState({
@@ -37,15 +38,18 @@ class LiveStreamFeedState {
 class LiveStreamFeedNotifier extends StateNotifier<LiveStreamFeedState> {
   LiveStreamFeedNotifier({
     required LiveStreamRepository repository,
+    required GetListStreamUseCase getListStreamUseCase,
     LiveStreamWsService? wsService,
   })  : _repository = repository,
         _wsService = wsService,
+        _getListStreamUseCase = getListStreamUseCase,
         super(const LiveStreamFeedState()) {
     _init();
   }
 
   final LiveStreamRepository _repository;
   final LiveStreamWsService? _wsService;
+  final GetListStreamUseCase _getListStreamUseCase;
   StreamSubscription<LiveEndedEvent>? _endedSub;
   StreamSubscription<LiveStream>? _startedSub;
   Timer? _periodicRefreshTimer;
@@ -104,11 +108,18 @@ class LiveStreamFeedNotifier extends StateNotifier<LiveStreamFeedState> {
     );
 
     try {
-      final streams = await _repository.listStreams(status: filter);
-      state = state.copyWith(
-        isLoading: false,
-        streams: streams,
+      final result = await _getListStreamUseCase(
+        ListStreamParam(status: filter),
       );
+
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (streams) {
+        state = state.copyWith(
+          isLoading: false,
+          streams: streams,
+        );
+      });
     } on Object catch (e, st) {
       AppLogger.error('Failed to load livestream feed', e, st);
       state = state.copyWith(
@@ -138,8 +149,10 @@ final liveStreamFeedProvider =
     StateNotifierProvider<LiveStreamFeedNotifier, LiveStreamFeedState>((ref) {
   final repository = ref.watch(liveStreamRepositoryProvider);
   final wsService = ref.watch(liveStreamWsServiceProvider);
+  final listStreamUseCase = GetListStreamUseCase(repository);
   return LiveStreamFeedNotifier(
     repository: repository,
     wsService: wsService,
+    getListStreamUseCase: listStreamUseCase,
   );
 });

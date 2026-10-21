@@ -10,7 +10,17 @@ import 'package:lotus_connect/features/livestream/domain/entities/live_stream.da
 import 'package:lotus_connect/features/livestream/domain/entities/live_viewer.dart';
 import 'package:lotus_connect/features/livestream/domain/repositories/livestream_repository.dart';
 import 'package:lotus_connect/features/livestream/domain/usecases/create_stream_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/end_stream_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/get_leader_board_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/get_list_comment_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/get_list_viewers_use_case.dart';
 import 'package:lotus_connect/features/livestream/domain/usecases/get_streams_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/join_stream_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/leave_stream_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/pin_comment_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/send_comment_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/send_gift_use_case.dart';
+import 'package:lotus_connect/features/livestream/domain/usecases/send_reaction_use_case.dart';
 import 'package:lotus_connect/features/livestream/domain/usecases/start_stream_use_case.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
@@ -82,12 +92,32 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
     required GetStreamUseCase getStreamUseCase,
     required CreateStreamUseCase createStreamUseCase,
     required StartStreamUseCase startStreamUseCase,
+    required EndStreamUseCase endStreamUseCase,
+    required SendGiftUseCase sendGiftUseCase,
+    required JoinStreamUseCase joinStreamUseCase,
+    required LeaveStreamUseCase leaveStreamUseCase,
+    required GetListCommentUseCase getListCommentUseCase,
+    required GetListViewersUseCase getListViewersUseCase,
+    required SendCommentUseCase sendCommentUseCase,
+    required PinCommentUseCase pinCommentUseCase,
+    required GetLeaderBoardUseCase getLeaderBoardUseCase,
+    required SendReactionUseCase sendReactionUseCase,
     required LiveStreamWsService wsService,
     required String currentUserId,
   })  : _repository = repository,
         _getStreamUseCase = getStreamUseCase,
         _createStreamUseCase = createStreamUseCase,
         _startStreamUseCase = startStreamUseCase,
+        _endStreamUseCase = endStreamUseCase,
+        _sendGiftUseCase = sendGiftUseCase,
+        _joinStreamUseCase = joinStreamUseCase,
+        _leaveStreamUseCase = leaveStreamUseCase,
+        _getListCommentUseCase = getListCommentUseCase,
+        _getListViewersUseCase = getListViewersUseCase,
+        _sendCommentUseCase = sendCommentUseCase,
+        _pinCommentUseCase = pinCommentUseCase,
+        _getLeaderBoardUseCase = getLeaderBoardUseCase,
+        _sendReactionUseCase = sendReactionUseCase,
         _wsService = wsService,
         _currentUserId = currentUserId,
         super(LiveStreamRoomState(stream: initialStream)) {
@@ -97,6 +127,16 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   final GetStreamUseCase _getStreamUseCase;
   final CreateStreamUseCase _createStreamUseCase;
   final StartStreamUseCase _startStreamUseCase;
+  final EndStreamUseCase _endStreamUseCase;
+  final SendGiftUseCase _sendGiftUseCase;
+  final JoinStreamUseCase _joinStreamUseCase;
+  final LeaveStreamUseCase _leaveStreamUseCase;
+  final GetListCommentUseCase _getListCommentUseCase;
+  final GetListViewersUseCase _getListViewersUseCase;
+  final SendCommentUseCase _sendCommentUseCase;
+  final PinCommentUseCase _pinCommentUseCase;
+  final GetLeaderBoardUseCase _getLeaderBoardUseCase;
+  final SendReactionUseCase _sendReactionUseCase;
   final LiveStreamRepository _repository;
   final LiveStreamWsService _wsService;
   final String _currentUserId;
@@ -120,7 +160,7 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
     // Call REST join if viewer
     if (!isHost) {
       try {
-        await _repository.joinStream(streamId);
+        await _joinStreamUseCase(JoinStreamParam(streamId: streamId));
       } on Object catch (e) {
         AppLogger.warning('Join stream REST non-fatal error: $e');
       }
@@ -333,14 +373,17 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   Future<void> _loadComments() async {
     state = state.copyWith(isLoadingComments: true);
     try {
-      final comments = await _repository.listComments(
-        state.stream.id,
-        limit: 50,
+      final result = await _getListCommentUseCase(
+        GetListCommentParam(streamId: state.stream.id, limit: 50),
       );
-      state = state.copyWith(
-        comments: comments,
-        isLoadingComments: false,
-      );
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (comments) {
+        state = state.copyWith(
+          comments: comments,
+          isLoadingComments: false,
+        );
+      });
     } on Object catch (e) {
       AppLogger.warning('Failed to fetch initial comments: $e');
       state = state.copyWith(isLoadingComments: false);
@@ -349,8 +392,14 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
 
   Future<void> _loadViewers() async {
     try {
-      final viewers = await _repository.listViewers(state.stream.id, limit: 15);
-      state = state.copyWith(viewers: viewers);
+      final result = await _getListViewersUseCase(
+        GetListViewersParam(streamId: state.stream.id, limit: 15),
+      );
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (viewers) {
+        state = state.copyWith(viewers: viewers);
+      });
     } on Object catch (e) {
       AppLogger.warning('Failed to fetch live viewers: $e');
     }
@@ -358,8 +407,14 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
 
   Future<void> _loadLeaderboard() async {
     try {
-      final leaderboard = await _repository.getLeaderboard(state.stream.id);
-      state = state.copyWith(leaderboard: leaderboard);
+      final result = await _getLeaderBoardUseCase(
+        GetLeaderBoardParam(streamId: state.stream.id),
+      );
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (leaderboard) {
+        state = state.copyWith(leaderboard: leaderboard);
+      });
     } on Object catch (e) {
       AppLogger.warning('Failed to load gift leaderboard: $e');
     }
@@ -368,9 +423,15 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   Future<void> sendComment(String content) async {
     if (content.trim().isEmpty) return;
     try {
-      final created = await _repository.sendComment(state.stream.id, content);
-      final updated = List<LiveComment>.from(state.comments)..add(created);
-      state = state.copyWith(comments: updated);
+      final result = await _sendCommentUseCase(
+        SendCommentParam(streamId: state.stream.id, content: content),
+      );
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (created) {
+        final updated = List<LiveComment>.from(state.comments)..add(created);
+        state = state.copyWith(comments: updated);
+      });
     } on Object catch (e) {
       AppLogger.error('Failed to send comment: $e');
     }
@@ -387,16 +448,22 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
     );
 
     try {
-      final totalLikes = await _repository.sendReaction(
-        state.stream.id,
-        reaction: reaction,
-        count: count,
+      final result = await _sendReactionUseCase(
+        SendReactionParam(
+          streamId: state.stream.id,
+          reaction: reaction,
+          count: count,
+        ),
       );
-      if (totalLikes > 0) {
-        state = state.copyWith(
-          stream: state.stream.copyWith(likeCount: totalLikes),
-        );
-      }
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (totalLikes) {
+        if (totalLikes > 0) {
+          state = state.copyWith(
+            stream: state.stream.copyWith(likeCount: totalLikes),
+          );
+        }
+      });
     } on Object catch (e) {
       AppLogger.warning('Failed to send reaction burst: $e');
     }
@@ -404,24 +471,30 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
 
   Future<void> sendGift(String giftType, int count) async {
     try {
-      final giftEvent = await _repository.sendGift(
-        state.stream.id,
-        giftType: giftType,
-        count: count,
+      final result = await _sendGiftUseCase(
+        SendGiftParam(
+          streamId: state.stream.id,
+          reaction: giftType,
+          count: count,
+        ),
       );
 
-      // Trigger animation locally if server doesn't echo back fast
-      _giftDismissTimer?.cancel();
-      state = state.copyWith(
-        activeGift: () => giftEvent,
-        reactionBurstTick: state.reactionBurstTick + 3,
-      );
-      _giftDismissTimer = Timer(const Duration(milliseconds: 4500), () {
-        if (mounted) {
-          state = state.copyWith(activeGift: () => null);
-        }
+      result.fold((error) {
+        state = state.copyWith(errorMessage: error.message);
+      }, (giftEvent) {
+        // Trigger animation locally if server doesn't echo back fast
+        _giftDismissTimer?.cancel();
+        state = state.copyWith(
+          activeGift: () => giftEvent,
+          reactionBurstTick: state.reactionBurstTick + 3,
+        );
+        _giftDismissTimer = Timer(const Duration(milliseconds: 4500), () {
+          if (mounted) {
+            state = state.copyWith(activeGift: () => null);
+          }
+        });
+        unawaited(_loadLeaderboard());
       });
-      unawaited(_loadLeaderboard());
     } on Object catch (e) {
       AppLogger.error('Failed to send gift: $e');
       state = state.copyWith(errorMessage: 'Failed to send gift');
@@ -431,8 +504,12 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   Future<void> pinComment(LiveComment comment) async {
     if (!isHost) return;
     try {
-      await _repository.pinComment(state.stream.id, comment.id);
-      state = state.copyWith(pinnedComment: () => comment);
+      final result = await _pinCommentUseCase(
+        PinCommentParam(streamId: state.stream.id, commentId: comment.id),
+      );
+      result.fold((error) {}, (success) {
+        state = state.copyWith(pinnedComment: () => comment);
+      });
     } on Object catch (e) {
       AppLogger.error('Failed to pin comment: $e');
     }
@@ -471,21 +548,30 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
   Future<void> endStream({String? recordingUrl}) async {
     if (!isHost) return;
     try {
-      final updated = await _repository.endStream(
-        state.stream.id,
-        recordingUrl: recordingUrl,
-      );
-      state = state.copyWith(
-        stream: updated,
-        endedEvent: LiveEndedEvent(
-          streamId: updated.id,
-          duration: updated.durationSeconds,
-          peakViewers: updated.peakViewers,
-          totalViews: updated.totalViews,
-          totalLikes: updated.likeCount,
-          recordingUrl: updated.recordingUrl,
+      final result = await _endStreamUseCase(
+        EndStreamParam(
+          streamId: state.stream.id,
+          recordingUrl: recordingUrl,
         ),
       );
+
+      result.fold((error) {
+        state = state.copyWith(
+          errorMessage: error.message,
+        );
+      }, (updated) {
+        state = state.copyWith(
+          stream: updated,
+          endedEvent: LiveEndedEvent(
+            streamId: updated.id,
+            duration: updated.durationSeconds,
+            peakViewers: updated.peakViewers,
+            totalViews: updated.totalViews,
+            totalLikes: updated.likeCount,
+            recordingUrl: updated.recordingUrl,
+          ),
+        );
+      });
     } on Object catch (e) {
       AppLogger.error('Failed to end stream: $e');
     }
@@ -503,7 +589,9 @@ class LiveStreamRoomNotifier extends StateNotifier<LiveStreamRoomState> {
     _wsService.leaveRoom(state.stream.id);
     if (!isHost) {
       try {
-        await _repository.leaveStream(state.stream.id);
+        await _leaveStreamUseCase(
+          LeaveStreamParam(streamId: state.stream.id),
+        );
       } on Object catch (_) {}
     }
   }
@@ -526,6 +614,16 @@ final liveStreamRoomProvider = StateNotifierProvider.autoDispose
     final getStreamUseCase = ref.watch(getStreamUseCaseProvider);
     final createStreamUseCase = ref.watch(createStreamUseCaseProvider);
     final startStreamUseCase = ref.watch(startStreamUseCaseProvider);
+    final endStreamUseCase = ref.watch(endStreamUseCaseProvider);
+    final sendGiftUseCase = ref.watch(sendGiftUseCaseProvider);
+    final joinStreamUseCase = ref.watch(joinStreamUseCaseProvider);
+    final leaveStreamUseCase = ref.watch(leaveStreamUseCaseProvider);
+    final getListCommentUseCase = ref.watch(getListCommentUseCaseProvider);
+    final getListViewersUseCase = ref.watch(getListViewersUseCaseProvider);
+    final sendCommentUseCase = ref.watch(sendCommentUseCaseProvider);
+    final pinCommentUseCase = ref.watch(pinCommentUseCaseProvider);
+    final getLeaderBoardUseCase = ref.watch(getLeaderBoardUseCaseProvider);
+    final sendReactionUseCase = ref.watch(sendReactionUseCaseProvider);
     final wsService = ref.watch(liveStreamWsServiceProvider);
     final currentUserId = ref.watch(settingsNotifierProvider).settings.userId;
 
@@ -535,6 +633,16 @@ final liveStreamRoomProvider = StateNotifierProvider.autoDispose
       getStreamUseCase: getStreamUseCase,
       createStreamUseCase: createStreamUseCase,
       startStreamUseCase: startStreamUseCase,
+      endStreamUseCase: endStreamUseCase,
+      sendGiftUseCase: sendGiftUseCase,
+      joinStreamUseCase: joinStreamUseCase,
+      leaveStreamUseCase: leaveStreamUseCase,
+      getListCommentUseCase: getListCommentUseCase,
+      getListViewersUseCase: getListViewersUseCase,
+      sendCommentUseCase: sendCommentUseCase,
+      pinCommentUseCase: pinCommentUseCase,
+      getLeaderBoardUseCase: getLeaderBoardUseCase,
+      sendReactionUseCase: sendReactionUseCase,
       wsService: wsService,
       currentUserId: currentUserId,
     );
