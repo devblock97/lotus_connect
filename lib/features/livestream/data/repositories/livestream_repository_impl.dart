@@ -57,20 +57,29 @@ class LiveStreamRepositoryImpl implements LiveStreamRepository {
   }
 
   @override
-  Future<LiveStream> updateStream(
+  FutureResult<LiveStream> updateStream(
     String streamId, {
     String? title,
     String? description,
     String? thumbnailUrl,
     String? privacy,
-  }) {
-    return _remoteDataSource.updateStream(
-      streamId,
-      title: title,
-      description: description,
-      thumbnailUrl: thumbnailUrl,
-      privacy: privacy,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.updateStream(
+        streamId,
+        title: title,
+        description: description,
+        thumbnailUrl: thumbnailUrl,
+        privacy: privacy,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to get stream $e', e));
+    }
   }
 
   @override
@@ -88,136 +97,301 @@ class LiveStreamRepositoryImpl implements LiveStreamRepository {
   }
 
   @override
-  Future<LiveStream> endStream(String streamId, {String? recordingUrl}) {
-    return _remoteDataSource.endStream(
-      streamId,
-      recordingUrl: recordingUrl,
-    );
+  FutureResult<LiveStream> endStream(
+    String streamId, {
+    String? recordingUrl,
+  }) async {
+    try {
+      final response = await _remoteDataSource.endStream(
+        streamId,
+        recordingUrl: recordingUrl,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to end stream $e', e));
+    }
   }
 
   @override
-  Future<List<LiveStream>> listStreams({
+  FutureResult<List<LiveStream>> listStreams({
     String? status,
     String? cursor,
     int? limit,
-  }) {
-    return _remoteDataSource.listStreams(
-      status: status,
-      cursor: cursor,
-      limit: limit,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.listStreams(
+        status: status,
+        cursor: cursor,
+        limit: limit,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to load list streams: $e', e));
+    }
   }
 
   @override
-  Future<List<LiveStream>> listMyStreams({
+  FutureResult<List<LiveStream>> listMyStreams({
     String? cursor,
     int? limit,
-  }) {
-    return _remoteDataSource.listMyStreams(
-      cursor: cursor,
-      limit: limit,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.listMyStreams(
+        cursor: cursor,
+        limit: limit,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to load your streams list: $e', e));
+    }
   }
 
   @override
-  Future<void> joinStream(String streamId) {
-    return _remoteDataSource.joinStream(streamId);
+  FutureResult<void> joinStream(String streamId) async {
+    try {
+      final response = await _remoteDataSource.joinStream(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to join stream: $e', e));
+    }
   }
 
   @override
-  Future<void> leaveStream(String streamId) {
-    return _remoteDataSource.leaveStream(streamId);
+  FutureResult<void> leaveStream(String streamId) async {
+    try {
+      final response = await _remoteDataSource.leaveStream(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to leave stream: $e', e));
+    }
   }
 
   @override
-  Future<List<LiveViewer>> listViewers(String streamId, {int? limit}) {
-    return _remoteDataSource.listViewers(streamId, limit: limit);
+  FutureResult<List<LiveViewer>> listViewers(
+    String streamId, {
+    int? limit,
+  }) async {
+    try {
+      final response = await _remoteDataSource.listViewers(
+        streamId,
+        limit: limit,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to get list viewers: $e', e));
+    }
   }
 
   @override
-  Future<List<LiveComment>> listComments(
+  FutureResult<List<LiveComment>> listComments(
     String streamId, {
     String? cursor,
     int? limit,
-  }) {
-    return _remoteDataSource.listComments(
-      streamId,
-      cursor: cursor,
-      limit: limit,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.listComments(
+        streamId,
+        cursor: cursor,
+        limit: limit,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to get list comments: $e', e));
+    }
   }
 
   @override
-  Future<LiveComment> sendComment(String streamId, String content) {
-    return _remoteDataSource.sendComment(streamId, content);
+  FutureResult<LiveComment> sendComment(String streamId, String content) async {
+    try {
+      final response = await _remoteDataSource.sendComment(streamId, content);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to send comment: $e', e));
+    }
   }
 
   @override
-  Future<void> pinComment(String streamId, String commentId) {
-    return _remoteDataSource.pinComment(streamId, commentId);
+  FutureResult<void> pinComment(String streamId, String commentId) async {
+    try {
+      final response = await _remoteDataSource.pinComment(streamId, commentId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on NetworkFailure catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to pin comment: $e', e));
+    }
   }
 
   @override
-  Future<void> unpinComment(String streamId, String commentId) {
-    return _remoteDataSource.unpinComment(streamId, commentId);
+  FutureResult<void> unpinComment(String streamId, String commentId) async {
+    try {
+      final response =
+          await _remoteDataSource.unpinComment(streamId, commentId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to unpin comment: $e', e));
+    }
   }
 
   @override
-  Future<int> sendReaction(
+  FutureResult<int> sendReaction(
     String streamId, {
     String reaction = 'heart',
     int count = 1,
-  }) {
-    return _remoteDataSource.sendReaction(
-      streamId,
-      reaction: reaction,
-      count: count,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.sendReaction(
+        streamId,
+        reaction: reaction,
+        count: count,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to send reaction: $e', e));
+    }
   }
 
   @override
-  Future<LiveGiftEvent> sendGift(
+  FutureResult<LiveGiftEvent> sendGift(
     String streamId, {
     required String giftType,
     int count = 1,
-  }) {
-    return _remoteDataSource.sendGift(
-      streamId,
-      giftType: giftType,
-      count: count,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.sendGift(
+        streamId,
+        giftType: giftType,
+        count: count,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to send gift: $e', e));
+    }
   }
 
   @override
-  Future<List<LiveLeaderboardItem>> getLeaderboard(String streamId) {
-    return _remoteDataSource.getLeaderboard(streamId);
+  FutureResult<List<LiveLeaderboardItem>> getLeaderboard(
+    String streamId,
+  ) async {
+    try {
+      final response = await _remoteDataSource.getLeaderboard(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to get leader board: $e', e));
+    }
   }
 
   @override
-  Future<LiveCohost> requestCohost(String streamId) {
-    return _remoteDataSource.requestCohost(streamId);
+  FutureResult<LiveCohost> requestCohost(String streamId) async {
+    try {
+      final response = await _remoteDataSource.requestCohost(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to request cohost: $e', e));
+    }
   }
 
   @override
-  Future<LiveCohost> respondCohost(
+  FutureResult<LiveCohost> respondCohost(
     String streamId, {
     required String userId,
     required String action,
-  }) {
-    return _remoteDataSource.respondCohost(
-      streamId,
-      userId: userId,
-      action: action,
-    );
+  }) async {
+    try {
+      final response = await _remoteDataSource.respondCohost(
+        streamId,
+        userId: userId,
+        action: action,
+      );
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(NetworkFailure('Failed to request cohost: $e', e));
+    }
   }
 
   @override
-  Future<void> leaveCohost(String streamId) {
-    return _remoteDataSource.leaveCohost(streamId);
+  FutureResult<void> leaveCohost(String streamId) async {
+    try {
+      final response = await _remoteDataSource.leaveCohost(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to leave cohost: $e', e));
+    }
   }
 
   @override
-  Future<List<LiveCohost>> listCohosts(String streamId) {
-    return _remoteDataSource.listCohosts(streamId);
+  FutureResult<List<LiveCohost>> listCohosts(String streamId) async {
+    try {
+      final response = await _remoteDataSource.listCohosts(streamId);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, e));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
+    } on Object catch (e) {
+      return Left(ServerFailure('Failed to load list cohosts: $e', e));
+    }
   }
 }

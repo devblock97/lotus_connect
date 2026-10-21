@@ -16,7 +16,7 @@ abstract class LiveStreamRepository {
 
   FutureResult<LiveStream> getStream(String streamId);
 
-  Future<LiveStream> updateStream(
+  FutureResult<LiveStream> updateStream(
     String streamId, {
     String? title,
     String? description,
@@ -26,60 +26,60 @@ abstract class LiveStreamRepository {
 
   FutureResult<LiveStream> startStream(String streamId);
 
-  Future<LiveStream> endStream(String streamId, {String? recordingUrl});
+  FutureResult<LiveStream> endStream(String streamId, {String? recordingUrl});
 
-  Future<List<LiveStream>> listStreams({
+  FutureResult<List<LiveStream>> listStreams({
     String? status,
     String? cursor,
     int? limit,
   });
 
-  Future<List<LiveStream>> listMyStreams({
+  FutureResult<List<LiveStream>> listMyStreams({
     String? cursor,
     int? limit,
   });
 
-  Future<void> joinStream(String streamId);
+  FutureResult<void> joinStream(String streamId);
 
-  Future<void> leaveStream(String streamId);
+  FutureResult<void> leaveStream(String streamId);
 
-  Future<List<LiveViewer>> listViewers(String streamId, {int? limit});
+  FutureResult<List<LiveViewer>> listViewers(String streamId, {int? limit});
 
-  Future<List<LiveComment>> listComments(
+  FutureResult<List<LiveComment>> listComments(
     String streamId, {
     String? cursor,
     int? limit,
   });
 
-  Future<LiveComment> sendComment(String streamId, String content);
+  FutureResult<LiveComment> sendComment(String streamId, String content);
 
-  Future<void> pinComment(String streamId, String commentId);
+  FutureResult<void> pinComment(String streamId, String commentId);
 
-  Future<void> unpinComment(String streamId, String commentId);
+  FutureResult<void> unpinComment(String streamId, String commentId);
 
-  Future<int> sendReaction(
+  FutureResult<int> sendReaction(
     String streamId, {
     String reaction = 'heart',
     int count = 1,
   });
 
-  Future<LiveGiftEvent> sendGift(
+  FutureResult<LiveGiftEvent> sendGift(
     String streamId, {
     required String giftType,
     int count = 1,
   });
 
-  Future<List<LiveLeaderboardItem>> getLeaderboard(String streamId);
+  FutureResult<List<LiveLeaderboardItem>> getLeaderboard(String streamId);
 
-  Future<LiveCohost> requestCohost(String streamId);
+  FutureResult<LiveCohost> requestCohost(String streamId);
 
-  Future<LiveCohost> respondCohost(
+  FutureResult<LiveCohost> respondCohost(
     String streamId, {
     required String userId,
     required String action,
   });
 
-  Future<void> leaveCohost(String streamId);
+  FutureResult<void> leaveCohost(String streamId);
 
-  Future<List<LiveCohost>> listCohosts(String streamId);
+  FutureResult<List<LiveCohost>> listCohosts(String streamId);
 }
