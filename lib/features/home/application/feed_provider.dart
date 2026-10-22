@@ -10,49 +10,42 @@ import 'package:lotus_connect/features/home/domain/usecases/delete_post_usecase.
 import 'package:lotus_connect/features/home/domain/usecases/get_feed_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/update_post_usecase.dart';
 
-/// Provider for [FeedRemoteDataSource].
 final feedRemoteDataSourceProvider = Provider<FeedRemoteDataSource>((ref) {
   return FeedRemoteDataSourceImpl(
     dioClient: ref.watch(dioClientProvider),
   );
 });
 
-/// Provider for [FeedRepository].
 final feedRepositoryProvider = Provider<FeedRepository>((ref) {
   return FeedRepositoryImpl(
     remoteDataSource: ref.watch(feedRemoteDataSourceProvider),
   );
 });
 
-/// Provider for [GetFeedUseCase].
 final getFeedUseCaseProvider = Provider<GetFeedUseCase>((ref) {
   return GetFeedUseCase(
     repository: ref.watch(feedRepositoryProvider),
   );
 });
 
-/// Provider for [CreatePostUseCase].
 final createPostUseCaseProvider = Provider<CreatePostUseCase>((ref) {
   return CreatePostUseCase(
     repository: ref.watch(feedRepositoryProvider),
   );
 });
 
-/// Provider for [UpdatePostUseCase].
 final updatePostUseCaseProvider = Provider<UpdatePostUseCase>((ref) {
   return UpdatePostUseCase(
     repository: ref.watch(feedRepositoryProvider),
   );
 });
 
-/// Provider for [DeletePostUseCase].
 final deletePostUseCaseProvider = Provider<DeletePostUseCase>((ref) {
   return DeletePostUseCase(
     repository: ref.watch(feedRepositoryProvider),
   );
 });
 
-/// Provider managing the active feed state.
 final feedNotifierProvider =
     StateNotifierProvider<FeedNotifier, FeedState>((ref) {
   return FeedNotifier(
@@ -61,7 +54,6 @@ final feedNotifierProvider =
   );
 });
 
-/// Provider managing the create/edit post screen state.
 final createPostNotifierProvider =
     StateNotifierProvider.autoDispose<CreatePostNotifier, CreatePostState>(
         (ref) {
