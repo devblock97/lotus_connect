@@ -24,6 +24,7 @@ void main() {
     registerFallbackValue(
       const UpdatePostParams(postId: 'fallback', content: 'fallback'),
     );
+    registerFallbackValue(const GetFeedParam());
     registerFallbackValue(const NoParams());
   });
 

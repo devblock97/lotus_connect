@@ -16,9 +16,9 @@ class FeedRepositoryImpl implements FeedRepository {
   final FeedRemoteDataSource _remoteDataSource;
 
   @override
-  FutureResult<List<PostItem>> getFeed() async {
+  FutureResult<List<PostItem>> getFeed([String? cursor, int? limit]) async {
     try {
-      final posts = await _remoteDataSource.getFeed();
+      final posts = await _remoteDataSource.getFeed(cursor, limit);
       return Right(posts);
     } on Object catch (e) {
       AppLogger.error('FeedRepositoryImpl.getFeed error: $e');

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
@@ -16,6 +18,7 @@ class MockDeletePostUseCase extends Mock implements DeletePostUseCase {}
 void main() {
   setUpAll(() {
     registerFallbackValue(const DeletePostParams('fallback'));
+    registerFallbackValue(const GetFeedParam());
     registerFallbackValue(const NoParams());
   });
 
@@ -30,6 +33,14 @@ void main() {
     commentCount: 2,
   );
 
+  const testPost2 = PostItem(
+    id: 'post_2',
+    author: PostAuthor(id: 'author_2', username: 'janedoe'),
+    content: 'Second post in feed',
+    likeCount: 5,
+    commentCount: 1,
+  );
+
   setUp(() {
     mockGetFeedUseCase = MockGetFeedUseCase();
     mockDeletePostUseCase = MockDeletePostUseCase();
@@ -37,11 +48,14 @@ void main() {
 
   group('FeedNotifier', () {
     test('loads posts successfully on initialization', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
 
-      final notifier = FeedNotifier(getFeedUseCase: mockGetFeedUseCase);
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: Duration.zero,
+      );
       await pumpEventQueue();
 
       expect(notifier.state.posts.length, 1);
@@ -51,11 +65,14 @@ void main() {
     });
 
     test('sets error message on failure', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Left(ServerFailure('Server down')),
       );
 
-      final notifier = FeedNotifier(getFeedUseCase: mockGetFeedUseCase);
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: Duration.zero,
+      );
       await pumpEventQueue();
 
       expect(notifier.state.posts, isEmpty);
@@ -64,11 +81,14 @@ void main() {
     });
 
     test('toggleLike updates like status and counter optimistically', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
 
-      final notifier = FeedNotifier(getFeedUseCase: mockGetFeedUseCase);
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: Duration.zero,
+      );
       await pumpEventQueue();
 
       notifier.toggleLike('post_1', isLiked: true);
@@ -83,11 +103,14 @@ void main() {
     });
 
     test('toggleSave updates bookmark status', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
 
-      final notifier = FeedNotifier(getFeedUseCase: mockGetFeedUseCase);
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: Duration.zero,
+      );
       await pumpEventQueue();
 
       notifier.toggleSave('post_1', isSaved: true);
@@ -98,11 +121,14 @@ void main() {
     });
 
     test('updatePost replaces updated post in state', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
 
-      final notifier = FeedNotifier(getFeedUseCase: mockGetFeedUseCase);
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: Duration.zero,
+      );
       await pumpEventQueue();
 
       const updated = PostItem(
@@ -117,7 +143,7 @@ void main() {
     });
 
     test('deletePost removes post from state on success', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
       when(() => mockDeletePostUseCase(any()))
@@ -126,6 +152,7 @@ void main() {
       final notifier = FeedNotifier(
         getFeedUseCase: mockGetFeedUseCase,
         deletePostUseCase: mockDeletePostUseCase,
+        debounceDuration: Duration.zero,
       );
       await pumpEventQueue();
 
@@ -139,7 +166,7 @@ void main() {
     });
 
     test('deletePost retains post and sets errorMessage on failure', () async {
-      when(() => mockGetFeedUseCase(const NoParams())).thenAnswer(
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
         (_) async => const Right([testPost]),
       );
       when(() => mockDeletePostUseCase(any())).thenAnswer(
@@ -149,6 +176,7 @@ void main() {
       final notifier = FeedNotifier(
         getFeedUseCase: mockGetFeedUseCase,
         deletePostUseCase: mockDeletePostUseCase,
+        debounceDuration: Duration.zero,
       );
       await pumpEventQueue();
 
@@ -157,6 +185,151 @@ void main() {
       expect(result, isFalse);
       expect(notifier.state.posts.length, 1);
       expect(notifier.state.errorMessage, 'Failed to delete');
+    });
+
+    test(
+      'loadMoreFeed debounces rapid calls and only triggers API once',
+      () async {
+        when(() => mockGetFeedUseCase(any())).thenAnswer(
+          (_) async => const Right([testPost]),
+        );
+
+        final notifier = FeedNotifier(
+          getFeedUseCase: mockGetFeedUseCase,
+          debounceDuration: const Duration(milliseconds: 60),
+        );
+        await pumpEventQueue();
+
+        // Initial load called once
+        verify(() => mockGetFeedUseCase(any())).called(1);
+
+        when(() => mockGetFeedUseCase(any())).thenAnswer(
+          (_) async => const Right([testPost2]),
+        );
+
+        // Simulate rapid scroll triggers
+        unawaited(notifier.loadMoreFeed());
+        expect(notifier.isDebouncing, isTrue);
+
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        unawaited(notifier.loadMoreFeed()); // resets debounce timer
+
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        unawaited(notifier.loadMoreFeed()); // resets debounce timer again
+
+        // 40ms since first call, only 20ms since last call -> no API yet
+        verifyNever(
+          () => mockGetFeedUseCase(
+            const GetFeedParam(cursor: 'post_1', limit: 1),
+          ),
+        );
+
+        // Await enough for the 60ms debounce duration to complete
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        // Now the API should have been called exactly once for loadMoreFeed
+        verify(
+          () => mockGetFeedUseCase(
+            const GetFeedParam(cursor: 'post_1', limit: 1),
+          ),
+        ).called(1);
+        expect(notifier.state.posts.length, 2);
+        expect(notifier.state.posts.last.id, 'post_2');
+        expect(notifier.isDebouncing, isFalse);
+      },
+    );
+
+    test('loadMoreFeed executes immediately when immediate is true', () async {
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
+        (_) async => const Right([testPost]),
+      );
+
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: const Duration(milliseconds: 100),
+      );
+      await pumpEventQueue();
+
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
+        (_) async => const Right([testPost2]),
+      );
+
+      await notifier.loadMoreFeed(immediate: true);
+
+      expect(notifier.state.posts.length, 2);
+      expect(notifier.state.posts.last.id, 'post_2');
+    });
+
+    test('loadMoreFeed does not fetch if hasReachedMax is true', () async {
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
+        (_) async => const Right(<PostItem>[]),
+      );
+
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: const Duration(milliseconds: 40),
+      );
+      await pumpEventQueue();
+
+      expect(notifier.state.hasReachedMax, isTrue);
+
+      unawaited(notifier.loadMoreFeed());
+      expect(notifier.isDebouncing, isFalse);
+
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      // Only the initial call was made
+      verify(() => mockGetFeedUseCase(any())).called(1);
+    });
+
+    test('refreshFeed cancels pending debounce timer', () async {
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
+        (_) async => const Right([testPost]),
+      );
+
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: const Duration(milliseconds: 60),
+      );
+      await pumpEventQueue();
+
+      unawaited(notifier.loadMoreFeed());
+      expect(notifier.isDebouncing, isTrue);
+
+      await notifier.refreshFeed();
+      expect(notifier.isDebouncing, isFalse);
+
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      // Verify loadMoreFeed was cancelled and only refresh was executed
+      verifyNever(
+        () => mockGetFeedUseCase(
+          const GetFeedParam(cursor: 'post_1', limit: 1),
+        ),
+      );
+    });
+
+    test('dispose cancels active debounce timer', () async {
+      when(() => mockGetFeedUseCase(any())).thenAnswer(
+        (_) async => const Right([testPost]),
+      );
+
+      final notifier = FeedNotifier(
+        getFeedUseCase: mockGetFeedUseCase,
+        debounceDuration: const Duration(milliseconds: 60),
+      );
+      await pumpEventQueue();
+
+      unawaited(notifier.loadMoreFeed());
+      expect(notifier.isDebouncing, isTrue);
+
+      notifier.dispose();
+      expect(notifier.isDebouncing, isFalse);
+
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+      verifyNever(
+        () => mockGetFeedUseCase(
+          const GetFeedParam(cursor: 'post_1', limit: 1),
+        ),
+      );
     });
   });
 }

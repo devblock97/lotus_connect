@@ -29,6 +29,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(const NoParams());
+    registerFallbackValue(const GetFeedParam());
     registerFallbackValue(const CreatePostParams());
     registerFallbackValue(
       const UpdatePostParams(postId: 'fallback', content: 'fallback'),

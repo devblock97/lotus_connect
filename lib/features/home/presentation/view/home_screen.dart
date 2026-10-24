@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/features/home/application/feed_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
@@ -25,15 +26,33 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with WidgetsBindingObserver {
+  final ScrollController _controller = ScrollController();
+
+  void _onScroll() {
+    if (_isBottom) {
+      ref.read<FeedNotifier>(feedNotifierProvider.notifier).loadMoreFeed();
+    }
+  }
+
+  bool get _isBottom {
+    if (!_controller.hasClients) return false;
+    final currScroll = _controller.position.pixels;
+    final maxScroll = _controller.position.maxScrollExtent;
+
+    return currScroll >= (maxScroll * 0.8);
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _controller.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
     super.dispose();
   }
 
@@ -143,6 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ]);
         },
         child: CustomScrollView(
+          controller: _controller,
           slivers: [
             const SliverToBoxAdapter(
               child: StoriesTray(),
