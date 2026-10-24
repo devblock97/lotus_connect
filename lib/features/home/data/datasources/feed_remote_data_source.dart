@@ -6,7 +6,7 @@ import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 
 abstract class FeedRemoteDataSource {
-  Future<List<PostItem>> getFeed();
+  Future<List<PostItem>> getFeed([String? cursor, int? limit]);
 
   Future<PostItem> createPost({
     String? content,
@@ -33,9 +33,15 @@ class FeedRemoteDataSourceImpl implements FeedRemoteDataSource {
   final DioClient _dioClient;
 
   @override
-  Future<List<PostItem>> getFeed() async {
+  Future<List<PostItem>> getFeed([String? cursor, int? limit]) async {
     try {
-      final response = await _dioClient.get<dynamic>(ApiConstants.feed);
+      final response = await _dioClient.get<dynamic>(
+        ApiConstants.feed,
+        queryParameters: {
+          if (cursor != null) 'cursor': cursor,
+          if (limit != null) 'limit': limit,
+        },
+      );
       final data = response.data;
 
       if (data is List) {

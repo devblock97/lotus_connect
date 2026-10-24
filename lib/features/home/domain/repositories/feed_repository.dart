@@ -3,7 +3,7 @@ import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 
 abstract class FeedRepository {
-  FutureResult<List<PostItem>> getFeed();
+  FutureResult<List<PostItem>> getFeed([String? cursor, int? limit]);
 
   FutureResult<PostItem> createPost({
     String? content,
