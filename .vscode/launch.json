@@ -2,7 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Lotus Connect (Development)",
+      "name": "Lotus Connect (iOS - Localhost)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env.ios"
+      ]
+    },
+    {
+      "name": "Lotus Connect (Android - 10.0.2.2)",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env.android"
+      ]
+    },
+    {
+      "name": "Lotus Connect (Development - .env)",
       "request": "launch",
       "type": "dart",
       "toolArgs": [
@@ -16,23 +34,43 @@
       "type": "dart"
     },
     {
-      "name": "Lotus Connect (Profile)",
+      "name": "Lotus Connect (iOS - Profile)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
       "toolArgs": [
         "--dart-define-from-file",
-        ".env"
+        ".env.ios"
       ]
     },
     {
-      "name": "Lotus Connect (Release)",
+      "name": "Lotus Connect (Android - Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env.android"
+      ]
+    },
+    {
+      "name": "Lotus Connect (iOS - Release)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
       "toolArgs": [
         "--dart-define-from-file",
-        ".env"
+        ".env.ios"
+      ]
+    },
+    {
+      "name": "Lotus Connect (Android - Release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "toolArgs": [
+        "--dart-define-from-file",
+        ".env.android"
       ]
     }
   ]

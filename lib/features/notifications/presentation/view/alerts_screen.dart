@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notifications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
-class AlertsScreen extends ConsumerWidget {
+class AlertsScreen extends ConsumerStatefulWidget {
   const AlertsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AlertsScreen> createState() => _AlertsScreenState();
+}
+
+class _AlertsScreenState extends ConsumerState<AlertsScreen> {
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = ref.watch(notificationsProvider);
 
@@ -37,17 +57,24 @@ class AlertsScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            ref.read(notificationsProvider.notifier).loadNotifications(),
+            ref.read(notificationsProvider.notifier).refreshNotifications(),
         child: state.isLoading && state.notifications.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : state.notifications.isEmpty
                 ? _buildEmptyState()
                 : ListView.separated(
+                    controller: _controller,
                     padding: const EdgeInsets.all(16),
-                    itemCount: state.notifications.length,
+                    itemCount: state.isLoadingMore
+                        ? state.notifications.length + 1
+                        : state.notifications.length,
+                    scrollCacheExtent: const ScrollCacheExtent.pixels(50),
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),
                     itemBuilder: (context, index) {
+                      if (state.isLoadingMore) {
+                        return const CircularProgressIndicator();
+                      }
                       final notification = state.notifications[index];
                       return _buildAlertCard(context, ref, theme, notification);
                     },
@@ -216,5 +243,20 @@ class AlertsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      ref.read(notificationsProvider.notifier).loadMoreNotifications();
+    }
+  }
+
+  bool get _isBottom {
+    if (!_controller.hasClients) return false;
+
+    final currScroll = _controller.position.pixels;
+    final maxScroll = _controller.position.maxScrollExtent;
+
+    return currScroll >= (maxScroll * 0.9);
   }
 }

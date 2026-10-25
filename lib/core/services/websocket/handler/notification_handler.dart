@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_event_handler.dart';
-import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notifications/application/notifications_notifier.dart';
 
 class NotificationHandler implements WebSocketEventHandler {
   NotificationHandler(this._notificationsNotifier);

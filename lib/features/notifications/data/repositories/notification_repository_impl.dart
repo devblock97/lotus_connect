@@ -2,9 +2,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
-import 'package:lotus_connect/features/notfications/data/datasources/notification_remote_data_source.dart';
-import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
+import 'package:lotus_connect/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
+import 'package:lotus_connect/features/notifications/domain/repositories/notification_repository.dart';
 
 class NotificationRepositoryImpl implements NotificationRepository {
   const NotificationRepositoryImpl({
@@ -13,9 +13,12 @@ class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationRemoteDataSource _remoteDataSource;
 
   @override
-  FutureResult<List<AppNotification>> getNotifications() async {
+  FutureResult<List<AppNotification>> getNotifications(
+    String? cursor,
+    int? limit,
+  ) async {
     try {
-      final result = await _remoteDataSource.getNotifications();
+      final result = await _remoteDataSource.getNotifications(cursor, limit!);
       return Right(result);
     } on Object catch (_) {
       return const Left(ServerFailure('Failed to load notifications'));

@@ -1,89 +1,49 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
-import 'package:lotus_connect/features/notfications/application/notification_provider.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/get_notifications_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/mark_notification_read_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/read_notification_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/register_device_token_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/unregister_device_token_use_case.dart';
-
-class AppNotification {
-  const AppNotification({
-    required this.id,
-    required this.userId,
-    required this.title,
-    required this.body,
-    required this.isRead,
-    required this.createdAt,
-    this.data,
-  });
-
-  factory AppNotification.fromJson(Map<String, dynamic> json) {
-    return AppNotification(
-      id: json['id'] as String? ?? '',
-      userId: json['userId'] as String? ?? json['user_id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      body: json['body'] as String? ?? '',
-      data: json['data'] as Map<String, dynamic>?,
-      isRead: json['isRead'] as bool? ?? json['is_read'] as bool? ?? false,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
-          : json['created_at'] != null
-              ? DateTime.tryParse(json['created_at'] as String) ??
-                  DateTime.now()
-              : DateTime.now(),
-    );
-  }
-
-  final String id;
-  final String userId;
-  final String title;
-  final String body;
-  final Map<String, dynamic>? data;
-  final bool isRead;
-  final DateTime createdAt;
-
-  AppNotification copyWith({
-    String? id,
-    String? userId,
-    String? title,
-    String? body,
-    bool? isRead,
-    Map<String, dynamic>? data,
-    DateTime? createdAt,
-  }) {
-    return AppNotification(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      title: title ?? this.title,
-      body: body ?? this.body,
-      isRead: isRead ?? this.isRead,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
-}
+import 'package:lotus_connect/features/notifications/application/notification_provider.dart';
+import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/get_notifications_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/mark_notification_read_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/read_notification_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/register_device_token_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/unregister_device_token_use_case.dart';
 
 class NotificationsState {
   const NotificationsState({
     this.notifications = const [],
     this.isLoading = false,
+    this.hasReachedMax = false,
+    this.isLoadingMore = false,
     this.errorMessage,
+    this.cursor,
   });
 
   final List<AppNotification> notifications;
   final bool isLoading;
   final String? errorMessage;
+  final String? cursor;
+  final bool hasReachedMax;
+  final bool isLoadingMore;
 
   NotificationsState copyWith({
     List<AppNotification>? notifications,
     bool? isLoading,
     String? errorMessage,
+    String? cursor,
+    bool? hasReachedMax,
+    bool? isLoadingMore,
   }) {
     return NotificationsState(
       notifications: notifications ?? this.notifications,
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage,
+      errorMessage: errorMessage ?? this.errorMessage,
+      cursor: cursor ?? this.cursor,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 }
@@ -95,11 +55,13 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     required RegisterDeviceTokenUseCase registerDeviceTokenUseCase,
     required UnregisterDeviceTokenUseCase unregisterDeviceTokenUseCase,
     required ReadNotificationUseCase readNotificationUseCase,
+    Duration debounceDuration = const Duration(milliseconds: 300),
   })  : _getNotificationsUseCase = getNotificationUseCase,
         _markNotificationReadUseCase = markNotificationReadUseCase,
         _registerDeviceTokenUseCase = registerDeviceTokenUseCase,
         _unregisterDeviceTokenUseCase = unregisterDeviceTokenUseCase,
         _readNotificationUseCase = readNotificationUseCase,
+        _debounceDuration = debounceDuration,
         super(const NotificationsState()) {
     loadNotifications();
   }
@@ -110,14 +72,53 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   final UnregisterDeviceTokenUseCase _unregisterDeviceTokenUseCase;
   final ReadNotificationUseCase _readNotificationUseCase;
 
+  final Duration _debounceDuration;
+  Timer? _debounceTimer;
+  Completer<void>? _debounceCompleter;
+
+  @visibleForTesting
+  bool get isDebouncing => _debounceTimer?.isActive ?? false;
+
+  final int _pageSize = 10;
+
+  Future<void> refreshNotifications() async {
+    _cancelDebounce();
+    state = state.copyWith(isLoading: true);
+
+    final result = await _getNotificationsUseCase(
+      GetNotificationParam(limit: _pageSize),
+    );
+
+    result.fold((failure) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: failure.message,
+      );
+    }, (notifications) {
+      state = state.copyWith(
+        notifications: notifications,
+        isLoading: false,
+        cursor: notifications.last.id,
+        hasReachedMax: notifications.length < _pageSize,
+      );
+    });
+  }
+
   Future<void> loadNotifications() async {
     state = state.copyWith(isLoading: true);
     try {
-      final notifications = await _getNotificationsUseCase(const NoParams());
-      notifications.fold((error) {
+      final result = await _getNotificationsUseCase(
+        GetNotificationParam(limit: _pageSize),
+      );
+      result.fold((error) {
         state = state.copyWith(errorMessage: error.message);
       }, (data) {
-        state = state.copyWith(notifications: data, isLoading: false);
+        state = state.copyWith(
+          notifications: data,
+          isLoading: false,
+          cursor: data.last.id,
+          hasReachedMax: data.length < _pageSize,
+        );
       });
     } on Object catch (e) {
       state = state.copyWith(
@@ -125,6 +126,71 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
       );
     }
+  }
+
+  Future<void> loadMoreNotifications({bool immediate = false}) {
+    if (state.hasReachedMax || state.isLoading) {
+      return Future.value();
+    }
+
+    _debounceTimer?.cancel();
+    _debounceCompleter ??= Completer<void>();
+
+    if (immediate || _debounceDuration == Duration.zero) {
+      _executeLoadMore();
+    } else {
+      _debounceTimer = Timer(_debounceDuration, _executeLoadMore);
+    }
+
+    return _debounceCompleter!.future;
+  }
+
+  Future<void> _executeLoadMore() async {
+    if (state.hasReachedMax || state.isLoading) {
+      _completeDebounce();
+      return;
+    }
+
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final result = await _getNotificationsUseCase(
+        GetNotificationParam(cursor: state.cursor),
+      );
+      result.fold((error) {
+        state = state.copyWith(
+          errorMessage: error.message,
+          isLoadingMore: false,
+        );
+      }, (notifications) {
+        final mergeNotifications = [...state.notifications, ...notifications];
+        state = state.copyWith(
+          notifications: mergeNotifications,
+          isLoadingMore: false,
+          cursor: mergeNotifications.last.id,
+          hasReachedMax: notifications.length < 10,
+        );
+      });
+    } on Object catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll('ServerException', ''),
+      );
+    }
+
+    _completeDebounce();
+  }
+
+  void _cancelDebounce() {
+    _debounceTimer?.cancel();
+    _completeDebounce();
+  }
+
+  void _completeDebounce() {
+    if (_debounceCompleter != null && !_debounceCompleter!.isCompleted) {
+      _debounceCompleter!.complete();
+    }
+    _debounceCompleter = null;
   }
 
   Future<void> readNotification(String notificationId) async {
@@ -189,9 +255,15 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
         UnregisterDeviceTokenParam(token: token),
       );
     } on Object catch (_) {
-      throw Exception('Failed to unregister device token '
-          'with token: $token');
+      throw Exception('Failed to unregister device token with token: $token');
     }
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _completeDebounce();
+    super.dispose();
   }
 }
 

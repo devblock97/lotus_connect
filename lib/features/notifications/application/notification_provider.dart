@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
-import 'package:lotus_connect/features/notfications/data/datasources/notification_remote_data_source.dart';
-import 'package:lotus_connect/features/notfications/data/repositories/notification_repository_impl.dart';
-import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/get_notifications_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/mark_notification_read_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/read_notification_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/register_device_token_use_case.dart';
-import 'package:lotus_connect/features/notfications/domain/usecase/unregister_device_token_use_case.dart';
+import 'package:lotus_connect/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:lotus_connect/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:lotus_connect/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/get_notifications_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/mark_notification_read_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/read_notification_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/register_device_token_use_case.dart';
+import 'package:lotus_connect/features/notifications/domain/usecase/unregister_device_token_use_case.dart';
 
 final notificationRemoteDataSourceProvider =
     Provider<NotificationRemoteDataSource>((ref) {
