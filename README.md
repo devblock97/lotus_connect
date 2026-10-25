@@ -139,10 +139,16 @@ A production-ready Flutter communication and social network platform built with 
    ```
 
 2. **Configure Environment Variables**:
-   Copy the example environment file and customize your backend URL:
+   Copy the example environment file for your target platform:
    ```bash
+   # For iOS Simulator (backend runs on localhost):
+   cp .env.ios.example .env.ios
+
+   # For Android Emulator (routes host machine via 10.0.2.2):
+   cp .env.android.example .env.android
+
+   # Or general configuration:
    cp .env.example .env
-   # Edit .env to set your API_BASE_URL (e.g. ngrok tunnel or local backend)
    ```
 
 3. **Generate code (Drift, Riverpod, Freezed, JSON serialization)**:
@@ -167,9 +173,16 @@ A production-ready Flutter communication and social network platform built with 
 
 7. **Launch the application**:
    ```bash
-   # Using .env environment configuration:
+   # Run on iOS Simulator (using .env.ios with localhost):
+   flutter run -d ios --dart-define-from-file=.env.ios
+
+   # Run on Android Emulator (using .env.android with 10.0.2.2):
+   flutter run -d android --dart-define-from-file=.env.android
+
+   # Using general .env:
    flutter run --dart-define-from-file=.env
 
    # Or fallback to default localhost:
    flutter run
    ```
+

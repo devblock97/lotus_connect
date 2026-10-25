@@ -7,8 +7,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/callkit/callkit_service.dart';
-import 'package:lotus_connect/features/notfications/application/notification_provider.dart';
-import 'package:lotus_connect/features/notfications/domain/repositories/notification_repository.dart';
+import 'package:lotus_connect/features/notifications/application/notification_provider.dart';
+import 'package:lotus_connect/features/notifications/domain/repositories/notification_repository.dart';
 import 'package:lotus_connect/firebase_options.dart';
 import 'package:uuid/uuid.dart';
 

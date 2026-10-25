@@ -83,7 +83,7 @@ class AppSettings extends Equatable {
         host.contains('ngrok-free.app')) {
       host = AppConfig.defaultServerHost;
     }
-    return host;
+    return AppConfig.normalizeHostForPlatform(host);
   }
 
   final String userId;

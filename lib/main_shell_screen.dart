@@ -7,7 +7,7 @@ import 'package:lotus_connect/features/calls/application/calls_providers.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
-import 'package:lotus_connect/features/notfications/presentation/view/alerts_screen.dart';
+import 'package:lotus_connect/features/notifications/presentation/view/alerts_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';

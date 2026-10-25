@@ -2,7 +2,7 @@ import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/network/dio_client.dart';
-import 'package:lotus_connect/features/notfications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
 abstract class NotificationRemoteDataSource {
   Future<ResponseEntityBase> registerDeviceToken({
@@ -12,7 +12,7 @@ abstract class NotificationRemoteDataSource {
 
   Future<ResponseEntityBase> unregisterDeviceToken({String? token});
 
-  Future<List<AppNotification>> getNotifications();
+  Future<List<AppNotification>> getNotifications(String? cursor, int limit);
 
   Future<ResponseEntityBase> markNotificationRead();
 
@@ -26,9 +26,18 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   final DioClient _dioClient;
 
   @override
-  Future<List<AppNotification>> getNotifications() async {
+  Future<List<AppNotification>> getNotifications(
+    String? cursor,
+    int limit,
+  ) async {
     try {
-      final response = await _dioClient.get(ApiConstants.notifications);
+      final response = await _dioClient.get(
+        ApiConstants.notifications,
+        queryParameters: {
+          if (cursor != null) 'cursor': cursor,
+          'limit': limit,
+        },
+      );
       if (response.statusCode == 200) {
         final data = response.data as List;
         return data
