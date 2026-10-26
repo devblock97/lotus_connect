@@ -265,5 +265,198 @@
         "type": "int"
       }
     }
-  }
+  },
+  "tabHome": "Home",
+  "liveStreams": "Live streams",
+  "createPost": "Create post",
+  "noPostsYet": "No posts yet",
+  "postDeletedSuccess": "Post deleted successfully.",
+  "postDeleteFailed": "Failed to delete post.",
+  "yourStory": "Your story",
+  "whatsOnYourMind": "What's on your mind, {firstName}?",
+  "@whatsOnYourMind": {
+    "description": "Hint text for feed create post bar",
+    "placeholders": {
+      "firstName": {
+        "type": "String"
+      }
+    }
+  },
+  "photo": "Photo",
+  "camera": "Camera",
+  "feeling": "Feeling",
+  "beTheFirstToLike": "Be the first to like this",
+  "likedBy": "Liked by ",
+  "othersCount": "{count} others",
+  "@othersCount": {
+    "description": "Label for other users who liked a post",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "seeMoreInline": "...more",
+  "video": "Video",
+  "postOptions": "Post Options",
+  "photosOrVideosCount": "{count} photos / videos",
+  "@photosOrVideosCount": {
+    "description": "Count of media items in a post",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editPost": "Edit post",
+  "editAudience": "Edit audience ({visibility})",
+  "@editAudience": {
+    "description": "Menu option to edit post audience",
+    "placeholders": {
+      "visibility": {
+        "type": "String"
+      }
+    }
+  },
+  "deletePost": "Delete post",
+  "deletePostConfirmTitle": "Delete post?",
+  "deletePostConfirmMessage": "Are you sure you want to delete this post? This cannot be undone.",
+  "deleteAction": "Delete",
+  "savePost": "Save post",
+  "postSavedToCollection": "Post saved to collection",
+  "hidePost": "Hide post",
+  "postHiddenFromFeed": "Post hidden from feed",
+  "reportPost": "Report post",
+  "thankYouForReporting": "Thank you for reporting",
+  "copyLinkToPost": "Copy link to post",
+  "linkCopiedToClipboard": "Link copied to clipboard",
+  "visibilityPublic": "Public",
+  "visibilityFriends": "Friends",
+  "visibilityPrivate": "Only me",
+  "failedToPickImage": "Failed to pick image: {error}",
+  "@failedToPickImage": {
+    "description": "Error message when picking an image fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToPickVideo": "Failed to pick video: {error}",
+  "@failedToPickVideo": {
+    "description": "Error message when picking a video fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "filterApplied": "Filter: {filterName}",
+  "@filterApplied": {
+    "description": "Snackbar notification when a photo filter is applied",
+    "placeholders": {
+      "filterName": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedToCloseFriends": "Shared to Close Friends! ⭐️",
+  "sharedToYourStory": "Shared to your story! ✨",
+  "failedToShareStory": "Failed to share story. Please try again.",
+  "discardStoryTitle": "Discard story?",
+  "discardStoryMessage": "If you go back now, you'll lose any edits you made.",
+  "keepEditing": "Keep editing",
+  "discard": "Discard",
+  "textToolTooltip": "Text",
+  "backgroundGradientTooltip": "Background gradient",
+  "photoFilterTooltip": "Photo filter",
+  "stickersTooltip": "Stickers",
+  "sharingStory": "Sharing story...",
+  "tapToType": "Tap to type",
+  "modeCreate": "Create",
+  "modeGallery": "Gallery",
+  "modeCamera": "Camera",
+  "pickPhoto": "Pick Photo",
+  "pickVideo": "Pick Video",
+  "closeFriends": "Close Friends",
+  "storyAudience": "Story Audience",
+  "storyAudiencePublicSubtitle": "Anyone on Lotus Connect can view",
+  "storyAudienceCloseFriendsSubtitle": "Only people in your Close Friends list",
+  "storyAudienceFriendsSubtitle": "Visible only to accepted friends",
+  "releaseToRemove": "Release to remove",
+  "dragHereToDelete": "Drag here to delete",
+  "done": "Done",
+  "typeSomething": "Type something...",
+  "stickers": "Stickers",
+  "mentionSomeone": "Mention Someone",
+  "mentionHint": "@username",
+  "locations": "Locations",
+  "customLocation": "Custom...",
+  "addLocation": "Add Location",
+  "cityOrVenueHint": "City or venue",
+  "statusAndVibes": "Status & Vibes",
+  "emojis": "Emojis",
+  "discardPostTitle": "Discard post?",
+  "discardPostMessage": "If you go back now, your current post draft and attachments will be lost.",
+  "failedToPickImages": "Failed to pick images: {error}",
+  "@failedToPickImages": {
+    "description": "Error message when picking images fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToCapturePhoto": "Failed to capture photo: {error}",
+  "@failedToCapturePhoto": {
+    "description": "Error message when taking photo fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "postUpdatedSuccess": "Post updated successfully!",
+  "postSharedSuccess": "Post shared successfully!",
+  "postAction": "Post",
+  "isFeeling": "is feeling",
+  "atLocation": "at",
+  "itemsSelected": "{count, plural, =1{1 item selected} other{{count} items selected}}",
+  "@itemsSelected": {
+    "description": "Number of media items selected in create post",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addMore": "Add more",
+  "uploadingMediaAndPublishing": "Uploading media & publishing...",
+  "savingChanges": "Saving changes...",
+  "publishingPost": "Publishing post...",
+  "addToYourPost": "Add to your post",
+  "photoVideoTooltip": "Photo / Video",
+  "feelingActivityTooltip": "Feeling / Activity",
+  "locationTooltip": "Location",
+  "backgroundColorTooltip": "Background Color",
+  "postAudience": "Post Audience",
+  "postAudiencePublicSubtitle": "Anyone on or off Lotus Connect can see this post",
+  "postAudienceFriendsSubtitle": "Only people in your accepted friends list",
+  "postAudiencePrivateSubtitle": "Only you can see this post in your timeline",
+  "howAreYouFeeling": "How are you feeling?",
+  "searchFeelings": "Search feelings...",
+  "whereAreYou": "Where are you?",
+  "useLocation": "Use \"{location}\"",
+  "@useLocation": {
+    "description": "Option to use a custom typed location",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "replySent": "Reply sent!",
+  "sendMessageHint": "Send message...",
+  "send": "Send",
+  "justNow": "Just now"
 }

@@ -19,6 +19,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/story_text_edit
 import 'package:lotus_connect/features/home/presentation/widgets/story_trash_bin.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 
 class CreateStoryScreen extends ConsumerStatefulWidget {
@@ -95,8 +96,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
       }
     } on Object catch (e) {
       if (mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick image: $e')),
+          SnackBar(
+            content: Text(
+              loc?.failedToPickImage(e.toString()) ??
+                  'Failed to pick image: $e',
+            ),
+          ),
         );
       }
     }
@@ -116,8 +123,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
       }
     } on Object catch (e) {
       if (mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick video: $e')),
+          SnackBar(
+            content: Text(
+              loc?.failedToPickVideo(e.toString()) ??
+                  'Failed to pick video: $e',
+            ),
+          ),
         );
       }
     }
@@ -163,10 +176,13 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     final nextFilter = kStoryFilters[nextIndex];
     ref.read(createStoryNotifierProvider.notifier).setFilter(nextFilter.id);
 
+    final loc = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Filter: ${nextFilter.name}'),
+        content: Text(
+          loc?.filterApplied(nextFilter.name) ?? 'Filter: ${nextFilter.name}',
+        ),
         duration: const Duration(milliseconds: 700),
         behavior: SnackBarBehavior.floating,
       ),
@@ -214,14 +230,15 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
     if (!mounted) return;
 
+    final loc = AppLocalizations.of(context);
     if (story != null) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             customVisibility == 'close_friends'
-                ? 'Shared to Close Friends! ⭐️'
-                : 'Shared to your story! ✨',
+                ? (loc?.sharedToCloseFriends ?? 'Shared to Close Friends! ⭐️')
+                : (loc?.sharedToYourStory ?? 'Shared to your story! ✨'),
           ),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 3),
@@ -231,7 +248,11 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
       final error = ref.read(createStoryNotifierProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error ?? 'Failed to share story. Please try again.'),
+          content: Text(
+            error ??
+                (loc?.failedToShareStory ??
+                    'Failed to share story. Please try again.'),
+          ),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -241,30 +262,32 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
   Future<void> _handleClose() async {
     final state = ref.read(createStoryNotifierProvider);
     if (state.hasContent) {
+      final loc = AppLocalizations.of(context);
       final shouldDiscard = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF24242A),
-          title: const Text(
-            'Discard story?',
-            style: TextStyle(
+          title: Text(
+            loc?.discardStoryTitle ?? 'Discard story?',
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          content: const Text(
-            "If you go back now, you'll lose any edits you made.",
-            style: TextStyle(color: Colors.white70),
+          content: Text(
+            loc?.discardStoryMessage ??
+                "If you go back now, you'll lose any edits you made.",
+            style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Keep editing'),
+              child: Text(loc?.keepEditing ?? 'Keep editing'),
             ),
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-              child: const Text('Discard'),
+              child: Text(loc?.discard ?? 'Discard'),
             ),
           ],
         ),
@@ -280,6 +303,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final storyState = ref.watch(createStoryNotifierProvider);
     final notifier = ref.read(createStoryNotifierProvider.notifier);
     final settings = ref.watch(settingsNotifierProvider).settings;
@@ -298,7 +322,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
           // Story Canvas
           GestureDetector(
             onTap: _openTextEditor,
-            child: _buildStoryCanvas(storyState, currentFilter),
+            child: _buildStoryCanvas(storyState, currentFilter, loc),
           ),
 
           // Stickers overlay layer (freely draggable & scalable)
@@ -344,7 +368,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         // Text tool button (Aa)
                         _buildTopIconButton(
                           icon: Icons.title,
-                          tooltip: 'Text',
+                          tooltip: loc?.textToolTooltip ?? 'Text',
                           onTap: _openTextEditor,
                         ),
                         const SizedBox(width: 8),
@@ -352,7 +376,8 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         // Color palette button (gradients)
                         _buildTopIconButton(
                           icon: Icons.palette_outlined,
-                          tooltip: 'Background gradient',
+                          tooltip: loc?.backgroundGradientTooltip ??
+                              'Background gradient',
                           onTap: () {
                             HapticFeedback.selectionClick();
                             notifier.cycleBackgroundPreset();
@@ -363,7 +388,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         // Filter button (Stars)
                         _buildTopIconButton(
                           icon: Icons.auto_awesome_outlined,
-                          tooltip: 'Photo filter',
+                          tooltip: loc?.photoFilterTooltip ?? 'Photo filter',
                           onTap: _cycleFilter,
                         ),
                         const SizedBox(width: 8),
@@ -371,7 +396,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         // Stickers button
                         _buildTopIconButton(
                           icon: CupertinoIcons.smiley,
-                          tooltip: 'Stickers',
+                          tooltip: loc?.stickersTooltip ?? 'Stickers',
                           onTap: _openStickers,
                         ),
 
@@ -414,10 +439,10 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Mode Picker Pills (Create / Gallery / Camera)
-                      _buildModeSelector(storyState, notifier),
+                      _buildModeSelector(storyState, notifier, loc),
                       const SizedBox(height: 12),
 
-                      _buildInstagramShareBar(settings, storyState),
+                      _buildInstagramShareBar(settings, storyState, loc),
                       const SizedBox(height: 10),
                     ],
                   ),
@@ -431,10 +456,10 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
             Container(
               color: Colors.black.withValues(alpha: 0.75),
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 48,
                     height: 48,
                     child: CircularProgressIndicator(
@@ -442,10 +467,10 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
-                    'Sharing story...',
-                    style: TextStyle(
+                    loc?.sharingStory ?? 'Sharing story...',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -459,7 +484,11 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     );
   }
 
-  Widget _buildStoryCanvas(CreateStoryState state, StoryFilter filter) {
+  Widget _buildStoryCanvas(
+    CreateStoryState state,
+    StoryFilter filter,
+    AppLocalizations? loc,
+  ) {
     Widget content;
 
     if (state.isImageMode && state.selectedFilePath != null) {
@@ -496,7 +525,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         child: state.caption.isEmpty
             ? Center(
                 child: Text(
-                  'Tap to type',
+                  loc?.tapToType ?? 'Tap to type',
                   style: GoogleFonts.inter(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 24,
@@ -738,7 +767,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     required VoidCallback onTap,
     String? tooltip,
   }) {
-    return GestureDetector(
+    final button = GestureDetector(
       onTap: onTap,
       child: Container(
         width: 38,
@@ -750,11 +779,20 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         child: Icon(icon, color: Colors.white, size: 20),
       ),
     );
+
+    if (tooltip != null) {
+      return Tooltip(
+        message: tooltip,
+        child: button,
+      );
+    }
+    return button;
   }
 
   Widget _buildModeSelector(
     CreateStoryState state,
     CreateStoryNotifier notifier,
+    AppLocalizations? loc,
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -766,7 +804,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildModeChip(
-            label: 'Create',
+            label: loc?.modeCreate ?? 'Create',
             icon: Icons.title,
             isSelected: state.isTextMode,
             onTap: () {
@@ -776,14 +814,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
           ),
           const SizedBox(width: 4),
           _buildModeChip(
-            label: 'Gallery',
+            label: loc?.modeGallery ?? 'Gallery',
             icon: Icons.photo_library_outlined,
             isSelected: state.isImageMode || state.isVideoMode,
             onTap: _showMediaPickerSheet,
           ),
           const SizedBox(width: 4),
           _buildModeChip(
-            label: 'Camera',
+            label: loc?.modeCamera ?? 'Camera',
             icon: Icons.camera_alt_outlined,
             isSelected: false,
             onTap: () => _pickImage(ImageSource.camera),
@@ -827,6 +865,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
   }
 
   void _showMediaPickerSheet() {
+    final loc = AppLocalizations.of(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF1E1E24),
@@ -839,9 +878,9 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo, color: Colors.white),
-              title: const Text(
-                'Pick Photo',
-                style: TextStyle(color: Colors.white),
+              title: Text(
+                loc?.pickPhoto ?? 'Pick Photo',
+                style: const TextStyle(color: Colors.white),
               ),
               onTap: () {
                 Navigator.of(sheetCtx).pop();
@@ -850,9 +889,9 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.videocam, color: Colors.white),
-              title: const Text(
-                'Pick Video',
-                style: TextStyle(color: Colors.white),
+              title: Text(
+                loc?.pickVideo ?? 'Pick Video',
+                style: const TextStyle(color: Colors.white),
               ),
               onTap: () {
                 Navigator.of(sheetCtx).pop();
@@ -868,6 +907,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
   Widget _buildInstagramShareBar(
     AppSettings settings,
     CreateStoryState storyState,
+    AppLocalizations? loc,
   ) {
     final avatarUrl = settings.avatarUrl;
     final initials =
@@ -928,12 +968,12 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                             ),
                     ),
                     const SizedBox(width: 8),
-                    const Flexible(
+                    Flexible(
                       child: Text(
-                        'Your story',
+                        loc?.yourStory ?? 'Your story',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
@@ -960,11 +1000,11 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.white12),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Green Star Badge
-                    DecoratedBox(
+                    const DecoratedBox(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color(0xFF10B981),
@@ -979,13 +1019,13 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        'Close Friends',
+                        loc?.closeFriends ?? 'Close Friends',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,

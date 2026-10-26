@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/features/home/presentation/models/story_sticker_item.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 class StoryStickerSheet extends StatefulWidget {
@@ -83,6 +84,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
     final isDark = theme.brightness == Brightness.dark;
     final now = DateTime.now();
     final currentTimeStr = DateFormat('hh:mm a').format(now);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
@@ -112,7 +114,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Stickers',
+                  loc?.stickers ?? 'Stickers',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -182,8 +184,8 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () => _promptCustomText(
-                          title: 'Mention Someone',
-                          hint: '@username',
+                          title: loc?.mentionSomeone ?? 'Mention Someone',
+                          hint: loc?.mentionHint ?? '@username',
                           type: StoryStickerType.mention,
                         ),
                         child: Container(
@@ -229,7 +231,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
 
                 // Location Chips
                 Text(
-                  'Locations',
+                  loc?.locations ?? 'Locations',
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.grey,
@@ -241,25 +243,25 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                   runSpacing: 8,
                   children: [
                     ..._kLocations.map(
-                      (loc) => ActionChip(
+                      (locationName) => ActionChip(
                         avatar: const Icon(
                           Icons.location_on,
                           size: 16,
                           color: Color(0xFFFF3B30),
                         ),
-                        label: Text(loc),
+                        label: Text(locationName),
                         onPressed: () => _selectSticker(
                           StoryStickerType.location,
-                          loc,
+                          locationName,
                         ),
                       ),
                     ),
                     ActionChip(
                       avatar: const Icon(Icons.add, size: 16),
-                      label: const Text('Custom...'),
+                      label: Text(loc?.customLocation ?? 'Custom...'),
                       onPressed: () => _promptCustomText(
-                        title: 'Add Location',
-                        hint: 'City or venue',
+                        title: loc?.addLocation ?? 'Add Location',
+                        hint: loc?.cityOrVenueHint ?? 'City or venue',
                         type: StoryStickerType.location,
                       ),
                     ),
@@ -269,7 +271,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
 
                 // Mood / Status Tags
                 Text(
-                  'Status & Vibes',
+                  loc?.statusAndVibes ?? 'Status & Vibes',
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.grey,
@@ -295,7 +297,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
 
                 // Popular Emojis
                 Text(
-                  'Emojis',
+                  loc?.emojis ?? 'Emojis',
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.grey,
@@ -348,6 +350,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
     required String hint,
     required StoryStickerType type,
   }) {
+    final loc = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -363,7 +366,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () {
@@ -373,7 +376,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                 _selectSticker(type, text);
               }
             },
-            child: const Text('Add'),
+            child: Text(loc?.add ?? 'Add'),
           ),
         ],
       ),

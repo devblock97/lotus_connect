@@ -10,6 +10,7 @@ import 'package:lotus_connect/features/home/application/story_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/story.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
 import 'package:lotus_connect/features/home/presentation/models/story_sticker_item.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 
 class StoryViewerScreen extends ConsumerStatefulWidget {
@@ -265,10 +266,11 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         .replyToStory(story.id, text);
 
     if (mounted) {
+      final loc = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Reply sent!'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(loc?.replySent ?? 'Reply sent!'),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -497,6 +499,11 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   }
 
   Widget _buildStoryHeader(UserStory group, Story story) {
+    final loc = AppLocalizations.of(context);
+    final timeAgoDisplay = story.timeAgo == 'Just now'
+        ? (loc?.justNow ?? 'Just now')
+        : story.timeAgo;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Row(
@@ -548,7 +555,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      story.timeAgo,
+                      timeAgoDisplay,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 12.5,
@@ -569,18 +576,18 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                         color: const Color(0xFF10B981),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.star_rounded,
                             size: 11,
                             color: Colors.white,
                           ),
-                          SizedBox(width: 3),
+                          const SizedBox(width: 3),
                           Text(
-                            'Close Friends',
-                            style: TextStyle(
+                            loc?.closeFriends ?? 'Close Friends',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -596,6 +603,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
 
           // Close button
           IconButton(
+            tooltip: loc?.close ?? 'Close',
             icon: const Icon(Icons.close, color: Colors.white, size: 26),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -933,6 +941,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   }
 
   Widget _buildBottomReplyBar(Story story) {
+    final loc = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       color: Colors.black.withValues(alpha: 0.4),
@@ -958,7 +967,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                 style: const TextStyle(color: Colors.white, fontSize: 14),
                 cursorColor: Colors.white,
                 decoration: InputDecoration(
-                  hintText: 'Send message...',
+                  hintText: loc?.sendMessageHint ?? 'Send message...',
                   hintStyle: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontSize: 14,
@@ -968,6 +977,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                   contentPadding: EdgeInsets.zero,
                   suffixIcon: _replyController.text.isNotEmpty
                       ? IconButton(
+                          tooltip: loc?.send ?? 'Send',
                           icon: const Icon(
                             Icons.send_rounded,
                             color: Colors.white,
@@ -985,23 +995,30 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
           const SizedBox(width: 10),
 
           // Heart Reaction button
-          GestureDetector(
-            onTap: _sendHeartReaction,
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.15),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  width: 0.8,
+          Semantics(
+            label: loc?.likeAction ?? 'Like',
+            button: true,
+            child: Tooltip(
+              message: loc?.likeAction ?? 'Like',
+              child: GestureDetector(
+                onTap: _sendHeartReaction,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: const Icon(
+                    CupertinoIcons.heart_fill,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
-              ),
-              child: const Icon(
-                CupertinoIcons.heart_fill,
-                color: Colors.white,
-                size: 24,
               ),
             ),
           ),

@@ -1319,6 +1319,630 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} likes'**
   String likeCountPlural(int count);
+
+  /// No description provided for @tabHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get tabHome;
+
+  /// No description provided for @liveStreams.
+  ///
+  /// In en, this message translates to:
+  /// **'Live streams'**
+  String get liveStreams;
+
+  /// No description provided for @createPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Create post'**
+  String get createPost;
+
+  /// No description provided for @noPostsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet'**
+  String get noPostsYet;
+
+  /// No description provided for @postDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Post deleted successfully.'**
+  String get postDeletedSuccess;
+
+  /// No description provided for @postDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete post.'**
+  String get postDeleteFailed;
+
+  /// No description provided for @yourStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Your story'**
+  String get yourStory;
+
+  /// Hint text for feed create post bar
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on your mind, {firstName}?'**
+  String whatsOnYourMind(String firstName);
+
+  /// No description provided for @photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get photo;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @feeling.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling'**
+  String get feeling;
+
+  /// No description provided for @beTheFirstToLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to like this'**
+  String get beTheFirstToLike;
+
+  /// No description provided for @likedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Liked by '**
+  String get likedBy;
+
+  /// Label for other users who liked a post
+  ///
+  /// In en, this message translates to:
+  /// **'{count} others'**
+  String othersCount(String count);
+
+  /// No description provided for @seeMoreInline.
+  ///
+  /// In en, this message translates to:
+  /// **'...more'**
+  String get seeMoreInline;
+
+  /// No description provided for @postOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Options'**
+  String get postOptions;
+
+  /// Count of media items in a post
+  ///
+  /// In en, this message translates to:
+  /// **'{count} photos / videos'**
+  String photosOrVideosCount(int count);
+
+  /// No description provided for @editPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit post'**
+  String get editPost;
+
+  /// Menu option to edit post audience
+  ///
+  /// In en, this message translates to:
+  /// **'Edit audience ({visibility})'**
+  String editAudience(String visibility);
+
+  /// No description provided for @deletePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete post'**
+  String get deletePost;
+
+  /// No description provided for @deletePostConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete post?'**
+  String get deletePostConfirmTitle;
+
+  /// No description provided for @deletePostConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this post? This cannot be undone.'**
+  String get deletePostConfirmMessage;
+
+  /// No description provided for @deleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteAction;
+
+  /// No description provided for @savePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Save post'**
+  String get savePost;
+
+  /// No description provided for @postSavedToCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Post saved to collection'**
+  String get postSavedToCollection;
+
+  /// No description provided for @hidePost.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide post'**
+  String get hidePost;
+
+  /// No description provided for @postHiddenFromFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Post hidden from feed'**
+  String get postHiddenFromFeed;
+
+  /// No description provided for @reportPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Report post'**
+  String get reportPost;
+
+  /// No description provided for @thankYouForReporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for reporting'**
+  String get thankYouForReporting;
+
+  /// No description provided for @copyLinkToPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link to post'**
+  String get copyLinkToPost;
+
+  /// No description provided for @linkCopiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied to clipboard'**
+  String get linkCopiedToClipboard;
+
+  /// No description provided for @visibilityPublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get visibilityPublic;
+
+  /// No description provided for @visibilityFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends'**
+  String get visibilityFriends;
+
+  /// No description provided for @visibilityPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only me'**
+  String get visibilityPrivate;
+
+  /// Error message when picking an image fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick image: {error}'**
+  String failedToPickImage(String error);
+
+  /// Error message when picking a video fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick video: {error}'**
+  String failedToPickVideo(String error);
+
+  /// Snackbar notification when a photo filter is applied
+  ///
+  /// In en, this message translates to:
+  /// **'Filter: {filterName}'**
+  String filterApplied(String filterName);
+
+  /// No description provided for @sharedToCloseFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared to Close Friends! ⭐️'**
+  String get sharedToCloseFriends;
+
+  /// No description provided for @sharedToYourStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared to your story! ✨'**
+  String get sharedToYourStory;
+
+  /// No description provided for @failedToShareStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to share story. Please try again.'**
+  String get failedToShareStory;
+
+  /// No description provided for @discardStoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard story?'**
+  String get discardStoryTitle;
+
+  /// No description provided for @discardStoryMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If you go back now, you\'ll lose any edits you made.'**
+  String get discardStoryMessage;
+
+  /// No description provided for @keepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get keepEditing;
+
+  /// No description provided for @discard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// No description provided for @textToolTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get textToolTooltip;
+
+  /// No description provided for @backgroundGradientTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Background gradient'**
+  String get backgroundGradientTooltip;
+
+  /// No description provided for @photoFilterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo filter'**
+  String get photoFilterTooltip;
+
+  /// No description provided for @stickersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Stickers'**
+  String get stickersTooltip;
+
+  /// No description provided for @sharingStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing story...'**
+  String get sharingStory;
+
+  /// No description provided for @tapToType.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to type'**
+  String get tapToType;
+
+  /// No description provided for @modeCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get modeCreate;
+
+  /// No description provided for @modeGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get modeGallery;
+
+  /// No description provided for @modeCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get modeCamera;
+
+  /// No description provided for @pickPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Photo'**
+  String get pickPhoto;
+
+  /// No description provided for @pickVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Video'**
+  String get pickVideo;
+
+  /// No description provided for @closeFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Close Friends'**
+  String get closeFriends;
+
+  /// No description provided for @storyAudience.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Audience'**
+  String get storyAudience;
+
+  /// No description provided for @storyAudiencePublicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone on Lotus Connect can view'**
+  String get storyAudiencePublicSubtitle;
+
+  /// No description provided for @storyAudienceCloseFriendsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only people in your Close Friends list'**
+  String get storyAudienceCloseFriendsSubtitle;
+
+  /// No description provided for @storyAudienceFriendsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible only to accepted friends'**
+  String get storyAudienceFriendsSubtitle;
+
+  /// No description provided for @releaseToRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to remove'**
+  String get releaseToRemove;
+
+  /// No description provided for @dragHereToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag here to delete'**
+  String get dragHereToDelete;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @typeSomething.
+  ///
+  /// In en, this message translates to:
+  /// **'Type something...'**
+  String get typeSomething;
+
+  /// No description provided for @stickers.
+  ///
+  /// In en, this message translates to:
+  /// **'Stickers'**
+  String get stickers;
+
+  /// No description provided for @mentionSomeone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mention Someone'**
+  String get mentionSomeone;
+
+  /// No description provided for @mentionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'@username'**
+  String get mentionHint;
+
+  /// No description provided for @locations.
+  ///
+  /// In en, this message translates to:
+  /// **'Locations'**
+  String get locations;
+
+  /// No description provided for @customLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom...'**
+  String get customLocation;
+
+  /// No description provided for @addLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Location'**
+  String get addLocation;
+
+  /// No description provided for @cityOrVenueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'City or venue'**
+  String get cityOrVenueHint;
+
+  /// No description provided for @statusAndVibes.
+  ///
+  /// In en, this message translates to:
+  /// **'Status & Vibes'**
+  String get statusAndVibes;
+
+  /// No description provided for @emojis.
+  ///
+  /// In en, this message translates to:
+  /// **'Emojis'**
+  String get emojis;
+
+  /// No description provided for @discardPostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard post?'**
+  String get discardPostTitle;
+
+  /// No description provided for @discardPostMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If you go back now, your current post draft and attachments will be lost.'**
+  String get discardPostMessage;
+
+  /// Error message when picking images fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to pick images: {error}'**
+  String failedToPickImages(String error);
+
+  /// Error message when taking photo fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to capture photo: {error}'**
+  String failedToCapturePhoto(String error);
+
+  /// No description provided for @postUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Post updated successfully!'**
+  String get postUpdatedSuccess;
+
+  /// No description provided for @postSharedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Post shared successfully!'**
+  String get postSharedSuccess;
+
+  /// No description provided for @postAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get postAction;
+
+  /// No description provided for @isFeeling.
+  ///
+  /// In en, this message translates to:
+  /// **'is feeling'**
+  String get isFeeling;
+
+  /// No description provided for @atLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'at'**
+  String get atLocation;
+
+  /// Number of media items selected in create post
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item selected} other{{count} items selected}}'**
+  String itemsSelected(int count);
+
+  /// No description provided for @addMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Add more'**
+  String get addMore;
+
+  /// No description provided for @uploadingMediaAndPublishing.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading media & publishing...'**
+  String get uploadingMediaAndPublishing;
+
+  /// No description provided for @savingChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving changes...'**
+  String get savingChanges;
+
+  /// No description provided for @publishingPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Publishing post...'**
+  String get publishingPost;
+
+  /// No description provided for @addToYourPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to your post'**
+  String get addToYourPost;
+
+  /// No description provided for @photoVideoTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo / Video'**
+  String get photoVideoTooltip;
+
+  /// No description provided for @feelingActivityTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling / Activity'**
+  String get feelingActivityTooltip;
+
+  /// No description provided for @locationTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationTooltip;
+
+  /// No description provided for @backgroundColorTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Background Color'**
+  String get backgroundColorTooltip;
+
+  /// No description provided for @postAudience.
+  ///
+  /// In en, this message translates to:
+  /// **'Post Audience'**
+  String get postAudience;
+
+  /// No description provided for @postAudiencePublicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone on or off Lotus Connect can see this post'**
+  String get postAudiencePublicSubtitle;
+
+  /// No description provided for @postAudienceFriendsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only people in your accepted friends list'**
+  String get postAudienceFriendsSubtitle;
+
+  /// No description provided for @postAudiencePrivateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can see this post in your timeline'**
+  String get postAudiencePrivateSubtitle;
+
+  /// No description provided for @howAreYouFeeling.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you feeling?'**
+  String get howAreYouFeeling;
+
+  /// No description provided for @searchFeelings.
+  ///
+  /// In en, this message translates to:
+  /// **'Search feelings...'**
+  String get searchFeelings;
+
+  /// No description provided for @whereAreYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Where are you?'**
+  String get whereAreYou;
+
+  /// Option to use a custom typed location
+  ///
+  /// In en, this message translates to:
+  /// **'Use \"{location}\"'**
+  String useLocation(String location);
+
+  /// No description provided for @replySent.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply sent!'**
+  String get replySent;
+
+  /// No description provided for @sendMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Send message...'**
+  String get sendMessageHint;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
 }
 
 class _AppLocalizationsDelegate

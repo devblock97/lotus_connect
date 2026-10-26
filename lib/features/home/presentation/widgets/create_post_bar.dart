@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Facebook-style "What's on your mind?" feed bar with quick action buttons.
 class CreatePostBar extends ConsumerWidget {
@@ -54,6 +55,7 @@ class CreatePostBar extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final loc = AppLocalizations.of(context);
 
     final settings = ref.watch(settingsNotifierProvider).settings;
     final displayName = settings.fullName.isNotEmpty
@@ -118,7 +120,8 @@ class CreatePostBar extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
-                      "What's on your mind, $firstName?",
+                      loc?.whatsOnYourMind(firstName) ??
+                          "What's on your mind, $firstName?",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -148,7 +151,7 @@ class CreatePostBar extends ConsumerWidget {
               _QuickActionButton(
                 icon: Icons.photo_library_rounded,
                 iconColor: const Color(0xFF4CAF50),
-                label: 'Photo',
+                label: loc?.photo ?? 'Photo',
                 textColor: primaryTextColor,
                 onTap: () => _pickGallery(context),
               ),
@@ -157,7 +160,7 @@ class CreatePostBar extends ConsumerWidget {
               _QuickActionButton(
                 icon: Icons.camera_alt_rounded,
                 iconColor: const Color(0xFF2196F3),
-                label: 'Camera',
+                label: loc?.camera ?? 'Camera',
                 textColor: primaryTextColor,
                 onTap: () => _pickCamera(context),
               ),
@@ -166,7 +169,7 @@ class CreatePostBar extends ConsumerWidget {
               _QuickActionButton(
                 icon: Icons.emoji_emotions_rounded,
                 iconColor: const Color(0xFFFFB300),
-                label: 'Feeling',
+                label: loc?.feeling ?? 'Feeling',
                 textColor: primaryTextColor,
                 onTap: () => _openCreatePost(context),
               ),

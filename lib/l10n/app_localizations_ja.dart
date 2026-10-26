@@ -209,7 +209,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get voice => '音声通話';
 
   @override
-  String get video => 'ビデオ通話';
+  String get video => '動画';
 
   @override
   String get viewSignalingLogs => 'シグナリングログを表示';
@@ -635,4 +635,338 @@ class AppLocalizationsJa extends AppLocalizations {
   String likeCountPlural(int count) {
     return 'いいね！ $count件';
   }
+
+  @override
+  String get tabHome => 'ホーム';
+
+  @override
+  String get liveStreams => 'ライブ配信';
+
+  @override
+  String get createPost => '投稿を作成';
+
+  @override
+  String get noPostsYet => '投稿はまだありません';
+
+  @override
+  String get postDeletedSuccess => '投稿を正常に削除しました。';
+
+  @override
+  String get postDeleteFailed => '投稿の削除に失敗しました。';
+
+  @override
+  String get yourStory => 'あなたのストーリーズ';
+
+  @override
+  String whatsOnYourMind(String firstName) {
+    return '$firstNameさん、今何してる？';
+  }
+
+  @override
+  String get photo => '写真';
+
+  @override
+  String get camera => 'カメラ';
+
+  @override
+  String get feeling => '気分';
+
+  @override
+  String get beTheFirstToLike => '最初に「いいね！」しましょう';
+
+  @override
+  String get likedBy => 'いいね！: ';
+
+  @override
+  String othersCount(String count) {
+    return '他$count人';
+  }
+
+  @override
+  String get seeMoreInline => '...もっと見る';
+
+  @override
+  String get postOptions => '投稿のオプション';
+
+  @override
+  String photosOrVideosCount(int count) {
+    return '$count件の写真・動画';
+  }
+
+  @override
+  String get editPost => '投稿を編集';
+
+  @override
+  String editAudience(String visibility) {
+    return '公開範囲を編集 ($visibility)';
+  }
+
+  @override
+  String get deletePost => '投稿を削除';
+
+  @override
+  String get deletePostConfirmTitle => '投稿を削除しますか？';
+
+  @override
+  String get deletePostConfirmMessage => 'この投稿を削除してもよろしいですか？この操作は取り消せません。';
+
+  @override
+  String get deleteAction => '削除';
+
+  @override
+  String get savePost => '投稿を保存';
+
+  @override
+  String get postSavedToCollection => '投稿をコレクションに保存しました';
+
+  @override
+  String get hidePost => '投稿を非表示';
+
+  @override
+  String get postHiddenFromFeed => '投稿をフィードで非表示にしました';
+
+  @override
+  String get reportPost => '投稿を報告';
+
+  @override
+  String get thankYouForReporting => 'ご報告ありがとうございます';
+
+  @override
+  String get copyLinkToPost => '投稿のリンクをコピー';
+
+  @override
+  String get linkCopiedToClipboard => 'リンクをクリップボードにコピーしました';
+
+  @override
+  String get visibilityPublic => '公開';
+
+  @override
+  String get visibilityFriends => '友達';
+
+  @override
+  String get visibilityPrivate => '自分のみ';
+
+  @override
+  String failedToPickImage(String error) {
+    return '写真の選択に失敗しました: $error';
+  }
+
+  @override
+  String failedToPickVideo(String error) {
+    return '動画の選択に失敗しました: $error';
+  }
+
+  @override
+  String filterApplied(String filterName) {
+    return 'フィルター: $filterName';
+  }
+
+  @override
+  String get sharedToCloseFriends => '親しい友達にシェアしました！⭐️';
+
+  @override
+  String get sharedToYourStory => 'ストーリーズにシェアしました！✨';
+
+  @override
+  String get failedToShareStory => 'ストーリーズのシェアに失敗しました。もう一度お試しください。';
+
+  @override
+  String get discardStoryTitle => 'ストーリーズを破棄しますか？';
+
+  @override
+  String get discardStoryMessage => '今戻ると、編集内容がすべて失われます。';
+
+  @override
+  String get keepEditing => '編集を続ける';
+
+  @override
+  String get discard => '破棄';
+
+  @override
+  String get textToolTooltip => 'テキスト';
+
+  @override
+  String get backgroundGradientTooltip => '背景グラデーション';
+
+  @override
+  String get photoFilterTooltip => '写真フィルター';
+
+  @override
+  String get stickersTooltip => 'スタンプ';
+
+  @override
+  String get sharingStory => 'ストーリーズをシェア中...';
+
+  @override
+  String get tapToType => 'タップして入力';
+
+  @override
+  String get modeCreate => '作成';
+
+  @override
+  String get modeGallery => 'ギャラリー';
+
+  @override
+  String get modeCamera => 'カメラ';
+
+  @override
+  String get pickPhoto => '写真を選択';
+
+  @override
+  String get pickVideo => '動画を選択';
+
+  @override
+  String get closeFriends => '親しい友達';
+
+  @override
+  String get storyAudience => 'ストーリーズの公開範囲';
+
+  @override
+  String get storyAudiencePublicSubtitle => 'Lotus Connect上の誰でも閲覧可能';
+
+  @override
+  String get storyAudienceCloseFriendsSubtitle => '親しい友達リストの人のみ';
+
+  @override
+  String get storyAudienceFriendsSubtitle => '承認された友達のみ閲覧可能';
+
+  @override
+  String get releaseToRemove => '離して削除';
+
+  @override
+  String get dragHereToDelete => 'ここにドラッグして削除';
+
+  @override
+  String get done => '完了';
+
+  @override
+  String get typeSomething => '入力してください...';
+
+  @override
+  String get stickers => 'スタンプ';
+
+  @override
+  String get mentionSomeone => 'ユーザーをメンション';
+
+  @override
+  String get mentionHint => '@ユーザー名';
+
+  @override
+  String get locations => '場所';
+
+  @override
+  String get customLocation => 'カスタム...';
+
+  @override
+  String get addLocation => '場所を追加';
+
+  @override
+  String get cityOrVenueHint => '都市またはスポット';
+
+  @override
+  String get statusAndVibes => 'ステータス & 気分';
+
+  @override
+  String get emojis => '絵文字';
+
+  @override
+  String get discardPostTitle => '投稿を破棄しますか？';
+
+  @override
+  String get discardPostMessage => '今戻ると、投稿の下書きと添付ファイルが失われます。';
+
+  @override
+  String failedToPickImages(String error) {
+    return '画像の選択に失敗しました: $error';
+  }
+
+  @override
+  String failedToCapturePhoto(String error) {
+    return '写真の撮影に失敗しました: $error';
+  }
+
+  @override
+  String get postUpdatedSuccess => '投稿を更新しました！';
+
+  @override
+  String get postSharedSuccess => '投稿を共有しました！';
+
+  @override
+  String get postAction => '投稿';
+
+  @override
+  String get isFeeling => '気分:';
+
+  @override
+  String get atLocation => '場所:';
+
+  @override
+  String itemsSelected(int count) {
+    return '$count個のアイテムを選択中';
+  }
+
+  @override
+  String get addMore => 'さらに追加';
+
+  @override
+  String get uploadingMediaAndPublishing => 'メディアをアップロードして投稿中...';
+
+  @override
+  String get savingChanges => '変更を保存中...';
+
+  @override
+  String get publishingPost => '投稿を公開中...';
+
+  @override
+  String get addToYourPost => '投稿に追加';
+
+  @override
+  String get photoVideoTooltip => '写真 / 動画';
+
+  @override
+  String get feelingActivityTooltip => '気分 / アクティビティ';
+
+  @override
+  String get locationTooltip => '位置情報';
+
+  @override
+  String get backgroundColorTooltip => '背景色';
+
+  @override
+  String get postAudience => '投稿の公開範囲';
+
+  @override
+  String get postAudiencePublicSubtitle => 'Lotus Connectの内外を問わず誰でもこの投稿を閲覧可能';
+
+  @override
+  String get postAudienceFriendsSubtitle => '承認された友達リストの人のみ';
+
+  @override
+  String get postAudiencePrivateSubtitle => 'タイムライン上であなただけがこの投稿を閲覧可能';
+
+  @override
+  String get howAreYouFeeling => 'どんな気分ですか？';
+
+  @override
+  String get searchFeelings => '気分を検索...';
+
+  @override
+  String get whereAreYou => '今どこにいますか？';
+
+  @override
+  String useLocation(String location) {
+    return '「$location」を使用';
+  }
+
+  @override
+  String get replySent => '返信を送信しました！';
+
+  @override
+  String get sendMessageHint => 'メッセージを送信...';
+
+  @override
+  String get send => '送信';
+
+  @override
+  String get justNow => 'たった今';
 }

@@ -649,4 +649,347 @@ class AppLocalizationsVi extends AppLocalizations {
   String likeCountPlural(int count) {
     return '$count lượt thích';
   }
+
+  @override
+  String get tabHome => 'Trang chủ';
+
+  @override
+  String get liveStreams => 'Phát trực tiếp';
+
+  @override
+  String get createPost => 'Tạo bài viết';
+
+  @override
+  String get noPostsYet => 'Chưa có bài viết nào';
+
+  @override
+  String get postDeletedSuccess => 'Đã xóa bài viết thành công.';
+
+  @override
+  String get postDeleteFailed => 'Xóa bài viết thất bại.';
+
+  @override
+  String get yourStory => 'Tin của bạn';
+
+  @override
+  String whatsOnYourMind(String firstName) {
+    return '$firstName ơi, bạn đang nghĩ gì thế?';
+  }
+
+  @override
+  String get photo => 'Ảnh';
+
+  @override
+  String get camera => 'Máy ảnh';
+
+  @override
+  String get feeling => 'Cảm xúc';
+
+  @override
+  String get beTheFirstToLike => 'Hãy là người đầu tiên thích bài viết này';
+
+  @override
+  String get likedBy => 'Được thích bởi ';
+
+  @override
+  String othersCount(String count) {
+    return '$count người khác';
+  }
+
+  @override
+  String get seeMoreInline => '...xem thêm';
+
+  @override
+  String get postOptions => 'Tùy chọn bài viết';
+
+  @override
+  String photosOrVideosCount(int count) {
+    return '$count ảnh / video';
+  }
+
+  @override
+  String get editPost => 'Chỉnh sửa bài viết';
+
+  @override
+  String editAudience(String visibility) {
+    return 'Chỉnh sửa đối tượng ($visibility)';
+  }
+
+  @override
+  String get deletePost => 'Xóa bài viết';
+
+  @override
+  String get deletePostConfirmTitle => 'Xóa bài viết?';
+
+  @override
+  String get deletePostConfirmMessage =>
+      'Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.';
+
+  @override
+  String get deleteAction => 'Xóa';
+
+  @override
+  String get savePost => 'Lưu bài viết';
+
+  @override
+  String get postSavedToCollection => 'Đã lưu bài viết vào bộ sưu tập';
+
+  @override
+  String get hidePost => 'Ẩn bài viết';
+
+  @override
+  String get postHiddenFromFeed => 'Đã ẩn bài viết khỏi bảng tin';
+
+  @override
+  String get reportPost => 'Báo cáo bài viết';
+
+  @override
+  String get thankYouForReporting => 'Cảm ơn bạn đã báo cáo';
+
+  @override
+  String get copyLinkToPost => 'Sao chép liên kết bài viết';
+
+  @override
+  String get linkCopiedToClipboard => 'Đã sao chép liên kết vào bộ nhớ tạm';
+
+  @override
+  String get visibilityPublic => 'Công khai';
+
+  @override
+  String get visibilityFriends => 'Bạn bè';
+
+  @override
+  String get visibilityPrivate => 'Chỉ mình tôi';
+
+  @override
+  String failedToPickImage(String error) {
+    return 'Không thể chọn ảnh: $error';
+  }
+
+  @override
+  String failedToPickVideo(String error) {
+    return 'Không thể chọn video: $error';
+  }
+
+  @override
+  String filterApplied(String filterName) {
+    return 'Bộ lọc: $filterName';
+  }
+
+  @override
+  String get sharedToCloseFriends => 'Đã chia sẻ với Bạn thân! ⭐️';
+
+  @override
+  String get sharedToYourStory => 'Đã chia sẻ lên tin của bạn! ✨';
+
+  @override
+  String get failedToShareStory => 'Không thể chia sẻ tin. Vui lòng thử lại.';
+
+  @override
+  String get discardStoryTitle => 'Hủy tin?';
+
+  @override
+  String get discardStoryMessage =>
+      'Nếu quay lại bây giờ, bạn sẽ mất các chỉnh sửa đã thực hiện.';
+
+  @override
+  String get keepEditing => 'Tiếp tục chỉnh sửa';
+
+  @override
+  String get discard => 'Hủy bỏ';
+
+  @override
+  String get textToolTooltip => 'Văn bản';
+
+  @override
+  String get backgroundGradientTooltip => 'Màu nền dải chuyển màu';
+
+  @override
+  String get photoFilterTooltip => 'Bộ lọc ảnh';
+
+  @override
+  String get stickersTooltip => 'Nhãn dán';
+
+  @override
+  String get sharingStory => 'Đang chia sẻ tin...';
+
+  @override
+  String get tapToType => 'Nhấn để nhập';
+
+  @override
+  String get modeCreate => 'Tạo';
+
+  @override
+  String get modeGallery => 'Thư viện';
+
+  @override
+  String get modeCamera => 'Máy ảnh';
+
+  @override
+  String get pickPhoto => 'Chọn ảnh';
+
+  @override
+  String get pickVideo => 'Chọn video';
+
+  @override
+  String get closeFriends => 'Bạn thân';
+
+  @override
+  String get storyAudience => 'Đối tượng xem tin';
+
+  @override
+  String get storyAudiencePublicSubtitle =>
+      'Mọi người trên Lotus Connect đều có thể xem';
+
+  @override
+  String get storyAudienceCloseFriendsSubtitle =>
+      'Chỉ những người trong danh sách Bạn thân';
+
+  @override
+  String get storyAudienceFriendsSubtitle =>
+      'Chỉ bạn bè đã chấp nhận mới xem được';
+
+  @override
+  String get releaseToRemove => 'Thả để xóa';
+
+  @override
+  String get dragHereToDelete => 'Kéo vào đây để xóa';
+
+  @override
+  String get done => 'Xong';
+
+  @override
+  String get typeSomething => 'Nhập nội dung...';
+
+  @override
+  String get stickers => 'Nhãn dán';
+
+  @override
+  String get mentionSomeone => 'Nhắc đến ai đó';
+
+  @override
+  String get mentionHint => '@tên_người_dùng';
+
+  @override
+  String get locations => 'Vị trí';
+
+  @override
+  String get customLocation => 'Tùy chỉnh...';
+
+  @override
+  String get addLocation => 'Thêm vị trí';
+
+  @override
+  String get cityOrVenueHint => 'Thành phố hoặc địa điểm';
+
+  @override
+  String get statusAndVibes => 'Trạng thái & Cảm xúc';
+
+  @override
+  String get emojis => 'Biểu tượng cảm xúc';
+
+  @override
+  String get discardPostTitle => 'Hủy bài viết?';
+
+  @override
+  String get discardPostMessage =>
+      'Nếu quay lại bây giờ, bản nháp bài viết và tệp đính kèm hiện tại sẽ bị mất.';
+
+  @override
+  String failedToPickImages(String error) {
+    return 'Không thể chọn ảnh: $error';
+  }
+
+  @override
+  String failedToCapturePhoto(String error) {
+    return 'Không thể chụp ảnh: $error';
+  }
+
+  @override
+  String get postUpdatedSuccess => 'Cập nhật bài viết thành công!';
+
+  @override
+  String get postSharedSuccess => 'Chia sẻ bài viết thành công!';
+
+  @override
+  String get postAction => 'Đăng';
+
+  @override
+  String get isFeeling => 'đang cảm thấy';
+
+  @override
+  String get atLocation => 'tại';
+
+  @override
+  String itemsSelected(int count) {
+    return 'Đã chọn $count mục';
+  }
+
+  @override
+  String get addMore => 'Thêm';
+
+  @override
+  String get uploadingMediaAndPublishing => 'Đang tải tệp lên & đăng bài...';
+
+  @override
+  String get savingChanges => 'Đang lưu thay đổi...';
+
+  @override
+  String get publishingPost => 'Đang đăng bài viết...';
+
+  @override
+  String get addToYourPost => 'Thêm vào bài viết của bạn';
+
+  @override
+  String get photoVideoTooltip => 'Ảnh / Video';
+
+  @override
+  String get feelingActivityTooltip => 'Cảm xúc / Hoạt động';
+
+  @override
+  String get locationTooltip => 'Vị trí';
+
+  @override
+  String get backgroundColorTooltip => 'Màu nền';
+
+  @override
+  String get postAudience => 'Đối tượng xem bài viết';
+
+  @override
+  String get postAudiencePublicSubtitle =>
+      'Bất kỳ ai trên hoặc ngoài Lotus Connect đều có thể xem bài viết này';
+
+  @override
+  String get postAudienceFriendsSubtitle =>
+      'Chỉ những người trong danh sách bạn bè đã chấp nhận của bạn';
+
+  @override
+  String get postAudiencePrivateSubtitle =>
+      'Chỉ bạn mới có thể xem bài viết này trên dòng thời gian của mình';
+
+  @override
+  String get howAreYouFeeling => 'Bạn đang cảm thấy thế nào?';
+
+  @override
+  String get searchFeelings => 'Tìm kiếm cảm xúc...';
+
+  @override
+  String get whereAreYou => 'Bạn đang ở đâu?';
+
+  @override
+  String useLocation(String location) {
+    return 'Dùng \"$location\"';
+  }
+
+  @override
+  String get replySent => 'Đã gửi tin nhắn!';
+
+  @override
+  String get sendMessageHint => 'Gửi tin nhắn...';
+
+  @override
+  String get send => 'Gửi';
+
+  @override
+  String get justNow => 'Vừa xong';
 }

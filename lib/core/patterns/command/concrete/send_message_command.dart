@@ -36,10 +36,8 @@ class SendMessageCommand implements ChatCommand<Message> {
   final SaveLocalMessageUseCase _saveLocalMessageUseCase;
   final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
 
-  late final Message _optimisticMessage;
-
   Message createOptimisticMessage() {
-    _optimisticMessage = Message(
+    return Message(
       id: id,
       conversationId: conversationId,
       role: MessageRole.user,
@@ -48,8 +46,6 @@ class SendMessageCommand implements ChatCommand<Message> {
       replyToId: replyToId,
       status: MessageStatus.sending,
     );
-
-    return _optimisticMessage;
   }
 
   @override
