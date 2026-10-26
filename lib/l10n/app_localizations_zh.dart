@@ -504,7 +504,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get startConversationPrompt => '开始讨论并分享你的想法！';
 
   @override
-  String get saySomethingNice => '留下友善的评论';
+  String get saySomethingNice => '说点好听的吧...';
 
   @override
   String get addCommentHint => '添加评论...';
@@ -967,4 +967,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get justNow => '刚刚';
+
+  @override
+  String get goLive => '发起直播';
+
+  @override
+  String get filterAll => '全部';
+
+  @override
+  String get liveNow => '正在直播';
+
+  @override
+  String get endedReplays => '已结束回放';
+
+  @override
+  String get noLiveStreams => '暂无正在进行的直播';
+
+  @override
+  String get noLiveStreamsPrompt => '成为第一个开播并与好友互动的人吧！';
+
+  @override
+  String get startStreamingNow => '立即开播';
+
+  @override
+  String get streamEnded => '已结束';
+
+  @override
+  String get pleaseEnterStreamTitle => '请输入直播标题';
+
+  @override
+  String get failedToStartLiveStream => '开启直播失败';
+
+  @override
+  String failedToGoLive(String error) {
+    return '发起直播失败: $error';
+  }
+
+  @override
+  String get cameraInitializing => '相机正在初始化...';
+
+  @override
+  String get flipCamera => '翻转相机';
+
+  @override
+  String get streamTitleHint => '添加一个吸引观众的标题...';
+
+  @override
+  String get privacyLabel => '隐私设置:';
+
+  @override
+  String get privacyPrivate => '私密';
+
+  @override
+  String get rtmpIngestTip => '支持手机摄像头及桌面端 OBS/Streamlabs RTMP 推流';
+
+  @override
+  String get goLiveNow => '立即开播';
+
+  @override
+  String get liveStreamEndedTitle => '直播已结束';
+
+  @override
+  String get streamDuration => '时长';
+
+  @override
+  String get peakViewers => '最高观众数';
+
+  @override
+  String get totalLikes => '总点赞数';
+
+  @override
+  String get totalViews => '总观看次数';
+
+  @override
+  String get follow => '关注';
+
+  @override
+  String get streamLinkCopied => '直播链接已复制到剪贴板！';
+
+  @override
+  String get endLiveStreamTitle => '结束直播？';
+
+  @override
+  String get endLiveStreamConfirm => '确定要结束这场直播吗？';
+
+  @override
+  String get endStream => '结束直播';
 }

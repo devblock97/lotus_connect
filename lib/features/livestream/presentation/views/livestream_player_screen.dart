@@ -18,6 +18,7 @@ import 'package:lotus_connect/features/livestream/presentation/widgets/live_badg
 import 'package:lotus_connect/features/livestream/presentation/widgets/live_chat_overlay.dart';
 import 'package:lotus_connect/features/livestream/presentation/widgets/viewers_sheet.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 
@@ -671,9 +672,10 @@ class _LiveStreamPlayerScreenState
                 color: Colors.white24,
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Camera initializing...',
-                style: TextStyle(color: Colors.white54, fontSize: 14),
+              Text(
+                AppLocalizations.of(context)?.cameraInitializing ??
+                    'Camera initializing...',
+                style: const TextStyle(color: Colors.white54, fontSize: 14),
               ),
             ],
           ),
@@ -869,9 +871,9 @@ class _LiveStreamPlayerScreenState
                       ),
                       borderRadius: BorderRadius.circular(13),
                     ),
-                    child: const Text(
-                      'Follow',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)?.follow ?? 'Follow',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -970,9 +972,10 @@ class _LiveStreamPlayerScreenState
                   border: Border.all(color: Colors.white12),
                 ),
                 alignment: Alignment.centerLeft,
-                child: const Text(
-                  'Add a comment...',
-                  style: TextStyle(color: Colors.white60, fontSize: 13),
+                child: Text(
+                  AppLocalizations.of(context)?.addCommentHint ??
+                      'Add a comment...',
+                  style: const TextStyle(color: Colors.white60, fontSize: 13),
                 ),
               ),
             ),
@@ -1053,10 +1056,13 @@ class _LiveStreamPlayerScreenState
                   ),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Stream link copied to clipboard!'),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)?.streamLinkCopied ??
+                          'Stream link copied to clipboard!',
+                    ),
                     behavior: SnackBarBehavior.floating,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               },
@@ -1143,7 +1149,8 @@ class _LiveStreamPlayerScreenState
               focusNode: _commentFocusNode,
               style: const TextStyle(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Say something nice...',
+                hintText: AppLocalizations.of(context)?.saySomethingNice ??
+                    'Say something nice...',
                 hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.1),
@@ -1219,24 +1226,28 @@ class _LiveStreamPlayerScreenState
   }
 
   void _handleExit(bool isHost, LiveStreamRoomNotifier roomNotifier) {
+    final loc = AppLocalizations.of(context);
     if (isHost) {
       showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF161823),
-          title: const Text(
-            'End Live Stream?',
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            loc?.endLiveStreamTitle ?? 'End Live Stream?',
+            style: const TextStyle(color: Colors.white),
           ),
-          content: const Text(
-            'Are you sure you want to conclude this live stream?',
-            style: TextStyle(color: Colors.white70),
+          content: Text(
+            loc?.endLiveStreamConfirm ??
+                'Are you sure you want to conclude this live stream?',
+            style: const TextStyle(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child:
-                  const Text('Cancel', style: TextStyle(color: Colors.white60)),
+              child: Text(
+                loc?.cancel ?? 'Cancel',
+                style: const TextStyle(color: Colors.white60),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -1246,9 +1257,9 @@ class _LiveStreamPlayerScreenState
                 Navigator.of(ctx).pop();
                 roomNotifier.endStream();
               },
-              child: const Text(
-                'End Stream',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                loc?.endStream ?? 'End Stream',
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],

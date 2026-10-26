@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lotus_connect/features/livestream/data/datasources/livestream_ws_service.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class LiveStreamEndedDialog extends StatelessWidget {
   const LiveStreamEndedDialog({
@@ -40,6 +41,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final host = stream.host;
     final duration = endedEvent?.duration ?? stream.durationSeconds;
     final peakViewers = endedEvent?.peakViewers ?? stream.peakViewers;
@@ -95,9 +97,9 @@ class LiveStreamEndedDialog extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            const Text(
-              'Live Stream Ended',
-              style: TextStyle(
+            Text(
+              loc?.liveStreamEndedTitle ?? 'Live Stream Ended',
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -121,22 +123,22 @@ class LiveStreamEndedDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildStatItem(
-                  'Duration',
+                  loc?.streamDuration ?? 'Duration',
                   _formatDuration(duration),
                   Icons.timer_outlined,
                 ),
                 _buildStatItem(
-                  'Peak Viewers',
+                  loc?.peakViewers ?? 'Peak Viewers',
                   '$peakViewers',
                   Icons.people_alt_outlined,
                 ),
                 _buildStatItem(
-                  'Total Likes',
+                  loc?.totalLikes ?? 'Total Likes',
                   '$totalLikes',
                   Icons.favorite_border,
                 ),
                 _buildStatItem(
-                  'Total Views',
+                  loc?.totalViews ?? 'Total Views',
                   '$totalViews',
                   Icons.remove_red_eye_outlined,
                 ),
@@ -160,9 +162,9 @@ class LiveStreamEndedDialog extends StatelessWidget {
                   Navigator.of(context).pop(); // Dismiss dialog
                   onDone?.call();
                 },
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
+                child: Text(
+                  loc?.done ?? 'Done',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),

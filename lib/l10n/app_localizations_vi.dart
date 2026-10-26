@@ -519,7 +519,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy bắt đầu cuộc trò chuyện và chia sẻ suy nghĩ của bạn!';
 
   @override
-  String get saySomethingNice => 'Viết bình luận...';
+  String get saySomethingNice => 'Nói điều gì đó tốt đẹp...';
 
   @override
   String get addCommentHint => 'Thêm bình luận...';
@@ -992,4 +992,95 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get justNow => 'Vừa xong';
+
+  @override
+  String get goLive => 'Phát trực tiếp';
+
+  @override
+  String get filterAll => 'Tất cả';
+
+  @override
+  String get liveNow => 'Đang phát trực tiếp';
+
+  @override
+  String get endedReplays => 'Bản phát lại';
+
+  @override
+  String get noLiveStreams => 'Hiện không có buổi phát trực tiếp nào';
+
+  @override
+  String get noLiveStreamsPrompt =>
+      'Hãy là người đầu tiên phát trực tiếp và kết nối với bạn bè!';
+
+  @override
+  String get startStreamingNow => 'Bắt đầu phát ngay';
+
+  @override
+  String get streamEnded => 'ĐÃ KẾT THÚC';
+
+  @override
+  String get pleaseEnterStreamTitle =>
+      'Vui lòng nhập tiêu đề cho buổi phát trực tiếp';
+
+  @override
+  String get failedToStartLiveStream => 'Không thể bắt đầu buổi phát trực tiếp';
+
+  @override
+  String failedToGoLive(String error) {
+    return 'Không thể phát trực tiếp: $error';
+  }
+
+  @override
+  String get cameraInitializing => 'Đang khởi tạo máy ảnh...';
+
+  @override
+  String get flipCamera => 'Lật máy ảnh';
+
+  @override
+  String get streamTitleHint => 'Thêm tiêu đề để thu hút người xem...';
+
+  @override
+  String get privacyLabel => 'Quyền riêng tư:';
+
+  @override
+  String get privacyPrivate => 'Riêng tư';
+
+  @override
+  String get rtmpIngestTip =>
+      'Hỗ trợ máy ảnh điện thoại & luồng RTMP từ OBS/Streamlabs máy tính';
+
+  @override
+  String get goLiveNow => 'BẮT ĐẦU PHÁT NGAY';
+
+  @override
+  String get liveStreamEndedTitle => 'Buổi phát trực tiếp đã kết thúc';
+
+  @override
+  String get streamDuration => 'Thời lượng';
+
+  @override
+  String get peakViewers => 'Người xem cao nhất';
+
+  @override
+  String get totalLikes => 'Tổng lượt thích';
+
+  @override
+  String get totalViews => 'Tổng lượt xem';
+
+  @override
+  String get follow => 'Theo dõi';
+
+  @override
+  String get streamLinkCopied =>
+      'Đã sao chép liên kết buổi phát vào bộ nhớ tạm!';
+
+  @override
+  String get endLiveStreamTitle => 'Kết thúc buổi phát trực tiếp?';
+
+  @override
+  String get endLiveStreamConfirm =>
+      'Bạn có chắc chắn muốn kết thúc buổi phát trực tiếp này không?';
+
+  @override
+  String get endStream => 'Kết thúc phát';
 }
