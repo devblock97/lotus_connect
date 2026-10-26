@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoryTextEditorResult {
   const StoryTextEditorResult({
@@ -168,6 +169,7 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
   @override
   Widget build(BuildContext context) {
     final textStyle = _getTextStyle();
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: Colors.black.withValues(alpha: 0.8),
@@ -233,9 +235,9 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(
+                    child: Text(
+                      loc?.done ?? 'Done',
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                       ),
@@ -274,7 +276,7 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                         maxLines: null,
                         cursorColor: Colors.white,
                         decoration: InputDecoration(
-                          hintText: 'Type something...',
+                          hintText: loc?.typeSomething ?? 'Type something...',
                           hintStyle: textStyle.copyWith(
                             color: Colors.white.withValues(alpha: 0.4),
                           ),

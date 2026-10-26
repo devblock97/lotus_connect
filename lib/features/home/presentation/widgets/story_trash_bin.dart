@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoryTrashBin extends StatelessWidget {
   const StoryTrashBin({
@@ -13,6 +14,7 @@ class StoryTrashBin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutCubic,
@@ -83,7 +85,9 @@ class StoryTrashBin extends StatelessWidget {
                   ],
                 ),
                 child: Text(
-                  isOverTrash ? 'Release to remove' : 'Drag here to delete',
+                  isOverTrash
+                      ? (loc?.releaseToRemove ?? 'Release to remove')
+                      : (loc?.dragHereToDelete ?? 'Drag here to delete'),
                 ),
               ),
             ],

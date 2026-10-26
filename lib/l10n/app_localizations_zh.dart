@@ -633,4 +633,338 @@ class AppLocalizationsZh extends AppLocalizations {
   String likeCountPlural(int count) {
     return '$count 次赞';
   }
+
+  @override
+  String get tabHome => '首页';
+
+  @override
+  String get liveStreams => '直播';
+
+  @override
+  String get createPost => '发布帖子';
+
+  @override
+  String get noPostsYet => '暂无帖子';
+
+  @override
+  String get postDeletedSuccess => '帖子已成功删除。';
+
+  @override
+  String get postDeleteFailed => '删除帖子失败。';
+
+  @override
+  String get yourStory => '你的快拍';
+
+  @override
+  String whatsOnYourMind(String firstName) {
+    return '$firstName，在想些什么呢？';
+  }
+
+  @override
+  String get photo => '照片';
+
+  @override
+  String get camera => '相机';
+
+  @override
+  String get feeling => '感受';
+
+  @override
+  String get beTheFirstToLike => '成为第一个点赞的人';
+
+  @override
+  String get likedBy => '赞了: ';
+
+  @override
+  String othersCount(String count) {
+    return '其他 $count 人';
+  }
+
+  @override
+  String get seeMoreInline => '...更多';
+
+  @override
+  String get postOptions => '帖子选项';
+
+  @override
+  String photosOrVideosCount(int count) {
+    return '$count 个照片/视频';
+  }
+
+  @override
+  String get editPost => '编辑帖子';
+
+  @override
+  String editAudience(String visibility) {
+    return '编辑受众 ($visibility)';
+  }
+
+  @override
+  String get deletePost => '删除帖子';
+
+  @override
+  String get deletePostConfirmTitle => '删除帖子？';
+
+  @override
+  String get deletePostConfirmMessage => '确定要删除这条帖子吗？此操作无法撤销。';
+
+  @override
+  String get deleteAction => '删除';
+
+  @override
+  String get savePost => '保存帖子';
+
+  @override
+  String get postSavedToCollection => '帖子已保存到收藏夹';
+
+  @override
+  String get hidePost => '隐藏帖子';
+
+  @override
+  String get postHiddenFromFeed => '已从动态中隐藏帖子';
+
+  @override
+  String get reportPost => '举报帖子';
+
+  @override
+  String get thankYouForReporting => '感谢你的举报';
+
+  @override
+  String get copyLinkToPost => '复制帖子链接';
+
+  @override
+  String get linkCopiedToClipboard => '链接已复制到剪贴板';
+
+  @override
+  String get visibilityPublic => '公开';
+
+  @override
+  String get visibilityFriends => '好友';
+
+  @override
+  String get visibilityPrivate => '仅自己';
+
+  @override
+  String failedToPickImage(String error) {
+    return '选择图片失败: $error';
+  }
+
+  @override
+  String failedToPickVideo(String error) {
+    return '选择视频失败: $error';
+  }
+
+  @override
+  String filterApplied(String filterName) {
+    return '滤镜: $filterName';
+  }
+
+  @override
+  String get sharedToCloseFriends => '已分享至密友！⭐️';
+
+  @override
+  String get sharedToYourStory => '已分享至你的快拍！✨';
+
+  @override
+  String get failedToShareStory => '分享快拍失败，请重试。';
+
+  @override
+  String get discardStoryTitle => '放弃快拍？';
+
+  @override
+  String get discardStoryMessage => '如果现在返回，你所做的编辑将会丢失。';
+
+  @override
+  String get keepEditing => '继续编辑';
+
+  @override
+  String get discard => '放弃';
+
+  @override
+  String get textToolTooltip => '文字';
+
+  @override
+  String get backgroundGradientTooltip => '背景渐变';
+
+  @override
+  String get photoFilterTooltip => '照片滤镜';
+
+  @override
+  String get stickersTooltip => '贴纸';
+
+  @override
+  String get sharingStory => '正在分享快拍...';
+
+  @override
+  String get tapToType => '点击输入';
+
+  @override
+  String get modeCreate => '创建';
+
+  @override
+  String get modeGallery => '图库';
+
+  @override
+  String get modeCamera => '相机';
+
+  @override
+  String get pickPhoto => '选择照片';
+
+  @override
+  String get pickVideo => '选择视频';
+
+  @override
+  String get closeFriends => '密友';
+
+  @override
+  String get storyAudience => '快拍受众';
+
+  @override
+  String get storyAudiencePublicSubtitle => 'Lotus Connect 上的任何人均可查看';
+
+  @override
+  String get storyAudienceCloseFriendsSubtitle => '仅限密友列表中的人';
+
+  @override
+  String get storyAudienceFriendsSubtitle => '仅好友可见';
+
+  @override
+  String get releaseToRemove => '松开即可删除';
+
+  @override
+  String get dragHereToDelete => '拖动到此处删除';
+
+  @override
+  String get done => '完成';
+
+  @override
+  String get typeSomething => '输入内容...';
+
+  @override
+  String get stickers => '贴纸';
+
+  @override
+  String get mentionSomeone => '提及某人';
+
+  @override
+  String get mentionHint => '@用户名';
+
+  @override
+  String get locations => '位置';
+
+  @override
+  String get customLocation => '自定义...';
+
+  @override
+  String get addLocation => '添加位置';
+
+  @override
+  String get cityOrVenueHint => '城市或地点';
+
+  @override
+  String get statusAndVibes => '状态 & 氛围';
+
+  @override
+  String get emojis => '表情符号';
+
+  @override
+  String get discardPostTitle => '放弃帖子？';
+
+  @override
+  String get discardPostMessage => '如果现在返回，当前的帖子草稿和附件将会丢失。';
+
+  @override
+  String failedToPickImages(String error) {
+    return '选择图片失败: $error';
+  }
+
+  @override
+  String failedToCapturePhoto(String error) {
+    return '拍照失败: $error';
+  }
+
+  @override
+  String get postUpdatedSuccess => '帖子更新成功！';
+
+  @override
+  String get postSharedSuccess => '帖子发布成功！';
+
+  @override
+  String get postAction => '发布';
+
+  @override
+  String get isFeeling => '觉得';
+
+  @override
+  String get atLocation => '在';
+
+  @override
+  String itemsSelected(int count) {
+    return '已选择 $count 项';
+  }
+
+  @override
+  String get addMore => '添加更多';
+
+  @override
+  String get uploadingMediaAndPublishing => '正在上传媒体并发布...';
+
+  @override
+  String get savingChanges => '正在保存更改...';
+
+  @override
+  String get publishingPost => '正在发布帖子...';
+
+  @override
+  String get addToYourPost => '添加到你的帖子';
+
+  @override
+  String get photoVideoTooltip => '照片 / 视频';
+
+  @override
+  String get feelingActivityTooltip => '感受 / 活动';
+
+  @override
+  String get locationTooltip => '位置';
+
+  @override
+  String get backgroundColorTooltip => '背景颜色';
+
+  @override
+  String get postAudience => '帖子受众';
+
+  @override
+  String get postAudiencePublicSubtitle => 'Lotus Connect 内外的任何人都可以看到此帖子';
+
+  @override
+  String get postAudienceFriendsSubtitle => '仅限已接受的好友列表中的人';
+
+  @override
+  String get postAudiencePrivateSubtitle => '只有你可以在时间线上看到此帖子';
+
+  @override
+  String get howAreYouFeeling => '你感觉怎么样？';
+
+  @override
+  String get searchFeelings => '搜索感受...';
+
+  @override
+  String get whereAreYou => '你在哪里？';
+
+  @override
+  String useLocation(String location) {
+    return '使用 \"$location\"';
+  }
+
+  @override
+  String get replySent => '回复已发送！';
+
+  @override
+  String get sendMessageHint => '发送消息...';
+
+  @override
+  String get send => '发送';
+
+  @override
+  String get justNow => '刚刚';
 }

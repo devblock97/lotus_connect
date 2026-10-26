@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Modal bottom sheet providing Facebook & Instagram style post options.
 class PostOptionsSheet extends StatelessWidget {
@@ -43,22 +44,25 @@ class PostOptionsSheet extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
+    final loc = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete post?'),
-        content: const Text(
-          'Are you sure you want to delete this post? This cannot be undone.',
+        title: Text(loc?.deletePostConfirmTitle ?? 'Delete post?'),
+        content: Text(
+          loc?.deletePostConfirmMessage ??
+              'Are you sure you want to delete this post? '
+                  'This cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(loc?.cancel ?? 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-            child: const Text('Delete'),
+            child: Text(loc?.deleteAction ?? 'Delete'),
           ),
         ],
       ),
@@ -74,6 +78,7 @@ class PostOptionsSheet extends StatelessWidget {
   }
 
   void _copyLink(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     Navigator.of(context).pop();
     Clipboard.setData(
       ClipboardData(text: 'https://lotusconnect.app/posts/${post.id}'),
@@ -81,11 +86,11 @@ class PostOptionsSheet extends StatelessWidget {
     HapticFeedback.lightImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.link, color: Colors.white, size: 18),
-            SizedBox(width: 8),
-            Text('Link copied to clipboard'),
+            const Icon(Icons.link, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(loc?.linkCopiedToClipboard ?? 'Link copied to clipboard'),
           ],
         ),
         behavior: SnackBarBehavior.floating,
@@ -97,12 +102,26 @@ class PostOptionsSheet extends StatelessWidget {
     );
   }
 
+  String _getVisibilityLabel(String visibility, AppLocalizations? loc) {
+    switch (visibility.toLowerCase()) {
+      case 'public':
+        return loc?.visibilityPublic ?? 'Public';
+      case 'friends':
+        return loc?.visibilityFriends ?? 'Friends';
+      case 'private':
+        return loc?.visibilityPrivate ?? 'Only me';
+      default:
+        return visibility;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -137,7 +156,7 @@ class PostOptionsSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Post Options',
+                        loc?.postOptions ?? 'Post Options',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -150,7 +169,10 @@ class PostOptionsSheet extends StatelessWidget {
                             ? (post.content.length > 35
                                 ? '${post.content.substring(0, 35)}...'
                                 : post.content)
-                            : '${post.mediaItems.length} photos / videos',
+                            : (loc?.photosOrVideosCount(
+                                  post.mediaItems.length,
+                                ) ??
+                                '${post.mediaItems.length} photos / videos'),
                         style: TextStyle(
                           fontSize: 12.5,
                           color: subtextColor,
@@ -181,7 +203,7 @@ class PostOptionsSheet extends StatelessWidget {
             // Edit Post
             _OptionTile(
               icon: Icons.edit_outlined,
-              label: 'Edit post',
+              label: loc?.editPost ?? 'Edit post',
               color: primaryTextColor,
               onTap: () {
                 Navigator.of(context).pop();
@@ -192,7 +214,10 @@ class PostOptionsSheet extends StatelessWidget {
             // Edit Audience
             _OptionTile(
               icon: CupertinoIcons.person_2,
-              label: 'Edit audience (${post.visibility})',
+              label: loc?.editAudience(
+                    _getVisibilityLabel(post.visibility, loc),
+                  ) ??
+                  'Edit audience (${post.visibility})',
               color: primaryTextColor,
               onTap: () {
                 Navigator.of(context).pop();
@@ -203,7 +228,7 @@ class PostOptionsSheet extends StatelessWidget {
             // Delete Post (Destructive)
             _OptionTile(
               icon: Icons.delete_outline_rounded,
-              label: 'Delete post',
+              label: loc?.deletePost ?? 'Delete post',
               color: Colors.redAccent,
               onTap: () => _confirmDelete(context),
             ),
@@ -211,12 +236,16 @@ class PostOptionsSheet extends StatelessWidget {
             // Save Post
             _OptionTile(
               icon: Icons.bookmark_border_rounded,
-              label: 'Save post',
+              label: loc?.savePost ?? 'Save post',
               color: primaryTextColor,
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Post saved to collection')),
+                  SnackBar(
+                    content: Text(
+                      loc?.postSavedToCollection ?? 'Post saved to collection',
+                    ),
+                  ),
                 );
               },
             ),
@@ -224,12 +253,16 @@ class PostOptionsSheet extends StatelessWidget {
             // Hide Post
             _OptionTile(
               icon: Icons.visibility_off_outlined,
-              label: 'Hide post',
+              label: loc?.hidePost ?? 'Hide post',
               color: primaryTextColor,
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Post hidden from feed')),
+                  SnackBar(
+                    content: Text(
+                      loc?.postHiddenFromFeed ?? 'Post hidden from feed',
+                    ),
+                  ),
                 );
               },
             ),
@@ -237,12 +270,16 @@ class PostOptionsSheet extends StatelessWidget {
             // Report Post
             _OptionTile(
               icon: Icons.report_problem_outlined,
-              label: 'Report post',
+              label: loc?.reportPost ?? 'Report post',
               color: Colors.redAccent,
               onTap: () {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Thank you for reporting')),
+                  SnackBar(
+                    content: Text(
+                      loc?.thankYouForReporting ?? 'Thank you for reporting',
+                    ),
+                  ),
                 );
               },
             ),
@@ -251,7 +288,7 @@ class PostOptionsSheet extends StatelessWidget {
           // Copy Link
           _OptionTile(
             icon: Icons.link_rounded,
-            label: 'Copy link to post',
+            label: loc?.copyLinkToPost ?? 'Copy link to post',
             color: primaryTextColor,
             onTap: () => _copyLink(context),
           ),

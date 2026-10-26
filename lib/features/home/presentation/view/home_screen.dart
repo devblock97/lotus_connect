@@ -16,6 +16,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.da
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_explore_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -90,6 +91,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final feedState = ref.watch(feedNotifierProvider);
     final notifier = ref.read(feedNotifierProvider.notifier);
     final settings = ref.watch(settingsNotifierProvider).settings;
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -115,7 +117,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               size: 24,
             ),
             splashRadius: 20,
-            tooltip: 'Live streams',
+            tooltip: loc?.liveStreams ?? 'Live streams',
             onPressed: () {
               Navigator.of(context).push<void>(
                 MaterialPageRoute(
@@ -131,7 +133,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               size: 24,
             ),
             splashRadius: 20,
-            tooltip: 'Create post',
+            tooltip: loc?.createPost ?? 'Create post',
             onPressed: () {
               Navigator.of(context).push<void>(
                 MaterialPageRoute(
@@ -147,6 +149,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               size: 24,
             ),
             splashRadius: 20,
+            tooltip: loc?.chat ?? 'Chat',
             onPressed: () {},
           ),
           const SizedBox(width: 4),
@@ -191,7 +194,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 hasScrollBody: false,
                 child: Center(
                   child: Text(
-                    'No posts yet',
+                    loc?.noPostsYet ?? 'No posts yet',
                     style: TextStyle(
                       color: primaryTextColor.withValues(alpha: 0.6),
                       fontSize: 15,
@@ -262,8 +265,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   SnackBar(
                                     content: Text(
                                       success
-                                          ? 'Post deleted successfully.'
-                                          : 'Failed to delete post.',
+                                          ? (loc?.postDeletedSuccess ??
+                                              'Post deleted successfully.')
+                                          : (loc?.postDeleteFailed ??
+                                              'Failed to delete post.'),
                                     ),
                                     behavior: SnackBarBehavior.floating,
                                   ),

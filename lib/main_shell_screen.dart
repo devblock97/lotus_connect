@@ -91,10 +91,10 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         indicatorColor: theme.colorScheme.primaryContainer,
         destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_filled),
-            label: 'Home',
+          NavigationDestination(
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_filled),
+            label: loc.tabHome,
           ),
           NavigationDestination(
             icon: const Icon(Icons.chat_bubble_outline),

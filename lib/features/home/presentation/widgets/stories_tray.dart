@@ -10,6 +10,7 @@ import 'package:lotus_connect/features/livestream/application/livestream_feed_no
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
 import 'package:lotus_connect/features/livestream/presentation/widgets/live_badge.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoriesTray extends ConsumerWidget {
   const StoriesTray({super.key});
@@ -19,6 +20,7 @@ class StoriesTray extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
+    final loc = AppLocalizations.of(context);
 
     final storiesState = ref.watch(storiesNotifierProvider);
     final groups = storiesState.storyGroups;
@@ -110,7 +112,9 @@ class StoriesTray extends ConsumerWidget {
                   SizedBox(
                     width: 68,
                     child: Text(
-                      isMe ? 'Your story' : userStory.username,
+                      isMe
+                          ? (loc?.yourStory ?? 'Your story')
+                          : userStory.username,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,

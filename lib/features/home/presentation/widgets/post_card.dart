@@ -613,7 +613,9 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 8),
             Text(
-              item.isVideo ? 'Video' : 'Photo',
+              item.isVideo
+                  ? (AppLocalizations.of(context)?.video ?? 'Video')
+                  : (AppLocalizations.of(context)?.photo ?? 'Photo'),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -725,12 +727,13 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   Widget _buildLikesSection(Color primaryColor, Color secondaryColor) {
     final hasLikedBy = widget.post.likedByUsername != null &&
         widget.post.likedByUsername!.isNotEmpty;
+    final loc = AppLocalizations.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       child: _likesCount == 0
           ? Text(
-              'Be the first to like this',
+              loc?.beTheFirstToLike ?? 'Be the first to like this',
               style: TextStyle(
                 fontSize: 13,
                 color: secondaryColor,
@@ -746,21 +749,27 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                 ),
                 children: [
                   if (hasLikedBy) ...[
-                    const TextSpan(text: 'Liked by '),
+                    TextSpan(text: loc?.likedBy ?? 'Liked by '),
                     TextSpan(
                       text: widget.post.likedByUsername,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                       recognizer: TapGestureRecognizer()
                         ..onTap = widget.onProfileTap,
                     ),
-                    const TextSpan(text: ' and '),
+                    TextSpan(text: loc?.andWord ?? ' and '),
                     TextSpan(
-                      text: '${_numberFormat.format(_likesCount)} others',
+                      text: loc?.othersCount(
+                            _numberFormat.format(_likesCount),
+                          ) ??
+                          '${_numberFormat.format(_likesCount)} others',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ] else ...[
                     TextSpan(
-                      text: '${_numberFormat.format(_likesCount)} likes',
+                      text: _likesCount == 1
+                          ? (loc?.likeCountSingular ?? '1 like')
+                          : (loc?.likeCountPlural(_likesCount) ??
+                              '${_numberFormat.format(_likesCount)} likes'),
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -818,7 +827,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                 // "...more" button if collapsed
                 if (!_isCaptionExpanded && isLong)
                   TextSpan(
-                    text: '...more',
+                    text: AppLocalizations.of(context)?.seeMoreInline ??
+                        '...more',
                     style: TextStyle(
                       color: secondaryColor,
                     ),

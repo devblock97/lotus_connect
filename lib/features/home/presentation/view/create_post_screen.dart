@@ -14,6 +14,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/post_feeling_sh
 import 'package:lotus_connect/features/home/presentation/widgets/post_location_sheet.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_privacy_sheet.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class ColorPreset {
   const ColorPreset({
@@ -124,23 +125,25 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       return true;
     }
 
+    final loc = AppLocalizations.of(context);
     final discard = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Discard post?'),
-        content: const Text(
-          'If you go back now, your current post draft and attachments will '
-          'be lost.',
+        title: Text(loc?.discardPostTitle ?? 'Discard post?'),
+        content: Text(
+          loc?.discardPostMessage ??
+              'If you go back now, your current post draft and '
+                  'attachments will be lost.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Keep editing'),
+            child: Text(loc?.keepEditing ?? 'Keep editing'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
-            child: const Text('Discard'),
+            child: Text(loc?.discard ?? 'Discard'),
           ),
         ],
       ),
@@ -163,8 +166,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       }
     } on Object catch (e) {
       if (mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to pick images: $e')),
+          SnackBar(
+            content: Text(
+              loc?.failedToPickImages(e.toString()) ??
+                  'Failed to pick images: $e',
+            ),
+          ),
         );
       }
     }
@@ -184,8 +193,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       }
     } on Object catch (e) {
       if (mounted) {
+        final loc = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to capture photo: $e')),
+          SnackBar(
+            content: Text(
+              loc?.failedToCapturePhoto(e.toString()) ??
+                  'Failed to capture photo: $e',
+            ),
+          ),
         );
       }
     }
@@ -198,6 +213,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final isEditing = widget.postToEdit != null;
     final post = await notifier.submitPost();
     if (post != null && mounted) {
+      final loc = AppLocalizations.of(context);
       HapticFeedback.mediumImpact().ignore();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -212,8 +228,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               const SizedBox(width: 10),
               Text(
                 isEditing
-                    ? 'Post updated successfully!'
-                    : 'Post shared successfully!',
+                    ? (loc?.postUpdatedSuccess ?? 'Post updated successfully!')
+                    : (loc?.postSharedSuccess ?? 'Post shared successfully!'),
               ),
             ],
           ),
@@ -234,6 +250,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final primaryTextColor = isDark ? Colors.white : Colors.black87;
     final subtextColor = isDark ? Colors.white60 : Colors.black54;
+    final loc = AppLocalizations.of(context);
 
     final state = ref.watch(createPostNotifierProvider);
     final settings = ref.watch(settingsNotifierProvider).settings;
@@ -275,7 +292,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             },
           ),
           title: Text(
-            widget.postToEdit != null ? 'Edit post' : 'Create post',
+            widget.postToEdit != null
+                ? (loc?.editPost ?? 'Edit post')
+                : (loc?.createPost ?? 'Create post'),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -312,7 +331,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           ),
                         )
                       : Text(
-                          widget.postToEdit != null ? 'Save' : 'Post',
+                          widget.postToEdit != null
+                              ? (loc?.save ?? 'Save')
+                              : (loc?.postAction ?? 'Post'),
                           style: const TextStyle(
                             fontSize: 14.5,
                             fontWeight: FontWeight.w700,
@@ -344,6 +365,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           state,
                           primaryTextColor,
                           subtextColor,
+                          loc,
                         ),
 
                         const SizedBox(height: 16),
@@ -389,11 +411,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         if (activePreset.isNone ||
                             state.mediaPaths.isNotEmpty ||
                             state.existingMediaItems.isNotEmpty)
-                          _buildStandardTextField(displayName, primaryTextColor)
+                          _buildStandardTextField(
+                            displayName,
+                            primaryTextColor,
+                            loc,
+                          )
                         else
                           _buildColoredBackgroundCard(
                             displayName,
                             activePreset,
+                            loc,
                           ),
 
                         const SizedBox(height: 16),
@@ -405,6 +432,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             theme,
                             state.existingMediaItems,
                             state.mediaPaths,
+                            loc,
                           ),
 
                         // Facebook-style Color Swatches
@@ -420,7 +448,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 ),
 
                 // Facebook & Instagram style bottom "Add to your post" toolbar
-                _buildBottomToolbar(context, theme, primaryTextColor),
+                _buildBottomToolbar(context, theme, primaryTextColor, loc),
               ],
             ),
 
@@ -455,10 +483,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                       const SizedBox(height: 16),
                       Text(
                         state.mediaPaths.isNotEmpty
-                            ? 'Uploading media & publishing...'
+                            ? (loc?.uploadingMediaAndPublishing ??
+                                'Uploading media & publishing...')
                             : (widget.postToEdit != null
-                                ? 'Saving changes...'
-                                : 'Publishing post...'),
+                                ? (loc?.savingChanges ?? 'Saving changes...')
+                                : (loc?.publishingPost ??
+                                    'Publishing post...')),
                         style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w600,
@@ -483,6 +513,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     CreatePostState state,
     Color primaryTextColor,
     Color subtextColor,
+    AppLocalizations? loc,
   ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +553,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   children: [
                     if (state.feeling != null) ...[
                       TextSpan(
-                        text: ' is feeling ',
+                        text: ' ${loc?.isFeeling ?? 'is feeling'} ',
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           color: subtextColor,
@@ -540,7 +571,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     ],
                     if (state.location != null) ...[
                       TextSpan(
-                        text: ' at ',
+                        text: ' ${loc?.atLocation ?? 'at'} ',
                         style: TextStyle(
                           fontWeight: FontWeight.normal,
                           color: subtextColor,
@@ -597,7 +628,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        _getVisibilityLabel(state.visibility),
+                        _getVisibilityLabel(state.visibility, loc),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -632,18 +663,22 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     }
   }
 
-  String _getVisibilityLabel(String visibility) {
+  String _getVisibilityLabel(String visibility, AppLocalizations? loc) {
     switch (visibility) {
       case 'friends':
-        return 'Friends';
+        return loc?.visibilityFriends ?? 'Friends';
       case 'private':
-        return 'Only me';
+        return loc?.visibilityPrivate ?? 'Only me';
       default:
-        return 'Public';
+        return loc?.visibilityPublic ?? 'Public';
     }
   }
 
-  Widget _buildStandardTextField(String displayName, Color primaryTextColor) {
+  Widget _buildStandardTextField(
+    String displayName,
+    Color primaryTextColor,
+    AppLocalizations? loc,
+  ) {
     final firstName = displayName.split(' ').first;
     return TextField(
       controller: _textController,
@@ -657,7 +692,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         color: primaryTextColor,
       ),
       decoration: InputDecoration(
-        hintText: "What's on your mind, $firstName?",
+        hintText: loc?.whatsOnYourMind(firstName) ??
+            "What's on your mind, $firstName?",
         hintStyle: TextStyle(
           fontSize: 17,
           color: primaryTextColor.withValues(alpha: 0.45),
@@ -671,6 +707,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   Widget _buildColoredBackgroundCard(
     String displayName,
     ColorPreset preset,
+    AppLocalizations? loc,
   ) {
     final firstName = displayName.split(' ').first;
     return Container(
@@ -704,7 +741,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           height: 1.35,
         ),
         decoration: InputDecoration(
-          hintText: "What's on your mind, $firstName?",
+          hintText: loc?.whatsOnYourMind(firstName) ??
+              "What's on your mind, $firstName?",
           hintStyle: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -785,6 +823,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     ThemeData theme,
     List<PostMediaItem> existingItems,
     List<String> paths,
+    AppLocalizations? loc,
   ) {
     final totalCount = existingItems.length + paths.length;
     return Column(
@@ -793,8 +832,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         Row(
           children: [
             Text(
-              '$totalCount ${totalCount == 1 ? 'item' : 'items'} '
-              'selected',
+              loc?.itemsSelected(totalCount) ??
+                  '$totalCount ${totalCount == 1 ? 'item' : 'items'} selected',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -805,7 +844,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             TextButton.icon(
               onPressed: _handlePickGallery,
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 16),
-              label: const Text('Add more', style: TextStyle(fontSize: 12.5)),
+              label: Text(
+                loc?.addMore ?? 'Add more',
+                style: const TextStyle(fontSize: 12.5),
+              ),
             ),
           ],
         ),
@@ -858,18 +900,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             color: Colors.black.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.videocam_rounded,
                                 color: Colors.white,
                                 size: 14,
                               ),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
-                                'Video',
-                                style: TextStyle(
+                                loc?.video ?? 'Video',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
@@ -943,18 +985,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           color: Colors.black.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.videocam_rounded,
                               color: Colors.white,
                               size: 14,
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
-                              'Video',
-                              style: TextStyle(
+                              loc?.video ?? 'Video',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
@@ -1001,6 +1043,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     BuildContext context,
     ThemeData theme,
     Color primaryTextColor,
+    AppLocalizations? loc,
   ) {
     return Container(
       decoration: BoxDecoration(
@@ -1031,7 +1074,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           children: [
             Expanded(
               child: Text(
-                'Add to your post',
+                loc?.addToYourPost ?? 'Add to your post',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -1045,7 +1088,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
             // Photo / Video
             IconButton(
-              tooltip: 'Photo / Video',
+              tooltip: loc?.photoVideoTooltip ?? 'Photo / Video',
               padding: const EdgeInsets.all(6),
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
@@ -1060,7 +1103,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
             // Camera
             IconButton(
-              tooltip: 'Camera',
+              tooltip: loc?.camera ?? 'Camera',
               padding: const EdgeInsets.all(6),
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
@@ -1075,7 +1118,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
             // Feeling
             IconButton(
-              tooltip: 'Feeling / Activity',
+              tooltip: loc?.feelingActivityTooltip ?? 'Feeling / Activity',
               padding: const EdgeInsets.all(6),
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
@@ -1100,7 +1143,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
             // Location
             IconButton(
-              tooltip: 'Location',
+              tooltip: loc?.locationTooltip ?? 'Location',
               padding: const EdgeInsets.all(6),
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
@@ -1111,21 +1154,21 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               ),
               splashRadius: 18,
               onPressed: () async {
-                final loc = await PostLocationSheet.show(
+                final selectedLocation = await PostLocationSheet.show(
                   context,
                   current: ref.read(createPostNotifierProvider).location,
                 );
-                if (loc != null) {
+                if (selectedLocation != null) {
                   ref
                       .read(createPostNotifierProvider.notifier)
-                      .setLocation(loc);
+                      .setLocation(selectedLocation);
                 }
               },
             ),
 
             // Facebook Color Palette
             IconButton(
-              tooltip: 'Background Color',
+              tooltip: loc?.backgroundColorTooltip ?? 'Background Color',
               padding: const EdgeInsets.all(6),
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,

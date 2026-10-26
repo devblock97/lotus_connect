@@ -647,4 +647,351 @@ class AppLocalizationsEn extends AppLocalizations {
   String likeCountPlural(int count) {
     return '$count likes';
   }
+
+  @override
+  String get tabHome => 'Home';
+
+  @override
+  String get liveStreams => 'Live streams';
+
+  @override
+  String get createPost => 'Create post';
+
+  @override
+  String get noPostsYet => 'No posts yet';
+
+  @override
+  String get postDeletedSuccess => 'Post deleted successfully.';
+
+  @override
+  String get postDeleteFailed => 'Failed to delete post.';
+
+  @override
+  String get yourStory => 'Your story';
+
+  @override
+  String whatsOnYourMind(String firstName) {
+    return 'What\'s on your mind, $firstName?';
+  }
+
+  @override
+  String get photo => 'Photo';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get feeling => 'Feeling';
+
+  @override
+  String get beTheFirstToLike => 'Be the first to like this';
+
+  @override
+  String get likedBy => 'Liked by ';
+
+  @override
+  String othersCount(String count) {
+    return '$count others';
+  }
+
+  @override
+  String get seeMoreInline => '...more';
+
+  @override
+  String get postOptions => 'Post Options';
+
+  @override
+  String photosOrVideosCount(int count) {
+    return '$count photos / videos';
+  }
+
+  @override
+  String get editPost => 'Edit post';
+
+  @override
+  String editAudience(String visibility) {
+    return 'Edit audience ($visibility)';
+  }
+
+  @override
+  String get deletePost => 'Delete post';
+
+  @override
+  String get deletePostConfirmTitle => 'Delete post?';
+
+  @override
+  String get deletePostConfirmMessage =>
+      'Are you sure you want to delete this post? This cannot be undone.';
+
+  @override
+  String get deleteAction => 'Delete';
+
+  @override
+  String get savePost => 'Save post';
+
+  @override
+  String get postSavedToCollection => 'Post saved to collection';
+
+  @override
+  String get hidePost => 'Hide post';
+
+  @override
+  String get postHiddenFromFeed => 'Post hidden from feed';
+
+  @override
+  String get reportPost => 'Report post';
+
+  @override
+  String get thankYouForReporting => 'Thank you for reporting';
+
+  @override
+  String get copyLinkToPost => 'Copy link to post';
+
+  @override
+  String get linkCopiedToClipboard => 'Link copied to clipboard';
+
+  @override
+  String get visibilityPublic => 'Public';
+
+  @override
+  String get visibilityFriends => 'Friends';
+
+  @override
+  String get visibilityPrivate => 'Only me';
+
+  @override
+  String failedToPickImage(String error) {
+    return 'Failed to pick image: $error';
+  }
+
+  @override
+  String failedToPickVideo(String error) {
+    return 'Failed to pick video: $error';
+  }
+
+  @override
+  String filterApplied(String filterName) {
+    return 'Filter: $filterName';
+  }
+
+  @override
+  String get sharedToCloseFriends => 'Shared to Close Friends! ⭐️';
+
+  @override
+  String get sharedToYourStory => 'Shared to your story! ✨';
+
+  @override
+  String get failedToShareStory => 'Failed to share story. Please try again.';
+
+  @override
+  String get discardStoryTitle => 'Discard story?';
+
+  @override
+  String get discardStoryMessage =>
+      'If you go back now, you\'ll lose any edits you made.';
+
+  @override
+  String get keepEditing => 'Keep editing';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get textToolTooltip => 'Text';
+
+  @override
+  String get backgroundGradientTooltip => 'Background gradient';
+
+  @override
+  String get photoFilterTooltip => 'Photo filter';
+
+  @override
+  String get stickersTooltip => 'Stickers';
+
+  @override
+  String get sharingStory => 'Sharing story...';
+
+  @override
+  String get tapToType => 'Tap to type';
+
+  @override
+  String get modeCreate => 'Create';
+
+  @override
+  String get modeGallery => 'Gallery';
+
+  @override
+  String get modeCamera => 'Camera';
+
+  @override
+  String get pickPhoto => 'Pick Photo';
+
+  @override
+  String get pickVideo => 'Pick Video';
+
+  @override
+  String get closeFriends => 'Close Friends';
+
+  @override
+  String get storyAudience => 'Story Audience';
+
+  @override
+  String get storyAudiencePublicSubtitle => 'Anyone on Lotus Connect can view';
+
+  @override
+  String get storyAudienceCloseFriendsSubtitle =>
+      'Only people in your Close Friends list';
+
+  @override
+  String get storyAudienceFriendsSubtitle => 'Visible only to accepted friends';
+
+  @override
+  String get releaseToRemove => 'Release to remove';
+
+  @override
+  String get dragHereToDelete => 'Drag here to delete';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get typeSomething => 'Type something...';
+
+  @override
+  String get stickers => 'Stickers';
+
+  @override
+  String get mentionSomeone => 'Mention Someone';
+
+  @override
+  String get mentionHint => '@username';
+
+  @override
+  String get locations => 'Locations';
+
+  @override
+  String get customLocation => 'Custom...';
+
+  @override
+  String get addLocation => 'Add Location';
+
+  @override
+  String get cityOrVenueHint => 'City or venue';
+
+  @override
+  String get statusAndVibes => 'Status & Vibes';
+
+  @override
+  String get emojis => 'Emojis';
+
+  @override
+  String get discardPostTitle => 'Discard post?';
+
+  @override
+  String get discardPostMessage =>
+      'If you go back now, your current post draft and attachments will be lost.';
+
+  @override
+  String failedToPickImages(String error) {
+    return 'Failed to pick images: $error';
+  }
+
+  @override
+  String failedToCapturePhoto(String error) {
+    return 'Failed to capture photo: $error';
+  }
+
+  @override
+  String get postUpdatedSuccess => 'Post updated successfully!';
+
+  @override
+  String get postSharedSuccess => 'Post shared successfully!';
+
+  @override
+  String get postAction => 'Post';
+
+  @override
+  String get isFeeling => 'is feeling';
+
+  @override
+  String get atLocation => 'at';
+
+  @override
+  String itemsSelected(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items selected',
+      one: '1 item selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addMore => 'Add more';
+
+  @override
+  String get uploadingMediaAndPublishing => 'Uploading media & publishing...';
+
+  @override
+  String get savingChanges => 'Saving changes...';
+
+  @override
+  String get publishingPost => 'Publishing post...';
+
+  @override
+  String get addToYourPost => 'Add to your post';
+
+  @override
+  String get photoVideoTooltip => 'Photo / Video';
+
+  @override
+  String get feelingActivityTooltip => 'Feeling / Activity';
+
+  @override
+  String get locationTooltip => 'Location';
+
+  @override
+  String get backgroundColorTooltip => 'Background Color';
+
+  @override
+  String get postAudience => 'Post Audience';
+
+  @override
+  String get postAudiencePublicSubtitle =>
+      'Anyone on or off Lotus Connect can see this post';
+
+  @override
+  String get postAudienceFriendsSubtitle =>
+      'Only people in your accepted friends list';
+
+  @override
+  String get postAudiencePrivateSubtitle =>
+      'Only you can see this post in your timeline';
+
+  @override
+  String get howAreYouFeeling => 'How are you feeling?';
+
+  @override
+  String get searchFeelings => 'Search feelings...';
+
+  @override
+  String get whereAreYou => 'Where are you?';
+
+  @override
+  String useLocation(String location) {
+    return 'Use \"$location\"';
+  }
+
+  @override
+  String get replySent => 'Reply sent!';
+
+  @override
+  String get sendMessageHint => 'Send message...';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get justNow => 'Just now';
 }
