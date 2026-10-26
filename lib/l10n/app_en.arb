@@ -458,5 +458,130 @@
   "replySent": "Reply sent!",
   "sendMessageHint": "Send message...",
   "send": "Send",
-  "justNow": "Just now"
+  "justNow": "Just now",
+  "goLive": "Go Live",
+  "@goLive": {
+    "description": "Button label to start a livestream"
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter chip label for showing all items"
+  },
+  "liveNow": "Live Now",
+  "@liveNow": {
+    "description": "Label for active livestream status"
+  },
+  "endedReplays": "Ended Replays",
+  "@endedReplays": {
+    "description": "Filter chip label for ended livestream replays"
+  },
+  "noLiveStreams": "No live streams right now",
+  "@noLiveStreams": {
+    "description": "Title for empty livestream feed"
+  },
+  "noLiveStreamsPrompt": "Be the first to start a live stream and connect with friends!",
+  "@noLiveStreamsPrompt": {
+    "description": "Subtitle encouraging user to start a live stream"
+  },
+  "startStreamingNow": "Start Streaming Now",
+  "@startStreamingNow": {
+    "description": "Button label to start streaming on empty feed"
+  },
+  "streamEnded": "ENDED",
+  "@streamEnded": {
+    "description": "Badge label indicating a stream has ended"
+  },
+  "pleaseEnterStreamTitle": "Please enter a title for your live stream",
+  "@pleaseEnterStreamTitle": {
+    "description": "Validation error when stream title is empty"
+  },
+  "failedToStartLiveStream": "Failed to start live stream",
+  "@failedToStartLiveStream": {
+    "description": "Error message when creating live stream fails"
+  },
+  "failedToGoLive": "Failed to go live: {error}",
+  "@failedToGoLive": {
+    "description": "Error message when starting live stream fails with exception",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cameraInitializing": "Camera initializing...",
+  "@cameraInitializing": {
+    "description": "Placeholder text while camera stream is loading"
+  },
+  "flipCamera": "Flip Camera",
+  "@flipCamera": {
+    "description": "Tooltip for flipping camera"
+  },
+  "streamTitleHint": "Add a title to attract viewers...",
+  "@streamTitleHint": {
+    "description": "Hint text for live stream title input"
+  },
+  "privacyLabel": "Privacy:",
+  "@privacyLabel": {
+    "description": "Label for stream privacy setting"
+  },
+  "privacyPrivate": "Private",
+  "@privacyPrivate": {
+    "description": "Privacy option for private live stream"
+  },
+  "rtmpIngestTip": "Supports mobile camera & desktop OBS/Streamlabs RTMP ingest",
+  "@rtmpIngestTip": {
+    "description": "Tip describing camera and RTMP broadcast support"
+  },
+  "goLiveNow": "GO LIVE NOW",
+  "@goLiveNow": {
+    "description": "Call to action button to immediately broadcast live"
+  },
+  "liveStreamEndedTitle": "Live Stream Ended",
+  "@liveStreamEndedTitle": {
+    "description": "Title on the dialog shown when a live stream concludes"
+  },
+  "streamDuration": "Duration",
+  "@streamDuration": {
+    "description": "Statistic label for live stream duration"
+  },
+  "peakViewers": "Peak Viewers",
+  "@peakViewers": {
+    "description": "Statistic label for highest concurrent viewers"
+  },
+  "totalLikes": "Total Likes",
+  "@totalLikes": {
+    "description": "Statistic label for total reactions/likes received"
+  },
+  "totalViews": "Total Views",
+  "@totalViews": {
+    "description": "Statistic label for total unique viewers"
+  },
+  "follow": "Follow",
+  "@follow": {
+    "description": "Button to follow streamer"
+  },
+  "addCommentHint": "Add a comment...",
+  "@addCommentHint": {
+    "description": "Placeholder on the comment input bar"
+  },
+  "streamLinkCopied": "Stream link copied to clipboard!",
+  "@streamLinkCopied": {
+    "description": "Snackbar notification when stream URL is copied"
+  },
+  "saySomethingNice": "Say something nice...",
+  "@saySomethingNice": {
+    "description": "Hint in active live chat text input field"
+  },
+  "endLiveStreamTitle": "End Live Stream?",
+  "@endLiveStreamTitle": {
+    "description": "Dialog title confirming if host wants to conclude stream"
+  },
+  "endLiveStreamConfirm": "Are you sure you want to conclude this live stream?",
+  "@endLiveStreamConfirm": {
+    "description": "Confirmation message when host attempts to exit stream"
+  },
+  "endStream": "End Stream",
+  "@endStream": {
+    "description": "Action button in dialog confirming stream conclusion"
+  }
 }

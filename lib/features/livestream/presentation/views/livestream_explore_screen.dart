@@ -7,6 +7,7 @@ import 'package:lotus_connect/features/livestream/domain/entities/live_stream.da
 import 'package:lotus_connect/features/livestream/presentation/views/go_live_screen.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
 import 'package:lotus_connect/features/livestream/presentation/widgets/live_badge.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class LiveStreamExploreScreen extends ConsumerWidget {
   const LiveStreamExploreScreen({super.key});
@@ -14,19 +15,20 @@ class LiveStreamExploreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final feedState = ref.watch(liveStreamFeedProvider);
     final feedNotifier = ref.read(liveStreamFeedProvider.notifier);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            LiveBadge(),
-            SizedBox(width: 8),
+            const LiveBadge(),
+            const SizedBox(width: 8),
             Text(
-              'Live Streams',
-              style: TextStyle(
+              loc?.liveStreams ?? 'Live Streams',
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -39,9 +41,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
               foregroundColor: const Color(0xFFFF0844),
             ),
             icon: const Icon(Icons.sensors, size: 18),
-            label: const Text(
-              'Go Live',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            label: Text(
+              loc?.goLive ?? 'Go Live',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             onPressed: () {
               Navigator.of(context).push(
@@ -53,48 +55,47 @@ class LiveStreamExploreScreen extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                _buildFilterChip(
+                  context,
+                  label: loc?.filterAll ?? 'All',
+                  filterValue: 'all',
+                  currentFilter: feedState.statusFilter,
+                  onSelect: feedNotifier.changeStatusFilter,
+                ),
+                const SizedBox(width: 8),
+                _buildFilterChip(
+                  context,
+                  label: '🔴 ${loc?.liveNow ?? 'Live Now'}',
+                  filterValue: 'live',
+                  currentFilter: feedState.statusFilter,
+                  onSelect: feedNotifier.changeStatusFilter,
+                ),
+                const SizedBox(width: 8),
+                _buildFilterChip(
+                  context,
+                  label: loc?.endedReplays ?? 'Ended Replays',
+                  filterValue: 'ended',
+                  currentFilter: feedState.statusFilter,
+                  onSelect: feedNotifier.changeStatusFilter,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: feedNotifier.refresh,
         child: CustomScrollView(
           slivers: [
-            // Filter Chips
-            SliverToBoxAdapter(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    _buildFilterChip(
-                      context,
-                      label: 'All',
-                      filterValue: 'all',
-                      currentFilter: feedState.statusFilter,
-                      onSelect: feedNotifier.changeStatusFilter,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      context,
-                      label: '🔴 Live Now',
-                      filterValue: 'live',
-                      currentFilter: feedState.statusFilter,
-                      onSelect: feedNotifier.changeStatusFilter,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildFilterChip(
-                      context,
-                      label: 'Ended Replays',
-                      filterValue: 'ended',
-                      currentFilter: feedState.statusFilter,
-                      onSelect: feedNotifier.changeStatusFilter,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Content
-            if (feedState.isLoading && feedState.streams.isEmpty)
+            if (feedState.status == LiveStreamFeedStatus.initial &&
+                feedState.streams.isEmpty)
               const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               )
@@ -111,21 +112,26 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                         color: theme.dividerColor.withValues(alpha: 0.6),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'No live streams right now',
-                        style: TextStyle(
+                      Text(
+                        loc?.noLiveStreams ?? 'No live streams right now',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(
-                        'Be the first to start a live stream '
-                        'and connect with friends!',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: theme.textTheme.bodyMedium?.color
-                              ?.withValues(alpha: 0.7),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(
+                          loc?.noLiveStreamsPrompt ??
+                              'Be the first to start a live stream '
+                                  'and connect with friends!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.7),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -142,7 +148,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                           ),
                         ),
                         icon: const Icon(Icons.sensors, size: 18),
-                        label: const Text('Start Streaming Now'),
+                        label: Text(
+                          loc?.startStreamingNow ?? 'Start Streaming Now',
+                        ),
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute<void>(
@@ -181,9 +189,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFFFF0844),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.sensors),
-        label: const Text(
-          'Go Live',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        label: Text(
+          loc?.goLive ?? 'Go Live',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         onPressed: () {
           Navigator.of(context).push(
@@ -231,6 +239,7 @@ class LiveStreamExploreScreen extends ConsumerWidget {
   }
 
   Widget _buildStreamCard(BuildContext context, LiveStream stream) {
+    final loc = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
@@ -313,9 +322,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        'ENDED',
-                        style: TextStyle(
+                      child: Text(
+                        loc?.streamEnded ?? 'ENDED',
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,

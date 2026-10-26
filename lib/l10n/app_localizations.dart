@@ -1086,13 +1086,13 @@ abstract class AppLocalizations {
   /// **'Start the conversation and share what you think!'**
   String get startConversationPrompt;
 
-  /// No description provided for @saySomethingNice.
+  /// Hint in active live chat text input field
   ///
   /// In en, this message translates to:
-  /// **'Say something nice'**
+  /// **'Say something nice...'**
   String get saySomethingNice;
 
-  /// No description provided for @addCommentHint.
+  /// Placeholder on the comment input bar
   ///
   /// In en, this message translates to:
   /// **'Add a comment...'**
@@ -1943,6 +1943,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Just now'**
   String get justNow;
+
+  /// Button label to start a livestream
+  ///
+  /// In en, this message translates to:
+  /// **'Go Live'**
+  String get goLive;
+
+  /// Filter chip label for showing all items
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Label for active livestream status
+  ///
+  /// In en, this message translates to:
+  /// **'Live Now'**
+  String get liveNow;
+
+  /// Filter chip label for ended livestream replays
+  ///
+  /// In en, this message translates to:
+  /// **'Ended Replays'**
+  String get endedReplays;
+
+  /// Title for empty livestream feed
+  ///
+  /// In en, this message translates to:
+  /// **'No live streams right now'**
+  String get noLiveStreams;
+
+  /// Subtitle encouraging user to start a live stream
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to start a live stream and connect with friends!'**
+  String get noLiveStreamsPrompt;
+
+  /// Button label to start streaming on empty feed
+  ///
+  /// In en, this message translates to:
+  /// **'Start Streaming Now'**
+  String get startStreamingNow;
+
+  /// Badge label indicating a stream has ended
+  ///
+  /// In en, this message translates to:
+  /// **'ENDED'**
+  String get streamEnded;
+
+  /// Validation error when stream title is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a title for your live stream'**
+  String get pleaseEnterStreamTitle;
+
+  /// Error message when creating live stream fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to start live stream'**
+  String get failedToStartLiveStream;
+
+  /// Error message when starting live stream fails with exception
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to go live: {error}'**
+  String failedToGoLive(String error);
+
+  /// Placeholder text while camera stream is loading
+  ///
+  /// In en, this message translates to:
+  /// **'Camera initializing...'**
+  String get cameraInitializing;
+
+  /// Tooltip for flipping camera
+  ///
+  /// In en, this message translates to:
+  /// **'Flip Camera'**
+  String get flipCamera;
+
+  /// Hint text for live stream title input
+  ///
+  /// In en, this message translates to:
+  /// **'Add a title to attract viewers...'**
+  String get streamTitleHint;
+
+  /// Label for stream privacy setting
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy:'**
+  String get privacyLabel;
+
+  /// Privacy option for private live stream
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get privacyPrivate;
+
+  /// Tip describing camera and RTMP broadcast support
+  ///
+  /// In en, this message translates to:
+  /// **'Supports mobile camera & desktop OBS/Streamlabs RTMP ingest'**
+  String get rtmpIngestTip;
+
+  /// Call to action button to immediately broadcast live
+  ///
+  /// In en, this message translates to:
+  /// **'GO LIVE NOW'**
+  String get goLiveNow;
+
+  /// Title on the dialog shown when a live stream concludes
+  ///
+  /// In en, this message translates to:
+  /// **'Live Stream Ended'**
+  String get liveStreamEndedTitle;
+
+  /// Statistic label for live stream duration
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get streamDuration;
+
+  /// Statistic label for highest concurrent viewers
+  ///
+  /// In en, this message translates to:
+  /// **'Peak Viewers'**
+  String get peakViewers;
+
+  /// Statistic label for total reactions/likes received
+  ///
+  /// In en, this message translates to:
+  /// **'Total Likes'**
+  String get totalLikes;
+
+  /// Statistic label for total unique viewers
+  ///
+  /// In en, this message translates to:
+  /// **'Total Views'**
+  String get totalViews;
+
+  /// Button to follow streamer
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get follow;
+
+  /// Snackbar notification when stream URL is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Stream link copied to clipboard!'**
+  String get streamLinkCopied;
+
+  /// Dialog title confirming if host wants to conclude stream
+  ///
+  /// In en, this message translates to:
+  /// **'End Live Stream?'**
+  String get endLiveStreamTitle;
+
+  /// Confirmation message when host attempts to exit stream
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to conclude this live stream?'**
+  String get endLiveStreamConfirm;
+
+  /// Action button in dialog confirming stream conclusion
+  ///
+  /// In en, this message translates to:
+  /// **'End Stream'**
+  String get endStream;
 }
 
 class _AppLocalizationsDelegate

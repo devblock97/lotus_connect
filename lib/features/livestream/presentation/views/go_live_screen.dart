@@ -6,6 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:lotus_connect/features/livestream/application/go_live_notifier.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Screen allowing users to setup and start broadcasting their live stream.
 class GoLiveScreen extends ConsumerStatefulWidget {
@@ -86,11 +87,15 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
   }
 
   Future<void> _startLiveStream() async {
+    final loc = AppLocalizations.of(context);
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a title for your live stream'),
+        SnackBar(
+          content: Text(
+            loc?.pleaseEnterStreamTitle ??
+                'Please enter a title for your live stream',
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -114,7 +119,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
       if (liveStream == null) {
         setState(() => _isCreating = false);
         final error = ref.read(goLiveNotifierProvider).error ??
-            'Failed to start live stream';
+            (loc?.failedToStartLiveStream ?? 'Failed to start live stream');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(error),
@@ -142,7 +147,9 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
         setState(() => _isCreating = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to go live: $e'),
+            content: Text(
+              loc?.failedToGoLive(e.toString()) ?? 'Failed to go live: $e',
+            ),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
@@ -153,6 +160,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final goLiveState = ref.watch(goLiveNotifierProvider);
     final isCreating = _isCreating || goLiveState.isLoading;
 
@@ -192,10 +200,12 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                             color: Colors.white24,
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            'Camera initializing...',
-                            style:
-                                TextStyle(color: Colors.white38, fontSize: 13),
+                          Text(
+                            loc?.cameraInitializing ?? 'Camera initializing...',
+                            style: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
@@ -223,7 +233,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                           Icons.flip_camera_ios,
                           color: Colors.white,
                         ),
-                        tooltip: 'Flip Camera',
+                        tooltip: loc?.flipCamera ?? 'Flip Camera',
                         onPressed: _flipCamera,
                       ),
                     ],
@@ -260,7 +270,8 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Add a title to attract viewers...',
+                          hintText: loc?.streamTitleHint ??
+                              'Add a title to attract viewers...',
                           hintStyle: const TextStyle(
                             color: Colors.white54,
                             fontSize: 15,
@@ -282,20 +293,29 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
 
                       Row(
                         children: [
-                          const Text(
-                            'Privacy:',
-                            style: TextStyle(
+                          Text(
+                            loc?.privacyLabel ?? 'Privacy:',
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _buildPrivacyChip('public', '🌍 Public'),
+                          _buildPrivacyChip(
+                            'public',
+                            '🌍 ${loc?.visibilityPublic ?? 'Public'}',
+                          ),
                           const SizedBox(width: 6),
-                          _buildPrivacyChip('friends', '👥 Friends'),
+                          _buildPrivacyChip(
+                            'friends',
+                            '👥 ${loc?.visibilityFriends ?? 'Friends'}',
+                          ),
                           const SizedBox(width: 6),
-                          _buildPrivacyChip('private', '🔒 Private'),
+                          _buildPrivacyChip(
+                            'private',
+                            '🔒 ${loc?.privacyPrivate ?? 'Private'}',
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -307,18 +327,19 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                           color: Colors.white.withValues(alpha: 0.04),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.cast_connected,
                               color: Color(0xFF64D2FF),
                               size: 18,
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Supports mobile camera & desktop OBS/Streamlabs RTMP ingest',
-                                style: TextStyle(
+                                loc?.rtmpIngestTip ??
+                                    'Supports mobile camera & desktop OBS/Streamlabs RTMP ingest',
+                                style: const TextStyle(
                                   color: Colors.white60,
                                   fontSize: 11,
                                 ),
@@ -368,18 +389,18 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                                         strokeWidth: 2.5,
                                       ),
                                     )
-                                  : const Row(
+                                  : Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.sensors,
                                           color: Colors.white,
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Text(
-                                          'GO LIVE NOW',
-                                          style: TextStyle(
+                                          loc?.goLiveNow ?? 'GO LIVE NOW',
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w900,

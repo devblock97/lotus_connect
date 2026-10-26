@@ -506,7 +506,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get startConversationPrompt => '最初のコメントを投稿して会話を始めましょう！';
 
   @override
-  String get saySomethingNice => '素敵なコメントを残す';
+  String get saySomethingNice => '優しい言葉をかけましょう...';
 
   @override
   String get addCommentHint => 'コメントを追加...';
@@ -969,4 +969,90 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get justNow => 'たった今';
+
+  @override
+  String get goLive => 'ライブ配信';
+
+  @override
+  String get filterAll => 'すべて';
+
+  @override
+  String get liveNow => 'ライブ中';
+
+  @override
+  String get endedReplays => '終了した配信';
+
+  @override
+  String get noLiveStreams => '現在配信中のライブはありません';
+
+  @override
+  String get noLiveStreamsPrompt => '最初の配信者になって友達とつながりましょう！';
+
+  @override
+  String get startStreamingNow => '今すぐ配信を開始';
+
+  @override
+  String get streamEnded => '終了';
+
+  @override
+  String get pleaseEnterStreamTitle => 'ライブ配信のタイトルを入力してください';
+
+  @override
+  String get failedToStartLiveStream => 'ライブ配信を開始できませんでした';
+
+  @override
+  String failedToGoLive(String error) {
+    return '配信開始に失敗しました: $error';
+  }
+
+  @override
+  String get cameraInitializing => 'カメラを初期化中...';
+
+  @override
+  String get flipCamera => 'カメラを反転';
+
+  @override
+  String get streamTitleHint => '視聴者を惹きつけるタイトルを追加...';
+
+  @override
+  String get privacyLabel => '公開範囲:';
+
+  @override
+  String get privacyPrivate => '非公開';
+
+  @override
+  String get rtmpIngestTip => 'スマホカメラおよびPC OBS/Streamlabs RTMP配信に対応';
+
+  @override
+  String get goLiveNow => '今すぐ配信開始';
+
+  @override
+  String get liveStreamEndedTitle => 'ライブ配信が終了しました';
+
+  @override
+  String get streamDuration => '配信時間';
+
+  @override
+  String get peakViewers => '最高視聴者数';
+
+  @override
+  String get totalLikes => '総いいね数';
+
+  @override
+  String get totalViews => '総視聴回数';
+
+  @override
+  String get follow => 'フォロー';
+
+  @override
+  String get streamLinkCopied => '配信リンクをクリップボードにコピーしました！';
+
+  @override
+  String get endLiveStreamTitle => 'ライブ配信を終了しますか？';
+
+  @override
+  String get endLiveStreamConfirm => 'このライブ配信を終了してもよろしいですか？';
+
+  @override
+  String get endStream => '配信終了';
 }

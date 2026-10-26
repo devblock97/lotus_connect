@@ -517,7 +517,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Start the conversation and share what you think!';
 
   @override
-  String get saySomethingNice => 'Say something nice';
+  String get saySomethingNice => 'Say something nice...';
 
   @override
   String get addCommentHint => 'Add a comment...';
@@ -994,4 +994,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get justNow => 'Just now';
+
+  @override
+  String get goLive => 'Go Live';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get liveNow => 'Live Now';
+
+  @override
+  String get endedReplays => 'Ended Replays';
+
+  @override
+  String get noLiveStreams => 'No live streams right now';
+
+  @override
+  String get noLiveStreamsPrompt =>
+      'Be the first to start a live stream and connect with friends!';
+
+  @override
+  String get startStreamingNow => 'Start Streaming Now';
+
+  @override
+  String get streamEnded => 'ENDED';
+
+  @override
+  String get pleaseEnterStreamTitle =>
+      'Please enter a title for your live stream';
+
+  @override
+  String get failedToStartLiveStream => 'Failed to start live stream';
+
+  @override
+  String failedToGoLive(String error) {
+    return 'Failed to go live: $error';
+  }
+
+  @override
+  String get cameraInitializing => 'Camera initializing...';
+
+  @override
+  String get flipCamera => 'Flip Camera';
+
+  @override
+  String get streamTitleHint => 'Add a title to attract viewers...';
+
+  @override
+  String get privacyLabel => 'Privacy:';
+
+  @override
+  String get privacyPrivate => 'Private';
+
+  @override
+  String get rtmpIngestTip =>
+      'Supports mobile camera & desktop OBS/Streamlabs RTMP ingest';
+
+  @override
+  String get goLiveNow => 'GO LIVE NOW';
+
+  @override
+  String get liveStreamEndedTitle => 'Live Stream Ended';
+
+  @override
+  String get streamDuration => 'Duration';
+
+  @override
+  String get peakViewers => 'Peak Viewers';
+
+  @override
+  String get totalLikes => 'Total Likes';
+
+  @override
+  String get totalViews => 'Total Views';
+
+  @override
+  String get follow => 'Follow';
+
+  @override
+  String get streamLinkCopied => 'Stream link copied to clipboard!';
+
+  @override
+  String get endLiveStreamTitle => 'End Live Stream?';
+
+  @override
+  String get endLiveStreamConfirm =>
+      'Are you sure you want to conclude this live stream?';
+
+  @override
+  String get endStream => 'End Stream';
 }

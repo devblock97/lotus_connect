@@ -4,30 +4,31 @@ import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_providers.dart';
 import 'package:lotus_connect/features/livestream/data/datasources/livestream_ws_service.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
-import 'package:lotus_connect/features/livestream/domain/repositories/livestream_repository.dart';
 import 'package:lotus_connect/features/livestream/domain/usecases/get_list_stream_use_case.dart';
+
+enum LiveStreamFeedStatus { initial, loading, success, failure }
 
 class LiveStreamFeedState {
   const LiveStreamFeedState({
-    this.isLoading = false,
+    this.status = LiveStreamFeedStatus.initial,
     this.streams = const [],
     this.statusFilter = 'live',
     this.errorMessage,
   });
 
-  final bool isLoading;
+  final LiveStreamFeedStatus status;
   final List<LiveStream> streams;
   final String statusFilter;
   final String? errorMessage;
 
   LiveStreamFeedState copyWith({
-    bool? isLoading,
+    LiveStreamFeedStatus? status,
     List<LiveStream>? streams,
     String? statusFilter,
     String? errorMessage,
   }) {
     return LiveStreamFeedState(
-      isLoading: isLoading ?? this.isLoading,
+      status: status ?? this.status,
       streams: streams ?? this.streams,
       statusFilter: statusFilter ?? this.statusFilter,
       errorMessage: errorMessage,
@@ -37,17 +38,14 @@ class LiveStreamFeedState {
 
 class LiveStreamFeedNotifier extends StateNotifier<LiveStreamFeedState> {
   LiveStreamFeedNotifier({
-    required LiveStreamRepository repository,
     required GetListStreamUseCase getListStreamUseCase,
     LiveStreamWsService? wsService,
-  })  : _repository = repository,
-        _wsService = wsService,
+  })  : _wsService = wsService,
         _getListStreamUseCase = getListStreamUseCase,
         super(const LiveStreamFeedState()) {
     _init();
   }
 
-  final LiveStreamRepository _repository;
   final LiveStreamWsService? _wsService;
   final GetListStreamUseCase _getListStreamUseCase;
   StreamSubscription<LiveEndedEvent>? _endedSub;
@@ -103,7 +101,7 @@ class LiveStreamFeedNotifier extends StateNotifier<LiveStreamFeedState> {
   Future<void> fetchStreams({String? status}) async {
     final filter = status ?? state.statusFilter;
     state = state.copyWith(
-      isLoading: true,
+      status: LiveStreamFeedStatus.loading,
       statusFilter: filter,
     );
 
@@ -113,17 +111,20 @@ class LiveStreamFeedNotifier extends StateNotifier<LiveStreamFeedState> {
       );
 
       result.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
+        state = state.copyWith(
+          status: LiveStreamFeedStatus.failure,
+          errorMessage: error.message,
+        );
       }, (streams) {
         state = state.copyWith(
-          isLoading: false,
+          status: LiveStreamFeedStatus.success,
           streams: streams,
         );
       });
     } on Object catch (e, st) {
       AppLogger.error('Failed to load livestream feed', e, st);
       state = state.copyWith(
-        isLoading: false,
+        status: LiveStreamFeedStatus.failure,
         errorMessage: e.toString(),
       );
     }
@@ -151,7 +152,6 @@ final liveStreamFeedProvider =
   final wsService = ref.watch(liveStreamWsServiceProvider);
   final listStreamUseCase = GetListStreamUseCase(repository);
   return LiveStreamFeedNotifier(
-    repository: repository,
     wsService: wsService,
     getListStreamUseCase: listStreamUseCase,
   );
