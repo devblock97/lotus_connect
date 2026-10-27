@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 
 class FullScreenMediaViewer extends StatefulWidget {
@@ -215,6 +216,7 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
   Widget _buildTopBar(BuildContext context) {
     final media = widget.medias[_currentIndex];
     final title = media.fileName;
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: EdgeInsets.only(
@@ -244,7 +246,7 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
               size: 28,
             ),
             splashRadius: 24,
-            tooltip: 'Close',
+            tooltip: loc?.close ?? 'Close',
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -364,6 +366,7 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return GestureDetector(
       onTap: widget.onTap,
       onDoubleTapDown: (details) => _doubleTapDetails = details,
@@ -394,19 +397,22 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
                         ),
                       ),
               ),
-              errorWidget: (_, __, dynamic ___) => const Center(
+              errorWidget: (_, __, dynamic ___) => Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.broken_image_rounded,
                       color: Colors.white54,
                       size: 48,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Failed to load image',
-                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                      loc?.failedToLoadImage ?? 'Failed to load image',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -511,20 +517,21 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (_hasError) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline_rounded,
               color: Colors.white54,
               size: 48,
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Unable to play video',
-              style: TextStyle(color: Colors.white54, fontSize: 13),
+              loc?.unableToPlayVideo ?? 'Unable to play video',
+              style: const TextStyle(color: Colors.white54, fontSize: 13),
             ),
           ],
         ),
@@ -654,6 +661,9 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: _toggleMute,
+                  tooltip: _isMuted
+                      ? (loc?.unmute ?? 'Unmute')
+                      : (loc?.mute ?? 'Mute'),
                   icon: Icon(
                     _isMuted
                         ? Icons.volume_off_rounded

@@ -135,7 +135,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        formatLastSeen(isOnline, lastSeen),
+                        isOnline
+                            ? loc.online
+                            : formatLastSeen(isOnline, lastSeen),
                         style: TextStyle(
                           fontSize: 12,
                           color: Theme.of(context).textTheme.bodySmall?.color,
@@ -217,7 +219,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Row(
                 children: [
                   Text(
-                    '$displayName is typing...',
+                    loc.userIsTyping(displayName),
                     style: TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
@@ -238,7 +240,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ? activeState.draftInput
                 : '',
             onChanged: activeNotifier.updateDraft,
-            hintText: 'Message $displayName',
+            hintText: loc.messageUserHint(displayName),
             showAiDisclaimer: false,
           ),
         ],
@@ -254,6 +256,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     if (_newMessageOverlay != null || _isBottom) return;
 
     final overlay = Overlay.of(context);
+    final loc = AppLocalizations.of(context)!;
 
     _newMessageOverlay = OverlayEntry(
       builder: (context) => Positioned(
@@ -269,9 +272,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 color: Colors.blueAccent,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'New message',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                loc.newMessage,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -296,8 +299,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     PrivateActiveConversationNotifier notifier,
   ) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final isMine = replyingTo.role.isUser;
-    final senderName = isMine ? 'You' : peerName;
+    final senderName = isMine ? loc.senderYou : peerName;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -316,7 +320,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Replying to $senderName',
+                  '${loc.replyingTo}$senderName',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

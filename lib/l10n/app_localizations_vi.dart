@@ -1083,4 +1083,96 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get endStream => 'Kết thúc phát';
+
+  @override
+  String userIsTyping(String name) {
+    return '$name đang nhập...';
+  }
+
+  @override
+  String messageUserHint(String name) {
+    return 'Gửi tin nhắn cho $name...';
+  }
+
+  @override
+  String get newMessage => 'Tin nhắn mới';
+
+  @override
+  String get senderYou => 'Bạn';
+
+  @override
+  String get pinnedSection => 'ĐÃ GHIM';
+
+  @override
+  String get recentSection => 'GẦN ĐÂY';
+
+  @override
+  String get noPrivateChatsFound =>
+      'Không tìm thấy cuộc trò chuyện riêng tư nào.\nNhấn + để bắt đầu hoặc kéo xuống để làm mới!';
+
+  @override
+  String get tapToResumeConversation => 'Nhấn để tiếp tục cuộc trò chuyện...';
+
+  @override
+  String draftPrefix(String draft) {
+    return 'Bản nháp: $draft';
+  }
+
+  @override
+  String get newUserToUserChat => 'Cuộc trò chuyện mới';
+
+  @override
+  String get recipientUserUuid => 'UUID người nhận';
+
+  @override
+  String get recipientUuidHint => 'ví dụ: friend-uuid-v7';
+
+  @override
+  String get conversationTitle => 'Tiêu đề cuộc trò chuyện';
+
+  @override
+  String get conversationTitleHint => 'ví dụ: Trò chuyện bí mật';
+
+  @override
+  String get failedToStartChat => 'Không thể bắt đầu trò chuyện với người dùng';
+
+  @override
+  String get start => 'Bắt đầu';
+
+  @override
+  String get attachImage => 'Đính kèm hình ảnh';
+
+  @override
+  String get voiceInput => 'Nhập bằng giọng nói';
+
+  @override
+  String get addAttachment => 'Thêm tệp đính kèm';
+
+  @override
+  String get aiDisclaimer =>
+      'AI CÓ THỂ ĐƯA RA THÔNG TIN CHƯA CHÍNH XÁC. HÃY XÁC MINH LẠI THÔNG TIN QUAN TRỌNG.';
+
+  @override
+  String get neuralAi => 'Neural AI';
+
+  @override
+  String get neuralAiIsTyping => 'Neural AI đang soạn câu trả lời...';
+
+  @override
+  String get regenerate => 'Tạo lại';
+
+  @override
+  String get star => 'Đánh dấu sao';
+
+  @override
+  String get copy => 'Sao chép';
+
+  @override
+  String get messageCopied => 'Đã sao chép tin nhắn vào khay nhớ tạm';
+
+  @override
+  String get failedToLoadImage => 'Không thể tải hình ảnh';
+
+  @override
+  String get unableToPlayVideo => 'Không thể phát video';
 }

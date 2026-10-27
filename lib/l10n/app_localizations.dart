@@ -2111,6 +2111,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End Stream'**
   String get endStream;
+
+  /// Status text shown when the other user is typing in chat
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is typing...'**
+  String userIsTyping(String name);
+
+  /// Placeholder text for chat input field when chatting with a user
+  ///
+  /// In en, this message translates to:
+  /// **'Message {name}...'**
+  String messageUserHint(String name);
+
+  /// Floating banner/button text indicating a new message has arrived
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get newMessage;
+
+  /// Label representing the current user in chat bubble replies
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get senderYou;
+
+  /// Section header for pinned conversations
+  ///
+  /// In en, this message translates to:
+  /// **'PINNED'**
+  String get pinnedSection;
+
+  /// Section header for recent conversations
+  ///
+  /// In en, this message translates to:
+  /// **'RECENT'**
+  String get recentSection;
+
+  /// Empty state text in private conversations list
+  ///
+  /// In en, this message translates to:
+  /// **'No private chats found.\nTap + to start a chat or pull down to refresh!'**
+  String get noPrivateChatsFound;
+
+  /// Subtitle for conversation tile when there are no messages yet
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to resume conversation...'**
+  String get tapToResumeConversation;
+
+  /// Prefix for displaying an unsent draft in conversation tile
+  ///
+  /// In en, this message translates to:
+  /// **'Draft: {draft}'**
+  String draftPrefix(String draft);
+
+  /// Title for new private conversation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'New User-to-User Chat'**
+  String get newUserToUserChat;
+
+  /// Label for recipient user UUID input in start chat dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient User UUID'**
+  String get recipientUserUuid;
+
+  /// Hint text for recipient user UUID input
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. friend-uuid-v7'**
+  String get recipientUuidHint;
+
+  /// Label for conversation title input in start chat dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation Title'**
+  String get conversationTitle;
+
+  /// Hint text for conversation title input
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Secret Chat'**
+  String get conversationTitleHint;
+
+  /// Error message when creating private chat fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to start chat with user'**
+  String get failedToStartChat;
+
+  /// Button label to confirm and start a new action or chat
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
+
+  /// Tooltip for attaching images in chat
+  ///
+  /// In en, this message translates to:
+  /// **'Attach Image'**
+  String get attachImage;
+
+  /// Tooltip for voice input button in chat
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Input'**
+  String get voiceInput;
+
+  /// Tooltip for generic attachment button in chat
+  ///
+  /// In en, this message translates to:
+  /// **'Add Attachment'**
+  String get addAttachment;
+
+  /// Disclaimer warning that AI responses may contain inaccuracies
+  ///
+  /// In en, this message translates to:
+  /// **'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.'**
+  String get aiDisclaimer;
+
+  /// Name of the AI assistant persona
+  ///
+  /// In en, this message translates to:
+  /// **'Neural AI'**
+  String get neuralAi;
+
+  /// Typing indicator status when AI assistant is generating response
+  ///
+  /// In en, this message translates to:
+  /// **'Neural AI is typing...'**
+  String get neuralAiIsTyping;
+
+  /// Tooltip for regenerating AI message response
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get regenerate;
+
+  /// Tooltip for starring a message
+  ///
+  /// In en, this message translates to:
+  /// **'Star'**
+  String get star;
+
+  /// Action button / tooltip to copy text to clipboard
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// Snackbar notification when a chat message is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied to clipboard'**
+  String get messageCopied;
+
+  /// Error placeholder when full screen image fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load image'**
+  String get failedToLoadImage;
+
+  /// Error placeholder when full screen video cannot be played
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to play video'**
+  String get unableToPlayVideo;
 }
 
 class _AppLocalizationsDelegate
