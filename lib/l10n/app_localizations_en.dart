@@ -1084,4 +1084,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get endStream => 'End Stream';
+
+  @override
+  String userIsTyping(String name) {
+    return '$name is typing...';
+  }
+
+  @override
+  String messageUserHint(String name) {
+    return 'Message $name...';
+  }
+
+  @override
+  String get newMessage => 'New message';
+
+  @override
+  String get senderYou => 'You';
+
+  @override
+  String get pinnedSection => 'PINNED';
+
+  @override
+  String get recentSection => 'RECENT';
+
+  @override
+  String get noPrivateChatsFound =>
+      'No private chats found.\nTap + to start a chat or pull down to refresh!';
+
+  @override
+  String get tapToResumeConversation => 'Tap to resume conversation...';
+
+  @override
+  String draftPrefix(String draft) {
+    return 'Draft: $draft';
+  }
+
+  @override
+  String get newUserToUserChat => 'New User-to-User Chat';
+
+  @override
+  String get recipientUserUuid => 'Recipient User UUID';
+
+  @override
+  String get recipientUuidHint => 'e.g. friend-uuid-v7';
+
+  @override
+  String get conversationTitle => 'Conversation Title';
+
+  @override
+  String get conversationTitleHint => 'e.g. Secret Chat';
+
+  @override
+  String get failedToStartChat => 'Failed to start chat with user';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get attachImage => 'Attach Image';
+
+  @override
+  String get voiceInput => 'Voice Input';
+
+  @override
+  String get addAttachment => 'Add Attachment';
+
+  @override
+  String get aiDisclaimer =>
+      'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.';
+
+  @override
+  String get neuralAi => 'Neural AI';
+
+  @override
+  String get neuralAiIsTyping => 'Neural AI is typing...';
+
+  @override
+  String get regenerate => 'Regenerate';
+
+  @override
+  String get star => 'Star';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get messageCopied => 'Message copied to clipboard';
+
+  @override
+  String get failedToLoadImage => 'Failed to load image';
+
+  @override
+  String get unableToPlayVideo => 'Unable to play video';
 }

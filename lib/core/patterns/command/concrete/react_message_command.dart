@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:lotus_connect/core/patterns/command/chat_command.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
-import 'package:lotus_connect/features/chat/application/chat_application.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';

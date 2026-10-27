@@ -241,7 +241,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                 // Action options
                 ListTile(
                   leading: const Icon(Icons.reply_rounded, size: 20),
-                  title: const Text('Reply'),
+                  title: Text(loc.replyAction),
                   dense: true,
                   onTap: () {
                     Navigator.of(context).pop();
@@ -399,8 +399,10 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     ThemeData theme,
     bool isMine,
   ) {
+    final loc = AppLocalizations.of(context);
     final repliedIsMine = repliedTo.role.isUser;
-    final senderName = repliedIsMine ? 'You' : widget.peerName;
+    final senderName =
+        repliedIsMine ? (loc?.senderYou ?? 'You') : widget.peerName;
     final barColor = isMine
         ? theme.colorScheme.onPrimary.withValues(alpha: 0.6)
         : theme.colorScheme.primary;

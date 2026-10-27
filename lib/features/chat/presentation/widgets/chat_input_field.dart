@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Bottom chat input field widget matching modern ChatGPT / Telegram styling.
 class ChatInputField extends StatefulWidget {
@@ -13,7 +14,7 @@ class ChatInputField extends StatefulWidget {
     required this.onStop,
     this.initialText = '',
     this.onChanged,
-    this.hintText = 'Message Neural AI...',
+    this.hintText,
     this.showAiDisclaimer = true,
     super.key,
   });
@@ -23,7 +24,7 @@ class ChatInputField extends StatefulWidget {
   final VoidCallback onStop;
   final String initialText;
   final ValueChanged<String>? onChanged;
-  final String hintText;
+  final String? hintText;
   final bool showAiDisclaimer;
 
   @override
@@ -68,6 +69,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -152,7 +154,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _handleSend(),
                       decoration: InputDecoration(
-                        hintText: widget.hintText,
+                        hintText: widget.hintText ??
+                            loc?.messageInputHint ??
+                            'Message Neural AI...',
                         hintStyle: TextStyle(
                           color: theme.textTheme.bodyMedium?.color
                               ?.withValues(alpha: 0.5),
@@ -180,17 +184,17 @@ class _ChatInputFieldState extends State<ChatInputField> {
                               });
                             }
                           },
-                          tooltip: 'Attach Image',
+                          tooltip: loc?.attachImage ?? 'Attach Image',
                         ),
                         IconButton(
                           icon: const Icon(Icons.mic_none_rounded, size: 22),
                           onPressed: () {},
-                          tooltip: 'Voice Input',
+                          tooltip: loc?.voiceInput ?? 'Voice Input',
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline, size: 22),
                           onPressed: () {},
-                          tooltip: 'Add Attachment',
+                          tooltip: loc?.addAttachment ?? 'Add Attachment',
                         ),
                         const Spacer(),
                         if (widget.isGenerating)
@@ -223,7 +227,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
             if (widget.showAiDisclaimer) ...[
               const SizedBox(height: 6),
               Text(
-                'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.',
+                loc?.aiDisclaimer ??
+                    'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,

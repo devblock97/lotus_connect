@@ -1053,4 +1053,94 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get endStream => '结束直播';
+
+  @override
+  String userIsTyping(String name) {
+    return '$name正在输入...';
+  }
+
+  @override
+  String messageUserHint(String name) {
+    return '给$name发消息...';
+  }
+
+  @override
+  String get newMessage => '新消息';
+
+  @override
+  String get senderYou => '你';
+
+  @override
+  String get pinnedSection => '置顶';
+
+  @override
+  String get recentSection => '最近';
+
+  @override
+  String get noPrivateChatsFound => '未找到私聊会话。\n点击 + 开始聊天或下拉刷新！';
+
+  @override
+  String get tapToResumeConversation => '点击继续会话...';
+
+  @override
+  String draftPrefix(String draft) {
+    return '草稿: $draft';
+  }
+
+  @override
+  String get newUserToUserChat => '新建私聊';
+
+  @override
+  String get recipientUserUuid => '接收者用户 UUID';
+
+  @override
+  String get recipientUuidHint => '例如 friend-uuid-v7';
+
+  @override
+  String get conversationTitle => '会话标题';
+
+  @override
+  String get conversationTitleHint => '例如 私密聊天';
+
+  @override
+  String get failedToStartChat => '发起聊天失败';
+
+  @override
+  String get start => '开始';
+
+  @override
+  String get attachImage => '添加图片';
+
+  @override
+  String get voiceInput => '语音输入';
+
+  @override
+  String get addAttachment => '添加附件';
+
+  @override
+  String get aiDisclaimer => 'AI可能会提供不准确的信息。请核实重要信息。';
+
+  @override
+  String get neuralAi => 'Neural AI';
+
+  @override
+  String get neuralAiIsTyping => 'Neural AI正在输入...';
+
+  @override
+  String get regenerate => '重新生成';
+
+  @override
+  String get star => '加星标';
+
+  @override
+  String get copy => '复制';
+
+  @override
+  String get messageCopied => '消息已复制到剪贴板';
+
+  @override
+  String get failedToLoadImage => '加载图片失败';
+
+  @override
+  String get unableToPlayVideo => '无法播放视频';
 }

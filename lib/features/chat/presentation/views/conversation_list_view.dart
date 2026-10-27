@@ -95,7 +95,7 @@ class ConversationListView extends ConsumerWidget {
             child: TextField(
               onChanged: notifier.setSearchQuery,
               decoration: InputDecoration(
-                hintText: 'Search conversations...',
+                hintText: loc.searchConversations,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: theme.colorScheme.surfaceContainerHighest
@@ -117,7 +117,7 @@ class ConversationListView extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       children: [
                         if (pinnedConversations.isNotEmpty) ...[
-                          _buildSectionHeader(context, 'PINNED'),
+                          _buildSectionHeader(context, loc.pinnedSection),
                           ...pinnedConversations.map(
                             (c) => _buildConversationTile(
                               context,
@@ -129,7 +129,7 @@ class ConversationListView extends ConsumerWidget {
                         ],
                         if (unpinnedConversations.isNotEmpty) ...[
                           if (pinnedConversations.isNotEmpty)
-                            _buildSectionHeader(context, 'RECENT'),
+                            _buildSectionHeader(context, loc.recentSection),
                           ...unpinnedConversations.map(
                             (c) => _buildConversationTile(
                               context,
@@ -144,7 +144,7 @@ class ConversationListView extends ConsumerWidget {
                             padding: const EdgeInsets.all(32),
                             child: Center(
                               child: Text(
-                                'No private chats found.\nTap + to start a chat or pull down to refresh!',
+                                loc.noPrivateChatsFound,
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodyMedium
                                     ?.copyWith(color: Colors.grey),
@@ -199,6 +199,7 @@ class ConversationListView extends ConsumerWidget {
     bool isSelected,
   ) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context)!;
     final notifier = ref.read(privateConversationListProvider.notifier);
     final repository = ref.watch(chatCoreRepositoryProvider);
     final displayTitle = _displayTitle(
@@ -216,7 +217,7 @@ class ConversationListView extends ConsumerWidget {
         final lastMessage =
             messages != null && messages.isNotEmpty ? messages.last : null;
         final subtitle = lastMessage == null
-            ? 'Tap to resume conversation...'
+            ? loc.tapToResumeConversation
             : lastMessage.content.replaceAll(RegExp(r'\s+'), ' ');
         final time = lastMessage?.timestamp ?? conversation.updatedAt;
         final timeStr = DateFormat('h:mm a').format(time);
@@ -264,7 +265,7 @@ class ConversationListView extends ConsumerWidget {
             ),
             subtitle: Text(
               conversation.draftMessage?.isNotEmpty ?? false
-                  ? 'Draft: ${conversation.draftMessage}'
+                  ? loc.draftPrefix(conversation.draftMessage!)
                   : subtitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -328,25 +329,25 @@ class ConversationListView extends ConsumerWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('New User-to-User Chat'),
+          title: Text(loc.newUserToUserChat),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: friendIdController,
-                decoration: const InputDecoration(
-                  labelText: 'Recipient User UUID',
-                  hintText: 'e.g. friend-uuid-v7',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: loc.recipientUserUuid,
+                  hintText: loc.recipientUuidHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Conversation Title',
-                  hintText: 'e.g. Secret Chat',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: loc.conversationTitle,
+                  hintText: loc.conversationTitleHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -381,13 +382,13 @@ class ConversationListView extends ConsumerWidget {
                   if (screenContext.mounted) {
                     ScaffoldMessenger.of(screenContext).showSnackBar(
                       SnackBar(
-                        content: Text(err ?? 'Failed to start chat with user'),
+                        content: Text(err ?? loc.failedToStartChat),
                       ),
                     );
                   }
                 }
               },
-              child: const Text('Start'),
+              child: Text(loc.start),
             ),
           ],
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Animated typing indicator widget showing animated dots when AI is thinking.
 class TypingIndicator extends StatefulWidget {
@@ -30,6 +31,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
       child: Row(
@@ -69,7 +71,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
           ),
           const SizedBox(width: 8),
           Text(
-            'Neural AI is typing...',
+            loc?.neuralAiIsTyping ?? 'Neural AI is typing...',
             style: TextStyle(
               fontSize: 12,
               color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),

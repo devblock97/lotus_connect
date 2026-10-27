@@ -1055,4 +1055,95 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get endStream => '配信終了';
+
+  @override
+  String userIsTyping(String name) {
+    return '$nameが入力中...';
+  }
+
+  @override
+  String messageUserHint(String name) {
+    return '$nameにメッセージを送信...';
+  }
+
+  @override
+  String get newMessage => '新しいメッセージ';
+
+  @override
+  String get senderYou => 'あなた';
+
+  @override
+  String get pinnedSection => '固定中';
+
+  @override
+  String get recentSection => '最近';
+
+  @override
+  String get noPrivateChatsFound =>
+      'プライベートチャットが見つかりません。\n+ をタップしてチャットを開始するか、下に引っ張って更新してください！';
+
+  @override
+  String get tapToResumeConversation => 'タップして会話を再開...';
+
+  @override
+  String draftPrefix(String draft) {
+    return '下書き: $draft';
+  }
+
+  @override
+  String get newUserToUserChat => '新しいダイレクトチャット';
+
+  @override
+  String get recipientUserUuid => '送信先ユーザーUUID';
+
+  @override
+  String get recipientUuidHint => '例: friend-uuid-v7';
+
+  @override
+  String get conversationTitle => '会話のタイトル';
+
+  @override
+  String get conversationTitleHint => '例: シークレットチャット';
+
+  @override
+  String get failedToStartChat => 'ユーザーとのチャット開始に失敗しました';
+
+  @override
+  String get start => '開始';
+
+  @override
+  String get attachImage => '画像を添付';
+
+  @override
+  String get voiceInput => '音声入力';
+
+  @override
+  String get addAttachment => '添付ファイルを追加';
+
+  @override
+  String get aiDisclaimer => 'AIは不正確な情報を提供する可能性があります。重要な情報は確認してください。';
+
+  @override
+  String get neuralAi => 'Neural AI';
+
+  @override
+  String get neuralAiIsTyping => 'Neural AIが入力中...';
+
+  @override
+  String get regenerate => '再生成';
+
+  @override
+  String get star => 'スターを付ける';
+
+  @override
+  String get copy => 'コピー';
+
+  @override
+  String get messageCopied => 'メッセージをクリップボードにコピーしました';
+
+  @override
+  String get failedToLoadImage => '画像の読み込みに失敗しました';
+
+  @override
+  String get unableToPlayVideo => '動画を再生できません';
 }

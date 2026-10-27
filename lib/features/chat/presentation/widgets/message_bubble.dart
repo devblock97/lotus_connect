@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/theme_extensions.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/markdown_message_view.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Message bubble widget supporting Markdown, syntax highlighting, and actions.
 class MessageBubble extends StatelessWidget {
@@ -23,6 +24,7 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final chatTheme = theme.extension<AppChatTheme>();
     final isUser = message.role.isUser;
     final timeStr = DateFormat('h:mm a').format(message.timestamp);
@@ -98,7 +100,7 @@ class MessageBubble extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Neural AI',
+                loc?.neuralAi ?? 'Neural AI',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
@@ -137,33 +139,36 @@ class MessageBubble extends StatelessWidget {
                       icon: const Icon(Icons.thumb_up_outlined, size: 16),
                       onPressed: () {},
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Like',
+                      tooltip: loc?.likeAction ?? 'Like',
                     ),
                     IconButton(
                       icon: const Icon(Icons.refresh_rounded, size: 16),
                       onPressed: onRegenerate,
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Regenerate',
+                      tooltip: loc?.regenerate ?? 'Regenerate',
                     ),
                     IconButton(
                       icon: const Icon(Icons.star_outline_rounded, size: 16),
                       onPressed: () {},
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Star',
+                      tooltip: loc?.star ?? 'Star',
                     ),
                     IconButton(
                       icon: const Icon(Icons.copy_rounded, size: 16),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: message.content));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Message copied to clipboard'),
-                            duration: Duration(seconds: 1),
+                          SnackBar(
+                            content: Text(
+                              loc?.messageCopied ??
+                                  'Message copied to clipboard',
+                            ),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Copy',
+                      tooltip: loc?.copy ?? 'Copy',
                     ),
                     const Spacer(),
                     Text(

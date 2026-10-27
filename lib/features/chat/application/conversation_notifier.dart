@@ -4,14 +4,12 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/core/patterns/command/chat_command_factory.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/application/chat_application.dart';
-import 'package:lotus_connect/features/chat/application/chat_providers.dart';
-import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/get_remote_message_usecase.dart';
-import 'package:lotus_connect/features/chat/domain/usecases/reaction_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -22,7 +20,6 @@ import 'package:lotus_connect/features/settings//application/settings_notifier.d
 
 enum Status { initialize, success, failure, loading }
 
-/// State representing the active user-to-user conversation message stream.
 class PrivateActiveConversationState {
   const PrivateActiveConversationState({
     this.conversationId,
@@ -92,25 +89,15 @@ class PrivateActiveConversationNotifier
     required ChatCommandFactory commandFactory,
     required SaveLocalMessageUseCase saveLocalMessageUseCase,
     required DeleteLocalMessageUseCase deleteLocalMessageUseCase,
-    // required DeleteRemoteMessageUseCase deleteRemoteMessageUseCase,
-    // required UpdateMessageUseCase updateMessageUseCase,
     required SaveDraftMessageUseCase saveDraftMessageUseCase,
-    // required SendMessageUseCase sendMessageUseCase,
-    required ReactionMessageUseCase reactionMessageUseCase,
     required UploadFileUseCase uploadFileUseCase,
-    // required GetMessageUseCase getMessageUseCase,
   })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
         _getLocalMessageUseCase = getLocalMessageUseCase,
         _commandFactory = commandFactory,
         _saveLocalMessageUseCase = saveLocalMessageUseCase,
         _deleteLocalMessageUseCase = deleteLocalMessageUseCase,
-        // _deleteRemoteMessageUseCase = deleteRemoteMessageUseCase,
-        // _updateMessageUseCase = updateMessageUseCase,
         _saveDraftMessageUseCase = saveDraftMessageUseCase,
-        // _sendMessageUseCase = sendMessageUseCase,
-        _reactionMessageUseCase = reactionMessageUseCase,
         _uploadFileUseCase = uploadFileUseCase,
-        // _getMessagesUseCase = getMessageUseCase,
         super(const PrivateActiveConversationState()) {
     _init();
   }
@@ -121,13 +108,8 @@ class PrivateActiveConversationNotifier
   final GetLocalMessageUseCase _getLocalMessageUseCase;
   final SaveLocalMessageUseCase _saveLocalMessageUseCase;
   final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
-  // final DeleteRemoteMessageUseCase _deleteRemoteMessageUseCase;
-  // final UpdateMessageUseCase _updateMessageUseCase;
   final SaveDraftMessageUseCase _saveDraftMessageUseCase;
-  // final SendMessageUseCase _sendMessageUseCase;
-  final ReactionMessageUseCase _reactionMessageUseCase;
   final UploadFileUseCase _uploadFileUseCase;
-  // final GetMessageUseCase _getMessagesUseCase;
 
   final ChatCommandFactory _commandFactory;
 
@@ -486,7 +468,6 @@ class PrivateActiveConversationNotifier
   }
 }
 
-/// Provider for PrivateActiveConversationNotifier.
 final privateActiveConversationProvider = StateNotifierProvider<
     PrivateActiveConversationNotifier, PrivateActiveConversationState>((ref) {
   return PrivateActiveConversationNotifier(
@@ -495,13 +476,8 @@ final privateActiveConversationProvider = StateNotifierProvider<
     getLocalMessageUseCase: ref.watch(getLocalMessageUseCaseProvider),
     saveLocalMessageUseCase: ref.watch(saveMessageUseCaseProvider),
     deleteLocalMessageUseCase: ref.watch(deleteLocalMessageUseCaseProvider),
-    // deleteRemoteMessageUseCase: ref.watch(deleteRemoteMessageUseCaseProvider),
-    // updateMessageUseCase: ref.watch(updateMessageUseCaseProvider),
     saveDraftMessageUseCase: ref.watch(saveDraftMessageUseCaseProvider),
-    // sendMessageUseCase: ref.watch(sendMessageUseCaseProvider),
-    reactionMessageUseCase: ref.watch(reactionMessageUseCaseProvider),
     uploadFileUseCase: ref.watch(uploadFileUseCaseProvider),
-    // getMessageUseCase: ref.watch(getMessageUseCaseProvider),
     commandFactory: ref.watch(chatCommandFactoryProvider),
   );
 });

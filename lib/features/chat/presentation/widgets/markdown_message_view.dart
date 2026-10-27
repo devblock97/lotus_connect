@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/theme_map.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:markdown/markdown.dart' as md;
 
 /// Renders Markdown text with syntax highlighted code blocks and copy button.
@@ -18,6 +19,8 @@ class MarkdownMessageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return MarkdownBody(
       data: content,
       selectable: true,
@@ -37,7 +40,7 @@ class MarkdownMessageView extends StatelessWidget {
         ),
       ),
       builders: {
-        'code': CodeElementBuilder(),
+        'code': CodeElementBuilder(copyLabel: loc?.copy ?? 'Copy'),
       },
     );
   }
@@ -45,6 +48,10 @@ class MarkdownMessageView extends StatelessWidget {
 
 /// Custom code block element builder supporting syntax highlighting.
 class CodeElementBuilder extends MarkdownElementBuilder {
+  CodeElementBuilder({this.copyLabel = 'Copy'});
+
+  final String copyLabel;
+
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     final language =
@@ -83,13 +90,20 @@ class CodeElementBuilder extends MarkdownElementBuilder {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: code));
                   },
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.copy_rounded, size: 14, color: Colors.grey),
-                      SizedBox(width: 4),
+                      const Icon(
+                        Icons.copy_rounded,
+                        size: 14,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
                       Text(
-                        'Copy',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        copyLabel,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
