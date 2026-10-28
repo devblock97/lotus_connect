@@ -1176,4 +1176,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unableToPlayVideo => 'Unable to play video';
+
+  @override
+  String get appName => 'Lotus Connect';
+
+  @override
+  String get agreeToTermsSuffix => '.';
+
+  @override
+  String get google => 'Google';
+
+  @override
+  String get apple => 'Apple';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get passwordStrength => 'Password strength';
+
+  @override
+  String get failedToLogin => 'Failed to log in';
+
+  @override
+  String get failedToRegister => 'Failed to register';
 }

@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
-/// Highly aesthetic Login & Registration screen with full AppLocalizations support.
+/// Highly aesthetic Login & Registration screen with full
+/// AppLocalizations support.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -43,7 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
     final strength = _calculatePasswordStrength(_passwordController.text);
@@ -66,7 +67,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 Text(
-                  'Lotus Connect',
+                  loc?.appName ?? 'Lotus Connect',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineLarge!.copyWith(
                     color: const Color(0xFF222222),
@@ -79,7 +80,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       const SizedBox(height: 8),
                       Text(
-                        _isLogin ? loc.signInSubtitle : loc.joinSubtitle,
+                        _isLogin
+                            ? (loc?.signInSubtitle ??
+                                'Sign in to continue your '
+                                    'secure conversations.')
+                            : (loc?.joinSubtitle ??
+                                'Join the future of secure communication.'),
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium!.copyWith(
                           color: const Color(0xFF222222),
@@ -89,7 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       if (!_isLogin) ...[
                         Text(
-                          loc.fullNameLabel,
+                          loc?.fullNameLabel ?? 'FULL NAME',
                           style: theme.textTheme.titleSmall!.copyWith(
                             color: const Color(0xFF222222),
                           ),
@@ -98,7 +104,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _fullNameController,
                           decoration: InputDecoration(
-                            hintText: loc.enterFullNameHint,
+                            hintText: loc?.enterFullNameHint ??
+                                'Enter your full name',
                             hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.person_outline,
@@ -112,12 +119,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           validator: (val) => val == null || val.isEmpty
-                              ? loc.fullNameRequired
+                              ? (loc?.fullNameRequired ?? 'Full name required')
                               : null,
                         ),
                         const SizedBox(height: 18),
                         Text(
-                          loc.usernameLabel,
+                          loc?.usernameLabel ?? 'USERNAME',
                           style: theme.textTheme.titleSmall!.copyWith(
                             color: const Color(0xFF222222),
                           ),
@@ -126,7 +133,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
-                            hintText: loc.chooseUsernameHint,
+                            hintText: loc?.chooseUsernameHint ??
+                                'Choose a unique username',
                             hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.alternate_email,
@@ -141,13 +149,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           validator: (val) {
                             if (val == null || val.isEmpty) {
-                              return loc.usernameRequired;
+                              return loc?.usernameRequired ??
+                                  'Username required';
                             }
                             if (val.length < 3) {
-                              return loc.usernameMinLength;
+                              return loc?.usernameMinLength ??
+                                  'Username must be at least 3 characters';
                             }
                             if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(val)) {
-                              return loc.usernameAlphanumericOnly;
+                              return loc?.usernameAlphanumericOnly ??
+                                  'Only alphanumeric characters & underscores';
                             }
                             return null;
                           },
@@ -156,7 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ],
 
                       Text(
-                        loc.emailAddressLabel,
+                        loc?.emailAddressLabel ?? 'EMAIL ADDRESS',
                         style: theme.textTheme.titleSmall!.copyWith(
                           color: const Color(0xFF222222),
                         ),
@@ -166,7 +177,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: loc.emailHint,
+                          hintText: loc?.emailHint ?? 'name@company.com',
                           hintStyle: theme.textTheme.labelMedium,
                           prefixIcon: const Icon(
                             Icons.mail_outline,
@@ -180,13 +191,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         validator: (val) => val == null || !val.contains('@')
-                            ? loc.invalidEmail
+                            ? (loc?.invalidEmail ?? 'Invalid email address')
                             : null,
                       ),
                       const SizedBox(height: 18),
 
                       Text(
-                        loc.passwordLabel,
+                        loc?.passwordLabel ?? 'PASSWORD',
                         style: theme.textTheme.titleSmall!.copyWith(
                           color: const Color(0xFF222222),
                         ),
@@ -198,8 +209,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onChanged: (val) => setState(() {}),
                         decoration: InputDecoration(
                           hintText: _isLogin
-                              ? loc.loginPasswordHint
-                              : loc.createPasswordHint,
+                              ? (loc?.loginPasswordHint ?? '•••••••••')
+                              : (loc?.createPasswordHint ??
+                                  'Create a strong password'),
                           hintStyle: theme.textTheme.labelMedium,
                           prefixIcon: const Icon(
                             Icons.lock_outline,
@@ -214,6 +226,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               color: Colors.grey,
                               size: 20,
                             ),
+                            tooltip: _obscurePassword
+                                ? (loc?.showPassword ?? 'Show password')
+                                : (loc?.hidePassword ?? 'Hide password'),
                             onPressed: () => setState(
                               () => _obscurePassword = !_obscurePassword,
                             ),
@@ -225,42 +240,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         validator: (val) => val == null || val.length < 6
-                            ? loc.passwordMinLength
+                            ? (loc?.passwordMinLength ??
+                                'Password must be at least 6 characters')
                             : null,
                       ),
 
                       // Password Strength Indicator (Registration Only)
                       if (!_isLogin && _passwordController.text.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Row(
-                          children: List.generate(4, (index) {
-                            final filled = index < strength;
-                            var color = Colors.grey.shade300;
-                            if (filled) {
-                              if (strength == 1) color = Colors.red;
-                              if (strength == 2) color = Colors.orange;
-                              if (strength == 3) color = Colors.yellow.shade700;
-                              if (strength == 4) color = Colors.green;
-                            }
-                            return Expanded(
-                              child: Container(
-                                height: 4,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 2),
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  borderRadius: BorderRadius.circular(2),
+                        Semantics(
+                          label: loc?.passwordStrength ?? 'Password strength',
+                          value: '$strength / 4',
+                          child: Row(
+                            children: List.generate(4, (index) {
+                              final filled = index < strength;
+                              var color = Colors.grey.shade300;
+                              if (filled) {
+                                if (strength == 1) color = Colors.red;
+                                if (strength == 2) color = Colors.orange;
+                                if (strength == 3) {
+                                  color = Colors.yellow.shade700;
+                                }
+                                if (strength == 4) color = Colors.green;
+                              }
+                              return Expanded(
+                                child: Container(
+                                  height: 4,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
+                              );
+                            }),
+                          ),
                         ),
                       ],
                       const SizedBox(height: 18),
 
                       if (!_isLogin) ...[
                         Text(
-                          loc.confirmPasswordLabel,
+                          loc?.confirmPasswordLabel ?? 'CONFIRM PASSWORD',
                           style: theme.textTheme.titleSmall!.copyWith(
                             color: const Color(0xFF222222),
                           ),
@@ -270,7 +292,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
-                            hintText: loc.repeatPasswordHint,
+                            hintText: loc?.repeatPasswordHint ??
+                                'Repeat your password',
                             hintStyle: theme.textTheme.labelMedium,
                             prefixIcon: const Icon(
                               Icons.refresh,
@@ -285,6 +308,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 color: Colors.grey,
                                 size: 20,
                               ),
+                              tooltip: _obscureConfirmPassword
+                                  ? (loc?.showPassword ?? 'Show password')
+                                  : (loc?.hidePassword ?? 'Hide password'),
                               onPressed: () => setState(
                                 () => _obscureConfirmPassword =
                                     !_obscureConfirmPassword,
@@ -298,10 +324,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           validator: (val) {
                             if (val == null || val.isEmpty) {
-                              return loc.confirmPasswordRequired;
+                              return loc?.confirmPasswordRequired ??
+                                  'Confirm password required';
                             }
                             if (val != _passwordController.text) {
-                              return loc.passwordsDoNotMatch;
+                              return loc?.passwordsDoNotMatch ??
+                                  'Passwords do not match';
                             }
                             return null;
                           },
@@ -323,23 +351,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     fontSize: 13,
                                   ),
                                   children: [
-                                    TextSpan(text: loc.agreeToTermsPrefix),
                                     TextSpan(
-                                      text: loc.termsOfService,
+                                      text: loc?.agreeToTermsPrefix ??
+                                          'I agree to the ',
+                                    ),
+                                    TextSpan(
+                                      text: loc?.termsOfService ??
+                                          'Terms of Service',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
                                       ),
                                     ),
-                                    TextSpan(text: loc.andWord),
                                     TextSpan(
-                                      text: loc.privacyPolicy,
+                                      text: loc?.andWord ?? ' and ',
+                                    ),
+                                    TextSpan(
+                                      text: loc?.privacyPolicy ??
+                                          'Privacy Policy',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black,
                                       ),
                                     ),
-                                    const TextSpan(text: '.'),
+                                    TextSpan(
+                                      text: loc?.agreeToTermsSuffix ?? '.',
+                                    ),
                                   ],
                                 ),
                               ),
@@ -355,7 +392,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: TextButton(
                             onPressed: () {},
                             child: Text(
-                              loc.forgotPassword,
+                              loc?.forgotPassword ?? 'Forgot Password?',
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -393,8 +430,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 children: [
                                   Text(
                                     _isLogin
-                                        ? loc.logInButton
-                                        : loc.createAccountButton,
+                                        ? (loc?.logInButton ?? 'Log In')
+                                        : (loc?.createAccountButton ??
+                                            'Create Account'),
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
@@ -415,7 +453,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              loc.orContinueWith,
+                              loc?.orContinueWith ?? 'OR CONTINUE WITH',
                               style: theme.textTheme.labelSmall!.copyWith(
                                 color: const Color(0xFF222222),
                               ),
@@ -456,9 +494,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text(
-                                    'Google',
-                                    style: TextStyle(
+                                  Text(
+                                    loc?.google ?? 'Google',
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
@@ -480,18 +518,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.apple,
                                     color: Colors.black,
                                     size: 20,
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    'Apple',
-                                    style: TextStyle(
+                                    loc?.apple ?? 'Apple',
+                                    style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
@@ -510,8 +548,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         children: [
                           Text(
                             _isLogin
-                                ? loc.dontHaveAccount
-                                : loc.alreadyHaveAccount,
+                                ? (loc?.dontHaveAccount ??
+                                    "Don't have an account? ")
+                                : (loc?.alreadyHaveAccount ??
+                                    'Already have an account? '),
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 14,
@@ -524,7 +564,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               });
                             },
                             child: Text(
-                              _isLogin ? loc.registerAction : loc.logInButton,
+                              _isLogin
+                                  ? (loc?.registerAction ?? 'Register')
+                                  : (loc?.logInButton ?? 'Log In'),
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -547,13 +589,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    final loc = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) return;
 
     if (!_isLogin && !_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(loc.mustAgreeTerms),
+          content: Text(
+            loc?.mustAgreeTerms ??
+                'You must agree to the Terms of Service & Privacy Policy.',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -564,7 +609,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(loc.passwordsDoNotMatch),
+          content: Text(
+            loc?.passwordsDoNotMatch ?? 'Passwords do not match',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -593,7 +640,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(loc.registrationSuccess),
+            content: Text(
+              loc?.registrationSuccess ??
+                  'Registration successful! Please login.',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -604,7 +654,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final error = ref.read(authStateProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(error ?? loc.authenticationFailed),
+          content: Text(
+            error ??
+                (_isLogin
+                    ? (loc?.failedToLogin ??
+                        loc?.authenticationFailed ??
+                        'Failed to log in')
+                    : (loc?.failedToRegister ??
+                        loc?.authenticationFailed ??
+                        'Failed to register')),
+          ),
           backgroundColor: Colors.red,
         ),
       );

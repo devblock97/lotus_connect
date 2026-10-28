@@ -364,5 +364,14 @@
   "copy": "Sao chép",
   "messageCopied": "Đã sao chép tin nhắn vào khay nhớ tạm",
   "failedToLoadImage": "Không thể tải hình ảnh",
-  "unableToPlayVideo": "Không thể phát video"
+  "unableToPlayVideo": "Không thể phát video",
+  "appName": "Lotus Connect",
+  "agreeToTermsSuffix": ".",
+  "google": "Google",
+  "apple": "Apple",
+  "showPassword": "Hiện mật khẩu",
+  "hidePassword": "Ẩn mật khẩu",
+  "passwordStrength": "Độ mạnh mật khẩu",
+  "failedToLogin": "Đăng nhập thất bại",
+  "failedToRegister": "Đăng ký thất bại"
 }

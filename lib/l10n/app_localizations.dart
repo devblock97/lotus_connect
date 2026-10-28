@@ -2279,6 +2279,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to play video'**
   String get unableToPlayVideo;
+
+  /// The application title
+  ///
+  /// In en, this message translates to:
+  /// **'Lotus Connect'**
+  String get appName;
+
+  /// Suffix punctuation or phrase after privacy policy in terms agreement text
+  ///
+  /// In en, this message translates to:
+  /// **'.'**
+  String get agreeToTermsSuffix;
+
+  /// Google authentication provider name
+  ///
+  /// In en, this message translates to:
+  /// **'Google'**
+  String get google;
+
+  /// Apple authentication provider name
+  ///
+  /// In en, this message translates to:
+  /// **'Apple'**
+  String get apple;
+
+  /// Tooltip to unhide/show password
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// Tooltip to hide password
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
+
+  /// Accessibility label for password strength meter
+  ///
+  /// In en, this message translates to:
+  /// **'Password strength'**
+  String get passwordStrength;
+
+  /// Error message when login request fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to log in'**
+  String get failedToLogin;
+
+  /// Error message when register request fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to register'**
+  String get failedToRegister;
 }
 
 class _AppLocalizationsDelegate

@@ -710,5 +710,41 @@
   "unableToPlayVideo": "Unable to play video",
   "@unableToPlayVideo": {
     "description": "Error placeholder when full screen video cannot be played"
+  },
+  "appName": "Lotus Connect",
+  "@appName": {
+    "description": "The application title"
+  },
+  "agreeToTermsSuffix": ".",
+  "@agreeToTermsSuffix": {
+    "description": "Suffix punctuation or phrase after privacy policy in terms agreement text"
+  },
+  "google": "Google",
+  "@google": {
+    "description": "Google authentication provider name"
+  },
+  "apple": "Apple",
+  "@apple": {
+    "description": "Apple authentication provider name"
+  },
+  "showPassword": "Show password",
+  "@showPassword": {
+    "description": "Tooltip to unhide/show password"
+  },
+  "hidePassword": "Hide password",
+  "@hidePassword": {
+    "description": "Tooltip to hide password"
+  },
+  "passwordStrength": "Password strength",
+  "@passwordStrength": {
+    "description": "Accessibility label for password strength meter"
+  },
+  "failedToLogin": "Failed to log in",
+  "@failedToLogin": {
+    "description": "Error message when login request fails"
+  },
+  "failedToRegister": "Failed to register",
+  "@failedToRegister": {
+    "description": "Error message when register request fails"
   }
 }

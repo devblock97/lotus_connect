@@ -118,7 +118,7 @@
   "repeatPasswordHint": "パスワードを再入力してください",
   "confirmPasswordRequired": "パスワードの確認は必須です",
   "passwordsDoNotMatch": "パスワードが一致しません",
-  "agreeToTermsPrefix": "利用規約と",
+  "agreeToTermsPrefix": "",
   "termsOfService": "利用規約",
   "andWord": "および",
   "privacyPolicy": "プライバシーポリシー",
@@ -364,5 +364,14 @@
   "copy": "コピー",
   "messageCopied": "メッセージをクリップボードにコピーしました",
   "failedToLoadImage": "画像の読み込みに失敗しました",
-  "unableToPlayVideo": "動画を再生できません"
+  "unableToPlayVideo": "動画を再生できません",
+  "appName": "Lotus Connect",
+  "agreeToTermsSuffix": "に同意します。",
+  "google": "Google",
+  "apple": "Apple",
+  "showPassword": "パスワードを表示",
+  "hidePassword": "パスワードを非表示",
+  "passwordStrength": "パスワードの強度",
+  "failedToLogin": "ログインに失敗しました",
+  "failedToRegister": "登録に失敗しました"
 }
