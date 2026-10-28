@@ -1143,4 +1143,31 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unableToPlayVideo => '无法播放视频';
+
+  @override
+  String get appName => 'Lotus Connect';
+
+  @override
+  String get agreeToTermsSuffix => '。';
+
+  @override
+  String get google => 'Google';
+
+  @override
+  String get apple => 'Apple';
+
+  @override
+  String get showPassword => '显示密码';
+
+  @override
+  String get hidePassword => '隐藏密码';
+
+  @override
+  String get passwordStrength => '密码强度';
+
+  @override
+  String get failedToLogin => '登录失败';
+
+  @override
+  String get failedToRegister => '注册失败';
 }

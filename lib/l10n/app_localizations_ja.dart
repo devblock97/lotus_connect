@@ -368,7 +368,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get passwordsDoNotMatch => 'パスワードが一致しません';
 
   @override
-  String get agreeToTermsPrefix => '利用規約と';
+  String get agreeToTermsPrefix => '';
 
   @override
   String get termsOfService => '利用規約';
@@ -1146,4 +1146,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get unableToPlayVideo => '動画を再生できません';
+
+  @override
+  String get appName => 'Lotus Connect';
+
+  @override
+  String get agreeToTermsSuffix => 'に同意します。';
+
+  @override
+  String get google => 'Google';
+
+  @override
+  String get apple => 'Apple';
+
+  @override
+  String get showPassword => 'パスワードを表示';
+
+  @override
+  String get hidePassword => 'パスワードを非表示';
+
+  @override
+  String get passwordStrength => 'パスワードの強度';
+
+  @override
+  String get failedToLogin => 'ログインに失敗しました';
+
+  @override
+  String get failedToRegister => '登録に失敗しました';
 }

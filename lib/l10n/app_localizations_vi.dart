@@ -1175,4 +1175,31 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get unableToPlayVideo => 'Không thể phát video';
+
+  @override
+  String get appName => 'Lotus Connect';
+
+  @override
+  String get agreeToTermsSuffix => '.';
+
+  @override
+  String get google => 'Google';
+
+  @override
+  String get apple => 'Apple';
+
+  @override
+  String get showPassword => 'Hiện mật khẩu';
+
+  @override
+  String get hidePassword => 'Ẩn mật khẩu';
+
+  @override
+  String get passwordStrength => 'Độ mạnh mật khẩu';
+
+  @override
+  String get failedToLogin => 'Đăng nhập thất bại';
+
+  @override
+  String get failedToRegister => 'Đăng ký thất bại';
 }

@@ -364,5 +364,14 @@
   "copy": "复制",
   "messageCopied": "消息已复制到剪贴板",
   "failedToLoadImage": "加载图片失败",
-  "unableToPlayVideo": "无法播放视频"
+  "unableToPlayVideo": "无法播放视频",
+  "appName": "Lotus Connect",
+  "agreeToTermsSuffix": "。",
+  "google": "Google",
+  "apple": "Apple",
+  "showPassword": "显示密码",
+  "hidePassword": "隐藏密码",
+  "passwordStrength": "密码强度",
+  "failedToLogin": "登录失败",
+  "failedToRegister": "注册失败"
 }
