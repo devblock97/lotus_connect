@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
@@ -13,47 +15,41 @@ import 'package:lotus_connect/features/home/domain/usecases/update_comment_useca
 import 'package:lotus_connect/features/home/domain/usecases/upload_comment_media_usecase.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 
+enum CommentStatus { initial, loading, success, failure, refresh }
+
 @immutable
 class CommentState {
   const CommentState({
     this.postId,
     this.comments = const [],
-    this.isLoading = false,
-    this.isRefreshing = false,
+    this.status = CommentStatus.initial,
     this.isSubmitting = false,
     this.errorMessage,
     this.sort = CommentSortOrder.popular,
     this.replyingTo,
     this.loadingReplyCommentIds = const {},
     this.isInitialized = false,
+    this.hasReachedMax = false,
+    this.cursor,
   });
 
   final String? postId;
   final List<CommentUiModel> comments;
-  final bool isLoading;
-  final bool isRefreshing;
   final bool isSubmitting;
   final String? errorMessage;
   final CommentSortOrder sort;
   final CommentUiModel? replyingTo;
   final Set<String> loadingReplyCommentIds;
   final bool isInitialized;
-
-  int get totalCommentsCount {
-    var count = 0;
-    for (final c in comments) {
-      count += 1 + c.replies.length;
-    }
-    return count;
-  }
+  final CommentStatus status;
+  final bool hasReachedMax;
+  final String? cursor;
 
   bool get isEmpty => comments.isEmpty;
 
   CommentState copyWith({
     String? postId,
     List<CommentUiModel>? comments,
-    bool? isLoading,
-    bool? isRefreshing,
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
@@ -62,12 +58,15 @@ class CommentState {
     bool clearReplyingTo = false,
     Set<String>? loadingReplyCommentIds,
     bool? isInitialized,
+    CommentStatus? status,
+    bool? hasReachedMax,
+    String? cursor,
+    bool clearCursor = false,
   }) {
     return CommentState(
       postId: postId ?? this.postId,
       comments: comments ?? this.comments,
-      isLoading: isLoading ?? this.isLoading,
-      isRefreshing: isRefreshing ?? this.isRefreshing,
+      status: status ?? this.status,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       sort: sort ?? this.sort,
@@ -75,6 +74,8 @@ class CommentState {
       loadingReplyCommentIds:
           loadingReplyCommentIds ?? this.loadingReplyCommentIds,
       isInitialized: isInitialized ?? this.isInitialized,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      cursor: clearCursor ? null : (cursor ?? this.cursor),
     );
   }
 }
@@ -92,7 +93,7 @@ class CommentNotifier extends StateNotifier<CommentState> {
     UploadCommentMediaUseCase? uploadCommentMediaUseCase,
     String? postId,
     List<CommentUiModel>? initialComments,
-    bool isLoading = false,
+    Duration debounceDuration = const Duration(milliseconds: 300),
   })  : _getCommentsUseCase = getCommentsUseCase,
         _createCommentUseCase = createCommentUseCase,
         _getCommentByIdUseCase = getCommentByIdUseCase,
@@ -102,11 +103,11 @@ class CommentNotifier extends StateNotifier<CommentState> {
         _reactToCommentUseCase = reactToCommentUseCase,
         _pinCommentUseCase = pinCommentUseCase,
         _uploadCommentMediaUseCase = uploadCommentMediaUseCase,
+        _debounceDuration = debounceDuration,
         super(
           CommentState(
             postId: postId,
             comments: initialComments ?? const [],
-            isLoading: isLoading,
             isInitialized: initialComments != null,
           ),
         );
@@ -121,6 +122,27 @@ class CommentNotifier extends StateNotifier<CommentState> {
   final PinCommentUseCase _pinCommentUseCase;
   final UploadCommentMediaUseCase? _uploadCommentMediaUseCase;
 
+  final int _pageSize = 10;
+
+  Timer? _debounceTimer;
+  Completer<void>? _debounceCompleter;
+  final Duration _debounceDuration;
+
+  @visibleForTesting
+  bool get isDebouncing => _debounceTimer?.isActive ?? false;
+
+  void _completeDebounce() {
+    if (_debounceCompleter != null && !_debounceCompleter!.isCompleted) {
+      _debounceCompleter!.complete();
+    }
+    _debounceCompleter = null;
+  }
+
+  void _cancelDebounce() {
+    _debounceTimer?.cancel();
+    _completeDebounce();
+  }
+
   void initialize({
     String? postId,
     List<CommentUiModel>? initialComments,
@@ -133,15 +155,18 @@ class CommentNotifier extends StateNotifier<CommentState> {
     state = state.copyWith(
       postId: postId ?? state.postId,
       comments: effectiveComments,
-      isLoading: isLoading ?? false,
+      status:
+          (isLoading ?? false) ? CommentStatus.loading : CommentStatus.success,
       isInitialized: true,
       clearError: true,
+      cursor: effectiveComments.isNotEmpty ? effectiveComments.last.id : null,
+      clearCursor: effectiveComments.isEmpty,
     );
   }
 
   void setLoading({required bool isLoading}) {
     state = state.copyWith(
-      isLoading: isLoading,
+      status: isLoading ? CommentStatus.loading : CommentStatus.success,
       isInitialized: true,
     );
   }
@@ -171,11 +196,12 @@ class CommentNotifier extends StateNotifier<CommentState> {
     CommentSortOrder? sort,
     bool isSilent = false,
   }) async {
+    _cancelDebounce();
     final targetPostId = postId ?? state.postId;
     if (targetPostId == null || targetPostId.trim().isEmpty) return;
 
     if (!isSilent) {
-      state = state.copyWith(isLoading: true, clearError: true);
+      state = state.copyWith(status: CommentStatus.loading, clearError: true);
     }
 
     final targetSort = sort ?? state.sort;
@@ -183,57 +209,147 @@ class CommentNotifier extends StateNotifier<CommentState> {
       GetCommentsParams(
         postId: targetPostId,
         sort: targetSort.value,
+        limit: _pageSize,
       ),
     );
 
     result.fold(
       (failure) {
         state = state.copyWith(
-          isLoading: false,
+          status: CommentStatus.failure,
           errorMessage: failure.message,
+          isInitialized: true,
         );
       },
       (models) {
+        final lastCursor = models.isNotEmpty ? models.last.id : null;
         final uiModels = models.map((m) => m.toUiModel()).toList();
         final sortedList = _sortComments(uiModels, targetSort);
         state = state.copyWith(
           postId: targetPostId,
           comments: sortedList,
           sort: targetSort,
-          isLoading: false,
+          status: CommentStatus.success,
+          isInitialized: true,
           clearError: true,
+          cursor: lastCursor,
+          clearCursor: lastCursor == null,
+          hasReachedMax: models.length < _pageSize,
         );
       },
     );
   }
 
+  Future<void> loadMoreComment({
+    bool immediate = false,
+    CommentSortOrder? sort,
+  }) {
+    if (state.hasReachedMax || state.status == CommentStatus.loading) {
+      return Future.value();
+    }
+
+    _debounceTimer?.cancel();
+    _debounceCompleter ??= Completer<void>();
+
+    if (immediate || _debounceDuration == Duration.zero) {
+      _executeLoadMore(sort);
+    } else {
+      _debounceTimer = Timer(_debounceDuration, () => _executeLoadMore(sort));
+    }
+
+    return _debounceCompleter!.future;
+  }
+
+  Future<void> _executeLoadMore([CommentSortOrder? sort]) async {
+    if (state.hasReachedMax || state.status == CommentStatus.loading) {
+      _completeDebounce();
+      return;
+    }
+
+    final targetPostId = state.postId;
+    if (targetPostId == null || targetPostId.trim().isEmpty) {
+      _completeDebounce();
+      return;
+    }
+
+    final targetSorted = sort ?? state.sort;
+
+    state = state.copyWith(
+      status: CommentStatus.loading,
+    );
+
+    final result = await _getCommentsUseCase(
+      GetCommentsParams(
+        postId: targetPostId,
+        limit: _pageSize,
+        cursor: state.cursor,
+        sort: targetSorted.value,
+      ),
+    );
+
+    result.fold(
+      (error) {
+        state = state.copyWith(
+          errorMessage: error.message,
+          status: CommentStatus.failure,
+        );
+      },
+      (comments) {
+        final commentUiModel = comments.map((m) => m.toUiModel()).toList();
+        final sortedList = _sortComments(commentUiModel, targetSorted);
+        final existingIds = state.comments.map((c) => c.id).toSet();
+        final newComments =
+            sortedList.where((c) => !existingIds.contains(c.id)).toList();
+        final mergeComments = [...state.comments, ...newComments];
+        final nextCursor = comments.isNotEmpty
+            ? comments.last.id
+            : (mergeComments.isNotEmpty ? mergeComments.last.id : state.cursor);
+        state = state.copyWith(
+          comments: mergeComments,
+          status: CommentStatus.success,
+          cursor: nextCursor,
+          clearError: true,
+          hasReachedMax: comments.length < _pageSize,
+        );
+      },
+    );
+
+    _completeDebounce();
+  }
+
   Future<void> refreshComments() async {
+    _cancelDebounce();
     final targetPostId = state.postId;
     if (targetPostId == null || targetPostId.trim().isEmpty) return;
 
-    state = state.copyWith(isRefreshing: true, clearError: true);
+    state = state.copyWith(status: CommentStatus.refresh, clearError: true);
 
     final result = await _getCommentsUseCase(
       GetCommentsParams(
         postId: targetPostId,
         sort: state.sort.value,
+        limit: _pageSize,
       ),
     );
 
     result.fold(
       (failure) {
         state = state.copyWith(
-          isRefreshing: false,
+          status: CommentStatus.failure,
           errorMessage: failure.message,
         );
       },
       (models) {
+        final lastCursor = models.isNotEmpty ? models.last.id : null;
         final uiModels = models.map((m) => m.toUiModel()).toList();
         final sortedList = _sortComments(uiModels, state.sort);
         state = state.copyWith(
           comments: sortedList,
-          isRefreshing: false,
+          status: CommentStatus.success,
           clearError: true,
+          cursor: lastCursor,
+          clearCursor: lastCursor == null,
+          hasReachedMax: models.length < _pageSize,
         );
       },
     );
@@ -780,5 +896,12 @@ class CommentNotifier extends StateNotifier<CommentState> {
             return a.createdAt.compareTo(b.createdAt);
         }
       });
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _completeDebounce();
+    super.dispose();
   }
 }

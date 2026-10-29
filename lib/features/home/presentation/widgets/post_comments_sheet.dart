@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/features/home/application/comment_notifier.dart';
 import 'package:lotus_connect/features/home/application/comment_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
@@ -108,24 +109,28 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final notifier =
-          ref.read(postCommentsNotifierProvider(widget.post.id).notifier);
-      if (widget.initialComments != null) {
-        notifier.initialize(
-          postId: widget.post.id,
-          initialComments: widget.initialComments,
-          isLoading: widget.isLoading,
-        );
-      } else {
-        if (widget.isLoading) {
-          notifier.setLoading(isLoading: true);
-        } else {
-          notifier.loadComments(postId: widget.post.id, isSilent: true);
-        }
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (!mounted) return;
+    //   final notifier =
+    //       ref.read(postCommentsNotifierProvider(widget.post.id).notifier);
+    //   if (widget.initialComments != null) {
+    //     notifier.initialize(
+    //       postId: widget.post.id,
+    //       initialComments: widget.initialComments,
+    //       isLoading: widget.isLoading,
+    //     );
+    //   } else {
+    //     if (widget.isLoading) {
+    //       notifier.setLoading(isLoading: true);
+    //     } else {
+    //       notifier.loadComments(postId: widget.post.id, isSilent: true);
+    //     }
+    //   }
+    // });
+    ref
+        .read(postCommentsNotifierProvider(widget.post.id).notifier)
+        .loadComments(postId: widget.post.id, isSilent: true);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -152,169 +157,6 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
     super.dispose();
   }
 
-  void _handleAddComment(
-    String content, {
-    String? parentCommentId,
-    String? mediaUrl,
-  }) {
-    final settings = ref.read(settingsNotifierProvider).settings;
-    final currentAuthor = PostAuthor(
-      id: settings.userId.isNotEmpty ? settings.userId : 'current_user',
-      username: settings.username.isNotEmpty ? settings.username : 'you',
-      fullName: settings.fullName.isNotEmpty ? settings.fullName : 'You',
-      avatarUrl: settings.avatarUrl.isNotEmpty ? settings.avatarUrl : null,
-    );
-
-    ref.read(postCommentsNotifierProvider(widget.post.id).notifier).addComment(
-          content: content,
-          author: currentAuthor,
-          parentCommentId: parentCommentId,
-          mediaUrl: mediaUrl,
-          persist: widget.onAddComment == null,
-        );
-
-    widget.onAddComment?.call(
-      content,
-      parentCommentId: parentCommentId,
-      mediaUrl: mediaUrl,
-    );
-  }
-
-  void _handleToggleLike(CommentUiModel comment) {
-    final willLike = !comment.userHasLiked;
-    ref
-        .read(postCommentsNotifierProvider(widget.post.id).notifier)
-        .toggleReaction(
-          comment,
-          persist: widget.onToggleReaction == null,
-        );
-
-    widget.onToggleReaction?.call(
-      comment,
-      willLike ? '❤️' : '',
-    );
-  }
-
-  void _handleSelectReaction(CommentUiModel comment, String reaction) {
-    ref
-        .read(postCommentsNotifierProvider(widget.post.id).notifier)
-        .selectReaction(
-          comment,
-          reaction,
-          persist: widget.onToggleReaction == null,
-        );
-
-    widget.onToggleReaction?.call(comment, reaction);
-  }
-
-  void _handlePinToggle(CommentUiModel comment) {
-    final nextPinned = !comment.isPinned;
-    ref.read(postCommentsNotifierProvider(widget.post.id).notifier).togglePin(
-          comment,
-          persist: widget.onPinComment == null,
-        );
-
-    widget.onPinComment?.call(comment, isPinned: nextPinned);
-  }
-
-  void _handleDeleteComment(CommentUiModel comment) {
-    ref
-        .read(postCommentsNotifierProvider(widget.post.id).notifier)
-        .deleteComment(
-          comment.id,
-          parentCommentId: comment.parentCommentId,
-          persist: widget.onDeleteComment == null,
-        );
-
-    widget.onDeleteComment?.call(comment.id);
-  }
-
-  void _handleEditComment(CommentUiModel comment) {
-    final loc = AppLocalizations.of(context);
-    final textController = TextEditingController(text: comment.content);
-
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(loc?.editComment ?? 'Edit comment'),
-        content: TextField(
-          controller: textController,
-          autofocus: true,
-          maxLines: 4,
-          minLines: 1,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            hintText: loc?.editCommentHint ?? 'Edit your comment...',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(loc?.cancel ?? 'Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final newText = textController.text.trim();
-              final hasMedia =
-                  comment.mediaUrl != null && comment.mediaUrl!.isNotEmpty;
-              if (newText.isNotEmpty || hasMedia) {
-                ref
-                    .read(postCommentsNotifierProvider(widget.post.id).notifier)
-                    .editComment(
-                      commentId: comment.id,
-                      newContent: newText,
-                      mediaUrl: comment.mediaUrl,
-                      persist: widget.onEditComment == null,
-                    );
-                widget.onEditComment?.call(
-                  comment.id,
-                  newText,
-                  mediaUrl: comment.mediaUrl,
-                );
-              }
-              Navigator.of(ctx).pop();
-            },
-            child: Text(loc?.save ?? 'Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _handleToggleReplies(CommentUiModel comment) {
-    final notifier =
-        ref.read(postCommentsNotifierProvider(widget.post.id).notifier);
-    if (widget.onLoadReplies != null) {
-      notifier.toggleRepliesExpanded(comment.id);
-      if (!comment.isRepliesExpanded && comment.replies.isEmpty) {
-        widget.onLoadReplies!(comment);
-      }
-    } else {
-      notifier.toggleReplies(comment);
-    }
-  }
-
-  void _setSortOrder(CommentSortOrder order) {
-    ref
-        .read(postCommentsNotifierProvider(widget.post.id).notifier)
-        .changeSortOrder(
-          order,
-          reload: widget.onSortChanged == null,
-        );
-    widget.onSortChanged?.call(order);
-  }
-
-  String _getSortLabel(CommentSortOrder order, AppLocalizations? loc) {
-    switch (order) {
-      case CommentSortOrder.popular:
-        return loc?.topComments ?? order.label;
-      case CommentSortOrder.newest:
-        return loc?.newestFirst ?? order.label;
-      case CommentSortOrder.oldest:
-        return loc?.oldestFirst ?? order.label;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -337,15 +179,12 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
         (!commentState.isInitialized && widget.initialComments != null)
             ? widget.initialComments!
             : commentState.comments;
-    final isLoading = (!commentState.isInitialized && widget.isLoading) ||
-        commentState.isLoading;
-    final totalCommentsCount =
-        (!commentState.isInitialized && widget.initialComments != null)
-            ? widget.initialComments!.fold<int>(
-                0,
-                (acc, c) => acc + 1 + c.replies.length,
-              )
-            : commentState.totalCommentsCount;
+    final isLoading = (!commentState.isInitialized &&
+            (widget.isLoading || widget.initialComments == null)) ||
+        (commentState.status == CommentStatus.loading && comments.isEmpty);
+    final isLoadingMore =
+        commentState.status == CommentStatus.loading && comments.isNotEmpty;
+    final totalCommentsCount = widget.post.commentCount;
     final currentSort = commentState.sort;
     final replyingTo = commentState.replyingTo;
 
@@ -509,7 +348,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                             onRefresh:
                                 widget.onRefresh ?? notifier.refreshComments,
                             child: ListView.builder(
-                              controller: scrollController,
+                              controller: _scrollController,
                               physics: const AlwaysScrollableScrollPhysics(
                                 parent: BouncingScrollPhysics(),
                               ),
@@ -517,8 +356,23 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                                 top: 8,
                                 bottom: 20,
                               ),
-                              itemCount: comments.length,
+                              itemCount:
+                                  comments.length + (isLoadingMore ? 1 : 0),
                               itemBuilder: (context, index) {
+                                if (index >= comments.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
                                 final comment = comments[index];
                                 return CommentTree(
                                   key: ValueKey(comment.id),
@@ -557,5 +411,185 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
         );
       },
     );
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      ref
+          .read(postCommentsNotifierProvider(widget.post.id).notifier)
+          .loadMoreComment();
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+
+    final currScroll = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    return currScroll >= (maxScroll * 0.8);
+  }
+
+  void _handleAddComment(
+    String content, {
+    String? parentCommentId,
+    String? mediaUrl,
+  }) {
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final currentAuthor = PostAuthor(
+      id: settings.userId.isNotEmpty ? settings.userId : 'current_user',
+      username: settings.username.isNotEmpty ? settings.username : 'you',
+      fullName: settings.fullName.isNotEmpty ? settings.fullName : 'You',
+      avatarUrl: settings.avatarUrl.isNotEmpty ? settings.avatarUrl : null,
+    );
+
+    ref.read(postCommentsNotifierProvider(widget.post.id).notifier).addComment(
+          content: content,
+          author: currentAuthor,
+          parentCommentId: parentCommentId,
+          mediaUrl: mediaUrl,
+          persist: widget.onAddComment == null,
+        );
+
+    widget.onAddComment?.call(
+      content,
+      parentCommentId: parentCommentId,
+      mediaUrl: mediaUrl,
+    );
+  }
+
+  void _handleToggleLike(CommentUiModel comment) {
+    final willLike = !comment.userHasLiked;
+    ref
+        .read(postCommentsNotifierProvider(widget.post.id).notifier)
+        .toggleReaction(
+          comment,
+          persist: widget.onToggleReaction == null,
+        );
+
+    widget.onToggleReaction?.call(
+      comment,
+      willLike ? '❤️' : '',
+    );
+  }
+
+  void _handleSelectReaction(CommentUiModel comment, String reaction) {
+    ref
+        .read(postCommentsNotifierProvider(widget.post.id).notifier)
+        .selectReaction(
+          comment,
+          reaction,
+          persist: widget.onToggleReaction == null,
+        );
+
+    widget.onToggleReaction?.call(comment, reaction);
+  }
+
+  void _handlePinToggle(CommentUiModel comment) {
+    final nextPinned = !comment.isPinned;
+    ref.read(postCommentsNotifierProvider(widget.post.id).notifier).togglePin(
+          comment,
+          persist: widget.onPinComment == null,
+        );
+
+    widget.onPinComment?.call(comment, isPinned: nextPinned);
+  }
+
+  void _handleDeleteComment(CommentUiModel comment) {
+    ref
+        .read(postCommentsNotifierProvider(widget.post.id).notifier)
+        .deleteComment(
+          comment.id,
+          parentCommentId: comment.parentCommentId,
+          persist: widget.onDeleteComment == null,
+        );
+
+    widget.onDeleteComment?.call(comment.id);
+  }
+
+  void _handleEditComment(CommentUiModel comment) {
+    final loc = AppLocalizations.of(context);
+    final textController = TextEditingController(text: comment.content);
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(loc?.editComment ?? 'Edit comment'),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          maxLines: 4,
+          minLines: 1,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: loc?.editCommentHint ?? 'Edit your comment...',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(loc?.cancel ?? 'Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newText = textController.text.trim();
+              final hasMedia =
+                  comment.mediaUrl != null && comment.mediaUrl!.isNotEmpty;
+              if (newText.isNotEmpty || hasMedia) {
+                ref
+                    .read(postCommentsNotifierProvider(widget.post.id).notifier)
+                    .editComment(
+                      commentId: comment.id,
+                      newContent: newText,
+                      mediaUrl: comment.mediaUrl,
+                      persist: widget.onEditComment == null,
+                    );
+                widget.onEditComment?.call(
+                  comment.id,
+                  newText,
+                  mediaUrl: comment.mediaUrl,
+                );
+              }
+              Navigator.of(ctx).pop();
+            },
+            child: Text(loc?.save ?? 'Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleToggleReplies(CommentUiModel comment) {
+    final notifier =
+        ref.read(postCommentsNotifierProvider(widget.post.id).notifier);
+    if (widget.onLoadReplies != null) {
+      notifier.toggleRepliesExpanded(comment.id);
+      if (!comment.isRepliesExpanded && comment.replies.isEmpty) {
+        widget.onLoadReplies!(comment);
+      }
+    } else {
+      notifier.toggleReplies(comment);
+    }
+  }
+
+  void _setSortOrder(CommentSortOrder order) {
+    ref
+        .read(postCommentsNotifierProvider(widget.post.id).notifier)
+        .changeSortOrder(
+          order,
+          reload: widget.onSortChanged == null,
+        );
+    widget.onSortChanged?.call(order);
+  }
+
+  String _getSortLabel(CommentSortOrder order, AppLocalizations? loc) {
+    switch (order) {
+      case CommentSortOrder.popular:
+        return loc?.topComments ?? order.label;
+      case CommentSortOrder.newest:
+        return loc?.newestFirst ?? order.label;
+      case CommentSortOrder.oldest:
+        return loc?.oldestFirst ?? order.label;
+    }
   }
 }
