@@ -166,4 +166,14 @@ class ChatCoreRepositoryImpl implements ChatCoreRepository {
       return Left(DatabaseFailure('Failed to get message: $e', e));
     }
   }
+
+  @override
+  FutureResult<List<Message>> getPendingMessages() async {
+    try {
+      final messages = await _localDataSource.getPendingMessages();
+      return Right(messages);
+    } on Object catch (e) {
+      return Left(DatabaseFailure('Failed to get pending message: $e', e));
+    }
+  }
 }

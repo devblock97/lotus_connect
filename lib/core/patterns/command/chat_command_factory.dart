@@ -12,6 +12,7 @@ import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase
 import 'package:lotus_connect/features/chat/domain/usecases/update_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
+import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_message_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 
@@ -41,12 +42,14 @@ class ChatCommandFactory {
     required String text,
     String? replyToId,
     List<XFile> medias = const [],
+    Message? existingMessage,
   }) {
     return SendMessageCommand(
       conversationId: conversationId,
       text: text,
       replyToId: replyToId,
       medias: medias,
+      existingMessage: existingMessage,
       sendMessageUseCase: sendMessageUseCase,
       uploadFileUseCase: uploadFileUseCase,
       saveLocalMessageUseCase: saveLocalMessageUseCase,

@@ -30,6 +30,7 @@ abstract class ChatCoreLocalDataSource {
     String conversationId,
     DateTime timestamp,
   );
+  Future<List<Message>> getPendingMessages();
 }
 
 class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
@@ -365,5 +366,49 @@ class ChatCoreLocalDataSourceImpl implements ChatCoreLocalDataSource {
         status: Value(MessageStatus.read.name),
       ),
     );
+  }
+
+  @override
+  Future<List<Message>> getPendingMessages() async {
+    final query = _db.select(_db.messageTable)
+      ..where(
+        (tbl) =>
+            tbl.senderRole.equals(MessageRole.user.name) &
+            tbl.status.isIn([
+              MessageStatus.sending.name,
+              MessageStatus.failed.name,
+            ]),
+      )
+      ..orderBy([(tbl) => OrderingTerm.asc(tbl.timestamp)]);
+
+    final rows = await query.get();
+    return rows
+        .map(
+          (row) => Message(
+            id: row.id,
+            conversationId: row.conversationId,
+            role: MessageRole.values.firstWhere(
+              (e) => e.name == row.senderRole,
+              orElse: () => MessageRole.user,
+            ),
+            content: row.content,
+            timestamp: row.timestamp,
+            isError: row.isError,
+            status: MessageStatus.values.firstWhere(
+              (e) => e.name == row.status,
+              orElse: () => MessageStatus.failed,
+            ),
+            replyToId: row.replyToId,
+            mediaUrl: row.mediaUrl,
+            thumbnailUrl: row.thumbnailUrl,
+            fileName: row.fileName,
+            mimeType: row.mimeType,
+            duration: row.duration,
+            isEdited: row.isEdited,
+            reactions: _parseReactions(row.reactions),
+            medias: _parseMedias(row.medias),
+          ),
+        )
+        .toList();
   }
 }

@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/core/errors/failure.dart';
 import 'package:lotus_connect/core/patterns/command/chat_command.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/data/models/file_upload_response_model.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/send_message_usecase.dart';
@@ -20,16 +21,19 @@ class SendMessageCommand implements ChatCommand<Message> {
     required DeleteLocalMessageUseCase deleteLocalMessageUseCase,
     this.replyToId,
     this.medias = const [],
+    this.existingMessage,
   })  : _sendMessageUseCase = sendMessageUseCase,
         _uploadFileUseCase = uploadFileUseCase,
         _saveLocalMessageUseCase = saveLocalMessageUseCase,
         _deleteLocalMessageUseCase = deleteLocalMessageUseCase,
-        id = DateTime.now().millisecondsSinceEpoch.toString();
+        id = existingMessage?.id ??
+            DateTime.now().millisecondsSinceEpoch.toString();
 
   final String conversationId;
   final String text;
   final String? replyToId;
   final List<XFile> medias;
+  final Message? existingMessage;
 
   final SendMessageUseCase _sendMessageUseCase;
   final UploadFileUseCase _uploadFileUseCase;
@@ -37,6 +41,26 @@ class SendMessageCommand implements ChatCommand<Message> {
   final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
 
   Message createOptimisticMessage() {
+    if (existingMessage != null) {
+      return existingMessage!.copyWith(
+        status: MessageStatus.sending,
+        isError: false,
+      );
+    }
+
+    final localMediaModels = medias.map((f) {
+      final path = f.path;
+      final fileName = f.name.isNotEmpty ? f.name : path.split('/').last;
+      final mime = f.mimeType ?? (isVideo(path) ? 'video/mp4' : 'image/jpeg');
+
+      return MediaModel(
+        url: path,
+        fileName: fileName,
+        fileSize: 0,
+        mimeType: mime,
+      );
+    }).toList();
+
     return Message(
       id: id,
       conversationId: conversationId,
@@ -45,40 +69,61 @@ class SendMessageCommand implements ChatCommand<Message> {
       timestamp: DateTime.now(),
       replyToId: replyToId,
       status: MessageStatus.sending,
+      medias: localMediaModels,
     );
   }
 
   @override
   FutureResult<Message> execute() async {
+    final optimistic = createOptimisticMessage();
+
     try {
       var mediaModels = <MediaModel>[];
 
-      if (medias.isNotEmpty) {
-        final paths = medias.map((f) => f.path).toList();
-        final uploadResult =
-            await _uploadFileUseCase(UploadFileParam(paths: paths));
+      // Determine local file paths to upload (from XFile list
+      // or saved local MediaModels)
+      final localPathsToUpload = <String>[
+        if (medias.isNotEmpty)
+          ...medias.map((f) => f.path)
+        else if (existingMessage != null)
+          ...existingMessage!.medias
+              .where((m) => !isValidUrl(m.url))
+              .map((m) => m.url),
+      ];
+
+      final alreadyUploadedMedias =
+          existingMessage?.medias.where((m) => isValidUrl(m.url)).toList() ??
+              <MediaModel>[];
+
+      if (localPathsToUpload.isNotEmpty) {
+        final uploadResult = await _uploadFileUseCase(
+          UploadFileParam(paths: localPathsToUpload),
+        );
 
         final uploadFailureOrFiles = uploadResult
             .fold<Either<Failure, FileUploadResponseModel>>(left, right);
 
         if (uploadFailureOrFiles.isLeft()) {
           final failure = uploadFailureOrFiles.getLeft().toNullable()!;
-          await undo();
+          await _markAsFailed(optimistic);
           return left(failure);
         }
 
         final fileUrl = uploadFailureOrFiles.getRight().toNullable();
-        mediaModels = (fileUrl?.files ?? [])
-            .map(
-              (f) => MediaModel(
-                url: f.url,
-                fileName: f.fileName,
-                fileSize: f.fileSize,
-                thumbnailUrl: f.thumbnailUrl,
-                mimeType: f.mimeType,
-              ),
-            )
-            .toList();
+        mediaModels = [
+          ...alreadyUploadedMedias,
+          ...(fileUrl?.files ?? []).map(
+            (f) => MediaModel(
+              url: f.url,
+              fileName: f.fileName,
+              fileSize: f.fileSize,
+              thumbnailUrl: f.thumbnailUrl,
+              mimeType: f.mimeType,
+            ),
+          ),
+        ];
+      } else {
+        mediaModels = alreadyUploadedMedias;
       }
 
       final sendResult = await _sendMessageUseCase(
@@ -92,7 +137,11 @@ class SendMessageCommand implements ChatCommand<Message> {
       );
 
       return await sendResult.fold((failure) async {
-        await undo();
+        await _markAsFailed(
+          optimistic.copyWith(
+            medias: mediaModels.isNotEmpty ? mediaModels : null,
+          ),
+        );
         return left(failure);
       }, (remoteMessage) async {
         await _deleteLocalMessageUseCase(id);
@@ -102,9 +151,20 @@ class SendMessageCommand implements ChatCommand<Message> {
         return right(remoteMessage);
       });
     } on Object catch (e) {
-      await undo();
+      await _markAsFailed(optimistic);
       return left(ServerFailure(e.toString()));
     }
+  }
+
+  Future<void> _markAsFailed(Message message) async {
+    await _saveLocalMessageUseCase(
+      SaveLocalMessageParam(
+        message: message.copyWith(
+          status: MessageStatus.failed,
+          isError: true,
+        ),
+      ),
+    );
   }
 
   @override
