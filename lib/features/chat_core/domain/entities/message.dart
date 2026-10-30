@@ -159,6 +159,7 @@ class Message extends Equatable {
     List<Reaction>? reactions,
     bool? isEdited,
     String? messageType,
+    List<MediaModel>? medias,
   }) {
     return Message(
       id: id ?? this.id,
@@ -179,6 +180,7 @@ class Message extends Equatable {
       reactions: reactions ?? this.reactions,
       isEdited: isEdited ?? this.isEdited,
       messageType: messageType ?? this.messageType,
+      medias: medias ?? this.medias,
     );
   }
 

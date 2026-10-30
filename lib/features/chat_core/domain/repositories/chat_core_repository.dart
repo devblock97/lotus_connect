@@ -47,4 +47,6 @@ abstract class ChatCoreRepository {
   FutureResult<List<Message>> getLocalMessages(String conversationId);
 
   FutureResult<Message?> getMessage(String messageId);
+
+  FutureResult<List<Message>> getPendingMessages();
 }

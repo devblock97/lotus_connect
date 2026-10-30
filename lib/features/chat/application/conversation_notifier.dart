@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/core/patterns/command/chat_command_factory.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/core/usecases/usecase.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/application/chat_application.dart';
 import 'package:lotus_connect/features/chat/domain/usecases/delete_local_message_usecase.dart';
@@ -14,6 +15,7 @@ import 'package:lotus_connect/features/chat/domain/usecases/upload_file_usecase.
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_pending_messages_use_case.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
 import 'package:lotus_connect/features/settings//application/settings_notifier.dart';
@@ -91,6 +93,7 @@ class PrivateActiveConversationNotifier
     required DeleteLocalMessageUseCase deleteLocalMessageUseCase,
     required SaveDraftMessageUseCase saveDraftMessageUseCase,
     required UploadFileUseCase uploadFileUseCase,
+    required GetPendingMessagesUseCase getPendingMessageUseCase,
   })  : _getRemoteMessageUseCase = getRemoteMessageUseCase,
         _getLocalMessageUseCase = getLocalMessageUseCase,
         _commandFactory = commandFactory,
@@ -98,6 +101,7 @@ class PrivateActiveConversationNotifier
         _deleteLocalMessageUseCase = deleteLocalMessageUseCase,
         _saveDraftMessageUseCase = saveDraftMessageUseCase,
         _uploadFileUseCase = uploadFileUseCase,
+        _getPendingMessagesUseCase = getPendingMessageUseCase,
         super(const PrivateActiveConversationState()) {
     _init();
   }
@@ -110,11 +114,13 @@ class PrivateActiveConversationNotifier
   final DeleteLocalMessageUseCase _deleteLocalMessageUseCase;
   final SaveDraftMessageUseCase _saveDraftMessageUseCase;
   final UploadFileUseCase _uploadFileUseCase;
+  final GetPendingMessagesUseCase _getPendingMessagesUseCase;
 
   final ChatCommandFactory _commandFactory;
 
   Timer? _typingTimer;
   bool _isCurrentlyTyping = false;
+  bool _isFlushingOutbox = false;
 
   final Ref _ref;
   StreamSubscription<dynamic>? _messageSubscription;
@@ -153,16 +159,95 @@ class PrivateActiveConversationNotifier
     }
   }
 
+  /// Sync latest messages for the currently active conversation
+  Future<void> syncCurrentConversation() async {
+    final convId = state.conversationId;
+    if (convId != null) {
+      await _syncMessages(convId);
+    }
+  }
+
+  /// Flushes all unsent/failed messages stored in local SQLite in FIFO order.
+  Future<void> flushPendingMessages() async {
+    if (_isFlushingOutbox) return;
+    _isFlushingOutbox = true;
+
+    try {
+      final pendingResult = await _getPendingMessagesUseCase(const NoParams());
+
+      await pendingResult.fold((_) async {}, (pendingMessages) async {
+        for (final msg in pendingMessages) {
+          // Skip messages that already received a server UUID
+          if (uuidRegex.hasMatch(msg.id)) continue;
+
+          final command = _commandFactory.createSendMessageCommand(
+            conversationId: msg.conversationId,
+            text: msg.content,
+            replyToId: msg.replyToId,
+            existingMessage: msg,
+          );
+
+          // Mark as sending in SQLite so UI shows sending indicator
+          await _saveLocalMessageUseCase(
+            SaveLocalMessageParam(
+              message: msg.copyWith(
+                status: MessageStatus.sending,
+                isError: false,
+              ),
+            ),
+          );
+
+          final result = await command.execute();
+          if (result.isLeft()) {
+            // Stop flushing further messages if network is still unreachable
+            break;
+          }
+        }
+      });
+    } finally {
+      _isFlushingOutbox = false;
+    }
+  }
+
+  Future<void> retryMessage(String messageId) async {
+    final msg = state.messages.firstWhereOrNull((m) => m.id == messageId);
+    if (msg == null || uuidRegex.hasMatch(msg.id)) return;
+
+    final command = _commandFactory.createSendMessageCommand(
+      conversationId: msg.conversationId,
+      text: msg.content,
+      replyToId: msg.replyToId,
+      existingMessage: msg,
+    );
+
+    await _saveLocalMessageUseCase(
+      SaveLocalMessageParam(
+        message: msg.copyWith(
+          status: MessageStatus.sending,
+          isError: false,
+        ),
+      ),
+    );
+
+    final result = await command.execute();
+    result.fold(
+      (failure) => state = state.copyWith(errorMessage: failure.message),
+      (_) {},
+    );
+  }
+
   Future<void> _syncMessages(String conversationId) async {
     try {
       final currentUserId = _ref.read(settingsNotifierProvider).settings.userId;
       if (currentUserId.isEmpty) return;
 
+      const syncLimit = 15;
+
       final remoteResult = await _getRemoteMessageUseCase(
         GetRemoteMessageParam(
           conversationId: conversationId,
           userId: currentUserId,
-          limit: 15,
+          limit: syncLimit,
         ),
       );
 
@@ -479,5 +564,6 @@ final privateActiveConversationProvider = StateNotifierProvider<
     saveDraftMessageUseCase: ref.watch(saveDraftMessageUseCaseProvider),
     uploadFileUseCase: ref.watch(uploadFileUseCaseProvider),
     commandFactory: ref.watch(chatCommandFactoryProvider),
+    getPendingMessageUseCase: ref.watch(getPendingMessageUseCaseProvider),
   );
 });

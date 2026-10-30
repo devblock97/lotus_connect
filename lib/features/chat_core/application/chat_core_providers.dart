@@ -6,6 +6,7 @@ import 'package:lotus_connect/features/chat_core/domain/repositories/chat_core_r
 import 'package:lotus_connect/features/chat_core/domain/usecases/delete_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_conversations_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/get_local_message_usecase.dart';
+import 'package:lotus_connect/features/chat_core/domain/usecases/get_pending_messages_use_case.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/rename_conversation_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_draft_usecase.dart';
 import 'package:lotus_connect/features/chat_core/domain/usecases/save_local_message_usecase.dart';
@@ -71,6 +72,13 @@ final saveMessageUseCaseProvider = Provider<SaveLocalMessageUseCase>((ref) {
 
 final getLocalMessageUseCaseProvider = Provider<GetLocalMessageUseCase>((ref) {
   return GetLocalMessageUseCase(
+    repository: ref.watch(chatCoreRepositoryProvider),
+  );
+});
+
+final getPendingMessageUseCaseProvider =
+    Provider<GetPendingMessagesUseCase>((ref) {
+  return GetPendingMessagesUseCase(
     repository: ref.watch(chatCoreRepositoryProvider),
   );
 });

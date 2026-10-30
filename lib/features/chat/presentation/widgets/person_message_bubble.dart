@@ -129,16 +129,25 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
               ),
               if (isMine) ...[
                 const SizedBox(width: 3),
-                Icon(
-                  widget.message.isError
-                      ? Icons.error_outline
-                      : Icons.done_all_rounded,
-                  size: 14,
-                  color: widget.message.isError
-                      ? theme.colorScheme.error
-                      : (widget.message.status == MessageStatus.read
-                          ? AppColors.primaryLight
-                          : theme.disabledColor.withValues(alpha: 0.6)),
+                GestureDetector(
+                  onTap: () {
+                    if (widget.message.isError) {
+                      ref
+                          .read(privateActiveConversationProvider.notifier)
+                          .retryMessage(widget.message.id);
+                    }
+                  },
+                  child: Icon(
+                    widget.message.isError
+                        ? Icons.loop
+                        : Icons.done_all_rounded,
+                    size: 14,
+                    color: widget.message.isError
+                        ? theme.colorScheme.error
+                        : (widget.message.status == MessageStatus.read
+                            ? AppColors.primaryLight
+                            : theme.disabledColor.withValues(alpha: 0.6)),
+                  ),
                 ),
               ],
             ],

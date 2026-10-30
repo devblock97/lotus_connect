@@ -19,10 +19,13 @@ class WebSocketService {
   final _eventStreamController =
       StreamController<Map<String, dynamic>>.broadcast();
 
+  final _connectionStateController = StreamController<bool>.broadcast();
+
+  Stream<bool> get connectionStateStream => _connectionStateController.stream;
+
   /// Exposes incoming events stream from the server.
   Stream<Map<String, dynamic>> get eventStream => _eventStreamController.stream;
 
-  /// Connection state helper.
   bool get isConnected =>
       _socket != null && _socket!.readyState == WebSocket.open;
 
