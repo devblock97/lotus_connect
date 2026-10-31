@@ -9,6 +9,7 @@ import 'package:lotus_connect/features/chat/presentation/views/chat_screen.dart'
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/widgets/contact_card.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -302,6 +303,17 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
   Widget _buildFriendCard(User friend) {
     return ContactCard(
       friend: friend,
+      onProfileTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => ProfileScreen(
+              userId: friend.id,
+              initialUsername: friend.username,
+            ),
+          ),
+        );
+      },
       startChat: () async {
         final conversation = await ref
             .read(
@@ -472,6 +484,17 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         ],
       ),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => ProfileScreen(
+                userId: user.id,
+                initialUsername: user.username,
+              ),
+            ),
+          );
+        },
         contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
         leading: CircleAvatar(
           radius: 22,

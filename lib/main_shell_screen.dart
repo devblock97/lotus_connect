@@ -8,8 +8,8 @@ import 'package:lotus_connect/features/chat/presentation/views/conversation_list
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 import 'package:lotus_connect/features/notifications/presentation/view/alerts_screen.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
-import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class MainShellScreen extends ConsumerStatefulWidget {
@@ -75,7 +75,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       ),
       const ContactsScreen(),
       const AlertsScreen(),
-      const SettingsScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(

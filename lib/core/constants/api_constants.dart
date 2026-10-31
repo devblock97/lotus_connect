@@ -24,6 +24,25 @@ class ApiConstants {
   static String deleteFriend(String friendId) => '/users/friends/$friendId';
   static const String friendRequests = '/users/friends/requests';
   static const String searchUsers = '/users/search';
+  static const String closeFriends = '/users/close-friends';
+  static String removeCloseFriend(String friendId) =>
+      '/users/close-friends/$friendId';
+
+  // ---------------------------------------------------------------------------
+  // Profile endpoints
+  // ---------------------------------------------------------------------------
+  static const String myProfile = '/users/me';
+  static const String updateMyProfile = '/users/me';
+  static const String uploadAvatar = '/users/avatar';
+  static const String uploadCover = '/users/cover';
+  static const String myPosts = '/users/me/posts';
+  static const String myMedia = '/users/me/media';
+  static String userProfile(String userId) => '/users/$userId';
+  static String userProfileByUsername(String username) =>
+      '/users/username/$username';
+  static String userPosts(String userId) => '/users/$userId/posts';
+  static String userMedia(String userId) => '/users/$userId/media';
+  static String userFriends(String userId) => '/users/$userId/friends';
 
   // ---------------------------------------------------------------------------
   // Notifications & Devices endpoints

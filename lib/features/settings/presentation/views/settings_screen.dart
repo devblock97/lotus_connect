@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
+import 'package:lotus_connect/features/profile/application/profile_providers.dart';
+import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
+import 'package:lotus_connect/features/profile/presentation/views/edit_profile_screen.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/widgets/setting_card.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -38,66 +42,81 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           // Profile Header Card
           SettingCard(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.grey,
-                            backgroundImage: settings.avatarUrl.isNotEmpty
-                                ? NetworkImage(settings.avatarUrl)
-                                : null,
-                            child: settings.avatarUrl.isEmpty
-                                ? const Icon(
-                                    Icons.person,
-                                    size: 48,
-                                    color: Colors.white,
-                                  )
-                                : null,
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt_outlined,
-                                color: Colors.blue,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            settings.fullName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            settings.email,
-                          ),
-                        ],
-                      ),
-                    ],
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => const ProfileScreen(),
                   ),
-                  const SizedBox(height: 12),
-                ],
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.grey,
+                              backgroundImage: settings.avatarUrl.isNotEmpty
+                                  ? NetworkImage(settings.avatarUrl)
+                                  : null,
+                              child: settings.avatarUrl.isEmpty
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 48,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt_outlined,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                settings.fullName.isNotEmpty
+                                    ? settings.fullName
+                                    : settings.username,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                settings.email,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               ),
             ),
           ),
@@ -109,7 +128,29 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    final currentProfile =
+                        ref.read(myProfileNotifierProvider).profile ??
+                            UserProfile(
+                              id: settings.userId,
+                              username: settings.username,
+                              fullName: settings.fullName.isNotEmpty
+                                  ? settings.fullName
+                                  : null,
+                              email: settings.email,
+                              avatarUrl: settings.avatarUrl.isNotEmpty
+                                  ? settings.avatarUrl
+                                  : null,
+                              isSelf: true,
+                            );
+                    Navigator.of(context).push<void>(
+                      MaterialPageRoute(
+                        builder: (_) => EditProfileScreen(
+                          initialProfile: currentProfile,
+                        ),
+                      ),
+                    );
+                  },
                   leading: const Icon(Icons.edit),
                   title: Text(loc.editProfile),
                   trailing: const Icon(Icons.chevron_right),

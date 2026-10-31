@@ -15,6 +15,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/post_options_sh
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_explore_screen.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -218,6 +219,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     children: [
                       PostCard(
                         post: post,
+                        onProfileTap: () {
+                          Navigator.of(context).push<void>(
+                            MaterialPageRoute(
+                              builder: (_) => ProfileScreen(
+                                userId: post.author.id,
+                                initialUsername: post.author.username,
+                              ),
+                            ),
+                          );
+                        },
                         onLikeChanged: (isLiked) {
                           notifier.toggleLike(
                             post.id,
