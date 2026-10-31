@@ -9,6 +9,7 @@ import 'package:lotus_connect/features/home/presentation/view/create_story_scree
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/go_live_screen.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_explore_screen.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/presentation/views/settings_screen.dart';
 import 'package:lotus_connect/main_shell_screen.dart';
@@ -21,6 +22,7 @@ class AppRouter {
   static const String login = '/login';
   static const String conversations = '/conversations';
   static const String settings = '/settings';
+  static const String profile = '/profile';
   static const String contacts = '/contacts';
   static const String chat = '/chats';
   static const String createPost = '/create-post';
@@ -74,6 +76,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRouter.settings,
         builder: (BuildContext context, GoRouterState state) =>
             const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRouter.profile,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '${AppRouter.profile}/:userId',
+        builder: (BuildContext context, GoRouterState state) => ProfileScreen(
+          userId: state.pathParameters['userId'],
+        ),
       ),
       GoRoute(
         path: AppRouter.contacts,

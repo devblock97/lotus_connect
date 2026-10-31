@@ -12,6 +12,7 @@ class ContactCard extends ConsumerWidget {
     this.videoCall,
     this.startChat,
     this.onDelete,
+    this.onProfileTap,
     super.key,
   });
 
@@ -20,6 +21,7 @@ class ContactCard extends ConsumerWidget {
   final VoidCallback? voiceCall;
   final VoidCallback? videoCall;
   final VoidCallback? onDelete;
+  final VoidCallback? onProfileTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,45 +69,48 @@ class ContactCard extends ConsumerWidget {
             child: Row(
               children: [
                 // Avatar with Presence Indicator
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    CircleAvatar(
-                      radius: 23,
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      backgroundImage: friend.avatarUrl != null &&
-                              friend.avatarUrl!.isNotEmpty
-                          ? NetworkImage(friend.avatarUrl!)
-                          : null,
-                      child:
-                          friend.avatarUrl == null || friend.avatarUrl!.isEmpty
-                              ? Text(
-                                  initials,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onPrimaryContainer,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                  ),
-                                )
-                              : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 13,
-                        height: 13,
-                        decoration: BoxDecoration(
-                          color: presenceColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: cardColor,
-                            width: 2.2,
+                GestureDetector(
+                  onTap: onProfileTap,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      CircleAvatar(
+                        radius: 23,
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                        backgroundImage: friend.avatarUrl != null &&
+                                friend.avatarUrl!.isNotEmpty
+                            ? NetworkImage(friend.avatarUrl!)
+                            : null,
+                        child: friend.avatarUrl == null ||
+                                friend.avatarUrl!.isEmpty
+                            ? Text(
+                                initials,
+                                style: TextStyle(
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
+                              )
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 13,
+                          height: 13,
+                          decoration: BoxDecoration(
+                            color: presenceColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: cardColor,
+                              width: 2.2,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 14),
 
@@ -203,11 +208,27 @@ class ContactCard extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         onSelected: (value) {
-                          if (value == 'unfriend') {
+                          if (value == 'profile') {
+                            onProfileTap?.call();
+                          } else if (value == 'unfriend') {
                             onDelete?.call();
                           }
                         },
                         itemBuilder: (context) => [
+                          if (onProfileTap != null)
+                            PopupMenuItem(
+                              value: 'profile',
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.person_outline_rounded,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(loc.tabProfile),
+                                ],
+                              ),
+                            ),
                           PopupMenuItem(
                             value: 'unfriend',
                             child: Row(

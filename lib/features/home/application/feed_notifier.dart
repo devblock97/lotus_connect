@@ -119,7 +119,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
     state = state.copyWith(isLoading: true);
 
     final result = await _getFeedUseCase(
-      GetFeedParam(cursor: state.cursor, limit: 1),
+      GetFeedParam(cursor: state.cursor, limit: 10),
     );
 
     result.fold(

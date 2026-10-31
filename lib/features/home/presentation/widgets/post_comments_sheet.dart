@@ -10,6 +10,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/comments/commen
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_input_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_skeleton_list.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_tree.dart';
+import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -390,6 +391,16 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                                   onPinToggle: _handlePinToggle,
                                   onEdit: _handleEditComment,
                                   onDelete: _handleDeleteComment,
+                                  onAuthorTap: (author) {
+                                    Navigator.of(context).push<void>(
+                                      MaterialPageRoute(
+                                        builder: (_) => ProfileScreen(
+                                          userId: author.id,
+                                          initialUsername: author.username,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 );
                               },
                             ),
