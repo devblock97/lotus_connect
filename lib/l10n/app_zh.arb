@@ -154,7 +154,7 @@
   "online": "在线",
   "unknownUser": "未知用户",
   "unfriend": "解除好友",
-  "unfriendConfirmation": "确定要解除此好友关系吗？",
+  "unfriendConfirmation": "确定要解除与 {name} 的好友关系吗？",
   "friendRemoved": "已成功解除好友关系",
   "failedToRemoveFriend": "解除好友关系失败",
   "commentsTitle": "评论",
@@ -373,5 +373,16 @@
   "hidePassword": "隐藏密码",
   "passwordStrength": "密码强度",
   "failedToLogin": "登录失败",
-  "failedToRegister": "注册失败"
+  "failedToRegister": "注册失败",
+  "viewProfile": "查看资料",
+  "userWithId": "用户 {id}",
+  "offline": "离线",
+  "justNow": "刚刚",
+  "minutesAgo": "{minutes}分钟前",
+  "hoursAgo": "{hours}小时前",
+  "daysAgo": "{days}天前",
+  "clearSearch": "清除搜索",
+  "moreOptions": "更多选项",
+  "callDurationMinutesSeconds": "{minutes}分 {seconds}秒",
+  "callDurationSeconds": "{seconds}秒"
 }

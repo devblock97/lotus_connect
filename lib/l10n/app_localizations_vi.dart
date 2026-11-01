@@ -490,8 +490,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get unfriend => 'Hủy kết bạn';
 
   @override
-  String get unfriendConfirmation =>
-      'Bạn có chắc muốn hủy kết bạn với người này?';
+  String unfriendConfirmation(String name) {
+    return 'Bạn có chắc muốn hủy kết bạn với $name không?';
+  }
 
   @override
   String get friendRemoved => 'Đã xóa bạn thành công';
@@ -1202,4 +1203,46 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get failedToRegister => 'Đăng ký thất bại';
+
+  @override
+  String get viewProfile => 'Xem trang cá nhân';
+
+  @override
+  String userWithId(String id) {
+    return 'Người dùng $id';
+  }
+
+  @override
+  String get offline => 'Ngoại tuyến';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes phút trước';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours giờ trước';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '$days ngày trước';
+  }
+
+  @override
+  String get clearSearch => 'Xóa tìm kiếm';
+
+  @override
+  String get moreOptions => 'Tùy chọn khác';
+
+  @override
+  String callDurationMinutesSeconds(int minutes, int seconds) {
+    return '${minutes}p ${seconds}s';
+  }
+
+  @override
+  String callDurationSeconds(int seconds) {
+    return '${seconds}s';
+  }
 }

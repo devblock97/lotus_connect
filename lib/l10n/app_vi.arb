@@ -154,7 +154,7 @@
   "online": "Trực tuyến",
   "unknownUser": "Người dùng không xác định",
   "unfriend": "Hủy kết bạn",
-  "unfriendConfirmation": "Bạn có chắc muốn hủy kết bạn với người này?",
+  "unfriendConfirmation": "Bạn có chắc muốn hủy kết bạn với {name} không?",
   "friendRemoved": "Đã xóa bạn thành công",
   "failedToRemoveFriend": "Không thể xóa bạn bè",
   "commentsTitle": "Bình luận",
@@ -373,5 +373,16 @@
   "hidePassword": "Ẩn mật khẩu",
   "passwordStrength": "Độ mạnh mật khẩu",
   "failedToLogin": "Đăng nhập thất bại",
-  "failedToRegister": "Đăng ký thất bại"
+  "failedToRegister": "Đăng ký thất bại",
+  "viewProfile": "Xem trang cá nhân",
+  "userWithId": "Người dùng {id}",
+  "offline": "Ngoại tuyến",
+  "justNow": "Vừa xong",
+  "minutesAgo": "{minutes} phút trước",
+  "hoursAgo": "{hours} giờ trước",
+  "daysAgo": "{days} ngày trước",
+  "clearSearch": "Xóa tìm kiếm",
+  "moreOptions": "Tùy chọn khác",
+  "callDurationMinutesSeconds": "{minutes}p {seconds}s",
+  "callDurationSeconds": "{seconds}s"
 }

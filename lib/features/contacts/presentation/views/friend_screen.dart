@@ -91,6 +91,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear_rounded, size: 20),
+                          tooltip: loc.clearSearch,
                           onPressed: () {
                             _searchController.clear();
                             ref.read(contactsProvider.notifier).clearSearch();
@@ -615,7 +616,8 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     );
                     _addFriendController.clear();
                   } else {
-                    final err = ref.read(contactsProvider).errorMessage;
+                    final err = ref.read(friendRequestProvider).message ??
+                        ref.read(contactsProvider).errorMessage;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(err ?? loc.failedToSendRequest),
@@ -644,7 +646,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(loc.unfriend),
         content: Text(
-          loc.unfriendConfirmation.replaceAll('{name}', displayName),
+          loc.unfriendConfirmation(displayName),
         ),
         actions: [
           TextButton(

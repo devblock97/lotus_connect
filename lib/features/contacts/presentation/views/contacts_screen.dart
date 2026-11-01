@@ -245,7 +245,8 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     );
                     _addFriendController.clear();
                   } else {
-                    final err = ref.read(contactsProvider).errorMessage;
+                    final err = ref.read(friendRequestProvider).message ??
+                        ref.read(contactsProvider).errorMessage;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(err ?? loc.failedToSendRequest),

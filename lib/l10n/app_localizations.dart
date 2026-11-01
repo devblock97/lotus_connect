@@ -1032,11 +1032,11 @@ abstract class AppLocalizations {
   /// **'Unfriend'**
   String get unfriend;
 
-  /// No description provided for @unfriendConfirmation.
+  /// Confirmation message before removing a friend
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to remove this friend?'**
-  String get unfriendConfirmation;
+  /// **'Are you sure you want to remove {name}?'**
+  String unfriendConfirmation(String name);
 
   /// No description provided for @friendRemoved.
   ///
@@ -1938,7 +1938,7 @@ abstract class AppLocalizations {
   /// **'Send'**
   String get send;
 
-  /// No description provided for @justNow.
+  /// Time elapsed representation for an event that just occurred
   ///
   /// In en, this message translates to:
   /// **'Just now'**
@@ -2333,6 +2333,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to register'**
   String get failedToRegister;
+
+  /// Context menu action to view a contact's profile
+  ///
+  /// In en, this message translates to:
+  /// **'View Profile'**
+  String get viewProfile;
+
+  /// Fallback display for a user identified by a truncated ID
+  ///
+  /// In en, this message translates to:
+  /// **'User {id}'**
+  String userWithId(String id);
+
+  /// Presence status indicating the user is currently offline
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offline;
+
+  /// Time elapsed representation in minutes
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
+  String minutesAgo(int minutes);
+
+  /// Time elapsed representation in hours
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
+  String hoursAgo(int hours);
+
+  /// Time elapsed representation in days
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String daysAgo(int days);
+
+  /// Tooltip for clearing search text input
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// Tooltip for the more options menu button
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get moreOptions;
+
+  /// Duration format in minutes and seconds
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m {seconds}s'**
+  String callDurationMinutesSeconds(int minutes, int seconds);
+
+  /// Duration format in seconds only
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String callDurationSeconds(int seconds);
 }
 
 class _AppLocalizationsDelegate
