@@ -5,6 +5,7 @@
             <certificates src="system" />
             <certificates src="user" />
             <certificates src="@raw/caddy_root_ca" />
+            <certificates src="@raw/mkcert_root_ca" />
         </trust-anchors>
     </base-config>
     <debug-overrides>
@@ -12,6 +13,7 @@
             <certificates src="system" />
             <certificates src="user" />
             <certificates src="@raw/caddy_root_ca" />
+            <certificates src="@raw/mkcert_root_ca" />
         </trust-anchors>
     </debug-overrides>
 </network-security-config>

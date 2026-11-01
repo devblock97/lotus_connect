@@ -607,14 +607,12 @@ class VideoPreCacheManager {
     return _preCachedUrls.contains(normalized);
   }
 
-  /// Returns playable URL (served through 0ms local proxy if pre-cached,
-  /// otherwise returns normalized active URL).
+  /// Returns playable URL (served through 0ms local loopback proxy, which
+  /// caches chunks, rewrites HLS, and seamlessly bypasses native TLS/cert issues).
   String getPlayableUrl(String remoteUrl) {
     final activeHost = _serverHostGetter();
     final normalized = normalizeMediaUrl(remoteUrl, serverHost: activeHost);
-    if (_proxyServer.isRunning &&
-        _proxyServer.port != null &&
-        isPreCached(normalized)) {
+    if (_proxyServer.isRunning && _proxyServer.port != null) {
       final encoded = Uri.encodeComponent(normalized);
       return 'http://127.0.0.1:${_proxyServer.port}/video?url=$encoded';
     }
