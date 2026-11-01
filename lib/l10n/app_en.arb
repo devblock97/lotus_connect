@@ -162,7 +162,15 @@
   "online": "Online",
   "unknownUser": "Unknown User",
   "unfriend": "Unfriend",
-  "unfriendConfirmation": "Are you sure you want to remove this friend?",
+  "unfriendConfirmation": "Are you sure you want to remove {name}?",
+  "@unfriendConfirmation": {
+    "description": "Confirmation message before removing a friend",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "friendRemoved": "Friend removed successfully",
   "failedToRemoveFriend": "Failed to remove friend",
   "commentsTitle": "Comments",
@@ -746,5 +754,82 @@
   "failedToRegister": "Failed to register",
   "@failedToRegister": {
     "description": "Error message when register request fails"
+  },
+  "viewProfile": "View Profile",
+  "@viewProfile": {
+    "description": "Context menu action to view a contact's profile"
+  },
+  "userWithId": "User {id}",
+  "@userWithId": {
+    "description": "Fallback display for a user identified by a truncated ID",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "offline": "Offline",
+  "@offline": {
+    "description": "Presence status indicating the user is currently offline"
+  },
+  "justNow": "Just now",
+  "@justNow": {
+    "description": "Time elapsed representation for an event that just occurred"
+  },
+  "minutesAgo": "{minutes}m ago",
+  "@minutesAgo": {
+    "description": "Time elapsed representation in minutes",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{hours}h ago",
+  "@hoursAgo": {
+    "description": "Time elapsed representation in hours",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{days}d ago",
+  "@daysAgo": {
+    "description": "Time elapsed representation in days",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Tooltip for clearing search text input"
+  },
+  "moreOptions": "More options",
+  "@moreOptions": {
+    "description": "Tooltip for the more options menu button"
+  },
+  "callDurationMinutesSeconds": "{minutes}m {seconds}s",
+  "@callDurationMinutesSeconds": {
+    "description": "Duration format in minutes and seconds",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "callDurationSeconds": "{seconds}s",
+  "@callDurationSeconds": {
+    "description": "Duration format in seconds only",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   }
 }

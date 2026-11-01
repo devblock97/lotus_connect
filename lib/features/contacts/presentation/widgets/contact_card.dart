@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -196,6 +195,7 @@ class ContactCard extends ConsumerWidget {
                     ),
                     if (onDelete != null)
                       PopupMenuButton<String>(
+                        tooltip: loc.moreOptions,
                         icon: Icon(
                           Icons.more_vert_rounded,
                           color: theme.colorScheme.onSurfaceVariant
@@ -225,7 +225,7 @@ class ContactCard extends ConsumerWidget {
                                     size: 20,
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(loc.tabProfile),
+                                  Text(loc.viewProfile),
                                 ],
                               ),
                             ),
@@ -288,13 +288,23 @@ class ContactCard extends ConsumerWidget {
   ) {
     final presenceMap = ref.watch(presenceProvider);
     final peerPresence = presenceMap[peerId];
-    final isOnline = peerPresence?.isOnline ?? false;
-    final lastSeen = peerPresence?.lastSeen ?? DateTime.now();
-    if (isOnline) {
-      return loc.online;
-    } else {
-      return formatLastSeen(isOnline, lastSeen);
+    if (peerPresence == null) {
+      return loc.offline;
     }
+    if (peerPresence.isOnline) {
+      return loc.online;
+    }
+    final diff = DateTime.now().difference(peerPresence.lastSeen);
+    if (diff.isNegative || diff.inSeconds < 60) {
+      return loc.justNow;
+    }
+    if (diff.inMinutes < 60) {
+      return loc.minutesAgo(diff.inMinutes);
+    }
+    if (diff.inHours < 24) {
+      return loc.hoursAgo(diff.inHours);
+    }
+    return loc.daysAgo(diff.inDays);
   }
 
   Color _getPresenceColor(WidgetRef ref, String peerId) {

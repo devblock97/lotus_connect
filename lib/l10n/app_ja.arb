@@ -154,7 +154,7 @@
   "online": "オンライン",
   "unknownUser": "不明なユーザー",
   "unfriend": "友達を解除",
-  "unfriendConfirmation": "この友達を解除してもよろしいですか？",
+  "unfriendConfirmation": "{name}を友達から削除してもよろしいですか？",
   "friendRemoved": "友達を正常に解除しました",
   "failedToRemoveFriend": "友達の解除に失敗しました",
   "commentsTitle": "コメント",
@@ -373,5 +373,16 @@
   "hidePassword": "パスワードを非表示",
   "passwordStrength": "パスワードの強度",
   "failedToLogin": "ログインに失敗しました",
-  "failedToRegister": "登録に失敗しました"
+  "failedToRegister": "登録に失敗しました",
+  "viewProfile": "プロフィールを表示",
+  "userWithId": "ユーザー {id}",
+  "offline": "オフライン",
+  "justNow": "たった今",
+  "minutesAgo": "{minutes}分前",
+  "hoursAgo": "{hours}時間前",
+  "daysAgo": "{days}日前",
+  "clearSearch": "検索をクリア",
+  "moreOptions": "その他のオプション",
+  "callDurationMinutesSeconds": "{minutes}分 {seconds}秒",
+  "callDurationSeconds": "{seconds}秒"
 }

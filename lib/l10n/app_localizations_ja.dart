@@ -479,7 +479,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unfriend => '友達を解除';
 
   @override
-  String get unfriendConfirmation => 'この友達を解除してもよろしいですか？';
+  String unfriendConfirmation(String name) {
+    return '$nameを友達から削除してもよろしいですか？';
+  }
 
   @override
   String get friendRemoved => '友達を正常に解除しました';
@@ -1173,4 +1175,46 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get failedToRegister => '登録に失敗しました';
+
+  @override
+  String get viewProfile => 'プロフィールを表示';
+
+  @override
+  String userWithId(String id) {
+    return 'ユーザー $id';
+  }
+
+  @override
+  String get offline => 'オフライン';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes分前';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours時間前';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '$days日前';
+  }
+
+  @override
+  String get clearSearch => '検索をクリア';
+
+  @override
+  String get moreOptions => 'その他のオプション';
+
+  @override
+  String callDurationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes分 $seconds秒';
+  }
+
+  @override
+  String callDurationSeconds(int seconds) {
+    return '$seconds秒';
+  }
 }

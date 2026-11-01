@@ -488,8 +488,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unfriend => 'Unfriend';
 
   @override
-  String get unfriendConfirmation =>
-      'Are you sure you want to remove this friend?';
+  String unfriendConfirmation(String name) {
+    return 'Are you sure you want to remove $name?';
+  }
 
   @override
   String get friendRemoved => 'Friend removed successfully';
@@ -1203,4 +1204,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToRegister => 'Failed to register';
+
+  @override
+  String get viewProfile => 'View Profile';
+
+  @override
+  String userWithId(String id) {
+    return 'User $id';
+  }
+
+  @override
+  String get offline => 'Offline';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get moreOptions => 'More options';
+
+  @override
+  String callDurationMinutesSeconds(int minutes, int seconds) {
+    return '${minutes}m ${seconds}s';
+  }
+
+  @override
+  String callDurationSeconds(int seconds) {
+    return '${seconds}s';
+  }
 }

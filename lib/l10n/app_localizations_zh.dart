@@ -477,7 +477,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unfriend => '解除好友';
 
   @override
-  String get unfriendConfirmation => '确定要解除此好友关系吗？';
+  String unfriendConfirmation(String name) {
+    return '确定要解除与 $name 的好友关系吗？';
+  }
 
   @override
   String get friendRemoved => '已成功解除好友关系';
@@ -1170,4 +1172,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get failedToRegister => '注册失败';
+
+  @override
+  String get viewProfile => '查看资料';
+
+  @override
+  String userWithId(String id) {
+    return '用户 $id';
+  }
+
+  @override
+  String get offline => '离线';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '$minutes分钟前';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '$hours小时前';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '$days天前';
+  }
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get moreOptions => '更多选项';
+
+  @override
+  String callDurationMinutesSeconds(int minutes, int seconds) {
+    return '$minutes分 $seconds秒';
+  }
+
+  @override
+  String callDurationSeconds(int seconds) {
+    return '$seconds秒';
+  }
 }
