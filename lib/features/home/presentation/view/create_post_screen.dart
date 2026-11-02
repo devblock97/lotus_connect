@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/home/application/create_post_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
@@ -435,7 +436,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             loc,
                           ),
 
-                        // Facebook-style Color Swatches
                         if (_showColorPicker &&
                             state.mediaPaths.isEmpty &&
                             state.existingMediaItems.isEmpty)
@@ -446,8 +446,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     ),
                   ),
                 ),
-
-                // Facebook & Instagram style bottom "Add to your post" toolbar
                 _buildBottomToolbar(context, theme, primaryTextColor, loc),
               ],
             ),
@@ -853,12 +851,17 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         ),
         const SizedBox(height: 6),
         SizedBox(
-          height: 180,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 0.85,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+            ),
             physics: const BouncingScrollPhysics(),
             itemCount: totalCount,
-            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            // separatorBuilder: (_, __) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
               final isExisting = index < existingItems.length;
 
@@ -875,16 +878,35 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         width: 140,
                         height: 180,
                         color: Colors.black12,
-                        child: CachedNetworkImage(
-                          imageUrl: media.url,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) => const Center(
-                            child: CupertinoActivityIndicator(),
-                          ),
-                          errorWidget: (_, __, ___) => const Center(
-                            child: Icon(Icons.broken_image, size: 40),
-                          ),
-                        ),
+                        child: isVideo
+                            ? (media.thumbnailUrl != null &&
+                                    media.thumbnailUrl!.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: media.thumbnailUrl!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, __) => const Center(
+                                      child: CupertinoActivityIndicator(),
+                                    ),
+                                    errorWidget: (_, __, ___) =>
+                                        MediaVideoThumbnail(
+                                      key: ValueKey(media.url),
+                                      url: media.url,
+                                    ),
+                                  )
+                                : MediaVideoThumbnail(
+                                    key: ValueKey(media.url),
+                                    url: media.url,
+                                  ))
+                            : CachedNetworkImage(
+                                imageUrl: media.url,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => const Center(
+                                  child: CupertinoActivityIndicator(),
+                                ),
+                                errorWidget: (_, __, ___) => const Center(
+                                  child: Icon(Icons.broken_image, size: 40),
+                                ),
+                              ),
                       ),
                     ),
                     if (isVideo)
@@ -951,8 +973,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
               final localIndex = index - existingItems.length;
               final path = paths[localIndex];
-              final isVideo = path.toLowerCase().endsWith('.mp4') ||
-                  path.toLowerCase().endsWith('.mov');
+              final lowerPath = path.toLowerCase();
+              final isVideo = lowerPath.endsWith('.mp4') ||
+                  lowerPath.endsWith('.mov') ||
+                  lowerPath.endsWith('.m4v') ||
+                  lowerPath.endsWith('.webm') ||
+                  lowerPath.endsWith('.avi');
 
               return Stack(
                 clipBehavior: Clip.none,
@@ -963,13 +989,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                       width: 140,
                       height: 180,
                       color: Colors.black12,
-                      child: Image.file(
-                        File(path),
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Center(
-                          child: Icon(Icons.broken_image, size: 40),
-                        ),
-                      ),
+                      child: isVideo
+                          ? MediaVideoThumbnail(
+                              key: ValueKey(path),
+                              url: path,
+                            )
+                          : Image.file(
+                              File(path),
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Center(
+                                child: Icon(Icons.broken_image, size: 40),
+                              ),
+                            ),
                     ),
                   ),
                   if (isVideo)

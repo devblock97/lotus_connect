@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:video_player/video_player.dart';
@@ -15,19 +17,27 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
   late final VideoPlayerController _controller;
   bool _isInitialized = false;
 
+  bool get _isNetworkUrl {
+    final uri = Uri.tryParse(widget.url);
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _isInitialized = true;
-          });
-        }
-      }).catchError((Object e) {
-        AppLogger.error('Failed to initialize video: $e');
-      });
+    _controller = _isNetworkUrl
+        ? VideoPlayerController.networkUrl(Uri.parse(widget.url))
+        : VideoPlayerController.file(File(widget.url));
+
+    _controller.initialize().then((_) {
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
+    }).catchError((Object error) {
+      AppLogger.error('Failed to initialize video: $error');
+    });
   }
 
   @override
@@ -38,6 +48,9 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
 
   @override
   Widget build(BuildContext context) {
+    final size = _controller.value.size;
+    final hasValidSize = size.width > 0 && size.height > 0;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -46,22 +59,38 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
       clipBehavior: Clip.antiAlias,
       child: _isInitialized
           ? Stack(
+              fit: StackFit.expand,
               alignment: Alignment.center,
               children: [
-                AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
+                if (hasValidSize)
+                  FittedBox(
+                    fit: BoxFit.cover,
+                    clipBehavior: Clip.hardEdge,
+                    child: SizedBox(
+                      width: size.width,
+                      height: size.height,
+                      child: VideoPlayer(_controller),
+                    ),
+                  )
+                else
+                  Center(
+                    child: AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 20,
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ],
