@@ -7,7 +7,8 @@ import 'package:lotus_connect/features/calls/application/calls_providers.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
-import 'package:lotus_connect/features/notifications/presentation/view/alerts_screen.dart';
+import 'package:lotus_connect/features/notifications/application/notifications_notifier.dart';
+import 'package:lotus_connect/features/notifications/presentation/view/notifications_screen.dart';
 import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -65,6 +66,9 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       );
 
     final shellIndex = ref.watch(shellIndexProvider);
+    final unreadNotifications = ref.watch(
+      notificationsProvider.select((s) => s.unreadCount),
+    );
 
     final pages = [
       const HomeScreen(),
@@ -74,7 +78,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         },
       ),
       const ContactsScreen(),
-      const AlertsScreen(),
+      const NotificationsScreen(),
       const ProfileScreen(),
     ];
 
@@ -107,8 +111,20 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             label: loc.contacts,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.notifications_none_rounded),
-            selectedIcon: const Icon(Icons.notifications),
+            icon: Badge.count(
+              count: unreadNotifications,
+              isLabelVisible: unreadNotifications > 0,
+              backgroundColor: const Color(0xFFE41E3F),
+              textColor: Colors.white,
+              child: const Icon(Icons.notifications_none_rounded),
+            ),
+            selectedIcon: Badge.count(
+              count: unreadNotifications,
+              isLabelVisible: unreadNotifications > 0,
+              backgroundColor: const Color(0xFFE41E3F),
+              textColor: Colors.white,
+              child: const Icon(Icons.notifications),
+            ),
             label: loc.tabAlerts,
           ),
           NavigationDestination(
@@ -122,7 +138,6 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
   }
 }
 
-/// Placeholder screen for roadmap features (Phase 2 & Phase 3).
 class PlaceholderTab extends StatelessWidget {
   const PlaceholderTab({
     required this.title,

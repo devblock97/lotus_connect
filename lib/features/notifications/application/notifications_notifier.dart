@@ -18,6 +18,8 @@ class NotificationsState {
     this.isLoading = false,
     this.hasReachedMax = false,
     this.isLoadingMore = false,
+    this.activeFilter = NotificationFilter.all,
+    this.searchQuery = '',
     this.errorMessage,
     this.cursor,
   });
@@ -28,6 +30,32 @@ class NotificationsState {
   final String? cursor;
   final bool hasReachedMax;
   final bool isLoadingMore;
+  final NotificationFilter activeFilter;
+  final String searchQuery;
+
+  /// Number of unread notifications currently in state.
+  int get unreadCount => notifications.where((n) => !n.isRead).length;
+
+  /// Notifications filtered by [activeFilter] and [searchQuery].
+  List<AppNotification> get filteredNotifications {
+    final normalizedQuery = searchQuery.trim().toLowerCase();
+    return notifications.where((notification) {
+      if (!notification.matchesFilter(activeFilter)) {
+        return false;
+      }
+      if (normalizedQuery.isNotEmpty) {
+        final titleMatch =
+            notification.title.toLowerCase().contains(normalizedQuery);
+        final bodyMatch =
+            notification.body.toLowerCase().contains(normalizedQuery);
+        final actorMatch =
+            notification.actorName?.toLowerCase().contains(normalizedQuery) ??
+                false;
+        return titleMatch || bodyMatch || actorMatch;
+      }
+      return true;
+    }).toList();
+  }
 
   NotificationsState copyWith({
     List<AppNotification>? notifications,
@@ -36,6 +64,8 @@ class NotificationsState {
     String? cursor,
     bool? hasReachedMax,
     bool? isLoadingMore,
+    NotificationFilter? activeFilter,
+    String? searchQuery,
   }) {
     return NotificationsState(
       notifications: notifications ?? this.notifications,
@@ -44,6 +74,8 @@ class NotificationsState {
       cursor: cursor ?? this.cursor,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      activeFilter: activeFilter ?? this.activeFilter,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 }
@@ -81,6 +113,16 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
 
   final int _pageSize = 10;
 
+  void setFilter(NotificationFilter filter) {
+    if (state.activeFilter == filter) return;
+    state = state.copyWith(activeFilter: filter);
+  }
+
+  void setSearchQuery(String query) {
+    if (state.searchQuery == query) return;
+    state = state.copyWith(searchQuery: query);
+  }
+
   Future<void> refreshNotifications() async {
     _cancelDebounce();
     state = state.copyWith(isLoading: true);
@@ -98,7 +140,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
       state = state.copyWith(
         notifications: notifications,
         isLoading: false,
-        cursor: notifications.last.id,
+        cursor: notifications.isNotEmpty ? notifications.last.id : null,
         hasReachedMax: notifications.length < _pageSize,
       );
     });
@@ -111,12 +153,15 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
         GetNotificationParam(limit: _pageSize),
       );
       result.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: error.message,
+        );
       }, (data) {
         state = state.copyWith(
           notifications: data,
           isLoading: false,
-          cursor: data.last.id,
+          cursor: data.isNotEmpty ? data.last.id : null,
           hasReachedMax: data.length < _pageSize,
         );
       });
@@ -167,13 +212,16 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
         state = state.copyWith(
           notifications: mergeNotifications,
           isLoadingMore: false,
-          cursor: mergeNotifications.last.id,
-          hasReachedMax: notifications.length < 10,
+          cursor: mergeNotifications.isNotEmpty
+              ? mergeNotifications.last.id
+              : state.cursor,
+          hasReachedMax: notifications.length < _pageSize,
         );
       });
     } on Object catch (e) {
       state = state.copyWith(
         isLoading: false,
+        isLoadingMore: false,
         errorMessage: e.toString().replaceAll('ServerException', ''),
       );
     }
@@ -194,42 +242,98 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   }
 
   Future<void> readNotification(String notificationId) async {
+    // Optimistically mark as read for responsive UI
+    final previous = state.notifications;
+    final optimistic = state.notifications.map((n) {
+      if (n.id == notificationId) {
+        return n.copyWith(isRead: true);
+      }
+      return n;
+    }).toList();
+    state = state.copyWith(notifications: optimistic);
+
     try {
       final result = await _readNotificationUseCase(
         ReadNotificationParam(notificationId: notificationId),
       );
       result.fold((error) {
         AppLogger.debug('read notification error: ${error.message}');
-        state = state.copyWith(errorMessage: error.message);
+        state = state.copyWith(
+          notifications: previous,
+          errorMessage: error.message,
+        );
       }, (success) {
         AppLogger.debug('read notification success: ${success.message}');
-        final updated = state.notifications.map((n) {
-          if (n.id == notificationId) {
-            return n.copyWith(isRead: true);
-          }
-          return n;
-        }).toList();
-
-        state = state.copyWith(notifications: updated);
       });
     } on Object {
       state = state.copyWith(
+        notifications: previous,
         isLoading: false,
         errorMessage: 'Something went wrong, please try again!',
       );
     }
   }
 
+  /// Toggles the read status of a single notification.
+  Future<void> toggleReadStatus(String notificationId) async {
+    final index = state.notifications.indexWhere((n) => n.id == notificationId);
+    if (index == -1) return;
+
+    final target = state.notifications[index];
+    if (!target.isRead) {
+      await readNotification(notificationId);
+    } else {
+      final updated = state.notifications.map((n) {
+        if (n.id == notificationId) {
+          return n.copyWith(isRead: false);
+        }
+        return n;
+      }).toList();
+      state = state.copyWith(notifications: updated);
+    }
+  }
+
+  /// Removes a notification locally (with ability to undo via
+  /// [restoreNotification]).
+  int removeNotification(String notificationId) {
+    final index = state.notifications.indexWhere((n) => n.id == notificationId);
+    if (index == -1) return -1;
+
+    final updated = List<AppNotification>.from(state.notifications)
+      ..removeAt(index);
+    state = state.copyWith(notifications: updated);
+    return index;
+  }
+
+  /// Restores a previously removed notification at [index].
+  void restoreNotification(AppNotification notification, {int? index}) {
+    if (state.notifications.any((n) => n.id == notification.id)) return;
+    final updated = List<AppNotification>.from(state.notifications);
+    final insertIndex =
+        (index != null && index >= 0 && index <= updated.length) ? index : 0;
+    updated.insert(insertIndex, notification);
+    state = state.copyWith(notifications: updated);
+  }
+
   Future<void> markAllRead() async {
+    final previous = state.notifications;
+    final optimistic =
+        state.notifications.map((n) => n.copyWith(isRead: true)).toList();
+    state = state.copyWith(notifications: optimistic);
+
     try {
       final result = await _markNotificationReadUseCase(const NoParams());
       await result.fold((error) {
-        state = state.copyWith(errorMessage: error.message);
+        state = state.copyWith(
+          notifications: previous,
+          errorMessage: error.message,
+        );
       }, (data) async {
         await loadNotifications();
       });
     } on Object catch (e) {
       state = state.copyWith(
+        notifications: previous,
         errorMessage: e.toString().replaceAll('ServerException: ', ''),
       );
     }

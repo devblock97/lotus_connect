@@ -24,6 +24,13 @@ A production-ready Flutter communication and social network platform built with 
 |                        Live Stream Screen 1                        |                        Live Stream Screen 2                        |
 |:------------------------------------------------------------------:|:------------------------------------------------------------------:|
 | <img src="docs/screenshots/live_stream_screen_1.png" width="260"/> | <img src="docs/screenshots/live_stream_screen_2.png" width="260"/> |
+
+
+
+|                        Notifications Screen                        |
+|:------------------------------------------------------------------:|
+| <img src="docs/screenshots/notifications_screen.png" width="260"/> |
+
 ---
 
 ## 🎬 Demos
