@@ -37,7 +37,7 @@ class ProfileIntroSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Details',
+            loc?.detailsSectionTitle ?? 'Details',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
@@ -59,7 +59,7 @@ class ProfileIntroSection extends StatelessWidget {
                       text: TextSpan(
                         style: TextStyle(fontSize: 14.5, color: primaryColor),
                         children: [
-                          const TextSpan(text: 'Lives in '),
+                          TextSpan(text: loc?.livesInPrefix ?? 'Lives in '),
                           TextSpan(
                             text: profile.location!.trim(),
                             style: const TextStyle(fontWeight: FontWeight.w700),
@@ -126,7 +126,7 @@ class ProfileIntroSection extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Joined $joinedStr',
+                    loc?.joinedDate(joinedStr) ?? 'Joined $joinedStr',
                     style: TextStyle(fontSize: 14.5, color: primaryColor),
                   ),
                 ],
@@ -164,7 +164,7 @@ class ProfileIntroSection extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  loc?.editProfile ?? 'Edit public details',
+                  loc?.editPublicDetails ?? 'Edit public details',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,

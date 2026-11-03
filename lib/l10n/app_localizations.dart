@@ -1524,7 +1524,7 @@ abstract class AppLocalizations {
   /// **'Only me'**
   String get visibilityPrivate;
 
-  /// Error message when picking an image fails
+  /// Error message when image picking fails
   ///
   /// In en, this message translates to:
   /// **'Failed to pick image: {error}'**
@@ -1950,7 +1950,7 @@ abstract class AppLocalizations {
   /// **'Go Live'**
   String get goLive;
 
-  /// Filter chip label for showing all items
+  /// Timeline filter pill for all posts
   ///
   /// In en, this message translates to:
   /// **'All'**
@@ -2393,6 +2393,336 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{seconds}s'**
   String callDurationSeconds(int seconds);
+
+  /// Generic edit action label
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Generic refresh action label
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// Generic retry button label
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Posts tab label on profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get postsTab;
+
+  /// Photos tab label on profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photosTab;
+
+  /// Videos tab label on profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get videosTab;
+
+  /// About tab label on profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTab;
+
+  /// Snackbar message when profile picture update succeeds
+  ///
+  /// In en, this message translates to:
+  /// **'Profile picture updated'**
+  String get profilePictureUpdated;
+
+  /// Snackbar message when profile picture upload fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload avatar'**
+  String get failedToUploadAvatar;
+
+  /// Snackbar message when cover photo update succeeds
+  ///
+  /// In en, this message translates to:
+  /// **'Cover photo updated'**
+  String get coverPhotoUpdated;
+
+  /// Snackbar message when cover photo upload fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload cover photo'**
+  String get failedToUploadCover;
+
+  /// Snackbar notification after copying a username
+  ///
+  /// In en, this message translates to:
+  /// **'Copied @{username}'**
+  String copiedUsername(String username);
+
+  /// Menu action to copy a username
+  ///
+  /// In en, this message translates to:
+  /// **'Copy @{username}'**
+  String copyUsername(String username);
+
+  /// Empty state message for photos grid
+  ///
+  /// In en, this message translates to:
+  /// **'No photos shared yet'**
+  String get noPhotosSharedYet;
+
+  /// Empty state message for videos grid
+  ///
+  /// In en, this message translates to:
+  /// **'No videos shared yet'**
+  String get noVideosSharedYet;
+
+  /// Timeline filter pill for media posts
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get filterMedia;
+
+  /// Timeline filter pill for video posts
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get filterVideos;
+
+  /// Fallback text when user join date is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Lotus Connect Member'**
+  String get memberJoinedFallback;
+
+  /// Header title for About section
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutSectionTitle;
+
+  /// Label for user bio in profile
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get bioLabel;
+
+  /// Label for username row in About section
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get usernameRowLabel;
+
+  /// Label for email row in About section
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailRowLabel;
+
+  /// Label for location row in About section
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationRowLabel;
+
+  /// Label for website row in About section
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get websiteRowLabel;
+
+  /// Label for joined date row in About section
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get joinedRowLabel;
+
+  /// Button to edit profile details from About section
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile details'**
+  String get editProfileDetails;
+
+  /// Error message when loading a profile fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load profile'**
+  String get couldNotLoadProfile;
+
+  /// Singular badge label for a close friend
+  ///
+  /// In en, this message translates to:
+  /// **'Close Friend'**
+  String get closeFriend;
+
+  /// Stat label for post count in profile header
+  ///
+  /// In en, this message translates to:
+  /// **'Posts'**
+  String get postsStat;
+
+  /// Stat label for photo count in profile header
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get photosStat;
+
+  /// Action button in profile header to add a story
+  ///
+  /// In en, this message translates to:
+  /// **'Add to story'**
+  String get addToStory;
+
+  /// Friendship button label when incoming request is pending
+  ///
+  /// In en, this message translates to:
+  /// **'Respond'**
+  String get respondFriendRequest;
+
+  /// Option to accept incoming friend request in bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm friend request'**
+  String get confirmFriendRequest;
+
+  /// Option to reject/delete incoming friend request in bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Delete request'**
+  String get deleteFriendRequest;
+
+  /// Option to choose image from device gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get chooseFromGallery;
+
+  /// Option to capture a photo with device camera
+  ///
+  /// In en, this message translates to:
+  /// **'Take a Photo'**
+  String get takeAPhoto;
+
+  /// Snackbar notification after successfully updating profile
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully!'**
+  String get profileUpdatedSuccess;
+
+  /// Snackbar error message when profile update fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile'**
+  String get failedToUpdateProfile;
+
+  /// Section title for profile picture in edit profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Picture'**
+  String get profilePicture;
+
+  /// Section title for cover photo in edit profile screen
+  ///
+  /// In en, this message translates to:
+  /// **'Cover Photo'**
+  String get coverPhoto;
+
+  /// Placeholder hint text for bio input field
+  ///
+  /// In en, this message translates to:
+  /// **'Describe yourself...'**
+  String get bioHint;
+
+  /// Section header for profile details / intro
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get detailsSectionTitle;
+
+  /// Input field label for location or hometown
+  ///
+  /// In en, this message translates to:
+  /// **'Location / Hometown'**
+  String get locationHometownLabel;
+
+  /// Placeholder hint for location input field
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Da Nang, Vietnam'**
+  String get locationHint;
+
+  /// Placeholder hint for website input field
+  ///
+  /// In en, this message translates to:
+  /// **'https://yourwebsite.com'**
+  String get websiteHint;
+
+  /// Button label to save profile changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// Action button to find friends in friends preview
+  ///
+  /// In en, this message translates to:
+  /// **'Find Friends'**
+  String get findFriends;
+
+  /// Button to open all friends bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'See all friends'**
+  String get seeAllFriends;
+
+  /// Empty state text in friends preview when user has no friends
+  ///
+  /// In en, this message translates to:
+  /// **'No friends to show yet'**
+  String get noFriendsToShowYet;
+
+  /// Header title showing friend count in parentheses
+  ///
+  /// In en, this message translates to:
+  /// **'Friends ({count})'**
+  String friendsWithCount(int count);
+
+  /// Empty state text in media grid when no items are available
+  ///
+  /// In en, this message translates to:
+  /// **'No media yet'**
+  String get noMediaYet;
+
+  /// Location description for user's home location
+  ///
+  /// In en, this message translates to:
+  /// **'Lives in {location}'**
+  String livesIn(String location);
+
+  /// Prefix text preceding user location in intro details
+  ///
+  /// In en, this message translates to:
+  /// **'Lives in '**
+  String get livesInPrefix;
+
+  /// Profile joined date with month and year
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String joinedDate(String date);
+
+  /// Button to edit public details in profile intro section
+  ///
+  /// In en, this message translates to:
+  /// **'Edit public details'**
+  String get editPublicDetails;
 }
 
 class _AppLocalizationsDelegate

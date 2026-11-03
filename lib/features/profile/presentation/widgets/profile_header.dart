@@ -166,7 +166,7 @@ class ProfileHeader extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 6),
                                       Text(
-                                        loc?.editProfile ?? 'Edit',
+                                        loc?.edit ?? 'Edit',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -350,7 +350,9 @@ class ProfileHeader extends StatelessWidget {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                              loc?.closeFriends ?? 'Close Friend',
+                              loc?.closeFriend ??
+                                  loc?.closeFriends ??
+                                  'Close Friend',
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -403,14 +405,14 @@ class ProfileHeader extends StatelessWidget {
                     _buildDotSeparator(secondaryTextColor),
                     _buildStatItem(
                       count: profile.postCount,
-                      label: 'Posts',
+                      label: loc?.postsStat ?? 'Posts',
                       primaryColor: primaryTextColor,
                       secondaryColor: secondaryTextColor,
                     ),
                     _buildDotSeparator(secondaryTextColor),
                     _buildStatItem(
                       count: profile.mediaCount,
-                      label: loc?.photo ?? 'Photos',
+                      label: loc?.photosStat ?? loc?.photosTab ?? 'Photos',
                       primaryColor: primaryTextColor,
                       secondaryColor: secondaryTextColor,
                       onTap: onPhotosCountTap,
@@ -555,7 +557,7 @@ class ProfileHeader extends StatelessWidget {
             onPressed: onAddToStoryTap,
             icon: const Icon(Icons.add_circle_rounded, size: 19),
             label: Text(
-              loc?.yourStory ?? 'Add to story',
+              loc?.addToStory ?? 'Add to story',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -773,7 +775,7 @@ class ProfileHeader extends StatelessWidget {
             : () => _showRespondRequestSheet(context, loc),
         icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
         label: Text(
-          loc?.accept ?? 'Respond',
+          loc?.respondFriendRequest ?? 'Respond',
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
@@ -925,7 +927,9 @@ class ProfileHeader extends StatelessWidget {
                 Icons.check_circle_outline_rounded,
                 color: Color(0xFF16A34A),
               ),
-              title: Text(loc?.accept ?? 'Confirm friend request'),
+              title: Text(
+                loc?.confirmFriendRequest ?? 'Confirm friend request',
+              ),
               onTap: () {
                 Navigator.pop(ctx);
                 onAcceptFriendTap?.call();
@@ -937,7 +941,7 @@ class ProfileHeader extends StatelessWidget {
                 color: Colors.redAccent,
               ),
               title: Text(
-                loc?.reject ?? 'Delete request',
+                loc?.deleteFriendRequest ?? 'Delete request',
                 style: const TextStyle(color: Colors.redAccent),
               ),
               onTap: () {

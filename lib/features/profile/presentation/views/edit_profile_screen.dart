@@ -63,12 +63,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           .read(myProfileNotifierProvider.notifier)
           .uploadAvatar(image.path);
       if (!mounted) return;
+      final loc = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             success
-                ? 'Profile picture updated!'
-                : 'Failed to upload profile picture.',
+                ? (loc?.profilePictureUpdated ?? 'Profile picture updated!')
+                : (loc?.failedToUploadAvatar ??
+                    'Failed to upload profile picture.'),
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: success ? Colors.green : Colors.red,
@@ -76,8 +78,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
     } on Object catch (e) {
       if (!mounted) return;
+      final loc = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: $e')),
+        SnackBar(
+          content: Text(
+            loc?.failedToPickImage(e.toString()) ?? 'Failed to pick image: $e',
+          ),
+        ),
       );
     }
   }
@@ -99,10 +106,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           .read(myProfileNotifierProvider.notifier)
           .uploadCover(image.path);
       if (!mounted) return;
+      final loc = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            success ? 'Cover photo updated!' : 'Failed to upload cover photo.',
+            success
+                ? (loc?.coverPhotoUpdated ?? 'Cover photo updated!')
+                : (loc?.failedToUploadCover ?? 'Failed to upload cover photo.'),
           ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: success ? Colors.green : Colors.red,
@@ -110,8 +120,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
     } on Object catch (e) {
       if (!mounted) return;
+      final loc = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: $e')),
+        SnackBar(
+          content: Text(
+            loc?.failedToPickImage(e.toString()) ?? 'Failed to pick image: $e',
+          ),
+        ),
       );
     }
   }
@@ -130,12 +145,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 12),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
-              title: Text(loc?.modeGallery ?? 'Choose from Gallery'),
+              title: Text(loc?.chooseFromGallery ?? 'Choose from Gallery'),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
-              title: Text(loc?.modeCamera ?? 'Take a Photo'),
+              title: Text(loc?.takeAPhoto ?? 'Take a Photo'),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
             const SizedBox(height: 8),
@@ -159,10 +174,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
 
     if (!mounted) return;
+    final loc = AppLocalizations.of(context);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully!'),
+        SnackBar(
+          content: Text(
+            loc?.profileUpdatedSuccess ?? 'Profile updated successfully!',
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.green,
         ),
@@ -172,7 +190,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       final err = ref.read(myProfileNotifierProvider).errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(err ?? 'Failed to update profile'),
+          content: Text(
+            err ?? (loc?.failedToUpdateProfile ?? 'Failed to update profile'),
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
         ),
@@ -225,8 +245,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           children: [
             // 1. Profile Picture Section
             _buildSectionHeader(
-              title: 'Profile Picture',
-              actionLabel: 'Edit',
+              title: loc?.profilePicture ?? 'Profile Picture',
+              actionLabel: loc?.edit ?? 'Edit',
               onActionTap:
                   state.isUploadingAvatar ? null : _pickAndUploadAvatar,
             ),
@@ -266,8 +286,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             // 2. Cover Photo Section
             _buildSectionHeader(
-              title: 'Cover Photo',
-              actionLabel: 'Edit',
+              title: loc?.coverPhoto ?? 'Cover Photo',
+              actionLabel: loc?.edit ?? 'Edit',
               onActionTap: state.isUploadingCover ? null : _pickAndUploadCover,
             ),
             const SizedBox(height: 12),
@@ -325,9 +345,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 12),
 
             // 3. Bio Section
-            const Text(
-              'Bio',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+            Text(
+              loc?.bioLabel ?? 'Bio',
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -335,7 +355,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               maxLength: 500,
               maxLines: 3,
               decoration: InputDecoration(
-                hintText: 'Describe yourself...',
+                hintText: loc?.bioHint ?? 'Describe yourself...',
                 filled: true,
                 fillColor: theme.cardColor,
                 border: OutlineInputBorder(
@@ -348,9 +368,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             const SizedBox(height: 12),
 
             // 4. Details Section (Full Name, Location, Website)
-            const Text(
-              'Details',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+            Text(
+              loc?.detailsSectionTitle ?? 'Details',
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
             TextFormField(
@@ -372,8 +392,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               controller: _locationController,
               maxLength: 255,
               decoration: InputDecoration(
-                labelText: loc?.locations ?? 'Location / Hometown',
-                hintText: 'e.g. Da Nang, Vietnam',
+                labelText: loc?.locationHometownLabel ?? 'Location / Hometown',
+                hintText: loc?.locationHint ?? 'e.g. Da Nang, Vietnam',
                 prefixIcon: const Icon(Icons.home_outlined),
                 filled: true,
                 fillColor: theme.cardColor,
@@ -388,8 +408,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               maxLength: 255,
               keyboardType: TextInputType.url,
               decoration: InputDecoration(
-                labelText: 'Website',
-                hintText: 'https://yourwebsite.com',
+                labelText: loc?.websiteRowLabel ?? 'Website',
+                hintText: loc?.websiteHint ?? 'https://yourwebsite.com',
                 prefixIcon: const Icon(Icons.link_rounded),
                 filled: true,
                 fillColor: theme.cardColor,
@@ -412,7 +432,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                 ),
                 child: Text(
-                  loc?.save ?? 'Save Changes',
+                  loc?.saveChanges ?? 'Save Changes',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 15,

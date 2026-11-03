@@ -120,10 +120,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final success = await _readNotifier().uploadAvatar(picked.path);
     if (!mounted) return;
 
+    final loc = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success ? 'Profile picture updated' : 'Failed to upload avatar',
+          success
+              ? (loc?.profilePictureUpdated ?? 'Profile picture updated')
+              : (loc?.failedToUploadAvatar ?? 'Failed to upload avatar'),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -142,10 +145,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final success = await _readNotifier().uploadCover(picked.path);
     if (!mounted) return;
 
+    final loc = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success ? 'Cover photo updated' : 'Failed to upload cover photo',
+          success
+              ? (loc?.coverPhotoUpdated ?? 'Cover photo updated')
+              : (loc?.failedToUploadCover ?? 'Failed to upload cover photo'),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -338,7 +344,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Copied @${profile.username}'),
+                      content: Text(
+                        loc?.copiedUsername(profile.username) ??
+                            'Copied @${profile.username}',
+                      ),
                       behavior: SnackBarBehavior.floating,
                     ),
                   );
@@ -353,17 +362,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     children: [
                       const Icon(Icons.alternate_email_rounded, size: 19),
                       const SizedBox(width: 10),
-                      Text('Copy @${profile.username}'),
+                      Text(
+                        loc?.copyUsername(profile.username) ??
+                            'Copy @${profile.username}',
+                      ),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'refresh',
                   child: Row(
                     children: [
-                      Icon(Icons.refresh_rounded, size: 19),
-                      SizedBox(width: 10),
-                      Text('Refresh'),
+                      const Icon(Icons.refresh_rounded, size: 19),
+                      const SizedBox(width: 10),
+                      Text(loc?.refresh ?? 'Refresh'),
                     ],
                   ),
                 ),
@@ -520,10 +532,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required AppLocalizations? loc,
   }) {
     final tabs = <(ProfileTab, String)>[
-      (ProfileTab.posts, 'Posts'),
-      (ProfileTab.photos, loc?.photo ?? 'Photos'),
-      (ProfileTab.videos, loc?.video ?? 'Videos'),
-      (ProfileTab.about, 'About'),
+      (ProfileTab.posts, loc?.postsTab ?? 'Posts'),
+      (ProfileTab.photos, loc?.photosTab ?? 'Photos'),
+      (ProfileTab.videos, loc?.videosTab ?? 'Videos'),
+      (ProfileTab.about, loc?.aboutTab ?? 'About'),
     ];
 
     return Container(
@@ -609,7 +621,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: ProfileMediaGrid(
               items: state.photos,
               isLoading: state.isLoadingPhotos,
-              emptyTitle: 'No photos shared yet',
+              emptyTitle: loc?.noPhotosSharedYet ?? 'No photos shared yet',
             ),
           ),
         ];
@@ -622,7 +634,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: ProfileMediaGrid(
               items: state.videos,
               isLoading: state.isLoadingVideos,
-              emptyTitle: 'No videos shared yet',
+              emptyTitle: loc?.noVideosSharedYet ?? 'No videos shared yet',
               emptyIcon: Icons.videocam_off_outlined,
             ),
           ),
@@ -715,7 +727,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Posts',
+                      loc?.postsTab ?? 'Posts',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -728,7 +740,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _buildFilterChip(
-                          label: 'All',
+                          label: loc?.filterAll ?? 'All',
                           isSelected: state.postFilter == ProfilePostFilter.all,
                           isDark: isDark,
                           onTap: () =>
@@ -736,7 +748,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(width: 6),
                         _buildFilterChip(
-                          label: loc?.photo ?? 'Media',
+                          label: loc?.filterMedia ?? 'Media',
                           isSelected:
                               state.postFilter == ProfilePostFilter.media,
                           isDark: isDark,
@@ -745,7 +757,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ),
                         const SizedBox(width: 6),
                         _buildFilterChip(
-                          label: loc?.video ?? 'Videos',
+                          label: loc?.filterVideos ?? 'Videos',
                           isSelected:
                               state.postFilter == ProfilePostFilter.video,
                           isDark: isDark,
@@ -942,7 +954,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }) {
     final joinedText = profile.createdAt != null
         ? DateFormat.yMMMMd().format(profile.createdAt!)
-        : 'Lotus Connect Member';
+        : (loc?.memberJoinedFallback ?? 'Lotus Connect Member');
 
     return ColoredBox(
       color: theme.cardColor,
@@ -952,7 +964,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'About',
+              loc?.aboutSectionTitle ?? 'About',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -963,7 +975,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             if (profile.bio != null && profile.bio!.trim().isNotEmpty) ...[
               _buildAboutRow(
                 icon: Icons.format_quote_rounded,
-                title: 'Bio',
+                title: loc?.bioLabel ?? 'Bio',
                 value: profile.bio!.trim(),
                 primaryTextColor: primaryTextColor,
                 secondaryTextColor: secondaryTextColor,
@@ -972,7 +984,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
             _buildAboutRow(
               icon: Icons.alternate_email_rounded,
-              title: 'Username',
+              title: loc?.usernameRowLabel ?? 'Username',
               value: '@${profile.username}',
               primaryTextColor: primaryTextColor,
               secondaryTextColor: secondaryTextColor,
@@ -981,7 +993,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const Divider(height: 24),
               _buildAboutRow(
                 icon: Icons.mail_outline_rounded,
-                title: 'Email',
+                title: loc?.emailRowLabel ?? 'Email',
                 value: profile.email,
                 primaryTextColor: primaryTextColor,
                 secondaryTextColor: secondaryTextColor,
@@ -992,7 +1004,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const Divider(height: 24),
               _buildAboutRow(
                 icon: Icons.location_on_outlined,
-                title: 'Location',
+                title: loc?.locationRowLabel ?? 'Location',
                 value: profile.location!.trim(),
                 primaryTextColor: primaryTextColor,
                 secondaryTextColor: secondaryTextColor,
@@ -1003,7 +1015,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const Divider(height: 24),
               _buildAboutRow(
                 icon: Icons.link_rounded,
-                title: 'Website',
+                title: loc?.websiteRowLabel ?? 'Website',
                 value: profile.website!.trim(),
                 primaryTextColor: const Color(0xFF1877F2),
                 secondaryTextColor: secondaryTextColor,
@@ -1012,7 +1024,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const Divider(height: 24),
             _buildAboutRow(
               icon: Icons.calendar_today_outlined,
-              title: 'Joined',
+              title: loc?.joinedRowLabel ?? 'Joined',
               value: joinedText,
               primaryTextColor: primaryTextColor,
               secondaryTextColor: secondaryTextColor,
@@ -1024,7 +1036,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: OutlinedButton.icon(
                   onPressed: () => _openEditProfile(profile),
                   icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: Text(loc?.editProfile ?? 'Edit profile details'),
+                  label: Text(
+                    loc?.editProfileDetails ?? 'Edit profile details',
+                  ),
                 ),
               ),
             ],
@@ -1093,7 +1107,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 14),
             Text(
-              message ?? 'Could not load profile',
+              message ?? (loc?.couldNotLoadProfile ?? 'Could not load profile'),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15),
             ),
@@ -1101,7 +1115,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             FilledButton.icon(
               onPressed: notifier.loadAll,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
+              label: Text(loc?.retry ?? 'Retry'),
             ),
           ],
         ),

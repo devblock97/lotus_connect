@@ -764,7 +764,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String failedToPickImage(String error) {
-    return 'Không thể chọn ảnh: $error';
+    return 'Không thể chọn hình ảnh: $error';
   }
 
   @override
@@ -1245,4 +1245,179 @@ class AppLocalizationsVi extends AppLocalizations {
   String callDurationSeconds(int seconds) {
     return '${seconds}s';
   }
+
+  @override
+  String get edit => 'Chỉnh sửa';
+
+  @override
+  String get refresh => 'Làm mới';
+
+  @override
+  String get retry => 'Thử lại';
+
+  @override
+  String get postsTab => 'Bài viết';
+
+  @override
+  String get photosTab => 'Ảnh';
+
+  @override
+  String get videosTab => 'Video';
+
+  @override
+  String get aboutTab => 'Giới thiệu';
+
+  @override
+  String get profilePictureUpdated => 'Đã cập nhật ảnh đại diện';
+
+  @override
+  String get failedToUploadAvatar => 'Tải ảnh đại diện thất bại';
+
+  @override
+  String get coverPhotoUpdated => 'Đã cập nhật ảnh bìa';
+
+  @override
+  String get failedToUploadCover => 'Tải ảnh bìa thất bại';
+
+  @override
+  String copiedUsername(String username) {
+    return 'Đã sao chép @$username';
+  }
+
+  @override
+  String copyUsername(String username) {
+    return 'Sao chép @$username';
+  }
+
+  @override
+  String get noPhotosSharedYet => 'Chưa có ảnh nào được chia sẻ';
+
+  @override
+  String get noVideosSharedYet => 'Chưa có video nào được chia sẻ';
+
+  @override
+  String get filterMedia => 'Đa phương tiện';
+
+  @override
+  String get filterVideos => 'Video';
+
+  @override
+  String get memberJoinedFallback => 'Thành viên Lotus Connect';
+
+  @override
+  String get aboutSectionTitle => 'Giới thiệu';
+
+  @override
+  String get bioLabel => 'Tiểu sử';
+
+  @override
+  String get usernameRowLabel => 'Tên người dùng';
+
+  @override
+  String get emailRowLabel => 'Email';
+
+  @override
+  String get locationRowLabel => 'Địa chỉ';
+
+  @override
+  String get websiteRowLabel => 'Trang web';
+
+  @override
+  String get joinedRowLabel => 'Đã tham gia';
+
+  @override
+  String get editProfileDetails => 'Chỉnh sửa chi tiết trang cá nhân';
+
+  @override
+  String get couldNotLoadProfile => 'Không thể tải trang cá nhân';
+
+  @override
+  String get closeFriend => 'Bạn thân';
+
+  @override
+  String get postsStat => 'Bài viết';
+
+  @override
+  String get photosStat => 'Ảnh';
+
+  @override
+  String get addToStory => 'Thêm vào tin';
+
+  @override
+  String get respondFriendRequest => 'Phản hồi';
+
+  @override
+  String get confirmFriendRequest => 'Xác nhận lời mời kết bạn';
+
+  @override
+  String get deleteFriendRequest => 'Xóa lời mời';
+
+  @override
+  String get chooseFromGallery => 'Chọn từ thư viện';
+
+  @override
+  String get takeAPhoto => 'Chụp ảnh';
+
+  @override
+  String get profileUpdatedSuccess => 'Cập nhật trang cá nhân thành công!';
+
+  @override
+  String get failedToUpdateProfile => 'Cập nhật trang cá nhân thất bại';
+
+  @override
+  String get profilePicture => 'Ảnh đại diện';
+
+  @override
+  String get coverPhoto => 'Ảnh bìa';
+
+  @override
+  String get bioHint => 'Mô tả về bản thân...';
+
+  @override
+  String get detailsSectionTitle => 'Chi tiết';
+
+  @override
+  String get locationHometownLabel => 'Địa chỉ / Quê quán';
+
+  @override
+  String get locationHint => 'VD: Đà Nẵng, Việt Nam';
+
+  @override
+  String get websiteHint => 'https://yourwebsite.com';
+
+  @override
+  String get saveChanges => 'Lưu thay đổi';
+
+  @override
+  String get findFriends => 'Tìm bạn bè';
+
+  @override
+  String get seeAllFriends => 'Xem tất cả bạn bè';
+
+  @override
+  String get noFriendsToShowYet => 'Chưa có bạn bè nào để hiển thị';
+
+  @override
+  String friendsWithCount(int count) {
+    return 'Bạn bè ($count)';
+  }
+
+  @override
+  String get noMediaYet => 'Chưa có phương tiện nào';
+
+  @override
+  String livesIn(String location) {
+    return 'Sống tại $location';
+  }
+
+  @override
+  String get livesInPrefix => 'Sống tại ';
+
+  @override
+  String joinedDate(String date) {
+    return 'Đã tham gia $date';
+  }
+
+  @override
+  String get editPublicDetails => 'Chỉnh sửa chi tiết công khai';
 }

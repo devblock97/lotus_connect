@@ -69,7 +69,7 @@ class ProfileFriendsPreview extends StatelessWidget {
                 TextButton(
                   onPressed: onFindFriendsTap,
                   child: Text(
-                    loc?.addFriend ?? 'Find Friends',
+                    loc?.findFriends ?? 'Find Friends',
                     style: const TextStyle(
                       color: Color(0xFF1877F2),
                       fontWeight: FontWeight.w600,
@@ -123,7 +123,7 @@ class ProfileFriendsPreview extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  loc?.allFriends ?? 'See all friends',
+                  loc?.seeAllFriends ?? 'See all friends',
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
@@ -134,7 +134,7 @@ class ProfileFriendsPreview extends StatelessWidget {
           ] else ...[
             const SizedBox(height: 8),
             Text(
-              loc?.noFriendsFound ?? 'No friends to show yet',
+              loc?.noFriendsToShowYet ?? 'No friends to show yet',
               style: TextStyle(
                 fontSize: 13.5,
                 color: secondaryColor,
@@ -304,7 +304,9 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
                 child: Row(
                   children: [
                     Text(
-                      '${loc?.friends ?? 'Friends'} (${widget.friends.length})',
+                      loc?.friendsWithCount(widget.friends.length) ??
+                          '${loc?.friends ?? 'Friends'} '
+                              '(${widget.friends.length})',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,

@@ -831,5 +831,263 @@
         "type": "int"
       }
     }
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Generic edit action label"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Generic refresh action label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Generic retry button label"
+  },
+  "postsTab": "Posts",
+  "@postsTab": {
+    "description": "Posts tab label on profile screen"
+  },
+  "photosTab": "Photos",
+  "@photosTab": {
+    "description": "Photos tab label on profile screen"
+  },
+  "videosTab": "Videos",
+  "@videosTab": {
+    "description": "Videos tab label on profile screen"
+  },
+  "aboutTab": "About",
+  "@aboutTab": {
+    "description": "About tab label on profile screen"
+  },
+  "profilePictureUpdated": "Profile picture updated",
+  "@profilePictureUpdated": {
+    "description": "Snackbar message when profile picture update succeeds"
+  },
+  "failedToUploadAvatar": "Failed to upload avatar",
+  "@failedToUploadAvatar": {
+    "description": "Snackbar message when profile picture upload fails"
+  },
+  "coverPhotoUpdated": "Cover photo updated",
+  "@coverPhotoUpdated": {
+    "description": "Snackbar message when cover photo update succeeds"
+  },
+  "failedToUploadCover": "Failed to upload cover photo",
+  "@failedToUploadCover": {
+    "description": "Snackbar message when cover photo upload fails"
+  },
+  "copiedUsername": "Copied @{username}",
+  "@copiedUsername": {
+    "description": "Snackbar notification after copying a username",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "copyUsername": "Copy @{username}",
+  "@copyUsername": {
+    "description": "Menu action to copy a username",
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "noPhotosSharedYet": "No photos shared yet",
+  "@noPhotosSharedYet": {
+    "description": "Empty state message for photos grid"
+  },
+  "noVideosSharedYet": "No videos shared yet",
+  "@noVideosSharedYet": {
+    "description": "Empty state message for videos grid"
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Timeline filter pill for all posts"
+  },
+  "filterMedia": "Media",
+  "@filterMedia": {
+    "description": "Timeline filter pill for media posts"
+  },
+  "filterVideos": "Videos",
+  "@filterVideos": {
+    "description": "Timeline filter pill for video posts"
+  },
+  "memberJoinedFallback": "Lotus Connect Member",
+  "@memberJoinedFallback": {
+    "description": "Fallback text when user join date is unknown"
+  },
+  "aboutSectionTitle": "About",
+  "@aboutSectionTitle": {
+    "description": "Header title for About section"
+  },
+  "bioLabel": "Bio",
+  "@bioLabel": {
+    "description": "Label for user bio in profile"
+  },
+  "usernameRowLabel": "Username",
+  "@usernameRowLabel": {
+    "description": "Label for username row in About section"
+  },
+  "emailRowLabel": "Email",
+  "@emailRowLabel": {
+    "description": "Label for email row in About section"
+  },
+  "locationRowLabel": "Location",
+  "@locationRowLabel": {
+    "description": "Label for location row in About section"
+  },
+  "websiteRowLabel": "Website",
+  "@websiteRowLabel": {
+    "description": "Label for website row in About section"
+  },
+  "joinedRowLabel": "Joined",
+  "@joinedRowLabel": {
+    "description": "Label for joined date row in About section"
+  },
+  "editProfileDetails": "Edit profile details",
+  "@editProfileDetails": {
+    "description": "Button to edit profile details from About section"
+  },
+  "couldNotLoadProfile": "Could not load profile",
+  "@couldNotLoadProfile": {
+    "description": "Error message when loading a profile fails"
+  },
+  "closeFriend": "Close Friend",
+  "@closeFriend": {
+    "description": "Singular badge label for a close friend"
+  },
+  "postsStat": "Posts",
+  "@postsStat": {
+    "description": "Stat label for post count in profile header"
+  },
+  "photosStat": "Photos",
+  "@photosStat": {
+    "description": "Stat label for photo count in profile header"
+  },
+  "addToStory": "Add to story",
+  "@addToStory": {
+    "description": "Action button in profile header to add a story"
+  },
+  "respondFriendRequest": "Respond",
+  "@respondFriendRequest": {
+    "description": "Friendship button label when incoming request is pending"
+  },
+  "confirmFriendRequest": "Confirm friend request",
+  "@confirmFriendRequest": {
+    "description": "Option to accept incoming friend request in bottom sheet"
+  },
+  "deleteFriendRequest": "Delete request",
+  "@deleteFriendRequest": {
+    "description": "Option to reject/delete incoming friend request in bottom sheet"
+  },
+  "failedToPickImage": "Failed to pick image: {error}",
+  "@failedToPickImage": {
+    "description": "Error message when image picking fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseFromGallery": "Choose from Gallery",
+  "@chooseFromGallery": {
+    "description": "Option to choose image from device gallery"
+  },
+  "takeAPhoto": "Take a Photo",
+  "@takeAPhoto": {
+    "description": "Option to capture a photo with device camera"
+  },
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "@profileUpdatedSuccess": {
+    "description": "Snackbar notification after successfully updating profile"
+  },
+  "failedToUpdateProfile": "Failed to update profile",
+  "@failedToUpdateProfile": {
+    "description": "Snackbar error message when profile update fails"
+  },
+  "profilePicture": "Profile Picture",
+  "@profilePicture": {
+    "description": "Section title for profile picture in edit profile screen"
+  },
+  "coverPhoto": "Cover Photo",
+  "@coverPhoto": {
+    "description": "Section title for cover photo in edit profile screen"
+  },
+  "bioHint": "Describe yourself...",
+  "@bioHint": {
+    "description": "Placeholder hint text for bio input field"
+  },
+  "detailsSectionTitle": "Details",
+  "@detailsSectionTitle": {
+    "description": "Section header for profile details / intro"
+  },
+  "locationHometownLabel": "Location / Hometown",
+  "@locationHometownLabel": {
+    "description": "Input field label for location or hometown"
+  },
+  "locationHint": "e.g. Da Nang, Vietnam",
+  "@locationHint": {
+    "description": "Placeholder hint for location input field"
+  },
+  "websiteHint": "https://yourwebsite.com",
+  "@websiteHint": {
+    "description": "Placeholder hint for website input field"
+  },
+  "saveChanges": "Save Changes",
+  "@saveChanges": {
+    "description": "Button label to save profile changes"
+  },
+  "findFriends": "Find Friends",
+  "@findFriends": {
+    "description": "Action button to find friends in friends preview"
+  },
+  "seeAllFriends": "See all friends",
+  "@seeAllFriends": {
+    "description": "Button to open all friends bottom sheet"
+  },
+  "noFriendsToShowYet": "No friends to show yet",
+  "@noFriendsToShowYet": {
+    "description": "Empty state text in friends preview when user has no friends"
+  },
+  "friendsWithCount": "Friends ({count})",
+  "@friendsWithCount": {
+    "description": "Header title showing friend count in parentheses",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMediaYet": "No media yet",
+  "@noMediaYet": {
+    "description": "Empty state text in media grid when no items are available"
+  },
+  "livesIn": "Lives in {location}",
+  "@livesIn": {
+    "description": "Location description for user's home location",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "livesInPrefix": "Lives in ",
+  "@livesInPrefix": {
+    "description": "Prefix text preceding user location in intro details"
+  },
+  "joinedDate": "Joined {date}",
+  "@joinedDate": {
+    "description": "Profile joined date with month and year",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "editPublicDetails": "Edit public details",
+  "@editPublicDetails": {
+    "description": "Button to edit public details in profile intro section"
   }
 }

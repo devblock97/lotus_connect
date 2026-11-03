@@ -750,7 +750,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String failedToPickImage(String error) {
-    return '写真の選択に失敗しました: $error';
+    return '画像の選択に失敗しました: $error';
   }
 
   @override
@@ -1217,4 +1217,179 @@ class AppLocalizationsJa extends AppLocalizations {
   String callDurationSeconds(int seconds) {
     return '$seconds秒';
   }
+
+  @override
+  String get edit => '編集';
+
+  @override
+  String get refresh => '更新';
+
+  @override
+  String get retry => '再試行';
+
+  @override
+  String get postsTab => '投稿';
+
+  @override
+  String get photosTab => '写真';
+
+  @override
+  String get videosTab => '動画';
+
+  @override
+  String get aboutTab => '基本データ';
+
+  @override
+  String get profilePictureUpdated => 'プロフィール写真を更新しました';
+
+  @override
+  String get failedToUploadAvatar => 'アバターのアップロードに失敗しました';
+
+  @override
+  String get coverPhotoUpdated => 'カバー写真を更新しました';
+
+  @override
+  String get failedToUploadCover => 'カバー写真のアップロードに失敗しました';
+
+  @override
+  String copiedUsername(String username) {
+    return '@$username をコピーしました';
+  }
+
+  @override
+  String copyUsername(String username) {
+    return '@$username をコピー';
+  }
+
+  @override
+  String get noPhotosSharedYet => '共有された写真はまだありません';
+
+  @override
+  String get noVideosSharedYet => '共有された動画はまだありません';
+
+  @override
+  String get filterMedia => 'メディア';
+
+  @override
+  String get filterVideos => '動画';
+
+  @override
+  String get memberJoinedFallback => 'Lotus Connectメンバー';
+
+  @override
+  String get aboutSectionTitle => '基本データ';
+
+  @override
+  String get bioLabel => '自己紹介';
+
+  @override
+  String get usernameRowLabel => 'ユーザー名';
+
+  @override
+  String get emailRowLabel => 'メール';
+
+  @override
+  String get locationRowLabel => '居住地';
+
+  @override
+  String get websiteRowLabel => 'ウェブサイト';
+
+  @override
+  String get joinedRowLabel => '登録日';
+
+  @override
+  String get editProfileDetails => 'プロフィールの詳細を編集';
+
+  @override
+  String get couldNotLoadProfile => 'プロフィールを読み込めませんでした';
+
+  @override
+  String get closeFriend => '親しい友達';
+
+  @override
+  String get postsStat => '投稿';
+
+  @override
+  String get photosStat => '写真';
+
+  @override
+  String get addToStory => 'ストーリーズに追加';
+
+  @override
+  String get respondFriendRequest => '返答';
+
+  @override
+  String get confirmFriendRequest => '友達リクエストを承認';
+
+  @override
+  String get deleteFriendRequest => 'リクエストを削除';
+
+  @override
+  String get chooseFromGallery => 'ギャラリーから選択';
+
+  @override
+  String get takeAPhoto => '写真を撮影';
+
+  @override
+  String get profileUpdatedSuccess => 'プロフィールが正常に更新されました！';
+
+  @override
+  String get failedToUpdateProfile => 'プロフィールの更新に失敗しました';
+
+  @override
+  String get profilePicture => 'プロフィール写真';
+
+  @override
+  String get coverPhoto => 'カバー写真';
+
+  @override
+  String get bioHint => '自己紹介を入力...';
+
+  @override
+  String get detailsSectionTitle => '詳細';
+
+  @override
+  String get locationHometownLabel => '居住地 / 出身地';
+
+  @override
+  String get locationHint => '例: 東京都';
+
+  @override
+  String get websiteHint => 'https://yourwebsite.com';
+
+  @override
+  String get saveChanges => '変更を保存';
+
+  @override
+  String get findFriends => '友達を検索';
+
+  @override
+  String get seeAllFriends => 'すべての友達を見る';
+
+  @override
+  String get noFriendsToShowYet => '表示する友達がまだいません';
+
+  @override
+  String friendsWithCount(int count) {
+    return '友達 ($count)';
+  }
+
+  @override
+  String get noMediaYet => 'メディアはまだありません';
+
+  @override
+  String livesIn(String location) {
+    return '$location在住';
+  }
+
+  @override
+  String get livesInPrefix => '居住地: ';
+
+  @override
+  String joinedDate(String date) {
+    return '$dateに参加';
+  }
+
+  @override
+  String get editPublicDetails => '公開詳細情報を編集';
 }
