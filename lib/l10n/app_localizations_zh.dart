@@ -748,7 +748,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String failedToPickImage(String error) {
-    return '选择图片失败: $error';
+    return '选取图片失败: $error';
   }
 
   @override
@@ -1214,4 +1214,179 @@ class AppLocalizationsZh extends AppLocalizations {
   String callDurationSeconds(int seconds) {
     return '$seconds秒';
   }
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get refresh => '刷新';
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String get postsTab => '帖子';
+
+  @override
+  String get photosTab => '照片';
+
+  @override
+  String get videosTab => '视频';
+
+  @override
+  String get aboutTab => '简介';
+
+  @override
+  String get profilePictureUpdated => '个人资料照片已更新';
+
+  @override
+  String get failedToUploadAvatar => '上传头像失败';
+
+  @override
+  String get coverPhotoUpdated => '封面照片已更新';
+
+  @override
+  String get failedToUploadCover => '上传封面照片失败';
+
+  @override
+  String copiedUsername(String username) {
+    return '已复制 @$username';
+  }
+
+  @override
+  String copyUsername(String username) {
+    return '复制 @$username';
+  }
+
+  @override
+  String get noPhotosSharedYet => '尚无分享的照片';
+
+  @override
+  String get noVideosSharedYet => '尚无分享的视频';
+
+  @override
+  String get filterMedia => '媒体';
+
+  @override
+  String get filterVideos => '视频';
+
+  @override
+  String get memberJoinedFallback => 'Lotus Connect 成员';
+
+  @override
+  String get aboutSectionTitle => '简介';
+
+  @override
+  String get bioLabel => '个人简介';
+
+  @override
+  String get usernameRowLabel => '用户名';
+
+  @override
+  String get emailRowLabel => '电子邮箱';
+
+  @override
+  String get locationRowLabel => '所在地';
+
+  @override
+  String get websiteRowLabel => '网站';
+
+  @override
+  String get joinedRowLabel => '加入时间';
+
+  @override
+  String get editProfileDetails => '编辑个人资料详情';
+
+  @override
+  String get couldNotLoadProfile => '无法加载个人资料';
+
+  @override
+  String get closeFriend => '密友';
+
+  @override
+  String get postsStat => '帖子';
+
+  @override
+  String get photosStat => '照片';
+
+  @override
+  String get addToStory => '添加到快拍';
+
+  @override
+  String get respondFriendRequest => '回应';
+
+  @override
+  String get confirmFriendRequest => '确认好友请求';
+
+  @override
+  String get deleteFriendRequest => '删除请求';
+
+  @override
+  String get chooseFromGallery => '从相册中选择';
+
+  @override
+  String get takeAPhoto => '拍照';
+
+  @override
+  String get profileUpdatedSuccess => '个人资料更新成功！';
+
+  @override
+  String get failedToUpdateProfile => '更新个人资料失败';
+
+  @override
+  String get profilePicture => '个人头像';
+
+  @override
+  String get coverPhoto => '封面照片';
+
+  @override
+  String get bioHint => '描述你自己...';
+
+  @override
+  String get detailsSectionTitle => '详细资料';
+
+  @override
+  String get locationHometownLabel => '所在地 / 家乡';
+
+  @override
+  String get locationHint => '例如: 北京';
+
+  @override
+  String get websiteHint => 'https://yourwebsite.com';
+
+  @override
+  String get saveChanges => '保存更改';
+
+  @override
+  String get findFriends => '寻找好友';
+
+  @override
+  String get seeAllFriends => '查看所有好友';
+
+  @override
+  String get noFriendsToShowYet => '暂无好友显示';
+
+  @override
+  String friendsWithCount(int count) {
+    return '好友 ($count)';
+  }
+
+  @override
+  String get noMediaYet => '尚无多媒体';
+
+  @override
+  String livesIn(String location) {
+    return '现居 $location';
+  }
+
+  @override
+  String get livesInPrefix => '现居 ';
+
+  @override
+  String joinedDate(String date) {
+    return '加入于 $date';
+  }
+
+  @override
+  String get editPublicDetails => '编辑公开详细资料';
 }

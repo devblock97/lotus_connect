@@ -1246,4 +1246,179 @@ class AppLocalizationsEn extends AppLocalizations {
   String callDurationSeconds(int seconds) {
     return '${seconds}s';
   }
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get postsTab => 'Posts';
+
+  @override
+  String get photosTab => 'Photos';
+
+  @override
+  String get videosTab => 'Videos';
+
+  @override
+  String get aboutTab => 'About';
+
+  @override
+  String get profilePictureUpdated => 'Profile picture updated';
+
+  @override
+  String get failedToUploadAvatar => 'Failed to upload avatar';
+
+  @override
+  String get coverPhotoUpdated => 'Cover photo updated';
+
+  @override
+  String get failedToUploadCover => 'Failed to upload cover photo';
+
+  @override
+  String copiedUsername(String username) {
+    return 'Copied @$username';
+  }
+
+  @override
+  String copyUsername(String username) {
+    return 'Copy @$username';
+  }
+
+  @override
+  String get noPhotosSharedYet => 'No photos shared yet';
+
+  @override
+  String get noVideosSharedYet => 'No videos shared yet';
+
+  @override
+  String get filterMedia => 'Media';
+
+  @override
+  String get filterVideos => 'Videos';
+
+  @override
+  String get memberJoinedFallback => 'Lotus Connect Member';
+
+  @override
+  String get aboutSectionTitle => 'About';
+
+  @override
+  String get bioLabel => 'Bio';
+
+  @override
+  String get usernameRowLabel => 'Username';
+
+  @override
+  String get emailRowLabel => 'Email';
+
+  @override
+  String get locationRowLabel => 'Location';
+
+  @override
+  String get websiteRowLabel => 'Website';
+
+  @override
+  String get joinedRowLabel => 'Joined';
+
+  @override
+  String get editProfileDetails => 'Edit profile details';
+
+  @override
+  String get couldNotLoadProfile => 'Could not load profile';
+
+  @override
+  String get closeFriend => 'Close Friend';
+
+  @override
+  String get postsStat => 'Posts';
+
+  @override
+  String get photosStat => 'Photos';
+
+  @override
+  String get addToStory => 'Add to story';
+
+  @override
+  String get respondFriendRequest => 'Respond';
+
+  @override
+  String get confirmFriendRequest => 'Confirm friend request';
+
+  @override
+  String get deleteFriendRequest => 'Delete request';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get takeAPhoto => 'Take a Photo';
+
+  @override
+  String get profileUpdatedSuccess => 'Profile updated successfully!';
+
+  @override
+  String get failedToUpdateProfile => 'Failed to update profile';
+
+  @override
+  String get profilePicture => 'Profile Picture';
+
+  @override
+  String get coverPhoto => 'Cover Photo';
+
+  @override
+  String get bioHint => 'Describe yourself...';
+
+  @override
+  String get detailsSectionTitle => 'Details';
+
+  @override
+  String get locationHometownLabel => 'Location / Hometown';
+
+  @override
+  String get locationHint => 'e.g. Da Nang, Vietnam';
+
+  @override
+  String get websiteHint => 'https://yourwebsite.com';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get findFriends => 'Find Friends';
+
+  @override
+  String get seeAllFriends => 'See all friends';
+
+  @override
+  String get noFriendsToShowYet => 'No friends to show yet';
+
+  @override
+  String friendsWithCount(int count) {
+    return 'Friends ($count)';
+  }
+
+  @override
+  String get noMediaYet => 'No media yet';
+
+  @override
+  String livesIn(String location) {
+    return 'Lives in $location';
+  }
+
+  @override
+  String get livesInPrefix => 'Lives in ';
+
+  @override
+  String joinedDate(String date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get editPublicDetails => 'Edit public details';
 }

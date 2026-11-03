@@ -49,7 +49,7 @@ class ProfileMediaGrid extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                emptyTitle ?? (loc?.noPostsYet ?? 'No media yet'),
+                emptyTitle ?? (loc?.noMediaYet ?? 'No media yet'),
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
