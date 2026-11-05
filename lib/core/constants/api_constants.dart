@@ -98,6 +98,23 @@ class ApiConstants {
       '/posts/$postId/comments/$commentId/pin';
 
   // ---------------------------------------------------------------------------
+  // Chill / Reels endpoints
+  // ---------------------------------------------------------------------------
+  static const String chills = '/chills';
+  static const String chillFeed = '/chills/feed';
+  static const String chillExplore = '/feed/explore';
+  static const String myChills = '/chills/me';
+  static String chillById(String chillId) => '/chills/$chillId';
+  static String chillReactions(String chillId) => '/chills/$chillId/reactions';
+  static String chillComments(String chillId) => '/chills/$chillId/comments';
+  static String chillCommentReplies(String chillId, String commentId) =>
+      '/chills/$chillId/comments/$commentId/replies';
+  static String chillShare(String chillId) => '/chills/$chillId/share';
+  static String chillSave(String chillId) => '/chills/$chillId/save';
+  static String chillView(String chillId) => '/chills/$chillId/view';
+  static String userChills(String userId) => '/chills/user/$userId';
+
+  // ---------------------------------------------------------------------------
   // Upload endpoints
   // ---------------------------------------------------------------------------
   static const String uploadMultiple = '/uploads/multiple';

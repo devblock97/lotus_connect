@@ -657,7 +657,7 @@ class VideoPreCacheManager {
       if (!postDir.existsSync()) {
         postDir.createSync(recursive: true);
       }
-
+      AppLogger.info('Check video type: ${media.isHls}');
       if (media.isHls) {
         await _preCacheHls(url, postDir, cacheDir);
       } else {
@@ -769,6 +769,7 @@ class VideoPreCacheManager {
     );
     final bytes = response.data;
     if (bytes != null) {
+      AppLogger.info('check pre cache standard video: $bytes');
       final chunkFile = File('${postDir.path}/chunk_0.bin');
       await chunkFile.writeAsBytes(bytes);
 

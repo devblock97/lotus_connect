@@ -110,24 +110,6 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (!mounted) return;
-    //   final notifier =
-    //       ref.read(postCommentsNotifierProvider(widget.post.id).notifier);
-    //   if (widget.initialComments != null) {
-    //     notifier.initialize(
-    //       postId: widget.post.id,
-    //       initialComments: widget.initialComments,
-    //       isLoading: widget.isLoading,
-    //     );
-    //   } else {
-    //     if (widget.isLoading) {
-    //       notifier.setLoading(isLoading: true);
-    //     } else {
-    //       notifier.loadComments(postId: widget.post.id, isSilent: true);
-    //     }
-    //   }
-    // });
     ref
         .read(postCommentsNotifierProvider(widget.post.id).notifier)
         .loadComments(postId: widget.post.id, isSilent: true);
