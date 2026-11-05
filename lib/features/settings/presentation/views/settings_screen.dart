@@ -10,16 +10,15 @@ import 'package:lotus_connect/features/settings/application/settings_notifier.da
 import 'package:lotus_connect/features/settings/presentation/widgets/setting_card.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
-/// Supported languages map.
-const Map<String, String> _supportedLanguages = {
-  'en': 'English',
-  'vi': 'Tiếng Việt',
-  'ja': '日本語',
-  'zh': '中文',
-};
-
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  Map<String, String> _supportedLanguages(AppLocalizations loc) => {
+        'en': loc.languageEnglish,
+        'vi': loc.languageVietnamese,
+        'ja': loc.languageJapanese,
+        'zh': loc.languageChinese,
+      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,8 +26,7 @@ class SettingsScreen extends ConsumerWidget {
     final settings = settingsState.settings;
     final notifier = ref.read(settingsNotifierProvider.notifier);
     final loc = AppLocalizations.of(context)!;
-
-    debugPrint('setting screen: ${settingsState.isSuccess}');
+    final supportedLanguages = _supportedLanguages(loc);
 
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +97,9 @@ class SettingsScreen extends ConsumerWidget {
                               Text(
                                 settings.fullName.isNotEmpty
                                     ? settings.fullName
-                                    : settings.username,
+                                    : (settings.username.isNotEmpty
+                                        ? settings.username
+                                        : loc.unknownUser),
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -167,9 +167,11 @@ class SettingsScreen extends ConsumerWidget {
                   leading: const Icon(Icons.language),
                   title: Text(loc.language),
                   trailing: DropdownButton<String>(
-                    value: settings.languageCode,
+                    value: supportedLanguages.containsKey(settings.languageCode)
+                        ? settings.languageCode
+                        : 'en',
                     underline: const SizedBox(),
-                    items: _supportedLanguages.entries.map((entry) {
+                    items: supportedLanguages.entries.map((entry) {
                       return DropdownMenuItem(
                         value: entry.key,
                         child: Text(entry.value),
@@ -256,9 +258,9 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.info_outline),
                   title: Text(loc.about),
-                  trailing: const Text(
-                    'v1.0.0',
-                    style: TextStyle(color: Colors.grey),
+                  trailing: Text(
+                    loc.appVersion('1.0.0'),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
                 const Divider(height: 1),

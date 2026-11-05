@@ -1389,4 +1389,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get editPublicDetails => '编辑公开详细资料';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageChinese => '中文';
+
+  @override
+  String appVersion(String version) {
+    return 'v$version';
+  }
 }

@@ -1392,4 +1392,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get editPublicDetails => '公開詳細情報を編集';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageChinese => '中文';
+
+  @override
+  String appVersion(String version) {
+    return 'v$version';
+  }
 }

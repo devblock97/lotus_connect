@@ -441,5 +441,10 @@
   "livesIn": "现居 {location}",
   "livesInPrefix": "现居 ",
   "joinedDate": "加入于 {date}",
-  "editPublicDetails": "编辑公开详细资料"
+  "editPublicDetails": "编辑公开详细资料",
+  "languageEnglish": "English",
+  "languageVietnamese": "Tiếng Việt",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "appVersion": "v{version}"
 }
