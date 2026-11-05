@@ -441,5 +441,10 @@
   "livesIn": "{location}在住",
   "livesInPrefix": "居住地: ",
   "joinedDate": "{date}に参加",
-  "editPublicDetails": "公開詳細情報を編集"
+  "editPublicDetails": "公開詳細情報を編集",
+  "languageEnglish": "English",
+  "languageVietnamese": "Tiếng Việt",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "appVersion": "v{version}"
 }

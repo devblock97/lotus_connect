@@ -1089,5 +1089,30 @@
   "editPublicDetails": "Edit public details",
   "@editPublicDetails": {
     "description": "Button to edit public details in profile intro section"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Display name for English language option in settings"
+  },
+  "languageVietnamese": "Tiếng Việt",
+  "@languageVietnamese": {
+    "description": "Display name for Vietnamese language option in settings"
+  },
+  "languageJapanese": "日本語",
+  "@languageJapanese": {
+    "description": "Display name for Japanese language option in settings"
+  },
+  "languageChinese": "中文",
+  "@languageChinese": {
+    "description": "Display name for Chinese language option in settings"
+  },
+  "appVersion": "v{version}",
+  "@appVersion": {
+    "description": "Formatted application version label in settings",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
   }
 }

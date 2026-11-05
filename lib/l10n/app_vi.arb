@@ -441,5 +441,10 @@
   "livesIn": "Sống tại {location}",
   "livesInPrefix": "Sống tại ",
   "joinedDate": "Đã tham gia {date}",
-  "editPublicDetails": "Chỉnh sửa chi tiết công khai"
+  "editPublicDetails": "Chỉnh sửa chi tiết công khai",
+  "languageEnglish": "English",
+  "languageVietnamese": "Tiếng Việt",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "appVersion": "v{version}"
 }

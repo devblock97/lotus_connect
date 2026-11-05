@@ -2723,6 +2723,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit public details'**
   String get editPublicDetails;
+
+  /// Display name for English language option in settings
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// Display name for Vietnamese language option in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Tiếng Việt'**
+  String get languageVietnamese;
+
+  /// Display name for Japanese language option in settings
+  ///
+  /// In en, this message translates to:
+  /// **'日本語'**
+  String get languageJapanese;
+
+  /// Display name for Chinese language option in settings
+  ///
+  /// In en, this message translates to:
+  /// **'中文'**
+  String get languageChinese;
+
+  /// Formatted application version label in settings
+  ///
+  /// In en, this message translates to:
+  /// **'v{version}'**
+  String appVersion(String version);
 }
 
 class _AppLocalizationsDelegate
