@@ -4,7 +4,7 @@ A production-ready Flutter communication and social network platform built with 
 
 ---
 
-## 📱 Screenshots
+## Screenshots
 
 | Home Feed | Create Post Screen |
 |:---:|:---:|
@@ -31,9 +31,13 @@ A production-ready Flutter communication and social network platform built with 
 |:------------------------------------------------------------------:|
 | <img src="docs/screenshots/notifications_screen.png" width="260"/> |
 
+
+|                        Chills Screen 1                        |                        Chills Screen 2                        |
+|:-------------------------------------------------------------:|:-------------------------------------------------------------:|
+| <img src="docs/screenshots/chills_screen_1.png" width="260"/> | <img src="docs/screenshots/chills_screen_2.mp4" width="260"/> |
 ---
 
-## 🎬 Demos
+## Demos
 
 ### Person-to-Person (P2P) Chat
 - **Video Link**: [P2P Chat Demo](https://devblocks.tech/wp-content/uploads/2026/08/chat-p2p.mov)
@@ -43,7 +47,7 @@ A production-ready Flutter communication and social network platform built with 
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 - **Instagram-Style Social Feed & Stories**: Rich interactive social feed replicating the Instagram experience with story rings, multi-photo/video carousels, inline video playback with thumbnail fallbacks, bursting double-tap heart reactions, and high-performance lazy loading via `ListView.builder`.
 - **P2P Real-Time Chat**: Direct person-to-person messaging with message reactions, media sharing (images/videos), full-screen media viewer, and optimistic UI updates.
@@ -58,7 +62,7 @@ A production-ready Flutter communication and social network platform built with 
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Core & Framework
 | Technology | Description |
@@ -111,7 +115,7 @@ A production-ready Flutter communication and social network platform built with 
 
 ---
 
-## 🧰 Development Tools & Code Quality
+## Development Tools & Code Quality
 
 - **Code Generators**:
   - `build_runner`: Automated compilation runner for code generation.
@@ -129,7 +133,7 @@ A production-ready Flutter communication and social network platform built with 
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Flutter SDK `^3.5.0` or higher

@@ -10,9 +10,7 @@ import 'package:lotus_connect/core/network/interceptors/retry_interceptor.dart';
 import 'package:lotus_connect/core/network/interceptors/token_refresh_interceptor.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 
-/// Customized Dio HTTP client for network operations.
 class DioClient {
-  /// Creates a configured [DioClient].
   DioClient({
     String? baseUrl,
     String? Function()? tokenGetter,

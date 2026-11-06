@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/home/application/feed_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
@@ -151,7 +153,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             splashRadius: 20,
             tooltip: loc?.chat ?? 'Chat',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push<void>(
+                MaterialPageRoute(builder: (_) => const ConversationListView()),
+              );
+            },
           ),
           const SizedBox(width: 4),
         ],
@@ -219,6 +225,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     children: [
                       PostCard(
                         post: post,
+                        onMediaTap: () {
+                          final videoPosts = feedState.posts
+                              .where((p) => p.mediaItems.any((m) => m.isVideo))
+                              .toList();
+
+                          final targetIndex =
+                              videoPosts.indexWhere((p) => p.id == post.id);
+
+                          if (targetIndex != -1) {
+                            ref
+                                .read(feedPlaybackCoordinatorProvider.notifier)
+                                .togglePlayPause(post.id);
+
+                            ChillViewerScreen.open(
+                              context,
+                              initialChills: videoPosts
+                                  .map(ChillItem.fromPostItem)
+                                  .toList(),
+                              initialIndex: targetIndex,
+                            );
+                          }
+                        },
                         onProfileTap: () {
                           Navigator.of(context).push<void>(
                             MaterialPageRoute(

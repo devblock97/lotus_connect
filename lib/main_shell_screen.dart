@@ -4,7 +4,7 @@ import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_sync_coordinator.dart';
 import 'package:lotus_connect/features/calls/application/calls_providers.dart';
-import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
+import 'package:lotus_connect/features/chill/presentation/view/chill_viewer_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
 import 'package:lotus_connect/features/notifications/application/notifications_notifier.dart';
@@ -72,11 +72,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
 
     final pages = [
       const HomeScreen(),
-      ConversationListView(
-        onSelectConversation: () {
-          ref.read(shellIndexProvider.notifier).state = 0;
-        },
-      ),
+      const ChillViewerScreen(),
       const ContactsScreen(),
       const NotificationsScreen(),
       const ProfileScreen(),
@@ -101,8 +97,8 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             label: loc.tabHome,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.chat_bubble_outline),
-            selectedIcon: const Icon(Icons.chat_bubble),
+            icon: const Icon(Icons.video_camera_back_outlined),
+            selectedIcon: const Icon(Icons.video_camera_back),
             label: loc.tabChats,
           ),
           NavigationDestination(
