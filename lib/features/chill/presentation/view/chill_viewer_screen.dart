@@ -8,6 +8,7 @@ import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/chill/presentation/widgets/video_item.dart';
 import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:lotus_connect/main_shell_screen.dart';
 
 class ChillViewerScreen extends ConsumerStatefulWidget {
@@ -134,7 +135,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          _buildBody(chillState, isScreenVisible: isScreenVisible),
+          _buildBody(context, chillState, isScreenVisible: isScreenVisible),
           _buildTopBar(context, chillState),
         ],
       ),
@@ -142,9 +143,12 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
   }
 
   Widget _buildBody(
+    BuildContext context,
     ChillState chillState, {
     required bool isScreenVisible,
   }) {
+    final loc = AppLocalizations.of(context)!;
+
     if (chillState.status == ChillStatus.loading && chillState.chills.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(
@@ -168,7 +172,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                chillState.message ?? 'Unable to load Chills',
+                chillState.message ?? loc.unableToLoadChills,
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
@@ -180,7 +184,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                       );
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Retry'),
+                label: Text(loc.retry),
               ),
             ],
           ),
@@ -201,8 +205,8 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
             const SizedBox(height: 12),
             Text(
               chillState.activeTag != null
-                  ? 'No Chills found for #${chillState.activeTag}'
-                  : 'No Chills available yet',
+                  ? loc.noChillsFoundForTag(chillState.activeTag!)
+                  : loc.noChillsAvailableYet,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 15,
@@ -215,7 +219,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 onPressed: () {
                   ref.read(chillNotifierProvider.notifier).setTagFilter(null);
                 },
-                child: const Text('Clear tag filter'),
+                child: Text(loc.clearTagFilter),
               ),
             ],
           ],
@@ -248,6 +252,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
 
   Widget _buildTopBar(BuildContext context, ChillState chillState) {
     final topPadding = MediaQuery.of(context).padding.top;
+    final loc = AppLocalizations.of(context)!;
 
     return Positioned(
       top: 0,
@@ -286,9 +291,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 const SizedBox(width: 4),
               ] else
                 const SizedBox(width: 4),
-              const Text(
-                'Chills',
-                style: TextStyle(
+              Text(
+                loc.chillsTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
                   fontSize: 22,

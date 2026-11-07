@@ -13,6 +13,7 @@ import 'package:lotus_connect/features/home/presentation/widgets/post_comments_s
 import 'package:lotus_connect/features/home/presentation/widgets/post_options_sheet.dart';
 import 'package:lotus_connect/features/profile/presentation/views/profile_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_providers.dart';
+import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoItem extends ConsumerStatefulWidget {
@@ -197,6 +198,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final settings = ref.watch(settingsNotifierProvider).settings;
     final isAuthor = (settings.userId.isNotEmpty &&
             settings.userId == widget.chill.author.id) ||
@@ -263,19 +265,22 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     ),
                   )
                 else if (_hasError)
-                  const Center(
+                  Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        const Icon(
                           CupertinoIcons.exclamationmark_triangle,
                           color: Colors.white54,
                           size: 40,
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          'Unable to play video',
-                          style: TextStyle(color: Colors.white60, fontSize: 13),
+                          loc.unableToPlayVideo,
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -392,7 +397,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     ? CupertinoIcons.bookmark_fill
                     : CupertinoIcons.bookmark,
                 color: chill.userHasSaved ? Colors.amber : Colors.white,
-                label: chill.userHasSaved ? 'Saved' : 'Save',
+                label: chill.userHasSaved ? loc.saved : loc.save,
                 onPressed: _toggleSave,
               ),
               const SizedBox(height: 12),
@@ -566,7 +571,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
-                            _isExpandCaption ? 'Less' : 'More',
+                            _isExpandCaption ? loc.showLess : loc.showMore,
                             style: const TextStyle(
                               color: Colors.white60,
                               fontSize: 12,
@@ -621,7 +626,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     child: Text(
                       chill.audioTitle ??
                           chill.audio?.title ??
-                          'Original Audio - ${chill.author.fullName ?? chill.author.username}',
+                          loc.originalAudioByAuthor(
+                            chill.author.fullName ?? chill.author.username,
+                          ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -642,9 +649,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         color: Colors.white24,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Text(
-                        'Remix',
-                        style: TextStyle(
+                      child: Text(
+                        loc.remix,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -739,6 +746,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
   Future<void> _handleShare(BuildContext context) async {
     unawaited(HapticFeedback.selectionClick());
+    final loc = AppLocalizations.of(context)!;
     await Clipboard.setData(
       ClipboardData(
         text: 'https://lotusconnect.app/chills/${widget.chill.id}',
@@ -747,10 +755,10 @@ class _VideoItemState extends ConsumerState<VideoItem>
     await ref.read(chillNotifierProvider.notifier).shareChill(widget.chill.id);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Chill link copied to clipboard!'),
+        SnackBar(
+          content: Text(loc.chillLinkCopied),
           behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -758,6 +766,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
   void _openOptions(BuildContext context, {required bool isAuthor}) {
     HapticFeedback.selectionClick();
+    final loc = AppLocalizations.of(context)!;
     PostOptionsSheet.show(
       context,
       post: widget.chill.toPostItem(),
@@ -770,9 +779,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                deleted
-                    ? 'Chill deleted successfully.'
-                    : 'Failed to delete Chill.',
+                deleted ? loc.chillDeletedSuccess : loc.chillDeleteFailed,
               ),
               behavior: SnackBarBehavior.floating,
             ),

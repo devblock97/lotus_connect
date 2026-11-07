@@ -446,5 +446,18 @@
   "languageVietnamese": "Tiếng Việt",
   "languageJapanese": "日本語",
   "languageChinese": "中文",
-  "appVersion": "v{version}"
+  "appVersion": "v{version}",
+  "chillsTitle": "Chills",
+  "unableToLoadChills": "Chillsを読み込めませんでした",
+  "noChillsFoundForTag": "#{tag} のChillsが見つかりませんでした",
+  "noChillsAvailableYet": "まだChillsがありません",
+  "clearTagFilter": "タグフィルターを解除",
+  "saved": "保存済み",
+  "showMore": "もっと見る",
+  "showLess": "一部を表示",
+  "originalAudioByAuthor": "オリジナル音源 - {author}",
+  "remix": "リミックス",
+  "chillLinkCopied": "Chillのリンクをクリップボードにコピーしました！",
+  "chillDeletedSuccess": "Chillを削除しました。",
+  "chillDeleteFailed": "Chillの削除に失敗しました。"
 }

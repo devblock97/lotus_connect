@@ -2753,6 +2753,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'v{version}'**
   String appVersion(String version);
+
+  /// Header title for the Chills short-video feed screen
+  ///
+  /// In en, this message translates to:
+  /// **'Chills'**
+  String get chillsTitle;
+
+  /// Error message displayed when the Chills feed fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load Chills'**
+  String get unableToLoadChills;
+
+  /// Empty state message when no Chills match the selected hashtag filter
+  ///
+  /// In en, this message translates to:
+  /// **'No Chills found for #{tag}'**
+  String noChillsFoundForTag(String tag);
+
+  /// Empty state message when there are no Chills in the feed
+  ///
+  /// In en, this message translates to:
+  /// **'No Chills available yet'**
+  String get noChillsAvailableYet;
+
+  /// Button label to clear the active hashtag filter in Chills
+  ///
+  /// In en, this message translates to:
+  /// **'Clear tag filter'**
+  String get clearTagFilter;
+
+  /// Action label indicating a Chill or item has been saved/bookmarked
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// Label to expand a truncated caption
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get showMore;
+
+  /// Label to collapse an expanded caption
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get showLess;
+
+  /// Fallback audio track title showing original audio and author name
+  ///
+  /// In en, this message translates to:
+  /// **'Original Audio - {author}'**
+  String originalAudioByAuthor(String author);
+
+  /// Badge label indicating a Chill is a remix
+  ///
+  /// In en, this message translates to:
+  /// **'Remix'**
+  String get remix;
+
+  /// Snackbar message shown when a Chill share link is copied
+  ///
+  /// In en, this message translates to:
+  /// **'Chill link copied to clipboard!'**
+  String get chillLinkCopied;
+
+  /// Snackbar message shown when a Chill is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Chill deleted successfully.'**
+  String get chillDeletedSuccess;
+
+  /// Snackbar message shown when deleting a Chill fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete Chill.'**
+  String get chillDeleteFailed;
 }
 
 class _AppLocalizationsDelegate

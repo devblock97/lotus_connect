@@ -446,5 +446,18 @@
   "languageVietnamese": "Tiếng Việt",
   "languageJapanese": "日本語",
   "languageChinese": "中文",
-  "appVersion": "v{version}"
+  "appVersion": "v{version}",
+  "chillsTitle": "Chills",
+  "unableToLoadChills": "Không thể tải Chills",
+  "noChillsFoundForTag": "Không tìm thấy Chills nào cho #{tag}",
+  "noChillsAvailableYet": "Chưa có Chills nào",
+  "clearTagFilter": "Xóa bộ lọc thẻ",
+  "saved": "Đã lưu",
+  "showMore": "Xem thêm",
+  "showLess": "Ẩn bớt",
+  "originalAudioByAuthor": "Âm thanh gốc - {author}",
+  "remix": "Phối lại",
+  "chillLinkCopied": "Đã sao chép liên kết Chill vào bộ nhớ tạm!",
+  "chillDeletedSuccess": "Đã xóa Chill thành công.",
+  "chillDeleteFailed": "Xóa Chill thất bại."
 }

@@ -1406,4 +1406,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String appVersion(String version) {
     return 'v$version';
   }
+
+  @override
+  String get chillsTitle => 'Chills';
+
+  @override
+  String get unableToLoadChills => '无法加载 Chills';
+
+  @override
+  String noChillsFoundForTag(String tag) {
+    return '未找到 #$tag 的 Chills';
+  }
+
+  @override
+  String get noChillsAvailableYet => '暂无 Chills';
+
+  @override
+  String get clearTagFilter => '清除标签筛选';
+
+  @override
+  String get saved => '已保存';
+
+  @override
+  String get showMore => '更多';
+
+  @override
+  String get showLess => '收起';
+
+  @override
+  String originalAudioByAuthor(String author) {
+    return '原声 - $author';
+  }
+
+  @override
+  String get remix => '混音';
+
+  @override
+  String get chillLinkCopied => 'Chill 链接已复制到剪贴板！';
+
+  @override
+  String get chillDeletedSuccess => 'Chill 删除成功。';
+
+  @override
+  String get chillDeleteFailed => '删除 Chill 失败。';
 }

@@ -1437,4 +1437,47 @@ class AppLocalizationsVi extends AppLocalizations {
   String appVersion(String version) {
     return 'v$version';
   }
+
+  @override
+  String get chillsTitle => 'Chills';
+
+  @override
+  String get unableToLoadChills => 'Không thể tải Chills';
+
+  @override
+  String noChillsFoundForTag(String tag) {
+    return 'Không tìm thấy Chills nào cho #$tag';
+  }
+
+  @override
+  String get noChillsAvailableYet => 'Chưa có Chills nào';
+
+  @override
+  String get clearTagFilter => 'Xóa bộ lọc thẻ';
+
+  @override
+  String get saved => 'Đã lưu';
+
+  @override
+  String get showMore => 'Xem thêm';
+
+  @override
+  String get showLess => 'Ẩn bớt';
+
+  @override
+  String originalAudioByAuthor(String author) {
+    return 'Âm thanh gốc - $author';
+  }
+
+  @override
+  String get remix => 'Phối lại';
+
+  @override
+  String get chillLinkCopied => 'Đã sao chép liên kết Chill vào bộ nhớ tạm!';
+
+  @override
+  String get chillDeletedSuccess => 'Đã xóa Chill thành công.';
+
+  @override
+  String get chillDeleteFailed => 'Xóa Chill thất bại.';
 }
