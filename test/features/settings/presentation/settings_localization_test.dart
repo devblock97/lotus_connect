@@ -90,13 +90,11 @@ void main() {
     required Locale locale,
     required SettingsNotifier settingsNotifier,
   }) {
-    tester.view.physicalSize = const Size(800, 1400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
-
     return ProviderScope(
       overrides: [
         settingsNotifierProvider.overrideWith((ref) => settingsNotifier),

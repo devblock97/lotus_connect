@@ -38,6 +38,13 @@ class ChatMessageWebSocketHandler implements WebSocketEventHandler {
         ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
         : DateTime.now();
 
+    final mediasJson = payload['media_items'] as List? ?? [];
+    final medias = mediasJson
+        .map(
+          (m) => MediaModel.fromJson(m as Map<String, dynamic>),
+        )
+        .toList();
+
     // Auto-create or update conversation
     final conversations = await _localDataSource.getConversations();
     final existingConversation = conversations.cast<Conversation?>().firstWhere(
@@ -69,6 +76,7 @@ class ChatMessageWebSocketHandler implements WebSocketEventHandler {
       id: messageId,
       conversationId: conversationId,
       role: MessageRole.assistant,
+      medias: medias,
       content: content,
       timestamp: timestamp,
       replyToId: (payload['reply_to_id'] ?? payload['replyToId']) as String?,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_strategy.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
@@ -41,8 +42,6 @@ class MediaMessage implements MessageBodyStrategy {
       ),
       itemBuilder: (context, index) {
         final media = message.medias[index];
-        final isVideo = media.mimeType?.toLowerCase().contains('video') ??
-            media.url.toLowerCase().endsWith('.mp4');
         return GestureDetector(
           onLongPress: renderContext.onLongPress,
           onTap: () {
@@ -52,7 +51,7 @@ class MediaMessage implements MessageBodyStrategy {
               initialIndex: index,
             );
           },
-          child: isVideo
+          child: isVideo(media.url)
               ? MediaVideoThumbnail(url: media.url)
               : Container(
                   decoration: BoxDecoration(
@@ -62,7 +61,7 @@ class MediaMessage implements MessageBodyStrategy {
                   child: Hero(
                     tag: media.url,
                     child: CachedNetworkImage(
-                      imageUrl: media.thumbnailUrl ?? media.url,
+                      imageUrl: media.url,
                       fit: BoxFit.cover,
                       placeholder: (_, __) => const Center(
                         child: SizedBox(
