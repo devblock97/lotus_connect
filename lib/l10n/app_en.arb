@@ -1114,5 +1114,67 @@
         "type": "String"
       }
     }
+  },
+  "chillsTitle": "Chills",
+  "@chillsTitle": {
+    "description": "Header title for the Chills short-video feed screen"
+  },
+  "unableToLoadChills": "Unable to load Chills",
+  "@unableToLoadChills": {
+    "description": "Error message displayed when the Chills feed fails to load"
+  },
+  "noChillsFoundForTag": "No Chills found for #{tag}",
+  "@noChillsFoundForTag": {
+    "description": "Empty state message when no Chills match the selected hashtag filter",
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "noChillsAvailableYet": "No Chills available yet",
+  "@noChillsAvailableYet": {
+    "description": "Empty state message when there are no Chills in the feed"
+  },
+  "clearTagFilter": "Clear tag filter",
+  "@clearTagFilter": {
+    "description": "Button label to clear the active hashtag filter in Chills"
+  },
+  "saved": "Saved",
+  "@saved": {
+    "description": "Action label indicating a Chill or item has been saved/bookmarked"
+  },
+  "showMore": "More",
+  "@showMore": {
+    "description": "Label to expand a truncated caption"
+  },
+  "showLess": "Less",
+  "@showLess": {
+    "description": "Label to collapse an expanded caption"
+  },
+  "originalAudioByAuthor": "Original Audio - {author}",
+  "@originalAudioByAuthor": {
+    "description": "Fallback audio track title showing original audio and author name",
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "remix": "Remix",
+  "@remix": {
+    "description": "Badge label indicating a Chill is a remix"
+  },
+  "chillLinkCopied": "Chill link copied to clipboard!",
+  "@chillLinkCopied": {
+    "description": "Snackbar message shown when a Chill share link is copied"
+  },
+  "chillDeletedSuccess": "Chill deleted successfully.",
+  "@chillDeletedSuccess": {
+    "description": "Snackbar message shown when a Chill is deleted"
+  },
+  "chillDeleteFailed": "Failed to delete Chill.",
+  "@chillDeleteFailed": {
+    "description": "Snackbar message shown when deleting a Chill fails"
   }
 }

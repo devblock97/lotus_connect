@@ -1409,4 +1409,47 @@ class AppLocalizationsJa extends AppLocalizations {
   String appVersion(String version) {
     return 'v$version';
   }
+
+  @override
+  String get chillsTitle => 'Chills';
+
+  @override
+  String get unableToLoadChills => 'Chillsを読み込めませんでした';
+
+  @override
+  String noChillsFoundForTag(String tag) {
+    return '#$tag のChillsが見つかりませんでした';
+  }
+
+  @override
+  String get noChillsAvailableYet => 'まだChillsがありません';
+
+  @override
+  String get clearTagFilter => 'タグフィルターを解除';
+
+  @override
+  String get saved => '保存済み';
+
+  @override
+  String get showMore => 'もっと見る';
+
+  @override
+  String get showLess => '一部を表示';
+
+  @override
+  String originalAudioByAuthor(String author) {
+    return 'オリジナル音源 - $author';
+  }
+
+  @override
+  String get remix => 'リミックス';
+
+  @override
+  String get chillLinkCopied => 'Chillのリンクをクリップボードにコピーしました！';
+
+  @override
+  String get chillDeletedSuccess => 'Chillを削除しました。';
+
+  @override
+  String get chillDeleteFailed => 'Chillの削除に失敗しました。';
 }

@@ -446,5 +446,18 @@
   "languageVietnamese": "Tiếng Việt",
   "languageJapanese": "日本語",
   "languageChinese": "中文",
-  "appVersion": "v{version}"
+  "appVersion": "v{version}",
+  "chillsTitle": "Chills",
+  "unableToLoadChills": "无法加载 Chills",
+  "noChillsFoundForTag": "未找到 #{tag} 的 Chills",
+  "noChillsAvailableYet": "暂无 Chills",
+  "clearTagFilter": "清除标签筛选",
+  "saved": "已保存",
+  "showMore": "更多",
+  "showLess": "收起",
+  "originalAudioByAuthor": "原声 - {author}",
+  "remix": "混音",
+  "chillLinkCopied": "Chill 链接已复制到剪贴板！",
+  "chillDeletedSuccess": "Chill 删除成功。",
+  "chillDeleteFailed": "删除 Chill 失败。"
 }

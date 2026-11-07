@@ -1438,4 +1438,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String appVersion(String version) {
     return 'v$version';
   }
+
+  @override
+  String get chillsTitle => 'Chills';
+
+  @override
+  String get unableToLoadChills => 'Unable to load Chills';
+
+  @override
+  String noChillsFoundForTag(String tag) {
+    return 'No Chills found for #$tag';
+  }
+
+  @override
+  String get noChillsAvailableYet => 'No Chills available yet';
+
+  @override
+  String get clearTagFilter => 'Clear tag filter';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get showMore => 'More';
+
+  @override
+  String get showLess => 'Less';
+
+  @override
+  String originalAudioByAuthor(String author) {
+    return 'Original Audio - $author';
+  }
+
+  @override
+  String get remix => 'Remix';
+
+  @override
+  String get chillLinkCopied => 'Chill link copied to clipboard!';
+
+  @override
+  String get chillDeletedSuccess => 'Chill deleted successfully.';
+
+  @override
+  String get chillDeleteFailed => 'Failed to delete Chill.';
 }
