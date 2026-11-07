@@ -46,8 +46,6 @@ void main() {
     username: 'thong_nguyen',
     fullName: 'Thong Nguyen',
     email: 'thong@lotus.io',
-    languageCode: 'en',
-    themeMode: AppThemeMode.dark,
   );
 
   setUpAll(() {
