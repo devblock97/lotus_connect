@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/services/storage/secure_storage_service.dart';
 import 'package:lotus_connect/features/chat_core/application/chat_core_providers.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/features/settings/data/datasources/settings_local_data_source.dart';
@@ -9,7 +10,10 @@ import 'package:lotus_connect/features/settings/domain/usecases/get_app_settings
 import 'package:lotus_connect/features/settings/domain/usecases/update_app_setting_use_case.dart';
 
 final settingsLocalDataSourceProvider = Provider<SettingLocalDataSource>((ref) {
-  return SettingsLocalDataSourceImpl(ref.watch(databaseProvider));
+  return SettingsLocalDataSourceImpl(
+    ref.watch(databaseProvider),
+    ref.watch(secureStorageServiceProvider),
+  );
 });
 
 final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {

@@ -52,10 +52,13 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 
   final GetAppSettingsUseCase _getAppSettingsUseCase;
   final UpdateAppSettingUseCase _updateAppSettingUseCase;
+  int _settingsVersion = 0;
 
   Future<void> loadSettings() async {
+    final versionAtStart = _settingsVersion;
     state = state.copyWith(isLoading: true);
     final result = await _getAppSettingsUseCase(const NoParams());
+    if (_settingsVersion != versionAtStart) return;
     result.fold(
       (failure) {
         state = state.copyWith(
@@ -73,7 +76,10 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   }
 
   Future<bool> updateSettings(AppSettings settings) async {
+    _settingsVersion++;
+    final previousSettings = state.settings;
     state = state.copyWith(
+      settings: settings,
       isLoading: true,
       isSuccess: false,
     );
@@ -83,6 +89,7 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     return result.fold(
       (failure) {
         state = state.copyWith(
+          settings: previousSettings,
           isLoading: false,
           isSuccess: false,
           errorMessage: failure.message,

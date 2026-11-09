@@ -12,7 +12,6 @@ class AppSettings extends Equatable {
     this.languageCode = 'en',
     this.activeAiProvider = 'mock',
     this.activeAiModel = 'gemini-1.5-flash',
-    this.geminiApiKey = '',
     this.localLlmBaseUrl = 'http://localhost:11434',
     this.systemPrompt = 'You are a helpful, expert AI assistant.',
     this.accessToken = '',
@@ -37,7 +36,6 @@ class AppSettings extends Equatable {
       languageCode: json['languageCode'] as String? ?? 'en',
       activeAiProvider: json['activeAiProvider'] as String? ?? 'mock',
       activeAiModel: json['activeAiModel'] as String? ?? 'gemini-1.5-flash',
-      geminiApiKey: json['geminiApiKey'] as String? ?? '',
       localLlmBaseUrl:
           json['localLlmBaseUrl'] as String? ?? 'http://localhost:11434',
       systemPrompt: json['systemPrompt'] as String? ??
@@ -60,8 +58,6 @@ class AppSettings extends Equatable {
   final String activeAiProvider;
 
   final String activeAiModel;
-
-  final String geminiApiKey;
 
   final String localLlmBaseUrl;
 
@@ -102,7 +98,6 @@ class AppSettings extends Equatable {
       'languageCode': languageCode,
       'activeAiProvider': activeAiProvider,
       'activeAiModel': activeAiModel,
-      'geminiApiKey': geminiApiKey,
       'localLlmBaseUrl': localLlmBaseUrl,
       'systemPrompt': systemPrompt,
       'accessToken': accessToken,
@@ -138,7 +133,6 @@ class AppSettings extends Equatable {
       languageCode: languageCode ?? this.languageCode,
       activeAiProvider: activeAiProvider ?? this.activeAiProvider,
       activeAiModel: activeAiModel ?? this.activeAiModel,
-      geminiApiKey: geminiApiKey ?? this.geminiApiKey,
       localLlmBaseUrl: localLlmBaseUrl ?? this.localLlmBaseUrl,
       systemPrompt: systemPrompt ?? this.systemPrompt,
       accessToken: accessToken ?? this.accessToken,
@@ -158,7 +152,6 @@ class AppSettings extends Equatable {
         languageCode,
         activeAiProvider,
         activeAiModel,
-        geminiApiKey,
         localLlmBaseUrl,
         systemPrompt,
         accessToken,
