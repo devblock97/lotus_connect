@@ -9,6 +9,7 @@ import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/callkit/callkit_service.dart';
 import 'package:lotus_connect/features/notifications/application/notification_provider.dart';
 import 'package:lotus_connect/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/firebase_options.dart';
 import 'package:uuid/uuid.dart';
 
@@ -140,10 +141,12 @@ class PushNotificationService {
   PushNotificationService({
     required this.callKitService,
     required this.notificationRepository,
+    this.isAuthenticated,
   });
 
   final CallKitService callKitService;
   final NotificationRepository notificationRepository;
+  final bool Function()? isAuthenticated;
 
   Future<void> initialize({
     void Function(Map<String, dynamic> data)? onNotificationTap,
@@ -318,6 +321,12 @@ class PushNotificationService {
   /// Syncs current FCM token to backend database.
   Future<void> syncDeviceToken() async {
     try {
+      if (isAuthenticated != null && !isAuthenticated!()) {
+        AppLogger.debug(
+          '[FCM Token Sync] User is not authenticated yet — deferring FCM token sync.',
+        );
+        return;
+      }
       // 1. Bypass immediately on iOS Simulator
       if (_isIOSSimulator) {
         AppLogger.debug(
@@ -352,6 +361,9 @@ class PushNotificationService {
   }
 
   Future<void> _registerTokenToBackend(String token) async {
+    if (isAuthenticated != null && !isAuthenticated!()) {
+      return;
+    }
     try {
       final platform = defaultTargetPlatform.name;
       debugPrint(
@@ -407,5 +419,7 @@ final pushNotificationServiceProvider =
   return PushNotificationService(
     callKitService: callKitService,
     notificationRepository: ref.watch(notificationRepositoryProvider),
+    isAuthenticated: () =>
+        ref.read(settingsNotifierProvider).settings.accessToken.isNotEmpty,
   );
 });

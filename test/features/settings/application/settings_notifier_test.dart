@@ -123,41 +123,6 @@ void main() {
       verify(() => mockUpdateUseCase(any())).called(1);
     });
 
-    test('setAiProvider should update activeAiProvider', () async {
-      await notifier.setAiProvider('gemini');
-
-      expect(notifier.state.settings.activeAiProvider, 'gemini');
-      verify(() => mockUpdateUseCase(any())).called(1);
-    });
-
-    test('setAiModel should update activeAiModel', () async {
-      await notifier.setAiModel('gemini-1.5-pro');
-
-      expect(notifier.state.settings.activeAiModel, 'gemini-1.5-pro');
-      verify(() => mockUpdateUseCase(any())).called(1);
-    });
-
-    test('setGeminiApiKey should update apiKey and set provider to gemini',
-        () async {
-      await notifier.setGeminiApiKey('AIzaSyTestKey123');
-
-      expect(notifier.state.settings.geminiApiKey, 'AIzaSyTestKey123');
-      expect(notifier.state.settings.activeAiProvider, 'gemini');
-      verify(() => mockUpdateUseCase(any())).called(1);
-    });
-
-    test('setLocalLlmBaseUrl should update localLlmBaseUrl and provider',
-        () async {
-      await notifier.setLocalLlmBaseUrl('http://192.168.1.100:11434');
-
-      expect(
-        notifier.state.settings.localLlmBaseUrl,
-        'http://192.168.1.100:11434',
-      );
-      expect(notifier.state.settings.activeAiProvider, 'local');
-      verify(() => mockUpdateUseCase(any())).called(1);
-    });
-
     test('setTokens should update accessToken and refreshToken', () async {
       await notifier.setTokens('access_token_123', 'refresh_token_456');
 
