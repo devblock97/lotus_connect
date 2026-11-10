@@ -134,7 +134,6 @@ class _CommentInputBarState extends State<CommentInputBar> {
           _selectedMediaUrl = image.path;
           _showStickerTray = false;
         });
-        debugPrint('selected media url: $_selectedMediaUrl');
         _onTextChanged();
       }
     } on Exception catch (_) {

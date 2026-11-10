@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:lotus_connect/core/constants/api_constants.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
@@ -75,7 +74,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? deviceToken,
   }) async {
     try {
-      debugPrint('device token: $deviceToken');
       final response = await dioClient.post(
         ApiConstants.login,
         data: {

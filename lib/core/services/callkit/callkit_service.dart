@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/logging/app_logger.dart';
 
 /// Centralized service to manage native iOS CallKit & Android CallKit incoming/outgoing UI,
 /// full-screen intent permissions, and call event stream listeners.
@@ -19,8 +20,8 @@ class CallKitService {
   static Future<void> requestFullIntentPermission() async {
     try {
       await FlutterCallkitIncoming.requestFullIntentPermission();
-    } catch (e) {
-      debugPrint('CallKitService requestFullIntentPermission error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService requestFullIntentPermission error: $e');
     }
   }
 
@@ -83,8 +84,8 @@ class CallKitService {
       );
 
       await FlutterCallkitIncoming.showCallkitIncoming(params);
-    } catch (e) {
-      debugPrint('CallKitService showCallkitIncoming error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService showCallkitIncoming error: $e');
     }
   }
 
@@ -105,8 +106,8 @@ class CallKitService {
         extra: extra,
       );
       await FlutterCallkitIncoming.startCall(params);
-    } catch (e) {
-      debugPrint('CallKitService startCall error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService startCall error: $e');
     }
   }
 
@@ -117,8 +118,8 @@ class CallKitService {
       if (currentCallId == callId) {
         currentCallId = null;
       }
-    } catch (e) {
-      debugPrint('CallKitService endCall error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService endCall error: $e');
     }
   }
 
@@ -127,8 +128,8 @@ class CallKitService {
     try {
       await FlutterCallkitIncoming.endAllCalls();
       currentCallId = null;
-    } catch (e) {
-      debugPrint('CallKitService endAllCalls error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService endAllCalls error: $e');
     }
   }
 
@@ -136,8 +137,8 @@ class CallKitService {
   Future<void> bringAppToForeground() async {
     try {
       await _foregroundChannel.invokeMethod('bringToForeground');
-    } catch (e) {
-      debugPrint('CallKitService bringAppToForeground error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService bringAppToForeground error: $e');
     }
   }
 
@@ -150,16 +151,16 @@ class CallKitService {
       if (event == null) return;
 
       if (event is CallEventActionCallAccept) {
-        debugPrint('CallKitService: Call accepted by user');
+        AppLogger.info('CallKitService: Call accepted by user');
         await bringAppToForeground();
         final extra = event.callKitParams.extra ?? <String, dynamic>{};
         onCallAccepted(extra);
       } else if (event is CallEventActionCallDecline) {
-        debugPrint('CallKitService: Call declined by user');
+        AppLogger.info('CallKitService: Call declined by user');
         final extra = event.callKitParams.extra ?? <String, dynamic>{};
         onCallDeclined?.call(extra);
       } else if (event is CallEventActionCallCallback) {
-        debugPrint('CallKitService: Call callback tapped');
+        AppLogger.info('CallKitService: Call callback tapped');
         await bringAppToForeground();
       }
     });
@@ -179,8 +180,8 @@ class CallKitService {
       }
       currentCallId = null;
       return null;
-    } catch (e) {
-      debugPrint('CallKitService getCurrentCall error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService getCurrentCall error: $e');
       currentCallId = null;
       return null;
     }
@@ -190,8 +191,8 @@ class CallKitService {
   Future<String?> getDevicePushTokenVoIP() async {
     try {
       return await FlutterCallkitIncoming.getDevicePushTokenVoIP();
-    } catch (e) {
-      debugPrint('CallKitService getDevicePushTokenVoIP error: $e');
+    } on Object catch (e) {
+      AppLogger.info('CallKitService getDevicePushTokenVoIP error: $e');
       return null;
     }
   }

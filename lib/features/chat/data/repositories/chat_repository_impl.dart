@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/entities/response_entity_base.dart';
 import 'package:lotus_connect/core/errors/exception.dart';
@@ -110,7 +109,6 @@ class ChatRepositoryImpl implements ChatRepository {
     required int limit,
     String? cursor,
   }) async {
-    debugPrint('fetch remote message triggered');
     try {
       final remoteMessages = await _remoteDataSource.fetchRemoteMessages(
         conversationId: conversationId,
