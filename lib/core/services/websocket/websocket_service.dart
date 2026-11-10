@@ -43,12 +43,15 @@ class WebSocketService {
       return;
     }
 
-    final wsUrl = _buildWsUrl(serverHost, token);
+    final wsUrl = _buildWsUrl(serverHost);
     AppLogger.info('WS Connecting to: $wsUrl');
 
     try {
-      _socket =
-          await WebSocket.connect(wsUrl).timeout(const Duration(seconds: 10));
+      final header = {
+        'Authorization': 'Bearer $token',
+      };
+      _socket = await WebSocket.connect(wsUrl, headers: header)
+          .timeout(const Duration(seconds: 10));
       _reconnectDelaySeconds = 2;
       AppLogger.info('WS Connected successfully');
 
@@ -173,13 +176,13 @@ class WebSocketService {
     _reconnectTimer = null;
   }
 
-  String _buildWsUrl(String restUrl, String token) {
+  String _buildWsUrl(String restUrl) {
     var wsBase =
         restUrl.replaceAll('https://', 'wss://').replaceAll('http://', 'ws://');
     if (!wsBase.endsWith('/')) {
       wsBase = '$wsBase/';
     }
-    return '${wsBase}ws?token=$token';
+    return '${wsBase}ws';
   }
 
   void dispose() {
