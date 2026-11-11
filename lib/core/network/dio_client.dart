@@ -19,6 +19,7 @@ class DioClient {
     Future<void> Function(String accessToken, String refreshToken)?
         onTokensRefreshed,
     VoidCallback? onRefreshFailed,
+    DioFactory? dioFactory,
   }) : _dio = Dio(
           BaseOptions(
             baseUrl: baseUrl ?? ApiConstants.baseUrl,
@@ -31,14 +32,21 @@ class DioClient {
       LoggingInterceptor(),
       if (serverHostGetter != null)
         DynamicBaseUrlInterceptor(getServerHost: serverHostGetter),
-      if (tokenGetter != null) AuthInterceptor(getToken: tokenGetter),
+      if (tokenGetter != null)
+        AuthInterceptor(
+          getToken: tokenGetter,
+          getTrustedServerHost: serverHostGetter,
+        ),
       if (refreshTokenGetter != null &&
           onTokensRefreshed != null &&
           onRefreshFailed != null)
         TokenRefreshInterceptor(
           getRefreshToken: refreshTokenGetter,
+          getAccessToken: tokenGetter,
+          getServerHost: serverHostGetter,
           onTokensRefreshed: onTokensRefreshed,
           onRefreshFailed: onRefreshFailed,
+          dioFactory: dioFactory,
         ),
       RetryInterceptor(dio: _dio),
     ]);

@@ -11,13 +11,17 @@ class DynamicBaseUrlInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     var path = options.path;
-    final host = getServerHost();
+    final host = getServerHost().trim();
+    final uriPath = Uri.tryParse(path)?.path ?? path;
 
-    // If requesting an /uploads/ resource, rebase to the active server host
-    if (path.contains('/uploads/')) {
+    // If requesting an /uploads/ resource, rebase to the active server host.
+    if (uriPath.contains('/uploads/') && host.isNotEmpty) {
       final uploadIndex = path.indexOf('/uploads/');
       final uploadPath = path.substring(uploadIndex);
       var baseHost = host;
+      while (baseHost.endsWith('/')) {
+        baseHost = baseHost.substring(0, baseHost.length - 1);
+      }
       if (baseHost.endsWith('/api/v1')) {
         baseHost = baseHost.substring(0, baseHost.length - '/api/v1'.length);
       }
@@ -39,8 +43,13 @@ class DynamicBaseUrlInterceptor extends Interceptor {
       return;
     }
 
+    if (host.isEmpty) {
+      handler.next(options);
+      return;
+    }
+
     var base = host;
-    if (base.endsWith('/')) {
+    while (base.endsWith('/')) {
       base = base.substring(0, base.length - 1);
     }
     if (!path.startsWith('/')) {
