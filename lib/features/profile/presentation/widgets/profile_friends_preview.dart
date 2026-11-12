@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -35,7 +36,10 @@ class ProfileFriendsPreview extends StatelessWidget {
 
     return Container(
       color: theme.cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.md,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,7 +58,7 @@ class ProfileFriendsPreview extends StatelessWidget {
                       color: primaryColor,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  AppGap.vXxs,
                   Text(
                     '$effectiveCount '
                     '${loc?.friends.toLowerCase() ?? 'friends'}',
@@ -80,7 +84,7 @@ class ProfileFriendsPreview extends StatelessWidget {
           ),
 
           if (previewItems.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // 3x2 Grid of Friends
             GridView.builder(
@@ -89,8 +93,8 @@ class ProfileFriendsPreview extends StatelessWidget {
               itemCount: previewItems.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 10,
+                crossAxisSpacing: AppSize.sm,
+                mainAxisSpacing: AppSize.sm,
                 childAspectRatio: 0.78,
               ),
               itemBuilder: (context, index) {
@@ -104,7 +108,7 @@ class ProfileFriendsPreview extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // "See all friends" full-width tonal button
             SizedBox(
@@ -116,11 +120,9 @@ class ProfileFriendsPreview extends StatelessWidget {
                       ? const Color(0xFF3A3B3C)
                       : const Color(0xFFE4E6EB),
                   foregroundColor: primaryColor,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  elevation: AppSize.elevationNone,
+                  padding: AppPadding.vMd,
+                  shape: AppBorder.rounded(radius: AppSize.radiusChip),
                 ),
                 child: Text(
                   loc?.seeAllFriends ?? 'See all friends',
@@ -132,7 +134,7 @@ class ProfileFriendsPreview extends StatelessWidget {
               ),
             ),
           ] else ...[
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Text(
               loc?.noFriendsToShowYet ?? 'No friends to show yet',
               style: TextStyle(
@@ -175,7 +177,7 @@ class _FriendGridTile extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: AppRadius.md,
               child: SizedBox(
                 width: double.infinity,
                 child: hasAvatar
@@ -190,7 +192,7 @@ class _FriendGridTile extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 5),
+          AppGap.vXs,
           Text(
             displayName,
             maxLines: 1,
@@ -286,21 +288,26 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
         return Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+            borderRadius: AppRadius.bottomSheetTop,
           ),
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              AppGap.vMd,
               Container(
-                width: 38,
-                height: 4,
+                width: AppSize.sheetHandleWidth,
+                height: AppSize.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: theme.dividerColor.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppRadius.full,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSize.lg,
+                  AppSize.md,
+                  AppSize.sm,
+                  AppSize.sm,
+                ),
                 child: Row(
                   children: [
                     Text(
@@ -321,24 +328,29 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.lg,
+                  vertical: AppSize.xs,
+                ),
                 child: TextField(
                   onChanged: (val) => setState(() => _query = val),
                   decoration: InputDecoration(
                     hintText: loc?.searchFriends ?? 'Search friends...',
-                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      size: AppSize.iconSm,
+                    ),
                     isDense: true,
                     filled: true,
                     fillColor: theme.cardColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    border: const OutlineInputBorder(
+                      borderRadius: AppRadius.input,
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              AppGap.vSm,
               Expanded(
                 child: filtered.isEmpty
                     ? Center(
@@ -361,7 +373,7 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
 
                           return ListTile(
                             leading: CircleAvatar(
-                              radius: 22,
+                              radius: AppSize.avatarMd / 2,
                               backgroundImage: hasAvatar
                                   ? CachedNetworkImageProvider(user.avatarUrl!)
                                   : null,

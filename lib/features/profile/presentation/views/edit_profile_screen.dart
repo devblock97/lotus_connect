@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/profile/application/profile_providers.dart';
 import 'package:lotus_connect/features/profile/domain/entities/update_profile_params.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -136,13 +137,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 12),
+            AppGap.vMd,
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
               title: Text(loc?.chooseFromGallery ?? 'Choose from Gallery'),
@@ -153,7 +154,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               title: Text(loc?.takeAPhoto ?? 'Take a Photo'),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
           ],
         ),
       ),
@@ -223,9 +224,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             onPressed: state.isUpdatingProfile ? null : _saveProfile,
             child: state.isUpdatingProfile
                 ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    width: AppSize.loaderSizeSm,
+                    height: AppSize.loaderSizeSm,
+                    child: CircularProgressIndicator(
+                      strokeWidth: AppSize.borderThick,
+                    ),
                   )
                 : Text(
                     loc?.save ?? 'Save',
@@ -241,7 +244,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: AppPadding.screen,
           children: [
             // 1. Profile Picture Section
             _buildSectionHeader(
@@ -250,7 +253,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               onActionTap:
                   state.isUploadingAvatar ? null : _pickAndUploadAvatar,
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             Center(
               child: GestureDetector(
                 onTap: state.isUploadingAvatar ? null : _pickAndUploadAvatar,
@@ -258,7 +261,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   alignment: Alignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 58,
+                      radius: AppSize.avatarProfile / 2,
                       backgroundColor: theme.colorScheme.primaryContainer,
                       backgroundImage: hasAvatar
                           ? CachedNetworkImageProvider(profile.avatarUrl!)
@@ -280,9 +283,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            AppGap.vXl,
             const Divider(),
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // 2. Cover Photo Section
             _buildSectionHeader(
@@ -290,11 +293,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               actionLabel: loc?.edit ?? 'Edit',
               onActionTap: state.isUploadingCover ? null : _pickAndUploadCover,
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             GestureDetector(
               onTap: state.isUploadingCover ? null : _pickAndUploadCover,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadius.media,
                 child: SizedBox(
                   height: 150,
                   width: double.infinity,
@@ -321,7 +324,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           child: const Center(
                             child: Icon(
                               Icons.add_photo_alternate_outlined,
-                              size: 42,
+                              size: AppSize.iconXxl,
                               color: Colors.white70,
                             ),
                           ),
@@ -340,16 +343,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            AppGap.vXl,
             const Divider(),
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // 3. Bio Section
             Text(
               loc?.bioLabel ?? 'Bio',
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 10),
+            AppGap.vSm,
             TextFormField(
               controller: _bioController,
               maxLength: 500,
@@ -358,21 +361,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 hintText: loc?.bioHint ?? 'Describe yourself...',
                 filled: true,
                 fillColor: theme.cardColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.input,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             const Divider(),
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // 4. Details Section (Full Name, Location, Website)
             Text(
               loc?.detailsSectionTitle ?? 'Details',
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 14),
+            AppGap.vLg,
             TextFormField(
               controller: _fullNameController,
               maxLength: 100,
@@ -382,12 +385,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 prefixIcon: const Icon(Icons.person_outline_rounded),
                 filled: true,
                 fillColor: theme.cardColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.input,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             TextFormField(
               controller: _locationController,
               maxLength: 255,
@@ -397,12 +400,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 prefixIcon: const Icon(Icons.home_outlined),
                 filled: true,
                 fillColor: theme.cardColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.input,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             TextFormField(
               controller: _websiteController,
               maxLength: 255,
@@ -413,23 +416,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 prefixIcon: const Icon(Icons.link_rounded),
                 filled: true,
                 fillColor: theme.cardColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.input,
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            AppGap.vXxl,
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: AppSize.minTouchTarget,
               child: FilledButton(
                 onPressed: state.isUpdatingProfile ? null : _saveProfile,
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFF1877F2),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: AppBorder.rounded(radius: AppSize.radiusButton),
                 ),
                 child: Text(
                   loc?.saveChanges ?? 'Save Changes',
@@ -440,7 +441,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            AppGap.vXxxl,
           ],
         ),
       ),

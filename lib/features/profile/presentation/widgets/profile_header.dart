@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -110,10 +111,10 @@ class ProfileHeader extends StatelessWidget {
 
                         // Subtle bottom gradient for contrast
                         Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          height: 64,
+                          left: AppSize.none,
+                          right: AppSize.none,
+                          bottom: AppSize.none,
+                          height: AppSize.giant,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -134,7 +135,7 @@ class ProfileHeader extends StatelessWidget {
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: Colors.white,
-                                strokeWidth: 2.5,
+                                strokeWidth: AppSize.loaderStrokeWidth,
                               ),
                             ),
                           ),
@@ -142,29 +143,26 @@ class ProfileHeader extends StatelessWidget {
                         // Edit Cover Camera Button (for own profile)
                         if (profile.isSelf)
                           Positioned(
-                            right: 14,
-                            bottom: 12,
+                            right: AppSize.lg,
+                            bottom: AppSize.md,
                             child: Material(
                               color: Colors.black.withValues(alpha: 0.65),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: AppRadius.xl,
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: AppRadius.xl,
                                 onTap:
                                     isUploadingCover ? null : onChangeCoverTap,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 7,
-                                  ),
+                                  padding: AppPadding.chip,
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const Icon(
                                         Icons.camera_alt_rounded,
                                         color: Colors.white,
-                                        size: 16,
+                                        size: AppSize.iconXs,
                                       ),
-                                      const SizedBox(width: 6),
+                                      AppGap.hXs,
                                       Text(
                                         loc?.edit ?? 'Edit',
                                         style: const TextStyle(
@@ -186,8 +184,8 @@ class ProfileHeader extends StatelessWidget {
 
                 // Overlapping Profile Avatar (Bottom-Left like Facebook)
                 Positioned(
-                  left: 16,
-                  bottom: 0,
+                  left: AppSize.lg,
+                  bottom: AppSize.none,
                   child: GestureDetector(
                     onTap: () {
                       if (hasAvatar) {
@@ -208,15 +206,15 @@ class ProfileHeader extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: theme.cardColor,
-                            border: Border.all(
-                              color: theme.cardColor,
-                              width: 4,
+                            border: AppBorder.all(
+                              theme.cardColor,
+                              width: AppSize.xs,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.16),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                                blurRadius: AppSize.md,
+                                offset: const Offset(0, AppSize.xs),
                               ),
                             ],
                           ),
@@ -240,11 +238,12 @@ class ProfileHeader extends StatelessWidget {
                                     color: Colors.black45,
                                     child: Center(
                                       child: SizedBox(
-                                        width: 26,
-                                        height: 26,
+                                        width: AppSize.loaderSizeMd,
+                                        height: AppSize.loaderSizeMd,
                                         child: CircularProgressIndicator(
                                           color: Colors.white,
-                                          strokeWidth: 2.5,
+                                          strokeWidth:
+                                              AppSize.loaderStrokeWidth,
                                         ),
                                       ),
                                     ),
@@ -257,27 +256,27 @@ class ProfileHeader extends StatelessWidget {
                         // Camera icon badge for self OR online indicator
                         if (profile.isSelf)
                           Positioned(
-                            right: 2,
-                            bottom: 2,
+                            right: AppSize.xxs,
+                            bottom: AppSize.xxs,
                             child: GestureDetector(
                               onTap:
                                   isUploadingAvatar ? null : onChangeAvatarTap,
                               child: Container(
-                                width: 34,
-                                height: 34,
+                                width: AppSize.iconButtonSm,
+                                height: AppSize.iconButtonSm,
                                 decoration: BoxDecoration(
                                   color: isDark
                                       ? const Color(0xFF3A3B3C)
                                       : const Color(0xFFE4E6EB),
                                   shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: theme.cardColor,
-                                    width: 2.5,
+                                  border: AppBorder.all(
+                                    theme.cardColor,
+                                    width: AppSize.borderThick,
                                   ),
                                 ),
                                 child: Icon(
                                   Icons.camera_alt_rounded,
-                                  size: 18,
+                                  size: AppSize.iconSm,
                                   color: primaryTextColor,
                                 ),
                               ),
@@ -285,17 +284,17 @@ class ProfileHeader extends StatelessWidget {
                           )
                         else if (isOnline)
                           Positioned(
-                            right: 6,
-                            bottom: 6,
+                            right: AppSize.xs,
+                            bottom: AppSize.xs,
                             child: Container(
-                              width: 20,
-                              height: 20,
+                              width: AppSize.xl,
+                              height: AppSize.xl,
                               decoration: BoxDecoration(
                                 color: const Color(0xFF22C55E),
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.cardColor,
-                                  width: 3,
+                                border: AppBorder.all(
+                                  theme.cardColor,
+                                  width: AppSize.borderHeavy,
                                 ),
                               ),
                             ),
@@ -310,7 +309,12 @@ class ProfileHeader extends StatelessWidget {
 
           // 2. Name, @username, Close Friend badge, Bio, Stats
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            padding: const EdgeInsets.fromLTRB(
+              AppSize.lg,
+              AppSize.md,
+              AppSize.lg,
+              AppSize.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -329,26 +333,26 @@ class ProfileHeader extends StatelessWidget {
                       ),
                     ),
                     if (profile.isCloseFriend) ...[
-                      const SizedBox(width: 8),
+                      AppGap.hSm,
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
+                          horizontal: AppSize.sm,
+                          vertical: AppSize.xxs,
                         ),
                         decoration: BoxDecoration(
                           color:
                               const Color(0xFF10B981).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadius.md,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
                               Icons.star_rounded,
-                              size: 14,
+                              size: AppSize.iconXxs,
                               color: Color(0xFF10B981),
                             ),
-                            const SizedBox(width: 3),
+                            AppGap.hXs,
                             Text(
                               loc?.closeFriend ??
                                   loc?.closeFriends ??
@@ -365,7 +369,7 @@ class ProfileHeader extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                AppGap.vXxs,
 
                 // @username handle
                 Text(
@@ -379,7 +383,7 @@ class ProfileHeader extends StatelessWidget {
 
                 // Bio
                 if (profile.bio != null && profile.bio!.trim().isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  AppGap.vMd,
                   Text(
                     profile.bio!.trim(),
                     style: TextStyle(
@@ -390,7 +394,7 @@ class ProfileHeader extends StatelessWidget {
                   ),
                 ],
 
-                const SizedBox(height: 12),
+                AppGap.vMd,
 
                 // Inline Stats Row (Friends · Posts · Media)
                 Row(
@@ -420,7 +424,7 @@ class ProfileHeader extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                AppGap.vLg,
 
                 // 3. Facebook Action Buttons Row
                 if (profile.isSelf)
@@ -457,7 +461,7 @@ class ProfileHeader extends StatelessWidget {
       child: Center(
         child: Icon(
           Icons.spa_outlined,
-          size: 56,
+          size: AppSize.iconHero,
           color: Colors.white.withValues(alpha: 0.18),
         ),
       ),
@@ -520,9 +524,9 @@ class ProfileHeader extends StatelessWidget {
     if (onTap == null) return child;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: AppRadius.xs,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+        padding: AppPadding.xxs,
         child: child,
       ),
     );
@@ -530,7 +534,7 @@ class ProfileHeader extends StatelessWidget {
 
   Widget _buildDotSeparator(Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: AppPadding.hSm,
       child: Text(
         '•',
         style: TextStyle(color: color, fontWeight: FontWeight.bold),
@@ -555,7 +559,7 @@ class ProfileHeader extends StatelessWidget {
           flex: 5,
           child: FilledButton.icon(
             onPressed: onAddToStoryTap,
-            icon: const Icon(Icons.add_circle_rounded, size: 19),
+            icon: const Icon(Icons.add_circle_rounded, size: AppSize.iconSm),
             label: Text(
               loc?.addToStory ?? 'Add to story',
               maxLines: 1,
@@ -568,21 +572,23 @@ class ProfileHeader extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: const Color(0xFF1877F2),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 11),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              padding: AppPadding.vMd,
+              shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        AppGap.hSm,
 
         // Secondary: Edit profile
         Expanded(
           flex: 5,
           child: FilledButton.icon(
             onPressed: onEditProfileTap,
-            icon: Icon(Icons.edit_rounded, size: 18, color: secondaryFg),
+            icon: Icon(
+              Icons.edit_rounded,
+              size: AppSize.iconSm,
+              color: secondaryFg,
+            ),
             label: Text(
               loc?.editProfile ?? 'Edit profile',
               maxLines: 1,
@@ -596,28 +602,24 @@ class ProfileHeader extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: secondaryBg,
               foregroundColor: secondaryFg,
-              padding: const EdgeInsets.symmetric(vertical: 11),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              padding: AppPadding.vMd,
+              shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        AppGap.hSm,
 
         // More / Settings icon button
         SizedBox(
-          height: 42,
-          width: 46,
+          height: AppSize.buttonHeightMd,
+          width: AppSize.minTouchTarget,
           child: FilledButton(
             onPressed: onSettingsTap,
             style: FilledButton.styleFrom(
               backgroundColor: secondaryBg,
               foregroundColor: secondaryFg,
-              padding: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              padding: AppPadding.zero,
+              shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
             child: Icon(Icons.more_horiz_rounded, color: secondaryFg),
           ),
@@ -649,7 +651,7 @@ class ProfileHeader extends StatelessWidget {
             loc: loc,
           ),
         ),
-        const SizedBox(width: 8),
+        AppGap.hSm,
 
         // Message Button
         Expanded(
@@ -658,7 +660,7 @@ class ProfileHeader extends StatelessWidget {
             onPressed: onMessageTap,
             icon: Icon(
               CupertinoIcons.chat_bubble_text_fill,
-              size: 17,
+              size: AppSize.iconSm,
               color: profile.isFriend ? Colors.white : secondaryFg,
             ),
             label: Text(
@@ -674,19 +676,17 @@ class ProfileHeader extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor:
                   profile.isFriend ? const Color(0xFF1877F2) : secondaryBg,
-              padding: const EdgeInsets.symmetric(vertical: 11),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              padding: AppPadding.vMd,
+              shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        AppGap.hSm,
 
         // Call / More Button
         SizedBox(
-          height: 42,
-          width: 46,
+          height: AppSize.buttonHeightMd,
+          width: AppSize.minTouchTarget,
           child: PopupMenuButton<String>(
             onSelected: (val) {
               if (val == 'voice') {
@@ -695,16 +695,14 @@ class ProfileHeader extends StatelessWidget {
                 onVideoCallTap?.call();
               }
             },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: AppBorder.rounded(radius: AppSize.radiusMd),
             itemBuilder: (ctx) => [
               PopupMenuItem(
                 value: 'voice',
                 child: Row(
                   children: [
-                    const Icon(Icons.phone_outlined, size: 20),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.phone_outlined, size: AppSize.iconSm),
+                    AppGap.hMd,
                     Text(loc?.voiceCall ?? 'Voice call'),
                   ],
                 ),
@@ -713,8 +711,8 @@ class ProfileHeader extends StatelessWidget {
                 value: 'video',
                 child: Row(
                   children: [
-                    const Icon(Icons.videocam_outlined, size: 20),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.videocam_outlined, size: AppSize.iconSm),
+                    AppGap.hMd,
                     Text(loc?.videoCall ?? 'Video call'),
                   ],
                 ),
@@ -723,11 +721,11 @@ class ProfileHeader extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: secondaryBg,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: AppRadius.button,
               ),
               child: Icon(
                 Icons.phone_in_talk_rounded,
-                size: 19,
+                size: AppSize.iconSm,
                 color: secondaryFg,
               ),
             ),
@@ -749,7 +747,11 @@ class ProfileHeader extends StatelessWidget {
         onPressed: isMutatingFriendship
             ? null
             : () => _showFriendOptionsSheet(context, loc),
-        icon: Icon(Icons.how_to_reg_rounded, size: 18, color: secondaryFg),
+        icon: Icon(
+          Icons.how_to_reg_rounded,
+          size: AppSize.iconSm,
+          color: secondaryFg,
+        ),
         label: Text(
           loc?.friends ?? 'Friends',
           style: TextStyle(
@@ -760,10 +762,8 @@ class ProfileHeader extends StatelessWidget {
         ),
         style: FilledButton.styleFrom(
           backgroundColor: secondaryBg,
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          padding: AppPadding.vMd,
+          shape: AppBorder.rounded(radius: AppSize.radiusButton),
         ),
       );
     }
@@ -773,7 +773,10 @@ class ProfileHeader extends StatelessWidget {
         onPressed: isMutatingFriendship
             ? null
             : () => _showRespondRequestSheet(context, loc),
-        icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+        icon: const Icon(
+          Icons.person_add_alt_1_rounded,
+          size: AppSize.iconSm,
+        ),
         label: Text(
           loc?.respondFriendRequest ?? 'Respond',
           style: const TextStyle(
@@ -784,10 +787,8 @@ class ProfileHeader extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: const Color(0xFF1877F2),
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          padding: AppPadding.vMd,
+          shape: AppBorder.rounded(radius: AppSize.radiusButton),
         ),
       );
     }
@@ -795,7 +796,11 @@ class ProfileHeader extends StatelessWidget {
     if (profile.isPendingRequest) {
       return FilledButton.icon(
         onPressed: null,
-        icon: Icon(Icons.schedule_rounded, size: 18, color: secondaryFg),
+        icon: Icon(
+          Icons.schedule_rounded,
+          size: AppSize.iconSm,
+          color: secondaryFg,
+        ),
         label: Text(
           loc?.requested ?? 'Requested',
           style: TextStyle(
@@ -806,17 +811,15 @@ class ProfileHeader extends StatelessWidget {
         ),
         style: FilledButton.styleFrom(
           disabledBackgroundColor: secondaryBg,
-          padding: const EdgeInsets.symmetric(vertical: 11),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          padding: AppPadding.vMd,
+          shape: AppBorder.rounded(radius: AppSize.radiusButton),
         ),
       );
     }
 
     return FilledButton.icon(
       onPressed: isMutatingFriendship ? null : onAddFriendTap,
-      icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+      icon: const Icon(Icons.person_add_alt_1_rounded, size: AppSize.iconSm),
       label: Text(
         loc?.addFriend ?? 'Add Friend',
         style: const TextStyle(
@@ -827,10 +830,8 @@ class ProfileHeader extends StatelessWidget {
       style: FilledButton.styleFrom(
         backgroundColor: const Color(0xFF1877F2),
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 11),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        padding: AppPadding.vMd,
+        shape: AppBorder.rounded(radius: AppSize.radiusButton),
       ),
     );
   }
@@ -840,22 +841,22 @@ class ProfileHeader extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 10),
+            AppGap.vMd,
             Container(
-              width: 38,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: theme.dividerColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             ListTile(
               leading: Icon(
                 profile.isCloseFriend
@@ -894,7 +895,7 @@ class ProfileHeader extends StatelessWidget {
                 onUnfriendTap?.call();
               },
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
           ],
         ),
       ),
@@ -906,22 +907,22 @@ class ProfileHeader extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 10),
+            AppGap.vMd,
             Container(
-              width: 38,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: theme.dividerColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             ListTile(
               leading: const Icon(
                 Icons.check_circle_outline_rounded,
@@ -949,7 +950,7 @@ class ProfileHeader extends StatelessWidget {
                 onRejectFriendTap?.call();
               },
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
           ],
         ),
       ),

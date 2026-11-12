@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/features/profile/application/profile_providers.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -36,12 +37,12 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: AppPadding.screen,
         children: [
           // Profile Header Card
           SettingCard(
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadius.card,
               onTap: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute(
@@ -50,7 +51,7 @@ class SettingsScreen extends ConsumerWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: AppPadding.card,
                 child: Column(
                   children: [
                     Row(
@@ -58,7 +59,7 @@ class SettingsScreen extends ConsumerWidget {
                         Stack(
                           children: [
                             CircleAvatar(
-                              radius: 40,
+                              radius: AppSize.avatarXxl / 2,
                               backgroundColor: Colors.grey,
                               backgroundImage: settings.avatarUrl.isNotEmpty
                                   ? NetworkImage(settings.avatarUrl)
@@ -66,16 +67,16 @@ class SettingsScreen extends ConsumerWidget {
                               child: settings.avatarUrl.isEmpty
                                   ? const Icon(
                                       Icons.person,
-                                      size: 48,
+                                      size: AppSize.iconXxl,
                                       color: Colors.white,
                                     )
                                   : null,
                             ),
                             Positioned(
-                              bottom: 0,
-                              right: 0,
+                              bottom: AppSize.none,
+                              right: AppSize.none,
                               child: Container(
-                                padding: const EdgeInsets.all(2),
+                                padding: AppPadding.xxs,
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
                                   shape: BoxShape.circle,
@@ -83,13 +84,13 @@ class SettingsScreen extends ConsumerWidget {
                                 child: const Icon(
                                   Icons.camera_alt_outlined,
                                   color: Colors.blue,
-                                  size: 20,
+                                  size: AppSize.iconSm,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(width: 12),
+                        AppGap.hMd,
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,13 +115,13 @@ class SettingsScreen extends ConsumerWidget {
                         const Icon(Icons.chevron_right),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    AppGap.vMd,
                   ],
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          AppGap.vXxl,
 
           // GENERAL SECTION
           _buildSectionTitle(context, loc.general),
@@ -155,14 +156,14 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(loc.editProfile),
                   trailing: const Icon(Icons.chevron_right),
                 ),
-                const Divider(height: 1),
+                const Divider(height: AppSize.dividerThickness),
                 ListTile(
                   onTap: () {},
                   leading: const Icon(Icons.notifications_none),
                   title: Text(loc.notificationSettings),
                   trailing: const Icon(Icons.chevron_right),
                 ),
-                const Divider(height: 1),
+                const Divider(height: AppSize.dividerThickness),
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: Text(loc.language),
@@ -170,7 +171,7 @@ class SettingsScreen extends ConsumerWidget {
                     value: supportedLanguages.containsKey(settings.languageCode)
                         ? settings.languageCode
                         : 'en',
-                    underline: const SizedBox(),
+                    underline: AppGap.shrink,
                     items: supportedLanguages.entries.map((entry) {
                       return DropdownMenuItem(
                         value: entry.key,
@@ -185,27 +186,27 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
 
           // APPEARANCE SECTION
           _buildSectionTitle(context, loc.appearance),
           SettingCard(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppPadding.card,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.palette_outlined, size: 20),
-                      const SizedBox(width: 8),
+                      const Icon(Icons.palette_outlined, size: AppSize.iconSm),
+                      AppGap.hSm,
                       Text(
                         loc.themeSelection,
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  AppGap.vLg,
                   Row(
                     children: [
                       Expanded(
@@ -219,7 +220,7 @@ class SettingsScreen extends ConsumerWidget {
                               notifier.setThemeMode(AppThemeMode.light),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      AppGap.hSm,
                       Expanded(
                         child: _buildThemeCard(
                           context: context,
@@ -230,7 +231,7 @@ class SettingsScreen extends ConsumerWidget {
                           onTap: () => notifier.setThemeMode(AppThemeMode.dark),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      AppGap.hSm,
                       Expanded(
                         child: _buildThemeCard(
                           context: context,
@@ -248,7 +249,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
 
           // INFORMATION SECTION
           _buildSectionTitle(context, loc.information),
@@ -263,7 +264,7 @@ class SettingsScreen extends ConsumerWidget {
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ),
-                const Divider(height: 1),
+                const Divider(height: AppSize.dividerThickness),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
                   title: Text(
@@ -284,7 +285,11 @@ class SettingsScreen extends ConsumerWidget {
 
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8),
+      padding: const EdgeInsets.only(
+        left: AppSize.xs,
+        bottom: AppSize.sm,
+        top: AppSize.sm,
+      ),
       child: Text(
         title,
         style: const TextStyle(
@@ -308,25 +313,25 @@ class SettingsScreen extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: AppPadding.cardCompact,
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? Colors.black : Colors.transparent,
-            width: isSelected ? 2 : 1,
+          borderRadius: AppRadius.md,
+          border: AppBorder.all(
+            isSelected ? Colors.black : Colors.transparent,
+            width: isSelected ? AppSize.borderThick : AppSize.borderThin,
           ),
         ),
         child: Column(
           children: [
             Container(
-              height: 32,
+              height: AppSize.xxxl,
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppRadius.sm,
               ),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Text(
               title,
               style: TextStyle(

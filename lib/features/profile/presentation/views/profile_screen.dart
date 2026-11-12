@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -287,8 +288,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.cardColor,
-        elevation: 0,
-        scrolledUnderElevation: 0.5,
+        elevation: AppSize.elevationNone,
+        scrolledUnderElevation: AppSize.borderHairline,
         title: Text(
           profile?.displayName ??
               (widget.initialUsername != null
@@ -307,7 +308,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               icon: Icon(
                 CupertinoIcons.plus_app,
                 color: primaryTextColor,
-                size: 23,
+                size: AppSize.iconMd,
               ),
               tooltip: loc?.createPost ?? 'Create post',
               onPressed: _openCreatePost,
@@ -316,7 +317,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               icon: Icon(
                 Icons.edit_outlined,
                 color: primaryTextColor,
-                size: 22,
+                size: AppSize.iconMd,
               ),
               tooltip: loc?.editProfile ?? 'Edit profile',
               onPressed:
@@ -326,7 +327,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               icon: Icon(
                 Icons.settings_outlined,
                 color: primaryTextColor,
-                size: 22,
+                size: AppSize.iconMd,
               ),
               tooltip: loc?.profileSettings ?? 'Settings',
               onPressed: _openSettings,
@@ -334,9 +335,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ] else if (profile != null) ...[
             PopupMenuButton<String>(
               icon: Icon(Icons.more_horiz_rounded, color: primaryTextColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: AppBorder.rounded(radius: AppSize.radiusMd),
               onSelected: (value) {
                 if (value == 'copy_username') {
                   Clipboard.setData(
@@ -360,8 +359,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   value: 'copy_username',
                   child: Row(
                     children: [
-                      const Icon(Icons.alternate_email_rounded, size: 19),
-                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.alternate_email_rounded,
+                        size: AppSize.iconSm,
+                      ),
+                      AppGap.hMd,
                       Text(
                         loc?.copyUsername(profile.username) ??
                             'Copy @${profile.username}',
@@ -373,8 +375,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   value: 'refresh',
                   child: Row(
                     children: [
-                      const Icon(Icons.refresh_rounded, size: 19),
-                      const SizedBox(width: 10),
+                      const Icon(Icons.refresh_rounded, size: AppSize.iconSm),
+                      AppGap.hMd,
                       Text(loc?.refresh ?? 'Refresh'),
                     ],
                   ),
@@ -382,7 +384,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ],
-          const SizedBox(width: 4),
+          AppGap.hXs,
         ],
       ),
       body: state.isLoadingProfile && profile == null
@@ -490,7 +492,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
                       // Thick section divider
                       SliverToBoxAdapter(
-                        child: Container(height: 8, color: sectionDividerColor),
+                        child: Container(
+                          height: AppSize.sm,
+                          color: sectionDividerColor,
+                        ),
                       ),
 
                       // Facebook Content Tab Selector
@@ -540,7 +545,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Container(
       color: theme.cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -548,21 +556,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final (tab, label) = item;
             final isSelected = activeTab == tab;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppSize.sm),
               child: InkWell(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: AppRadius.xl,
                 onTap: () => onTabSelected(tab),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: AppSize.lg,
+                    vertical: AppSize.sm,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? const Color(0xFF1877F2).withValues(alpha: 0.14)
                         : Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.xl,
                   ),
                   child: Text(
                     label,
@@ -615,7 +623,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       case ProfileTab.photos:
         return [
           SliverToBoxAdapter(
-            child: Container(height: 1, color: sectionDividerColor),
+            child: Container(
+              height: AppSize.dividerThickness,
+              color: sectionDividerColor,
+            ),
           ),
           SliverToBoxAdapter(
             child: ProfileMediaGrid(
@@ -628,7 +639,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       case ProfileTab.videos:
         return [
           SliverToBoxAdapter(
-            child: Container(height: 1, color: sectionDividerColor),
+            child: Container(
+              height: AppSize.dividerThickness,
+              color: sectionDividerColor,
+            ),
           ),
           SliverToBoxAdapter(
             child: ProfileMediaGrid(
@@ -642,7 +656,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       case ProfileTab.about:
         return [
           SliverToBoxAdapter(
-            child: Container(height: 8, color: sectionDividerColor),
+            child: Container(
+              height: AppSize.sm,
+              color: sectionDividerColor,
+            ),
           ),
           SliverToBoxAdapter(
             child: _buildAboutOverviewCard(
@@ -676,8 +693,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       // Details / Intro section
       SliverToBoxAdapter(
         child: Divider(
-          height: 1,
-          thickness: 0.5,
+          height: AppSize.dividerThickness,
+          thickness: AppSize.borderHairline,
           color: theme.dividerColor.withValues(alpha: 0.15),
         ),
       ),
@@ -690,7 +707,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
 
       SliverToBoxAdapter(
-        child: Container(height: 8, color: sectionDividerColor),
+        child: Container(height: AppSize.sm, color: sectionDividerColor),
       ),
 
       // 6-Friend Preview Grid
@@ -711,7 +728,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
 
       SliverToBoxAdapter(
-        child: Container(height: 8, color: sectionDividerColor),
+        child: Container(height: AppSize.sm, color: sectionDividerColor),
       ),
 
       // Posts Header + Filter Chips + CreatePostBar (for self)
@@ -722,7 +739,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSize.lg,
+                  AppSize.md,
+                  AppSize.lg,
+                  AppSize.sm,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -746,7 +768,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           onTap: () =>
                               notifier.setPostFilter(ProfilePostFilter.all),
                         ),
-                        const SizedBox(width: 6),
+                        AppGap.hSm,
                         _buildFilterChip(
                           label: loc?.filterMedia ?? 'Media',
                           isSelected:
@@ -755,7 +777,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           onTap: () =>
                               notifier.setPostFilter(ProfilePostFilter.media),
                         ),
-                        const SizedBox(width: 6),
+                        AppGap.hSm,
                         _buildFilterChip(
                           label: loc?.filterVideos ?? 'Videos',
                           isSelected:
@@ -771,8 +793,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               if (profile.isSelf) ...[
                 Divider(
-                  height: 1,
-                  thickness: 0.5,
+                  height: AppSize.dividerThickness,
+                  thickness: AppSize.borderHairline,
                   color: theme.dividerColor.withValues(alpha: 0.15),
                 ),
                 const CreatePostBar(),
@@ -783,7 +805,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
 
       SliverToBoxAdapter(
-        child: Container(height: 8, color: sectionDividerColor),
+        child: Container(height: AppSize.sm, color: sectionDividerColor),
       ),
 
       // Timeline Posts List
@@ -793,15 +815,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         SliverToBoxAdapter(
           child: Container(
             color: theme.cardColor,
-            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSize.massive,
+              horizontal: AppSize.xxl,
+            ),
             child: Column(
               children: [
                 Icon(
                   Icons.dynamic_feed_outlined,
-                  size: 48,
+                  size: AppSize.iconXxl,
                   color: secondaryTextColor.withValues(alpha: 0.5),
                 ),
-                const SizedBox(height: 12),
+                AppGap.vMd,
                 Text(
                   loc?.noPostsYet ?? 'No posts yet',
                   style: TextStyle(
@@ -820,12 +845,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           itemBuilder: (context, index) {
             if (index >= state.posts.length) {
               return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: AppPadding.vLg,
                 child: Center(
                   child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    width: AppSize.loaderSizeMd,
+                    height: AppSize.loaderSizeMd,
+                    child: CircularProgressIndicator(
+                      strokeWidth: AppSize.borderThick,
+                    ),
                   ),
                 ),
               );
@@ -900,7 +927,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       );
                     },
                   ),
-                  Container(height: 8, color: sectionDividerColor),
+                  Container(height: AppSize.sm, color: sectionDividerColor),
                 ],
               ),
             );
@@ -924,12 +951,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: AppRadius.lg,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: AppPadding.chip,
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.lg,
         ),
         child: Text(
           label,
@@ -959,7 +986,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return ColoredBox(
       color: theme.cardColor,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: AppPadding.card,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -971,7 +998,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 color: primaryTextColor,
               ),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             if (profile.bio != null && profile.bio!.trim().isNotEmpty) ...[
               _buildAboutRow(
                 icon: Icons.format_quote_rounded,
@@ -980,7 +1007,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 primaryTextColor: primaryTextColor,
                 secondaryTextColor: secondaryTextColor,
               ),
-              const Divider(height: 24),
+              const Divider(height: AppSize.xxl),
             ],
             _buildAboutRow(
               icon: Icons.alternate_email_rounded,
@@ -990,7 +1017,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               secondaryTextColor: secondaryTextColor,
             ),
             if (profile.email.isNotEmpty) ...[
-              const Divider(height: 24),
+              const Divider(height: AppSize.xxl),
               _buildAboutRow(
                 icon: Icons.mail_outline_rounded,
                 title: loc?.emailRowLabel ?? 'Email',
@@ -1001,7 +1028,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
             if (profile.location != null &&
                 profile.location!.trim().isNotEmpty) ...[
-              const Divider(height: 24),
+              const Divider(height: AppSize.xxl),
               _buildAboutRow(
                 icon: Icons.location_on_outlined,
                 title: loc?.locationRowLabel ?? 'Location',
@@ -1012,7 +1039,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ],
             if (profile.website != null &&
                 profile.website!.trim().isNotEmpty) ...[
-              const Divider(height: 24),
+              const Divider(height: AppSize.xxl),
               _buildAboutRow(
                 icon: Icons.link_rounded,
                 title: loc?.websiteRowLabel ?? 'Website',
@@ -1021,7 +1048,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 secondaryTextColor: secondaryTextColor,
               ),
             ],
-            const Divider(height: 24),
+            const Divider(height: AppSize.xxl),
             _buildAboutRow(
               icon: Icons.calendar_today_outlined,
               title: loc?.joinedRowLabel ?? 'Joined',
@@ -1030,12 +1057,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               secondaryTextColor: secondaryTextColor,
             ),
             if (profile.isSelf) ...[
-              const SizedBox(height: 20),
+              AppGap.vXl,
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => _openEditProfile(profile),
-                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  icon: const Icon(Icons.edit_outlined, size: AppSize.iconSm),
                   label: Text(
                     loc?.editProfileDetails ?? 'Edit profile details',
                   ),
@@ -1058,8 +1085,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 22, color: secondaryTextColor),
-        const SizedBox(width: 14),
+        Icon(icon, size: AppSize.iconMd, color: secondaryTextColor),
+        AppGap.hMd,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1072,7 +1099,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 3),
+              AppGap.vXxs,
               Text(
                 value,
                 style: TextStyle(
@@ -1096,25 +1123,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   ) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: AppPadding.xxl,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
               Icons.person_off_outlined,
-              size: 56,
+              size: AppSize.iconHero,
               color: Colors.grey,
             ),
-            const SizedBox(height: 14),
+            AppGap.vMd,
             Text(
               message ?? (loc?.couldNotLoadProfile ?? 'Could not load profile'),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 15),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             FilledButton.icon(
               onPressed: notifier.loadAll,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
+              icon: const Icon(Icons.refresh_rounded, size: AppSize.iconSm),
               label: Text(loc?.retry ?? 'Retry'),
             ),
           ],
