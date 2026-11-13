@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/profile/domain/entities/profile_media_item.dart';
@@ -30,24 +31,27 @@ class ProfileMediaGrid extends StatelessWidget {
 
     if (isLoading && items.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 64),
+        padding: EdgeInsets.symmetric(vertical: AppSize.giant),
         child: Center(child: CircularProgressIndicator()),
       );
     }
 
     if (items.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 24),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSize.giant,
+          horizontal: AppSize.xxl,
+        ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 emptyIcon,
-                size: 56,
+                size: AppSize.iconHero,
                 color: Colors.grey.withValues(alpha: 0.45),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               Text(
                 emptyTitle ?? (loc?.noMediaYet ?? 'No media yet'),
                 style: TextStyle(
@@ -64,15 +68,15 @@ class ProfileMediaGrid extends StatelessWidget {
 
     return Container(
       color: theme.cardColor,
-      padding: const EdgeInsets.all(2),
+      padding: AppPadding.xxs,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: items.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          crossAxisSpacing: 2,
-          mainAxisSpacing: 2,
+          crossAxisSpacing: AppSize.xxs,
+          mainAxisSpacing: AppSize.xxs,
         ),
         itemBuilder: (context, index) {
           final item = items[index];
@@ -150,10 +154,10 @@ class _MediaGridTile extends StatelessWidget {
           // Video play badge + duration overlay
           if (item.isVideo) ...[
             Positioned(
-              top: 6,
-              right: 6,
+              top: AppSize.xs,
+              right: AppSize.xs,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: AppPadding.xs,
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.55),
                   shape: BoxShape.circle,
@@ -161,22 +165,19 @@ class _MediaGridTile extends StatelessWidget {
                 child: const Icon(
                   CupertinoIcons.play_fill,
                   color: Colors.white,
-                  size: 13,
+                  size: AppSize.iconXxs,
                 ),
               ),
             ),
             if (item.formattedDuration.isNotEmpty)
               Positioned(
-                bottom: 6,
-                right: 6,
+                bottom: AppSize.xs,
+                right: AppSize.xs,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
+                  padding: AppPadding.badge,
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.65),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: AppRadius.xs,
                   ),
                   child: Text(
                     item.formattedDuration,
@@ -209,7 +210,7 @@ class _MediaGridTile extends StatelessWidget {
         child: Icon(
           item.isVideo ? CupertinoIcons.videocam_fill : Icons.image_outlined,
           color: isDark ? Colors.white54 : Colors.black45,
-          size: 28,
+          size: AppSize.iconLg,
         ),
       ),
     );

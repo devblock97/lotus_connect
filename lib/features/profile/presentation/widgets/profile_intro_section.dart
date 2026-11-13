@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -32,7 +33,10 @@ class ProfileIntroSection extends StatelessWidget {
 
     return Container(
       color: theme.cardColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.md,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,16 +48,20 @@ class ProfileIntroSection extends StatelessWidget {
               color: primaryColor,
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
 
           // Location
           if (hasLocation)
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: AppSize.sm),
               child: Row(
                 children: [
-                  Icon(Icons.home_rounded, size: 21, color: iconColor),
-                  const SizedBox(width: 12),
+                  Icon(
+                    Icons.home_rounded,
+                    size: AppSize.iconSm,
+                    color: iconColor,
+                  ),
+                  AppGap.hMd,
                   Expanded(
                     child: RichText(
                       text: TextSpan(
@@ -75,7 +83,7 @@ class ProfileIntroSection extends StatelessWidget {
           // Website
           if (hasWebsite)
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: AppSize.sm),
               child: InkWell(
                 onTap: () {
                   Clipboard.setData(
@@ -91,11 +99,15 @@ class ProfileIntroSection extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppRadius.xs,
                 child: Row(
                   children: [
-                    Icon(Icons.link_rounded, size: 21, color: iconColor),
-                    const SizedBox(width: 12),
+                    Icon(
+                      Icons.link_rounded,
+                      size: AppSize.iconSm,
+                      color: iconColor,
+                    ),
+                    AppGap.hMd,
                     Expanded(
                       child: Text(
                         profile.website!.trim(),
@@ -116,15 +128,15 @@ class ProfileIntroSection extends StatelessWidget {
           // Joined Date
           if (joinedStr != null)
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: AppSize.sm),
               child: Row(
                 children: [
                   Icon(
                     Icons.access_time_filled_rounded,
-                    size: 20,
+                    size: AppSize.iconSm,
                     color: iconColor,
                   ),
-                  const SizedBox(width: 12),
+                  AppGap.hMd,
                   Text(
                     loc?.joinedDate(joinedStr) ?? 'Joined $joinedStr',
                     style: TextStyle(fontSize: 14.5, color: primaryColor),
@@ -136,8 +148,12 @@ class ProfileIntroSection extends StatelessWidget {
           // Username handle
           Row(
             children: [
-              Icon(Icons.alternate_email_rounded, size: 20, color: iconColor),
-              const SizedBox(width: 12),
+              Icon(
+                Icons.alternate_email_rounded,
+                size: AppSize.iconSm,
+                color: iconColor,
+              ),
+              AppGap.hMd,
               Text(
                 profile.username,
                 style: TextStyle(fontSize: 14.5, color: primaryColor),
@@ -147,7 +163,7 @@ class ProfileIntroSection extends StatelessWidget {
 
           // Edit Public Details button for own profile
           if (profile.isSelf && onEditDetailsTap != null) ...[
-            const SizedBox(height: 14),
+            AppGap.vLg,
             SizedBox(
               width: double.infinity,
               child: FilledButton(
@@ -157,11 +173,9 @@ class ProfileIntroSection extends StatelessWidget {
                       ? const Color(0xFF1877F2).withValues(alpha: 0.18)
                       : const Color(0xFFE7F3FF),
                   foregroundColor: const Color(0xFF1877F2),
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  elevation: AppSize.elevationNone,
+                  padding: AppPadding.vMd,
+                  shape: AppBorder.rounded(radius: AppSize.radiusChip),
                 ),
                 child: Text(
                   loc?.editPublicDetails ?? 'Edit public details',
