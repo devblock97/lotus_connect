@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -83,7 +84,10 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white24, width: 2),
+                        border: AppBorder.all(
+                          Colors.white24,
+                          width: AppSize.borderThick,
+                        ),
                       ),
                       child: CircleAvatar(
                         backgroundColor: Colors.grey.withValues(alpha: 0.1),
@@ -99,7 +103,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    AppGap.vLg,
                     Text(
                       displayName,
                       style: const TextStyle(
@@ -108,7 +112,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    AppGap.vSm,
                     Text(
                       loc.voiceConnected,
                       style: const TextStyle(
@@ -124,9 +128,9 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
 
           // Header Row (Dismiss, Encryption Status, Duration)
           Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 16,
-            right: 16,
+            top: MediaQuery.of(context).padding.top + AppSize.lg,
+            left: AppSize.lg,
+            right: AppSize.lg,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -134,7 +138,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                 GestureDetector(
                   onTap: widget.hangUp,
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: AppPadding.sm,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
@@ -142,27 +146,29 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     child: const Icon(
                       Icons.chevron_left,
                       color: Colors.white,
-                      size: 24,
+                      size: AppSize.iconMd,
                     ),
                   ),
                 ),
 
                 // Encryption Pill
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSize.sm,
+                    horizontal: AppSize.lg,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.xl,
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.lock,
                         color: Color(0xFF34C759),
-                        size: 14,
+                        size: AppSize.iconXs,
                       ),
-                      const SizedBox(width: 6),
+                      AppGap.hXs,
                       Text(
                         loc.endToEndEncrypted.toUpperCase(),
                         style: const TextStyle(
@@ -178,11 +184,10 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
 
                 // Call Duration Counter
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                  padding: AppPadding.chip,
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.md,
                   ),
                   child: Text(
                     widget.duration,
@@ -222,25 +227,28 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
           // Picture in Picture View (YOU)
           if (widget.isVideo)
             Positioned(
-              top: MediaQuery.of(context).padding.top + 80,
-              right: 16,
+              top: MediaQuery.of(context).padding.top + AppSize.avatarXxl,
+              right: AppSize.lg,
               child: Container(
                 width: 105,
                 height: 155,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white24, width: 1.5),
+                  borderRadius: AppRadius.lg,
+                  border: AppBorder.all(
+                    Colors.white24,
+                    width: AppSize.borderMedium,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 10,
+                      blurRadius: AppSize.md,
                     ),
                   ],
                 ),
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppRadius.lg,
                       child: RTCVideoView(
                         widget.localRenderer,
                         mirror: true,
@@ -249,16 +257,13 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       ),
                     ),
                     Positioned(
-                      bottom: 8,
-                      left: 8,
+                      bottom: AppSize.sm,
+                      left: AppSize.sm,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
+                        padding: AppPadding.badge,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: AppRadius.xs,
                         ),
                         child: Text(
                           loc.you.toUpperCase(),
@@ -277,19 +282,22 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
 
           // Bottom Control Overlay Pill
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 32,
+            left: AppSize.xl,
+            right: AppSize.xl,
+            bottom: AppSize.xxxl,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSize.md,
+                horizontal: AppSize.xl,
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E293B).withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(36),
+                borderRadius: AppRadius.full,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    blurRadius: AppSize.xl,
+                    offset: const Offset(0, AppSize.sm),
                   ),
                 ],
               ),
@@ -314,7 +322,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     style: IconButton.styleFrom(
                       backgroundColor:
                           _isMuted ? Colors.white24 : Colors.transparent,
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -341,7 +349,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       style: IconButton.styleFrom(
                         backgroundColor:
                             _isVideoOff ? Colors.white24 : Colors.transparent,
-                        padding: const EdgeInsets.all(12),
+                        padding: AppPadding.md,
                       ),
                     ),
 
@@ -357,7 +365,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     icon: const Icon(Icons.ios_share),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -377,7 +385,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     style: IconButton.styleFrom(
                       backgroundColor:
                           _isSpeakerOn ? Colors.white24 : Colors.transparent,
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -388,7 +396,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     color: Colors.white,
                     style: IconButton.styleFrom(
                       backgroundColor: const Color(0xFFD63A2F),
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
                 ],

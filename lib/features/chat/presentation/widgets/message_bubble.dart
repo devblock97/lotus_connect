@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/theme_extensions.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/markdown_message_view.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -31,20 +32,20 @@ class MessageBubble extends StatelessWidget {
 
     if (isUser) {
       return Padding(
-        padding: const EdgeInsets.only(left: 48, right: 16, top: 8, bottom: 8),
+        padding: const EdgeInsets.only(
+          left: AppSize.massive,
+          right: AppSize.lg,
+          top: AppSize.sm,
+          bottom: AppSize.sm,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: AppPadding.listTile,
               decoration: BoxDecoration(
                 color: chatTheme?.userBubbleBg ?? Colors.black,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(4),
-                ),
+                borderRadius: AppRadius.chatBubbleOwn,
               ),
               child: Text(
                 message.content,
@@ -55,7 +56,7 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            AppGap.vXs,
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -67,10 +68,10 @@ class MessageBubble extends StatelessWidget {
                     fontSize: 11,
                   ),
                 ),
-                const SizedBox(width: 4),
+                AppGap.hXs,
                 Icon(
                   Icons.done_all_rounded,
-                  size: 14,
+                  size: AppSize.iconXs,
                   color:
                       theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                 ),
@@ -83,22 +84,30 @@ class MessageBubble extends StatelessWidget {
 
     // AI Assistant message bubble
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 32, top: 8, bottom: 8),
+      padding: const EdgeInsets.only(
+        left: AppSize.lg,
+        right: AppSize.xxxl,
+        top: AppSize.sm,
+        bottom: AppSize.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 28,
-                height: 28,
+                width: AppSize.iconLg,
+                height: AppSize.iconLg,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: AppRadius.sm,
                 ),
-                child: const Icon(Icons.smart_toy_outlined, size: 18),
+                child: const Icon(
+                  Icons.smart_toy_outlined,
+                  size: AppSize.iconSm,
+                ),
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
               Text(
                 loc?.neuralAi ?? 'Neural AI',
                 style: TextStyle(
@@ -109,14 +118,14 @@ class MessageBubble extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          AppGap.vSm,
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: AppPadding.card,
             decoration: BoxDecoration(
               color: chatTheme?.aiBubbleBg ?? theme.cardColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.dividerColor.withValues(alpha: 0.1),
+              borderRadius: AppRadius.card,
+              border: AppBorder.all(
+                theme.dividerColor.withValues(alpha: 0.1),
               ),
             ),
             child: Column(
@@ -127,34 +136,46 @@ class MessageBubble extends StatelessWidget {
                   textColor: chatTheme?.aiBubbleFg ??
                       theme.textTheme.bodyLarge!.color!,
                 ),
-                const SizedBox(height: 12),
+                AppGap.vMd,
                 Divider(
-                  height: 1,
+                  height: AppSize.dividerThickness,
                   color: theme.dividerColor.withValues(alpha: 0.1),
                 ),
-                const SizedBox(height: 8),
+                AppGap.vSm,
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.thumb_up_outlined, size: 16),
+                      icon: const Icon(
+                        Icons.thumb_up_outlined,
+                        size: AppSize.iconXs,
+                      ),
                       onPressed: () {},
                       visualDensity: VisualDensity.compact,
                       tooltip: loc?.likeAction ?? 'Like',
                     ),
                     IconButton(
-                      icon: const Icon(Icons.refresh_rounded, size: 16),
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        size: AppSize.iconXs,
+                      ),
                       onPressed: onRegenerate,
                       visualDensity: VisualDensity.compact,
                       tooltip: loc?.regenerate ?? 'Regenerate',
                     ),
                     IconButton(
-                      icon: const Icon(Icons.star_outline_rounded, size: 16),
+                      icon: const Icon(
+                        Icons.star_outline_rounded,
+                        size: AppSize.iconXs,
+                      ),
                       onPressed: () {},
                       visualDensity: VisualDensity.compact,
                       tooltip: loc?.star ?? 'Star',
                     ),
                     IconButton(
-                      icon: const Icon(Icons.copy_rounded, size: 16),
+                      icon: const Icon(
+                        Icons.copy_rounded,
+                        size: AppSize.iconXs,
+                      ),
                       onPressed: () {
                         Clipboard.setData(ClipboardData(text: message.content));
                         ScaffoldMessenger.of(context).showSnackBar(

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -72,7 +73,10 @@ class _ChatInputFieldState extends State<ChatInputField> {
     final loc = AppLocalizations.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       color: theme.scaffoldBackgroundColor,
       child: SafeArea(
         top: false,
@@ -81,9 +85,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
             Container(
               decoration: BoxDecoration(
                 color: theme.cardColor,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: theme.dividerColor.withValues(alpha: 0.2),
+                borderRadius: AppRadius.xxl,
+                border: AppBorder.all(
+                  theme.dividerColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -98,7 +102,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                                 height: 70,
                                 width: 60,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: AppRadius.lg,
                                   boxShadow: [
                                     BoxShadow(
                                       color: theme.colorScheme.outline
@@ -123,8 +127,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
                                       ),
                                     ),
                                     Positioned(
-                                      top: 3,
-                                      right: 3,
+                                      top: AppSize.xs,
+                                      right: AppSize.xs,
                                       child: GestureDetector(
                                         onTap: () {
                                           setState(() {
@@ -145,7 +149,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       ),
                     ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: AppPadding.hLg,
                     child: TextField(
                       controller: _controller,
                       minLines: 1,
@@ -167,14 +171,17 @@ class _ChatInputFieldState extends State<ChatInputField> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
-                      left: 8,
-                      right: 8,
-                      bottom: 8,
+                      left: AppSize.sm,
+                      right: AppSize.sm,
+                      bottom: AppSize.sm,
                     ),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.image_outlined, size: 22),
+                          icon: const Icon(
+                            Icons.image_outlined,
+                            size: AppSize.iconMd,
+                          ),
                           onPressed: () async {
                             final picker = ImagePicker();
                             final medias = await picker.pickMultipleMedia();
@@ -187,12 +194,18 @@ class _ChatInputFieldState extends State<ChatInputField> {
                           tooltip: loc?.attachImage ?? 'Attach Image',
                         ),
                         IconButton(
-                          icon: const Icon(Icons.mic_none_rounded, size: 22),
+                          icon: const Icon(
+                            Icons.mic_none_rounded,
+                            size: AppSize.iconMd,
+                          ),
                           onPressed: () {},
                           tooltip: loc?.voiceInput ?? 'Voice Input',
                         ),
                         IconButton(
-                          icon: const Icon(Icons.add_circle_outline, size: 22),
+                          icon: const Icon(
+                            Icons.add_circle_outline,
+                            size: AppSize.iconMd,
+                          ),
                           onPressed: () {},
                           tooltip: loc?.addAttachment ?? 'Add Attachment',
                         ),
@@ -204,7 +217,10 @@ class _ChatInputFieldState extends State<ChatInputField> {
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                             ),
-                            icon: const Icon(Icons.stop_rounded, size: 20),
+                            icon: const Icon(
+                              Icons.stop_rounded,
+                              size: AppSize.iconSm,
+                            ),
                           )
                         else
                           IconButton.filled(
@@ -215,7 +231,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                             ),
                             icon: const Icon(
                               Icons.arrow_upward_rounded,
-                              size: 20,
+                              size: AppSize.iconSm,
                             ),
                           ),
                       ],
@@ -225,7 +241,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
               ),
             ),
             if (widget.showAiDisclaimer) ...[
-              const SizedBox(height: 6),
+              AppGap.vXs,
               Text(
                 loc?.aiDisclaimer ??
                     'AI MAY PROVIDE INACCURATE DATA. VERIFY CRITICAL INFO.',
