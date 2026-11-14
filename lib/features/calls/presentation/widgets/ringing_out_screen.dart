@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -51,7 +52,7 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 32),
+              AppGap.vXxxl,
               Column(
                 children: [
                   RippleAnimation(
@@ -60,12 +61,15 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: AppBorder.all(
+                          Colors.white,
+                          width: AppSize.xs,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            blurRadius: AppSize.xl,
+                            offset: const Offset(0, AppSize.sm),
                           ),
                         ],
                       ),
@@ -84,7 +88,7 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  AppGap.vXxxl,
                   Text(
                     displayName,
                     style: const TextStyle(
@@ -94,7 +98,7 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppGap.vSm,
                   Text(
                     widget.isVideo
                         ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
@@ -109,22 +113,22 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 64),
+                padding: const EdgeInsets.only(bottom: AppSize.giant),
                 child: Column(
                   children: [
                     IconButton(
                       onPressed: widget.hangUp,
-                      iconSize: 32,
-                      padding: const EdgeInsets.all(18),
+                      iconSize: AppSize.iconXl,
+                      padding: AppPadding.xl,
                       style: IconButton.styleFrom(
                         backgroundColor: const Color(0xFFD63A2F),
                         foregroundColor: Colors.white,
                         shape: const CircleBorder(),
-                        elevation: 4,
+                        elevation: AppSize.elevationMd,
                       ),
                       icon: const Icon(Icons.call_end),
                     ),
-                    const SizedBox(height: 12),
+                    AppGap.vMd,
                     Text(
                       loc.cancel,
                       style: const TextStyle(

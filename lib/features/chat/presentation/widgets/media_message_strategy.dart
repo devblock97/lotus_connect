@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_strategy.dart';
@@ -31,14 +32,14 @@ class MediaMessage implements MessageBodyStrategy {
     MessageRenderContext renderContext,
   ) {
     return GridView.builder(
-      padding: EdgeInsets.zero,
+      padding: AppPadding.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: message.medias.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: message.medias.length >= 4 ? 4 : message.medias.length,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
+        crossAxisSpacing: AppSize.xs,
+        mainAxisSpacing: AppSize.xs,
       ),
       itemBuilder: (context, index) {
         final media = message.medias[index];
@@ -54,8 +55,8 @@ class MediaMessage implements MessageBodyStrategy {
           child: isVideo(media.url)
               ? MediaVideoThumbnail(url: media.url)
               : Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                  decoration: const BoxDecoration(
+                    borderRadius: AppRadius.media,
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Hero(
@@ -65,9 +66,11 @@ class MediaMessage implements MessageBodyStrategy {
                       fit: BoxFit.cover,
                       placeholder: (_, __) => const Center(
                         child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          width: AppSize.loaderSizeSm,
+                          height: AppSize.loaderSizeSm,
+                          child: CircularProgressIndicator(
+                            strokeWidth: AppSize.borderThick,
+                          ),
                         ),
                       ),
                       errorWidget: (_, __, dynamic ___) =>

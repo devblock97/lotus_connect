@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/theme_map.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -34,9 +35,9 @@ class MarkdownMessageView extends StatelessWidget {
           fontFamily: 'monospace',
           fontSize: 13.5,
         ),
-        codeblockDecoration: BoxDecoration(
-          color: const Color(0xFF1E1E2E),
-          borderRadius: BorderRadius.circular(10),
+        codeblockDecoration: const BoxDecoration(
+          color: Color(0xFF1E1E2E),
+          borderRadius: AppRadius.md,
         ),
       ),
       builders: {
@@ -59,21 +60,23 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     final code = element.textContent.trimRight();
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: AppSize.sm),
       decoration: BoxDecoration(
         color: const Color(0xFF181825),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        borderRadius: AppRadius.md,
+        border: AppBorder.all(Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header with language tag and Copy button
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: AppPadding.chip,
             decoration: const BoxDecoration(
               color: Color(0xFF11111B),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppSize.radiusMd - AppSize.borderThin),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,10 +97,10 @@ class CodeElementBuilder extends MarkdownElementBuilder {
                     children: [
                       const Icon(
                         Icons.copy_rounded,
-                        size: 14,
+                        size: AppSize.iconXs,
                         color: Colors.grey,
                       ),
-                      const SizedBox(width: 4),
+                      AppGap.hXs,
                       Text(
                         copyLabel,
                         style: const TextStyle(
@@ -114,7 +117,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
           // Highlighted code snippet
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(12),
+            padding: AppPadding.md,
             child: HighlightView(
               code,
               language: language,

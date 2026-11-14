@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Animated typing indicator widget showing animated dots when AI is thinking.
@@ -33,15 +34,19 @@ class _TypingIndicatorState extends State<TypingIndicator>
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+      padding: const EdgeInsets.only(
+        left: AppSize.lg,
+        top: AppSize.sm,
+        bottom: AppSize.sm,
+      ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: AppPadding.chatBubble,
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadius.lg,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -55,9 +60,11 @@ class _TypingIndicatorState extends State<TypingIndicator>
                         (value < 0.5) ? (value * 2.0) : (2.0 - (value * 2.0));
 
                     return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 2),
-                      width: 7,
-                      height: 7,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: AppSize.xxs,
+                      ),
+                      width: AppSize.statusDotSm,
+                      height: AppSize.statusDotSm,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: theme.colorScheme.primary
@@ -69,7 +76,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
               }),
             ),
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           Text(
             loc?.neuralAiIsTyping ?? 'Neural AI is typing...',
             style: TextStyle(

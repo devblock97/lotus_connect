@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -53,17 +54,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: AppPadding.screenHorizontal,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 24),
+                AppGap.vXxl,
                 ClipRRect(
                   child: Image.asset(
                     'assets/icons/lotus_connect_logo.png',
-                    height: 80,
-                    width: 80,
+                    height: AppSize.avatarXxl,
+                    width: AppSize.avatarXxl,
                   ),
                 ),
                 Text(
@@ -78,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 8),
+                      AppGap.vSm,
                       Text(
                         _isLogin
                             ? (loc?.signInSubtitle ??
@@ -91,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           color: const Color(0xFF222222),
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      AppGap.vXxxl,
 
                       if (!_isLogin) ...[
                         Text(
@@ -100,7 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: const Color(0xFF222222),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        AppGap.vSm,
                         TextFormField(
                           controller: _fullNameController,
                           decoration: InputDecoration(
@@ -110,26 +111,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             prefixIcon: const Icon(
                               Icons.person_outline,
                               color: Colors.grey,
-                              size: 20,
+                              size: AppSize.iconSm,
                             ),
                             filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                            border: const OutlineInputBorder(
+                              borderRadius: AppRadius.input,
+                              borderSide: AppBorder.none,
                             ),
                           ),
                           validator: (val) => val == null || val.isEmpty
                               ? (loc?.fullNameRequired ?? 'Full name required')
                               : null,
                         ),
-                        const SizedBox(height: 18),
+                        AppGap.vLg,
                         Text(
                           loc?.usernameLabel ?? 'USERNAME',
                           style: theme.textTheme.titleSmall!.copyWith(
                             color: const Color(0xFF222222),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        AppGap.vSm,
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
@@ -139,12 +140,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             prefixIcon: const Icon(
                               Icons.alternate_email,
                               color: Colors.grey,
-                              size: 20,
+                              size: AppSize.iconSm,
                             ),
                             filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                            border: const OutlineInputBorder(
+                              borderRadius: AppRadius.input,
+                              borderSide: AppBorder.none,
                             ),
                           ),
                           validator: (val) {
@@ -163,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 18),
+                        AppGap.vLg,
                       ],
 
                       Text(
@@ -172,7 +173,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           color: const Color(0xFF222222),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      AppGap.vSm,
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -182,19 +183,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           prefixIcon: const Icon(
                             Icons.mail_outline,
                             color: Colors.grey,
-                            size: 20,
+                            size: AppSize.iconSm,
                           ),
                           filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+                          border: const OutlineInputBorder(
+                            borderRadius: AppRadius.input,
+                            borderSide: AppBorder.none,
                           ),
                         ),
                         validator: (val) => val == null || !val.contains('@')
                             ? (loc?.invalidEmail ?? 'Invalid email address')
                             : null,
                       ),
-                      const SizedBox(height: 18),
+                      AppGap.vLg,
 
                       Text(
                         loc?.passwordLabel ?? 'PASSWORD',
@@ -202,7 +203,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           color: const Color(0xFF222222),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      AppGap.vSm,
                       TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
@@ -216,7 +217,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           prefixIcon: const Icon(
                             Icons.lock_outline,
                             color: Colors.grey,
-                            size: 20,
+                            size: AppSize.iconSm,
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -224,7 +225,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
                               color: Colors.grey,
-                              size: 20,
+                              size: AppSize.iconSm,
                             ),
                             tooltip: _obscurePassword
                                 ? (loc?.showPassword ?? 'Show password')
@@ -234,9 +235,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                           filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+                          border: const OutlineInputBorder(
+                            borderRadius: AppRadius.input,
+                            borderSide: AppBorder.none,
                           ),
                         ),
                         validator: (val) => val == null || val.length < 6
@@ -247,7 +248,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       // Password Strength Indicator (Registration Only)
                       if (!_isLogin && _passwordController.text.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        AppGap.vSm,
                         Semantics(
                           label: loc?.passwordStrength ?? 'Password strength',
                           value: '$strength / 4',
@@ -265,12 +266,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               }
                               return Expanded(
                                 child: Container(
-                                  height: 4,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  height: AppSize.progressBarHeight,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: AppSize.xxs,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: color,
-                                    borderRadius: BorderRadius.circular(2),
+                                    borderRadius: AppRadius.full,
                                   ),
                                 ),
                               );
@@ -278,7 +280,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 18),
+                      AppGap.vLg,
 
                       if (!_isLogin) ...[
                         Text(
@@ -287,7 +289,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: const Color(0xFF222222),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        AppGap.vSm,
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
@@ -298,7 +300,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             prefixIcon: const Icon(
                               Icons.refresh,
                               color: Colors.grey,
-                              size: 20,
+                              size: AppSize.iconSm,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -306,7 +308,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: Colors.grey,
-                                size: 20,
+                                size: AppSize.iconSm,
                               ),
                               tooltip: _obscureConfirmPassword
                                   ? (loc?.showPassword ?? 'Show password')
@@ -317,9 +319,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
+                            border: const OutlineInputBorder(
+                              borderRadius: AppRadius.input,
+                              borderSide: AppBorder.none,
                             ),
                           ),
                           validator: (val) {
@@ -334,7 +336,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
+                        AppGap.vLg,
                         Row(
                           children: [
                             Checkbox(
@@ -383,7 +385,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        AppGap.vLg,
                       ],
 
                       if (_isLogin) ...[
@@ -402,25 +404,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 12),
+                      AppGap.vMd,
 
                       ElevatedButton(
                         onPressed: authState.isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          padding: AppPadding.vLg,
+                          shape: AppBorder.rounded(
+                            radius: AppSize.radiusButton,
                           ),
-                          elevation: 0,
+                          elevation: AppSize.elevationNone,
                         ),
                         child: authState.isLoading
                             ? const SizedBox(
-                                height: 20,
-                                width: 20,
+                                height: AppSize.loaderSizeSm,
+                                width: AppSize.loaderSizeSm,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                                  strokeWidth: AppSize.borderThick,
                                   valueColor:
                                       AlwaysStoppedAnimation(Colors.white),
                                 ),
@@ -438,12 +440,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       fontSize: 15,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward, size: 18),
+                                  AppGap.hSm,
+                                  const Icon(
+                                    Icons.arrow_forward,
+                                    size: AppSize.iconSm,
+                                  ),
                                 ],
                               ),
                       ),
-                      const SizedBox(height: 24),
+                      AppGap.vXxl,
 
                       Row(
                         children: [
@@ -451,7 +456,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: Divider(color: Colors.grey.shade200),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: AppPadding.hLg,
                             child: Text(
                               loc?.orContinueWith ?? 'OR CONTINUE WITH',
                               style: theme.textTheme.labelSmall!.copyWith(
@@ -464,7 +469,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      AppGap.vXxl,
 
                       Row(
                         children: [
@@ -472,11 +477,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: OutlinedButton(
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                side: BorderSide(color: Colors.grey.shade200),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                padding: AppPadding.vMd,
+                                side: AppBorder.thin(Colors.grey.shade200),
+                                shape: AppBorder.rounded(
+                                  radius: AppSize.radiusButton,
                                 ),
                               ),
                               child: Row(
@@ -484,16 +488,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 children: [
                                   Image.asset(
                                     'assets/icons/google-logo.jpg',
-                                    height: 18,
+                                    height: AppSize.iconSm,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const Icon(
                                       Icons.g_mobiledata,
                                       color: Colors.blue,
-                                      size: 24,
+                                      size: AppSize.iconMd,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Text(
                                     loc?.google ?? 'Google',
                                     style: const TextStyle(
@@ -506,16 +510,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          AppGap.hMd,
                           Expanded(
                             child: OutlinedButton(
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                side: BorderSide(color: Colors.grey.shade200),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                padding: AppPadding.vMd,
+                                side: AppBorder.thin(Colors.grey.shade200),
+                                shape: AppBorder.rounded(
+                                  radius: AppSize.radiusButton,
                                 ),
                               ),
                               child: Row(
@@ -524,9 +527,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   const Icon(
                                     Icons.apple,
                                     color: Colors.black,
-                                    size: 20,
+                                    size: AppSize.iconSm,
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Text(
                                     loc?.apple ?? 'Apple',
                                     style: const TextStyle(
@@ -541,7 +544,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      AppGap.vXxxl,
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -576,7 +579,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      AppGap.vXxxl,
                     ],
                   ),
                 ),

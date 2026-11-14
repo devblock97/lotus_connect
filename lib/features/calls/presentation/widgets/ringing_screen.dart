@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -52,7 +53,7 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 32),
+              AppGap.vXxxl,
 
               Column(
                 children: [
@@ -62,12 +63,15 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: AppBorder.all(
+                          Colors.white,
+                          width: AppSize.xs,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            blurRadius: AppSize.xl,
+                            offset: const Offset(0, AppSize.sm),
                           ),
                         ],
                       ),
@@ -86,7 +90,7 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  AppGap.vXxxl,
                   Text(
                     displayName,
                     style: const TextStyle(
@@ -96,7 +100,7 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppGap.vSm,
                   Text(
                     widget.isVideo
                         ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
@@ -113,7 +117,11 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
 
               // Decline / Accept Buttons
               Padding(
-                padding: const EdgeInsets.only(bottom: 48, left: 40, right: 40),
+                padding: const EdgeInsets.only(
+                  bottom: AppSize.massive,
+                  left: AppSize.huge,
+                  right: AppSize.huge,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -122,17 +130,17 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       children: [
                         IconButton(
                           onPressed: widget.onDecline,
-                          iconSize: 32,
-                          padding: const EdgeInsets.all(18),
+                          iconSize: AppSize.iconXl,
+                          padding: AppPadding.xl,
                           style: IconButton.styleFrom(
                             backgroundColor: const Color(0xFFD63A2F),
                             foregroundColor: Colors.white,
                             shape: const CircleBorder(),
-                            elevation: 4,
+                            elevation: AppSize.elevationMd,
                           ),
                           icon: const Icon(Icons.call_end),
                         ),
-                        const SizedBox(height: 10),
+                        AppGap.vMd,
                         Text(
                           loc.decline,
                           style: const TextStyle(
@@ -148,19 +156,19 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       children: [
                         IconButton(
                           onPressed: widget.onAccept,
-                          iconSize: 32,
-                          padding: const EdgeInsets.all(18),
+                          iconSize: AppSize.iconXl,
+                          padding: AppPadding.xl,
                           style: IconButton.styleFrom(
                             backgroundColor: const Color(0xFF34C759),
                             foregroundColor: Colors.white,
                             shape: const CircleBorder(),
-                            elevation: 4,
+                            elevation: AppSize.elevationMd,
                           ),
                           icon: Icon(
                             widget.isVideo ? Icons.videocam : Icons.call,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        AppGap.vMd,
                         Text(
                           loc.accept,
                           style: const TextStyle(

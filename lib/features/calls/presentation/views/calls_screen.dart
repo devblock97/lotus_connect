@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/active_call_notifier.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
@@ -593,18 +594,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         title: Row(
           children: [
             const Icon(Icons.terminal, color: Colors.blue),
-            const SizedBox(width: 8),
+            AppGap.hSm,
             Text(loc.signalingEventLogs),
           ],
         ),
         content: Container(
           width: double.maxFinite,
           height: 350,
-          padding: const EdgeInsets.all(12),
+          padding: AppPadding.md,
           decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white10),
+            borderRadius: AppRadius.md,
+            border: AppBorder.all(Colors.white10),
           ),
           child: _consoleLogs.isEmpty
               ? Center(
@@ -620,7 +621,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               : ListView.builder(
                   itemCount: _consoleLogs.length,
                   itemBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: const EdgeInsets.symmetric(vertical: AppSize.xxs),
                     child: Text(
                       _consoleLogs[index],
                       style: const TextStyle(
@@ -663,7 +664,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               loc.enterUserAddressToPlaceCall,
               style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             TextField(
               controller: _peerIdController,
               decoration: const InputDecoration(
@@ -746,7 +747,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 8,
+        titleSpacing: AppSize.sm,
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
@@ -762,8 +763,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 value: 'logs',
                 child: Row(
                   children: [
-                    const Icon(Icons.terminal, size: 18),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.terminal, size: AppSize.iconSm),
+                    AppGap.hSm,
                     Text(loc.viewSignalingLogs),
                   ],
                 ),
@@ -772,8 +773,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 value: 'clear',
                 child: Row(
                   children: [
-                    const Icon(Icons.refresh, size: 18),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.refresh, size: AppSize.iconSm),
+                    AppGap.hSm,
                     Text(loc.refreshHistory),
                   ],
                 ),
@@ -785,15 +786,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.screenPadding,
+              vertical: AppSize.sm,
+            ),
             child: Container(
-              height: 48,
+              height: AppSize.tabBarHeight,
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: AppRadius.xxl,
               ),
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: AppPadding.xs,
                 child: Row(
                   children: [
                     Expanded(
@@ -808,14 +812,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             color: _showFriendsTab
                                 ? Colors.white
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.xl,
                             boxShadow: _showFriendsTab
                                 ? [
                                     BoxShadow(
                                       color:
                                           Colors.black.withValues(alpha: 0.05),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
+                                      blurRadius: AppSize.xs,
+                                      offset: const Offset(0, AppSize.xxs),
                                     ),
                                   ]
                                 : null,
@@ -847,14 +851,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             color: !_showFriendsTab
                                 ? Colors.white
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.xl,
                             boxShadow: !_showFriendsTab
                                 ? [
                                     BoxShadow(
                                       color:
                                           Colors.black.withValues(alpha: 0.05),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
+                                      blurRadius: AppSize.xs,
+                                      offset: const Offset(0, AppSize.xxs),
                                     ),
                                   ]
                                 : null,
@@ -881,7 +885,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           ),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.screenPadding,
+              vertical: AppSize.xs,
+            ),
             child: TextField(
               controller: _searchController,
               onChanged: (val) {
@@ -905,10 +912,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     : null,
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+                contentPadding: AppPadding.zero,
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.lg,
+                  borderSide: AppBorder.none,
                 ),
               ),
             ),
@@ -935,7 +942,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_call),
         label: Text(loc.startNewCall),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        shape: AppBorder.rounded(radius: AppSize.radiusXxxl),
       ),
     );
   }
@@ -947,8 +954,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 16),
+            Icon(
+              Icons.people_outline,
+              size: AppSize.iconHero,
+              color: Colors.grey.shade400,
+            ),
+            AppGap.vLg,
             Text(
               loc.noFriendsFound,
               style: TextStyle(
@@ -963,7 +974,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       itemCount: friends.length,
       itemBuilder: (context, index) {
         final friend = friends[index];
@@ -998,10 +1012,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           children: [
             Icon(
               Icons.call_missed_outgoing,
-              size: 64,
+              size: AppSize.iconHero,
               color: Colors.grey.shade400,
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             Text(
               loc.noCallHistoryLogs,
               style: TextStyle(
@@ -1016,17 +1030,20 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       children: [
         if (today.isNotEmpty) ...[
           _buildHistorySectionHeader(loc.today),
           ...today.map((log) => _buildHistoryItem(log, friends, theme)),
-          const SizedBox(height: 12),
+          AppGap.vMd,
         ],
         if (yesterday.isNotEmpty) ...[
           _buildHistorySectionHeader(loc.yesterday),
           ...yesterday.map((log) => _buildHistoryItem(log, friends, theme)),
-          const SizedBox(height: 12),
+          AppGap.vMd,
         ],
         if (older.isNotEmpty) ...[
           _buildHistorySectionHeader(loc.older),
@@ -1038,7 +1055,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Widget _buildHistorySectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSize.sm,
+        horizontal: AppSize.xs,
+      ),
       child: Text(
         title,
         style: const TextStyle(
@@ -1075,14 +1095,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
 
     return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade100),
-      ),
+      elevation: AppSize.elevationNone,
+      margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
+      shape: AppBorder.rounded(color: Colors.grey.shade100),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSize.md,
+          vertical: AppSize.xs,
+        ),
         leading: Stack(
           children: [
             CircleAvatar(
@@ -1097,17 +1117,24 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               ),
             ),
             Positioned(
-              bottom: 0,
-              right: 0,
+              bottom: AppSize.none,
+              right: AppSize.none,
               child: Container(
-                width: 16,
-                height: 16,
+                width: AppSize.avatarBadgeSm,
+                height: AppSize.avatarBadgeSm,
                 decoration: BoxDecoration(
                   color: badgeColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: AppBorder.all(
+                    Colors.white,
+                    width: AppSize.borderThick,
+                  ),
                 ),
-                child: Icon(badgeIcon, size: 10, color: Colors.white),
+                child: Icon(
+                  badgeIcon,
+                  size: AppSize.iconXxs,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -1120,18 +1147,18 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           children: [
             Icon(
               log.isVideo ? Icons.videocam_outlined : Icons.phone_outlined,
-              size: 14,
+              size: AppSize.iconXs,
               color: Colors.grey.shade600,
             ),
-            const SizedBox(width: 4),
+            AppGap.hXs,
             Text(
               log.isVideo ? loc.videoCall : loc.voiceCall,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
             if (log.durationSeconds > 0) ...[
-              const SizedBox(width: 8),
-              const Icon(Icons.circle, size: 4, color: Colors.grey),
-              const SizedBox(width: 8),
+              AppGap.hSm,
+              const Icon(Icons.circle, size: AppSize.xs, color: Colors.grey),
+              AppGap.hSm,
               Text(
                 _formatDurationText(log.durationSeconds),
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
@@ -1146,14 +1173,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               timeText,
               style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
             ),
-            const SizedBox(width: 10),
+            AppGap.hMd,
             CircleAvatar(
-              radius: 20,
+              radius: AppSize.avatarMd / 2,
               backgroundColor: Colors.grey.shade100,
               child: IconButton(
                 icon: Icon(
                   log.isVideo ? Icons.videocam : Icons.phone,
-                  size: 16,
+                  size: AppSize.iconXs,
                   color: Colors.black87,
                 ),
                 onPressed: () {
@@ -1212,7 +1239,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 32),
+              AppGap.vXxxl,
 
               Column(
                 children: [
@@ -1222,12 +1249,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: AppBorder.all(
+                          Colors.white,
+                          width: AppSize.xs,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            blurRadius: AppSize.xl,
+                            offset: const Offset(0, AppSize.sm),
                           ),
                         ],
                       ),
@@ -1246,7 +1276,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  AppGap.vXxxl,
                   Text(
                     displayName,
                     style: const TextStyle(
@@ -1256,7 +1286,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppGap.vSm,
                   Text(
                     _isVideo
                         ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
@@ -1273,7 +1303,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
               // Option Buttons (Remind Me / Message)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                padding: const EdgeInsets.symmetric(horizontal: AppSize.huge),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -1285,7 +1315,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
               // Decline / Accept Buttons
               Padding(
-                padding: const EdgeInsets.only(bottom: 48, left: 40, right: 40),
+                padding: const EdgeInsets.only(
+                  bottom: AppSize.massive,
+                  left: AppSize.huge,
+                  right: AppSize.huge,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -1294,17 +1328,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       children: [
                         IconButton(
                           onPressed: _declineCall,
-                          iconSize: 32,
-                          padding: const EdgeInsets.all(18),
+                          iconSize: AppSize.iconXl,
+                          padding: AppPadding.xl,
                           style: IconButton.styleFrom(
                             backgroundColor: const Color(0xFFD63A2F),
                             foregroundColor: Colors.white,
                             shape: const CircleBorder(),
-                            elevation: 4,
+                            elevation: AppSize.elevationMd,
                           ),
                           icon: const Icon(Icons.call_end),
                         ),
-                        const SizedBox(height: 10),
+                        AppGap.vMd,
                         Text(
                           loc.decline,
                           style: const TextStyle(
@@ -1320,17 +1354,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       children: [
                         IconButton(
                           onPressed: _acceptIncomingCall,
-                          iconSize: 32,
-                          padding: const EdgeInsets.all(18),
+                          iconSize: AppSize.iconXl,
+                          padding: AppPadding.xl,
                           style: IconButton.styleFrom(
                             backgroundColor: const Color(0xFF34C759),
                             foregroundColor: Colors.white,
                             shape: const CircleBorder(),
-                            elevation: 4,
+                            elevation: AppSize.elevationMd,
                           ),
                           icon: Icon(_isVideo ? Icons.videocam : Icons.call),
                         ),
-                        const SizedBox(height: 10),
+                        AppGap.vMd,
                         Text(
                           loc.accept,
                           style: const TextStyle(
@@ -1380,7 +1414,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 32),
+              AppGap.vXxxl,
               Column(
                 children: [
                   RippleAnimation(
@@ -1389,12 +1423,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: AppBorder.all(
+                          Colors.white,
+                          width: AppSize.xs,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            blurRadius: AppSize.xl,
+                            offset: const Offset(0, AppSize.sm),
                           ),
                         ],
                       ),
@@ -1413,7 +1450,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  AppGap.vXxxl,
                   Text(
                     displayName,
                     style: const TextStyle(
@@ -1423,7 +1460,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  AppGap.vSm,
                   Text(
                     _isVideo
                         ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
@@ -1438,22 +1475,22 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 64),
+                padding: const EdgeInsets.only(bottom: AppSize.giant),
                 child: Column(
                   children: [
                     IconButton(
                       onPressed: _hangUp,
-                      iconSize: 32,
-                      padding: const EdgeInsets.all(18),
+                      iconSize: AppSize.iconXl,
+                      padding: AppPadding.xl,
                       style: IconButton.styleFrom(
                         backgroundColor: const Color(0xFFD63A2F),
                         foregroundColor: Colors.white,
                         shape: const CircleBorder(),
-                        elevation: 4,
+                        elevation: AppSize.elevationMd,
                       ),
                       icon: const Icon(Icons.call_end),
                     ),
-                    const SizedBox(height: 12),
+                    AppGap.vMd,
                     Text(
                       loc.cancel,
                       style: const TextStyle(
@@ -1513,7 +1550,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white24, width: 2),
+                        border: AppBorder.all(
+                          Colors.white24,
+                          width: AppSize.borderThick,
+                        ),
                       ),
                       child: CircleAvatar(
                         backgroundColor: Colors.grey.withValues(alpha: 0.1),
@@ -1529,7 +1569,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    AppGap.vLg,
                     Text(
                       displayName,
                       style: const TextStyle(
@@ -1538,7 +1578,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    AppGap.vSm,
                     Text(
                       loc.voiceConnected,
                       style: const TextStyle(
@@ -1554,9 +1594,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
           // Header Row (Dismiss, Encryption Status, Duration)
           Positioned(
-            top: MediaQuery.of(context).padding.top + 16,
-            left: 16,
-            right: 16,
+            top: MediaQuery.of(context).padding.top + AppSize.lg,
+            left: AppSize.lg,
+            right: AppSize.lg,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1564,7 +1604,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 GestureDetector(
                   onTap: _hangUp,
                   child: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: AppPadding.sm,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.4),
                       shape: BoxShape.circle,
@@ -1572,27 +1612,29 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     child: const Icon(
                       Icons.chevron_left,
                       color: Colors.white,
-                      size: 24,
+                      size: AppSize.iconMd,
                     ),
                   ),
                 ),
 
                 // Encryption Pill
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSize.sm,
+                    horizontal: AppSize.lg,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: AppRadius.xl,
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.lock,
                         color: Color(0xFF34C759),
-                        size: 14,
+                        size: AppSize.iconXs,
                       ),
-                      const SizedBox(width: 6),
+                      AppGap.hXs,
                       Text(
                         loc.endToEndEncrypted.toUpperCase(),
                         style: const TextStyle(
@@ -1608,11 +1650,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
                 // Call Duration Counter
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                  padding: AppPadding.chip,
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.md,
                   ),
                   child: Text(
                     _formatDuration(_secondsElapsed),
@@ -1630,7 +1671,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
           // Right Side floating control options
           Positioned(
-            right: 16,
+            right: AppSize.lg,
             bottom: size.height * 0.22,
             child: Column(
               children: [
@@ -1639,7 +1680,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     SnackBar(content: Text(loc.chatScreenOverlayOpened)),
                   );
                 }),
-                const SizedBox(height: 16),
+                AppGap.vLg,
                 _buildFloatingSideButton(Icons.more_horiz, () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(loc.moreWithOptionsOpened)),
@@ -1652,25 +1693,28 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           // Picture in Picture View (YOU)
           if (_isVideo)
             Positioned(
-              top: MediaQuery.of(context).padding.top + 80,
-              right: 16,
+              top: MediaQuery.of(context).padding.top + AppSize.avatarXxl,
+              right: AppSize.lg,
               child: Container(
                 width: 105,
                 height: 155,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white24, width: 1.5),
+                  borderRadius: AppRadius.lg,
+                  border: AppBorder.all(
+                    Colors.white24,
+                    width: AppSize.borderMedium,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 10,
+                      blurRadius: AppSize.md,
                     ),
                   ],
                 ),
                 child: Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppRadius.lg,
                       child: RTCVideoView(
                         _localRenderer,
                         mirror: true,
@@ -1679,16 +1723,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       ),
                     ),
                     Positioned(
-                      bottom: 8,
-                      left: 8,
+                      bottom: AppSize.sm,
+                      left: AppSize.sm,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
+                        padding: AppPadding.badge,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: AppRadius.xs,
                         ),
                         child: Text(
                           loc.you.toUpperCase(),
@@ -1707,19 +1748,22 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
           // Bottom Control Overlay Pill
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 32,
+            left: AppSize.xl,
+            right: AppSize.xl,
+            bottom: AppSize.xxxl,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSize.md,
+                horizontal: AppSize.xl,
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E293B).withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(36),
+                borderRadius: AppRadius.full,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    blurRadius: AppSize.xl,
+                    offset: const Offset(0, AppSize.sm),
                   ),
                 ],
               ),
@@ -1744,7 +1788,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     style: IconButton.styleFrom(
                       backgroundColor:
                           _isMuted ? Colors.white24 : Colors.transparent,
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -1771,7 +1815,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       style: IconButton.styleFrom(
                         backgroundColor:
                             _isVideoOff ? Colors.white24 : Colors.transparent,
-                        padding: const EdgeInsets.all(12),
+                        padding: AppPadding.md,
                       ),
                     ),
 
@@ -1787,7 +1831,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     icon: const Icon(Icons.ios_share),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -1807,7 +1851,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     style: IconButton.styleFrom(
                       backgroundColor:
                           _isSpeakerOn ? Colors.white24 : Colors.transparent,
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -1818,7 +1862,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     color: Colors.white,
                     style: IconButton.styleFrom(
                       backgroundColor: const Color(0xFFD63A2F),
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
                 ],
@@ -1834,15 +1878,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: AppPadding.sm,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.6),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+            border: AppBorder.all(Colors.black.withValues(alpha: 0.05)),
           ),
-          child: Icon(icon, color: Colors.black87, size: 22),
+          child: Icon(icon, color: Colors.black87, size: AppSize.iconMd),
         ),
-        const SizedBox(height: 8),
+        AppGap.vSm,
         Text(
           label,
           style: const TextStyle(
@@ -1859,12 +1903,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: AppPadding.sm,
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.4),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
+        child: Icon(icon, color: Colors.white, size: AppSize.iconMd),
       ),
     );
   }

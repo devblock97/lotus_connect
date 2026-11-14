@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_strategy.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
@@ -13,7 +14,7 @@ class TextMessage implements MessageBodyStrategy {
     return GestureDetector(
       onLongPress: renderContext.onLongPress,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: AppPadding.chatBubble,
         decoration: BoxDecoration(
           color: renderContext.background,
           borderRadius: renderContext.bubbleBorderRadius,
