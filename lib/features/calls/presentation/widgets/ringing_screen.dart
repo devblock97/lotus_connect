@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -39,13 +40,13 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE8E5E0),
-              Color(0xFFF7F5F2),
+              AppColor.callRingingBgStart.of(context),
+              AppColor.callRingingBgEnd.of(context),
             ],
           ),
         ),
@@ -63,20 +64,24 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: AppBorder.all(
-                          Colors.white,
+                        border: Border.all(
+                          color: AppColor.onMedia.of(context),
                           width: AppSize.xs,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
+                            color: AppColor.black
+                                .of(context)
+                                .withValues(alpha: 0.15),
                             blurRadius: AppSize.xl,
                             offset: const Offset(0, AppSize.sm),
                           ),
                         ],
                       ),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: AppColor.inkMuted
+                            .of(context)
+                            .withValues(alpha: 0.1),
                         child: Text(
                           initialName,
                           style: Theme.of(context)
@@ -93,10 +98,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                   AppGap.vXxxl,
                   Text(
                     displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColor.inkPrimary.of(context),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -105,10 +110,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                     widget.isVideo
                         ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
                         : '${loc.incomingCall.toUpperCase()} (${loc.voice.toUpperCase()})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black54,
+                      color: AppColor.inkSecondary.of(context),
                       letterSpacing: 2,
                     ),
                   ),
@@ -133,8 +138,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                           iconSize: AppSize.iconXl,
                           padding: AppPadding.xl,
                           style: IconButton.styleFrom(
-                            backgroundColor: const Color(0xFFD63A2F),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColor.callDeclineRed.of(
+                              context,
+                            ),
+                            foregroundColor: AppColor.onMedia.of(context),
                             shape: const CircleBorder(),
                             elevation: AppSize.elevationMd,
                           ),
@@ -143,10 +150,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                         AppGap.vMd,
                         Text(
                           loc.decline,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColor.inkPrimary.of(context),
                           ),
                         ),
                       ],
@@ -159,8 +166,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                           iconSize: AppSize.iconXl,
                           padding: AppPadding.xl,
                           style: IconButton.styleFrom(
-                            backgroundColor: const Color(0xFF34C759),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColor.callAcceptGreen.of(
+                              context,
+                            ),
+                            foregroundColor: AppColor.onMedia.of(context),
                             shape: const CircleBorder(),
                             elevation: AppSize.elevationMd,
                           ),
@@ -171,10 +180,10 @@ class _RingingInScreenState extends ConsumerState<RingingInScreen> {
                         AppGap.vMd,
                         Text(
                           loc.accept,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColor.inkPrimary.of(context),
                           ),
                         ),
                       ],

@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/profile/domain/entities/profile_media_item.dart';
@@ -49,7 +50,7 @@ class ProfileMediaGrid extends StatelessWidget {
               Icon(
                 emptyIcon,
                 size: AppSize.iconHero,
-                color: Colors.grey.withValues(alpha: 0.45),
+                color: AppColor.inkMuted.of(context).withValues(alpha: 0.45),
               ),
               AppGap.vMd,
               Text(
@@ -57,7 +58,7 @@ class ProfileMediaGrid extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.5,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                  color: AppColor.inkMutedMedium.of(context),
                 ),
               ),
             ],
@@ -143,13 +144,12 @@ class _MediaGridTile extends StatelessWidget {
               imageUrl: previewUrl,
               fit: BoxFit.cover,
               placeholder: (_, __) => ColoredBox(
-                color:
-                    isDark ? const Color(0xFF26262B) : const Color(0xFFECEEF2),
+                color: AppColor.mediaTileBg.of(context),
               ),
-              errorWidget: (_, __, dynamic ___) => _buildFallback(),
+              errorWidget: (_, __, dynamic ___) => _buildFallback(context),
             )
           else
-            _buildFallback(),
+            _buildFallback(context),
 
           // Video play badge + duration overlay
           if (item.isVideo) ...[
@@ -159,12 +159,14 @@ class _MediaGridTile extends StatelessWidget {
               child: Container(
                 padding: AppPadding.xs,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
+                  color: AppColor.mediaBackdrop
+                      .of(context)
+                      .withValues(alpha: 0.55),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.play_fill,
-                  color: Colors.white,
+                  color: AppColor.onMedia.of(context),
                   size: AppSize.iconXxs,
                 ),
               ),
@@ -176,13 +178,15 @@ class _MediaGridTile extends StatelessWidget {
                 child: Container(
                   padding: AppPadding.badge,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.65),
+                    color: AppColor.mediaBackdrop
+                        .of(context)
+                        .withValues(alpha: 0.65),
                     borderRadius: AppRadius.xs,
                   ),
                   child: Text(
                     item.formattedDuration,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColor.onMedia.of(context),
                       fontSize: 10.5,
                       fontWeight: FontWeight.w600,
                     ),
@@ -195,21 +199,22 @@ class _MediaGridTile extends StatelessWidget {
     );
   }
 
-  Widget _buildFallback() {
+  Widget _buildFallback(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? const [Color(0xFF2A2B36), Color(0xFF1A1B22)]
-              : const [Color(0xFFE2E8F0), Color(0xFFCBD5E1)],
+          colors: [
+            AppColor.mediaGradientStart.of(context),
+            AppColor.mediaGradientEnd.of(context),
+          ],
         ),
       ),
       child: Center(
         child: Icon(
           item.isVideo ? CupertinoIcons.videocam_fill : Icons.image_outlined,
-          color: isDark ? Colors.white54 : Colors.black45,
+          color: AppColor.inkTertiary.of(context),
           size: AppSize.iconLg,
         ),
       ),

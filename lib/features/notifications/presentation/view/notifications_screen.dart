@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/app/router/app_router.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
@@ -30,8 +31,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   bool _isSearching = false;
-
-  static const Color _fbBlue = Color(0xFF1877F2);
 
   @override
   void initState() {
@@ -94,7 +93,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         pendingRequests.isNotEmpty;
 
     final circleBtnBg = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppColor.onMedia10.of(context)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65);
 
     return Scaffold(
@@ -114,7 +113,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               icon: Icons.done_all_rounded,
               tooltip: 'Mark all as read',
               backgroundColor: circleBtnBg,
-              iconColor: isDark ? theme.colorScheme.primary : _fbBlue,
+              iconColor: isDark
+                  ? theme.colorScheme.primary
+                  : AppColor.socialBlue.of(context),
               onTap: notifier.markAllRead,
             ),
             const SizedBox(width: 8),
@@ -138,11 +139,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             icon: _isSearching ? Icons.close_rounded : CupertinoIcons.search,
             tooltip: _isSearching ? 'Close search' : 'Search notifications',
             backgroundColor: _isSearching
-                ? (isDark ? theme.colorScheme.primary : _fbBlue)
+                ? (isDark
+                        ? theme.colorScheme.primary
+                        : AppColor.socialBlue.of(context))
                     .withValues(alpha: 0.18)
                 : circleBtnBg,
             iconColor: _isSearching
-                ? (isDark ? theme.colorScheme.primary : _fbBlue)
+                ? (isDark
+                    ? theme.colorScheme.primary
+                    : AppColor.socialBlue.of(context))
                 : null,
             onTap: _toggleSearch,
           ),
@@ -160,7 +165,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
-          color: isDark ? theme.colorScheme.primary : _fbBlue,
+          color: isDark
+              ? theme.colorScheme.primary
+              : AppColor.socialBlue.of(context),
           onRefresh: () async {
             await Future.wait([
               notifier.refreshNotifications(),
@@ -304,7 +311,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final circleBtnBg = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppColor.onMedia10.of(context)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65);
 
     return Padding(
@@ -326,7 +333,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               icon: Icons.done_all_rounded,
               tooltip: 'Mark all as read',
               backgroundColor: circleBtnBg,
-              iconColor: isDark ? theme.colorScheme.primary : _fbBlue,
+              iconColor: isDark
+                  ? theme.colorScheme.primary
+                  : AppColor.socialBlue.of(context),
               onTap: notifier.markAllRead,
             ),
             const SizedBox(width: 8),
@@ -350,11 +359,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             icon: _isSearching ? Icons.close_rounded : CupertinoIcons.search,
             tooltip: _isSearching ? 'Close search' : 'Search notifications',
             backgroundColor: _isSearching
-                ? (isDark ? theme.colorScheme.primary : _fbBlue)
+                ? (isDark
+                        ? theme.colorScheme.primary
+                        : AppColor.socialBlue.of(context))
                     .withValues(alpha: 0.18)
                 : circleBtnBg,
             iconColor: _isSearching
-                ? (isDark ? theme.colorScheme.primary : _fbBlue)
+                ? (isDark
+                    ? theme.colorScheme.primary
+                    : AppColor.socialBlue.of(context))
                 : null,
             onTap: _toggleSearch,
           ),
@@ -370,7 +383,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final fillColor = isDark
-        ? Colors.white.withValues(alpha: 0.08)
+        ? AppColor.onMedia.of(context).withValues(alpha: 0.08)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.55);
 
     return Padding(
@@ -483,7 +496,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final actionColor = isDark ? theme.colorScheme.primary : _fbBlue;
+    final actionColor =
+        isDark ? theme.colorScheme.primary : AppColor.socialBlue.of(context);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 12, 6),
@@ -806,7 +820,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.06)
+                    ? AppColor.onMedia.of(context).withValues(alpha: 0.06)
                     : theme.colorScheme.surfaceContainerHighest
                         .withValues(alpha: 0.5),
               ),
@@ -959,18 +973,17 @@ class _FilterPill extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  static const Color _fbBlue = Color(0xFF1877F2);
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final activeAccent = isDark ? theme.colorScheme.primary : _fbBlue;
+    final activeAccent =
+        isDark ? theme.colorScheme.primary : AppColor.socialBlue.of(context);
 
     final bgColor = isSelected
         ? activeAccent.withValues(alpha: isDark ? 0.22 : 0.13)
         : (isDark
-            ? Colors.white.withValues(alpha: 0.08)
+            ? AppColor.onMedia.of(context).withValues(alpha: 0.08)
             : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6));
 
     final fgColor =
@@ -1003,7 +1016,9 @@ class _FilterPill extends StatelessWidget {
                     vertical: 1.5,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? activeAccent : const Color(0xFFE41E3F),
+                    color: isSelected
+                        ? activeAccent
+                        : AppColor.badgeRed.of(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -1013,7 +1028,7 @@ class _FilterPill extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: isSelected && isDark
                           ? theme.colorScheme.onPrimary
-                          : Colors.white,
+                          : AppColor.onMedia.of(context),
                     ),
                   ),
                 ),
@@ -1039,12 +1054,11 @@ class _FriendRequestNotificationRow extends StatelessWidget {
   final VoidCallback onDecline;
   final VoidCallback onTapProfile;
 
-  static const Color _fbBlue = Color(0xFF1877F2);
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final socialBlue = AppColor.socialBlue.of(context);
     final displayName =
         (user.fullName != null && user.fullName!.trim().isNotEmpty)
             ? user.fullName!.trim()
@@ -1053,7 +1067,7 @@ class _FriendRequestNotificationRow extends StatelessWidget {
         ? displayName.substring(0, 1).toUpperCase()
         : '?';
     final secondaryBtnBg = isDark
-        ? Colors.white.withValues(alpha: 0.12)
+        ? AppColor.onMedia.of(context).withValues(alpha: 0.12)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.75);
 
     return InkWell(
@@ -1072,7 +1086,7 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: _fbBlue.withValues(alpha: 0.15),
+                    backgroundColor: socialBlue.withValues(alpha: 0.15),
                     backgroundImage:
                         user.avatarUrl != null && user.avatarUrl!.isNotEmpty
                             ? CachedNetworkImageProvider(user.avatarUrl!)
@@ -1080,8 +1094,8 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                     child: user.avatarUrl == null || user.avatarUrl!.isEmpty
                         ? Text(
                             initials,
-                            style: const TextStyle(
-                              color: _fbBlue,
+                            style: TextStyle(
+                              color: socialBlue,
                               fontWeight: FontWeight.w800,
                               fontSize: 19,
                             ),
@@ -1099,15 +1113,15 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                         color: theme.scaffoldBackgroundColor,
                         shape: BoxShape.circle,
                       ),
-                      child: const DecoratedBox(
+                      child: DecoratedBox(
                         decoration: BoxDecoration(
-                          color: _fbBlue,
+                          color: socialBlue,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.person_add_alt_1_rounded,
                           size: 13,
-                          color: Colors.white,
+                          color: AppColor.onMedia.of(context),
                         ),
                       ),
                     ),
@@ -1156,11 +1170,12 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                           child: FilledButton(
                             onPressed: onAccept,
                             style: FilledButton.styleFrom(
-                              backgroundColor:
-                                  isDark ? theme.colorScheme.primary : _fbBlue,
+                              backgroundColor: isDark
+                                  ? theme.colorScheme.primary
+                                  : socialBlue,
                               foregroundColor: isDark
                                   ? theme.colorScheme.onPrimary
-                                  : Colors.white,
+                                  : AppColor.onMedia.of(context),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),

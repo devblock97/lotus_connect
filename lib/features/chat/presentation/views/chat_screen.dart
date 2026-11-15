@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
@@ -130,7 +131,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         width: AppSize.statusDotSm,
                         height: AppSize.statusDotSm,
                         decoration: BoxDecoration(
-                          color: isOnline ? Colors.green : Colors.grey,
+                          color: isOnline
+                              ? AppColor.successGreen.of(context)
+                              : AppColor.inkMuted.of(context),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -267,18 +270,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         bottom: bottom,
         left: left,
         child: Material(
-          color: Colors.transparent,
+          color: AppColor.transparent.of(context),
           child: InkWell(
             onTap: _hideNewMessageAlert,
             child: Container(
               padding: AppPadding.md,
-              decoration: const BoxDecoration(
-                color: Colors.blueAccent,
+              decoration: BoxDecoration(
+                color: AppColor.blueAccent.of(context),
                 borderRadius: AppRadius.sm,
               ),
               child: Text(
                 loc.newMessage,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColor.white.of(context)),
               ),
             ),
           ),

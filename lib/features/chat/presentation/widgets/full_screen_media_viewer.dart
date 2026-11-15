@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
@@ -34,7 +35,7 @@ class FullScreenMediaViewer extends StatefulWidget {
       PageRouteBuilder<void>(
         opaque: false,
         barrierDismissible: true,
-        barrierColor: Colors.transparent,
+        barrierColor: AppColor.transparent.of(context),
         pageBuilder: (_, __, ___) => FullScreenMediaViewer(
           medias: mediaList,
           initialIndex: safeInitialIndex,
@@ -136,12 +137,14 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
     final scale = (1.0 - (_dragOffset.abs() / 1400)).clamp(0.8, 1.0);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent.of(context),
       body: Stack(
         children: [
           Positioned.fill(
             child: Container(
-              color: Colors.black.withValues(alpha: backdropOpacity),
+              color: AppColor.mediaBackdrop
+                  .of(context)
+                  .withValues(alpha: backdropOpacity),
             ),
           ),
           GestureDetector(
@@ -219,6 +222,7 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
     final title = media.fileName;
     final loc = AppLocalizations.of(context);
 
+    final onMedia = AppColor.onMedia.of(context);
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + AppSize.xs,
@@ -226,14 +230,14 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
         left: AppSize.md,
         right: AppSize.md,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black87,
-            Colors.black45,
-            Colors.transparent,
+            AppColor.mediaScrim87.of(context),
+            AppColor.mediaScrim45.of(context),
+            AppColor.transparent.of(context),
           ],
         ),
       ),
@@ -241,9 +245,9 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
+            icon: Icon(
               Icons.close_rounded,
-              color: Colors.white,
+              color: onMedia,
               size: AppSize.iconLg,
             ),
             splashRadius: AppSize.xxl,
@@ -258,8 +262,8 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
                 if (widget.medias.length > 1)
                   Text(
                     '${_currentIndex + 1} / ${widget.medias.length}',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: onMedia,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -271,7 +275,7 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: onMedia.withValues(alpha: 0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -389,11 +393,11 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
                         imageUrl: widget.media.thumbnailUrl!,
                         fit: BoxFit.contain,
                       )
-                    : const SizedBox(
+                    : SizedBox(
                         width: AppSize.loaderSizeLg,
                         height: AppSize.loaderSizeLg,
                         child: CircularProgressIndicator(
-                          color: Colors.white70,
+                          color: AppColor.onMedia70.of(context),
                           strokeWidth: AppSize.loaderStrokeWidth,
                         ),
                       ),
@@ -402,16 +406,16 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.broken_image_rounded,
-                      color: Colors.white54,
+                      color: AppColor.onMedia54.of(context),
                       size: AppSize.iconXxl,
                     ),
                     AppGap.vSm,
                     Text(
                       loc?.failedToLoadImage ?? 'Failed to load image',
-                      style: const TextStyle(
-                        color: Colors.white54,
+                      style: TextStyle(
+                        color: AppColor.onMedia54.of(context),
                         fontSize: 13,
                       ),
                     ),
@@ -519,20 +523,24 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final onMedia = AppColor.onMedia.of(context);
+    final onMedia70 = AppColor.onMedia70.of(context);
+    final onMedia54 = AppColor.onMedia54.of(context);
+
     if (_hasError) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline_rounded,
-              color: Colors.white54,
+              color: onMedia54,
               size: AppSize.iconXxl,
             ),
             AppGap.vSm,
             Text(
               loc?.unableToPlayVideo ?? 'Unable to play video',
-              style: const TextStyle(color: Colors.white54, fontSize: 13),
+              style: TextStyle(color: onMedia54, fontSize: 13),
             ),
           ],
         ),
@@ -540,12 +548,12 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
     }
 
     if (!_isInitialized) {
-      return const Center(
+      return Center(
         child: SizedBox(
           width: AppSize.loaderSizeLg,
           height: AppSize.loaderSizeLg,
           child: CircularProgressIndicator(
-            color: Colors.white70,
+            color: onMedia70,
             strokeWidth: AppSize.loaderStrokeWidth,
           ),
         ),
@@ -574,13 +582,15 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
               duration: const Duration(milliseconds: 200),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.35),
+                  color: AppColor.mediaBackdrop
+                      .of(context)
+                      .withValues(alpha: 0.35),
                   shape: BoxShape.circle,
                 ),
                 padding: AppPadding.lg,
-                child: const Icon(
+                child: Icon(
                   Icons.play_arrow_rounded,
-                  color: Colors.white,
+                  color: onMedia,
                   size: AppSize.iconHero,
                 ),
               ),
@@ -597,9 +607,9 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
               vertical: AppSize.sm,
             ),
             decoration: BoxDecoration(
-              color: Colors.black54,
+              color: AppColor.mediaScrim54.of(context),
               borderRadius: AppRadius.xxl,
-              border: AppBorder.all(Colors.white12),
+              border: Border.all(color: AppColor.onMedia12.of(context)),
             ),
             child: Row(
               children: [
@@ -607,7 +617,7 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                   onPressed: _togglePlayPause,
                   icon: Icon(
                     isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    color: Colors.white,
+                    color: onMedia,
                   ),
                   splashRadius: AppSize.xl,
                   padding: AppPadding.zero,
@@ -619,8 +629,8 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                 AppGap.hSm,
                 Text(
                   _formatDuration(position),
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: TextStyle(
+                    color: onMedia70,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -628,9 +638,9 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                 Expanded(
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      thumbColor: Colors.white,
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white24,
+                      thumbColor: onMedia,
+                      activeTrackColor: onMedia,
+                      inactiveTrackColor: AppColor.onMedia24.of(context),
                       trackHeight: AppSize.borderHeavy,
                       thumbShape: const RoundSliderThumbShape(
                         enabledThumbRadius: AppSize.badgeHorizontal,
@@ -656,8 +666,8 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                 ),
                 Text(
                   _formatDuration(duration),
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style: TextStyle(
+                    color: onMedia70,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -672,7 +682,7 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
                     _isMuted
                         ? Icons.volume_off_rounded
                         : Icons.volume_up_rounded,
-                    color: Colors.white,
+                    color: onMedia,
                   ),
                   splashRadius: AppSize.xl,
                   padding: AppPadding.zero,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
 class NotificationOptionsSheet extends StatelessWidget {
@@ -43,7 +44,7 @@ class NotificationOptionsSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final iconBgColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppColor.onMedia10.of(context)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65);
 
     final displayTitle = notification.title.trim();
@@ -178,7 +179,7 @@ class NotificationsHeaderMenuSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final iconBgColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
+        ? AppColor.onMedia10.of(context)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65);
 
     return SafeArea(

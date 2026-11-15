@@ -1,4 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_theme_mode.dart';
+
+/// ThemeExtension carrying the active [AppThemeMode] (Light, Dark, or Sepia).
+class AppThemeModeExtension extends ThemeExtension<AppThemeModeExtension> {
+  const AppThemeModeExtension({required this.mode});
+
+  final AppThemeMode mode;
+
+  @override
+  AppThemeModeExtension copyWith({AppThemeMode? mode}) {
+    return AppThemeModeExtension(mode: mode ?? this.mode);
+  }
+
+  @override
+  AppThemeModeExtension lerp(
+    ThemeExtension<AppThemeModeExtension>? other,
+    double t,
+  ) {
+    if (other is! AppThemeModeExtension) return this;
+    return t < 0.5 ? this : other;
+  }
+}
 
 /// Custom ThemeExtension to support tailored chat UI colors across themes.
 class AppChatTheme extends ThemeExtension<AppChatTheme> {

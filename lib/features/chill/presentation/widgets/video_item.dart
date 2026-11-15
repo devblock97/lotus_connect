@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 import 'package:lotus_connect/features/chill/application/chill_provider.dart';
 import 'package:lotus_connect/features/chill/domain/entities/chill_item.dart';
@@ -239,7 +240,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
           onDoubleTap: _handleDoubleTap,
           behavior: HitTestBehavior.opaque,
           child: ColoredBox(
-            color: Colors.black,
+            color: AppColor.mediaBackdrop.of(context),
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -269,16 +270,16 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           CupertinoIcons.exclamationmark_triangle,
-                          color: Colors.white54,
+                          color: AppColor.onMedia54.of(context),
                           size: 40,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           loc.unableToPlayVideo,
-                          style: const TextStyle(
-                            color: Colors.white60,
+                          style: TextStyle(
+                            color: AppColor.onMedia60.of(context),
                             fontSize: 13,
                           ),
                         ),
@@ -286,9 +287,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     ),
                   )
                 else
-                  const Center(
+                  Center(
                     child: CircularProgressIndicator(
-                      color: Colors.white,
+                      color: AppColor.onMedia.of(context),
                       strokeWidth: 2,
                     ),
                   ),
@@ -310,9 +311,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.85),
-                    Colors.black.withValues(alpha: 0.35),
-                    Colors.transparent,
+                    AppColor.mediaBackdrop.of(context).withValues(alpha: 0.85),
+                    AppColor.mediaBackdrop.of(context).withValues(alpha: 0.35),
+                    AppColor.transparent.of(context),
                   ],
                 ),
               ),
@@ -327,12 +328,14 @@ class _VideoItemState extends ConsumerState<VideoItem>
               child: Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
+                  color: AppColor.mediaBackdrop
+                      .of(context)
+                      .withValues(alpha: 0.55),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.play_fill,
-                  color: Colors.white,
+                  color: AppColor.onMedia.of(context),
                   size: 42,
                 ),
               ),
@@ -353,9 +356,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     curve: Curves.elasticOut,
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   CupertinoIcons.heart_fill,
-                  color: Colors.redAccent,
+                  color: AppColor.dangerAccent.of(context),
                   size: 96,
                 ),
               ),
@@ -373,21 +376,23 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 icon: chill.userHasLiked
                     ? CupertinoIcons.heart_fill
                     : CupertinoIcons.heart,
-                color: chill.userHasLiked ? Colors.redAccent : Colors.white,
+                color: chill.userHasLiked
+                    ? AppColor.dangerAccent.of(context)
+                    : AppColor.onMedia.of(context),
                 label: _formatCount(chill.likeCount),
                 onPressed: _toggleLike,
               ),
               const SizedBox(height: 16),
               _buildActionButton(
                 icon: CupertinoIcons.chat_bubble_fill,
-                color: Colors.white,
+                color: AppColor.onMedia.of(context),
                 label: _formatCount(chill.commentCount),
                 onPressed: () => _openComments(context),
               ),
               const SizedBox(height: 16),
               _buildActionButton(
                 icon: CupertinoIcons.arrowshape_turn_up_right_fill,
-                color: Colors.white,
+                color: AppColor.onMedia.of(context),
                 label: _formatCount(chill.shareCount),
                 onPressed: () => _handleShare(context),
               ),
@@ -396,14 +401,16 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 icon: chill.userHasSaved
                     ? CupertinoIcons.bookmark_fill
                     : CupertinoIcons.bookmark,
-                color: chill.userHasSaved ? Colors.amber : Colors.white,
+                color: chill.userHasSaved
+                    ? AppColor.amber.of(context)
+                    : AppColor.onMedia.of(context),
                 label: chill.userHasSaved ? loc.saved : loc.save,
                 onPressed: _toggleSave,
               ),
               const SizedBox(height: 12),
               _buildActionButton(
                 icon: CupertinoIcons.ellipsis,
-                color: Colors.white,
+                color: AppColor.onMedia.of(context),
                 label: '',
                 onPressed: () => _openOptions(context, isAuthor: isAuthor),
               ),
@@ -417,21 +424,21 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.grey.shade900,
+                    color: AppColor.mediaLoaderBg.of(context),
                     border: Border.all(
-                      color: Colors.white38,
+                      color: AppColor.onMedia38.of(context),
                       width: 1.5,
                     ),
                   ),
                   child: CircleAvatar(
-                    backgroundColor: Colors.redAccent,
+                    backgroundColor: AppColor.dangerAccent.of(context),
                     backgroundImage: avatarUrl != null
                         ? CachedNetworkImageProvider(avatarUrl)
                         : null,
                     child: avatarUrl == null
-                        ? const Icon(
+                        ? Icon(
                             CupertinoIcons.music_note,
-                            color: Colors.white,
+                            color: AppColor.onMedia.of(context),
                             size: 14,
                           )
                         : null,
@@ -469,15 +476,15 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor: Colors.white24,
+                      backgroundColor: AppColor.onMedia24.of(context),
                       backgroundImage: avatarUrl != null
                           ? CachedNetworkImageProvider(avatarUrl)
                           : null,
                       child: avatarUrl == null
                           ? Text(
                               chill.author.initials,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppColor.onMedia.of(context),
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),
@@ -493,16 +500,16 @@ class _VideoItemState extends ConsumerState<VideoItem>
                             chill.author.fullName ?? chill.author.username,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: AppColor.onMedia.of(context),
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
                           ),
                           Text(
                             '@${chill.author.username}',
-                            style: const TextStyle(
-                              color: Colors.white70,
+                            style: TextStyle(
+                              color: AppColor.onMedia70.of(context),
                               fontSize: 12,
                             ),
                           ),
@@ -517,23 +524,26 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.45),
+                        color: AppColor.mediaScrim45.of(context),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white24, width: 0.5),
+                        border: Border.all(
+                          color: AppColor.onMedia24.of(context),
+                          width: 0.5,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             CupertinoIcons.eye_fill,
-                            color: Colors.white70,
+                            color: AppColor.onMedia70.of(context),
                             size: 12,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             _formatCount(chill.viewCount),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: AppColor.onMedia.of(context),
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
                             ),
@@ -561,8 +571,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         chill.caption,
                         maxLines: _isExpandCaption ? 12 : 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColor.onMedia.of(context),
                           fontSize: 13.5,
                           height: 1.35,
                         ),
@@ -572,8 +582,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
                           padding: const EdgeInsets.only(top: 2),
                           child: Text(
                             _isExpandCaption ? loc.showLess : loc.showMore,
-                            style: const TextStyle(
-                              color: Colors.white60,
+                            style: TextStyle(
+                              color: AppColor.onMedia60.of(context),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -601,8 +611,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
                       },
                       child: Text(
                         '#$cleanTag',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColor.onMedia.of(context),
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                         ),
@@ -616,9 +626,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
               // Audio Track Info Row
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     CupertinoIcons.music_note_2,
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     size: 14,
                   ),
                   const SizedBox(width: 6),
@@ -631,8 +641,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppColor.onMedia.of(context),
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
                       ),
@@ -646,13 +656,13 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white24,
+                        color: AppColor.onMedia24.of(context),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         loc.remix,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColor.onMedia.of(context),
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                         ),
@@ -674,10 +684,10 @@ class _VideoItemState extends ConsumerState<VideoItem>
             child: VideoProgressIndicator(
               _controller!,
               allowScrubbing: true,
-              colors: const VideoProgressColors(
-                playedColor: Colors.redAccent,
-                bufferedColor: Colors.white24,
-                backgroundColor: Colors.white10,
+              colors: VideoProgressColors(
+                playedColor: AppColor.dangerAccent.of(context),
+                bufferedColor: AppColor.onMedia24.of(context),
+                backgroundColor: AppColor.onMedia10.of(context),
               ),
             ),
           ),
@@ -802,7 +812,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
           Container(
             padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.4),
+              color: AppColor.mediaBackdrop.of(context).withValues(alpha: 0.4),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -815,8 +825,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AppColor.onMedia.of(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),

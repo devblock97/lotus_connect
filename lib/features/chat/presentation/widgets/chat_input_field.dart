@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -135,9 +136,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
                                             files = null;
                                           });
                                         },
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.close,
-                                          color: Colors.red,
+                                          color: AppColor.danger.of(context),
                                         ),
                                       ),
                                     ),
@@ -214,8 +215,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
                           IconButton.filled(
                             onPressed: widget.onStop,
                             style: IconButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
+                              backgroundColor: AppColor.authCtaBg.of(context),
+                              foregroundColor: AppColor.authCtaFg.of(context),
                             ),
                             icon: const Icon(
                               Icons.stop_rounded,
@@ -227,7 +228,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                             onPressed: _handleSend,
                             style: IconButton.styleFrom(
                               backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: Colors.white,
+                              foregroundColor: theme.colorScheme.onPrimary,
                             ),
                             icon: const Icon(
                               Icons.arrow_upward_rounded,

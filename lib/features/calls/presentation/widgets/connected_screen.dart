@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -68,11 +69,14 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
             )
           else
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                  colors: [
+                    AppColor.callConnectedBgStart.of(context),
+                    AppColor.callConnectedBgEnd.of(context),
+                  ],
                 ),
               ),
               child: Center(
@@ -84,13 +88,15 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: AppBorder.all(
-                          Colors.white24,
+                        border: Border.all(
+                          color: AppColor.onMedia24.of(context),
                           width: AppSize.borderThick,
                         ),
                       ),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: AppColor.inkMuted
+                            .of(context)
+                            .withValues(alpha: 0.1),
                         child: Text(
                           initialName,
                           style: Theme.of(context)
@@ -106,8 +112,8 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     AppGap.vLg,
                     Text(
                       displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppColor.onMedia.of(context),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -115,8 +121,8 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     AppGap.vSm,
                     Text(
                       loc.voiceConnected,
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: AppColor.onMedia70.of(context),
                         fontSize: 13,
                         letterSpacing: 0.5,
                       ),
@@ -140,13 +146,13 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                   child: Container(
                     padding: AppPadding.sm,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.4),
+                      color: AppColor.black.of(context).withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.chevron_left,
-                      color: Colors.white,
                       size: AppSize.iconMd,
+                      color: AppColor.onMedia.of(context),
                     ),
                   ),
                 ),
@@ -158,21 +164,21 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     horizontal: AppSize.lg,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: AppRadius.xl,
+                    color: AppColor.black.of(context).withValues(alpha: 0.4),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.lock,
-                        color: Color(0xFF34C759),
                         size: AppSize.iconXs,
+                        color: AppColor.callAcceptGreen.of(context),
                       ),
                       AppGap.hXs,
                       Text(
                         loc.endToEndEncrypted.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColor.onMedia.of(context),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -186,13 +192,13 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                 Container(
                   padding: AppPadding.chip,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: AppRadius.md,
+                    color: AppColor.black.of(context).withValues(alpha: 0.4),
                   ),
                   child: Text(
                     widget.duration,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColor.onMedia.of(context),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       fontFamily: 'monospace',
@@ -234,13 +240,13 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                 height: 155,
                 decoration: BoxDecoration(
                   borderRadius: AppRadius.lg,
-                  border: AppBorder.all(
-                    Colors.white24,
+                  border: Border.all(
+                    color: AppColor.onMedia24.of(context),
                     width: AppSize.borderMedium,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
+                      color: AppColor.black.of(context).withValues(alpha: 0.25),
                       blurRadius: AppSize.md,
                     ),
                   ],
@@ -262,13 +268,14 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       child: Container(
                         padding: AppPadding.badge,
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
+                          color:
+                              AppColor.black.of(context).withValues(alpha: 0.5),
                           borderRadius: AppRadius.xs,
                         ),
                         child: Text(
                           loc.you.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColor.onMedia.of(context),
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                           ),
@@ -291,11 +298,13 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                 horizontal: AppSize.xl,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.85),
+                color: AppColor.callControlBarBg
+                    .of(context)
+                    .withValues(alpha: 0.85),
                 borderRadius: AppRadius.full,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
+                    color: AppColor.black.of(context).withValues(alpha: 0.3),
                     blurRadius: AppSize.xl,
                     offset: const Offset(0, AppSize.sm),
                   ),
@@ -318,10 +327,11 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       // );
                     },
                     icon: Icon(_isMuted ? Icons.mic_off : Icons.mic),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          _isMuted ? Colors.white24 : Colors.transparent,
+                      backgroundColor: _isMuted
+                          ? AppColor.onMedia24.of(context)
+                          : AppColor.transparent.of(context),
                       padding: AppPadding.md,
                     ),
                   ),
@@ -345,10 +355,11 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       icon: Icon(
                         _isVideoOff ? Icons.videocam_off : Icons.videocam,
                       ),
-                      color: Colors.white,
+                      color: AppColor.onMedia.of(context),
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            _isVideoOff ? Colors.white24 : Colors.transparent,
+                        backgroundColor: _isVideoOff
+                            ? AppColor.onMedia24.of(context)
+                            : AppColor.transparent.of(context),
                         padding: AppPadding.md,
                       ),
                     ),
@@ -363,7 +374,7 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       );
                     },
                     icon: const Icon(Icons.ios_share),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
                       padding: AppPadding.md,
                     ),
@@ -381,10 +392,11 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                     icon: Icon(
                       _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
                     ),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          _isSpeakerOn ? Colors.white24 : Colors.transparent,
+                      backgroundColor: _isSpeakerOn
+                          ? AppColor.onMedia24.of(context)
+                          : AppColor.transparent.of(context),
                       padding: AppPadding.md,
                     ),
                   ),
@@ -393,9 +405,9 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                   IconButton(
                     onPressed: widget.hangUp,
                     icon: const Icon(Icons.call_end),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFD63A2F),
+                      backgroundColor: AppColor.callDeclineRed.of(context),
                       padding: AppPadding.md,
                     ),
                   ),

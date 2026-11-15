@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -26,8 +27,8 @@ class ProfileFriendsPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = isDark ? Colors.white : Colors.black87;
-    final secondaryColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final primaryColor = AppColor.inkPrimary.of(context);
+    final secondaryColor = AppColor.inkMutedMedium.of(context);
     final loc = AppLocalizations.of(context);
 
     final previewItems = friends.take(6).toList();
@@ -74,8 +75,8 @@ class ProfileFriendsPreview extends StatelessWidget {
                   onPressed: onFindFriendsTap,
                   child: Text(
                     loc?.findFriends ?? 'Find Friends',
-                    style: const TextStyle(
-                      color: Color(0xFF1877F2),
+                    style: TextStyle(
+                      color: AppColor.socialBlue.of(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -116,9 +117,7 @@ class ProfileFriendsPreview extends StatelessWidget {
               child: FilledButton(
                 onPressed: onSeeAllTap,
                 style: FilledButton.styleFrom(
-                  backgroundColor: isDark
-                      ? const Color(0xFF3A3B3C)
-                      : const Color(0xFFE4E6EB),
+                  backgroundColor: AppColor.secondaryControlBg.of(context),
                   foregroundColor: primaryColor,
                   elevation: AppSize.elevationNone,
                   padding: AppPadding.vMd,
@@ -184,11 +183,12 @@ class _FriendGridTile extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: friend.avatarUrl!,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) => _buildPlaceholder(displayName),
+                        placeholder: (_, __) =>
+                            _buildPlaceholder(context, displayName),
                         errorWidget: (_, __, dynamic ___) =>
-                            _buildPlaceholder(displayName),
+                            _buildPlaceholder(context, displayName),
                       )
-                    : _buildPlaceholder(displayName),
+                    : _buildPlaceholder(context, displayName),
               ),
             ),
           ),
@@ -208,24 +208,19 @@ class _FriendGridTile extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder(String name) {
+  Widget _buildPlaceholder(BuildContext context, String name) {
     final initials = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    final colors = [
-      const Color(0xFF4F46E5),
-      const Color(0xFF0891B2),
-      const Color(0xFF059669),
-      const Color(0xFFD97706),
-      const Color(0xFFE11D48),
-    ];
-    final bgColor = colors[friend.username.hashCode.abs() % colors.length];
+    const colors = AppColor.friendAvatarPalette;
+    final bgColor =
+        colors[friend.username.hashCode.abs() % colors.length].of(context);
 
     return ColoredBox(
       color: bgColor,
       child: Center(
         child: Text(
           initials,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: AppColor.onMedia.of(context),
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
@@ -254,7 +249,7 @@ class ProfileFriendsSheet extends StatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent.of(context),
       builder: (_) => ProfileFriendsSheet(
         friends: friends,
         onFriendTap: onFriendTap,
@@ -356,7 +351,8 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
                     ? Center(
                         child: Text(
                           loc?.noFriendsFound ?? 'No friends found',
-                          style: const TextStyle(color: Colors.grey),
+                          style:
+                              TextStyle(color: AppColor.inkMuted.of(context)),
                         ),
                       )
                     : ListView.builder(

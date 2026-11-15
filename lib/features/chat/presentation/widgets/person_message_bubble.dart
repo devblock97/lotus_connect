@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/app/theme/app_colors.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_factory.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
@@ -151,7 +151,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                     color: widget.message.isError
                         ? theme.colorScheme.error
                         : (widget.message.status == MessageStatus.read
-                            ? AppColors.primaryLight
+                            ? AppColor.brandAccent.of(context)
                             : theme.disabledColor.withValues(alpha: 0.6)),
                   ),
                 ),

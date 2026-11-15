@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
@@ -59,9 +60,10 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: theme.brightness == Brightness.dark ? 0.2 : 0.03,
-                    ),
+                    color: AppColor.black.of(context).withValues(
+                          alpha:
+                              theme.brightness == Brightness.dark ? 0.2 : 0.03,
+                        ),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -104,7 +106,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                   filled: true,
                   fillColor: theme.brightness == Brightness.dark
                       ? theme.colorScheme.surfaceContainer
-                      : Colors.white,
+                      : AppColor.surfaceCard.of(context),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: OutlineInputBorder(
@@ -361,12 +363,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
         : '?';
-    final avatarColor =
-        Colors.primaries[user.username.hashCode % Colors.primaries.length];
+    final avatarColor = AppColor
+        .avatarPalette[user.username.hashCode % AppColor.avatarPalette.length]
+        .of(context);
     final currentUserId = ref.watch(settingsNotifierProvider).settings.userId;
 
-    final cardColor =
-        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final cardColor = isDark
+        ? theme.colorScheme.surfaceContainer
+        : AppColor.surfaceCard.of(context);
     final borderColor = isDark
         ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
@@ -378,14 +382,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         trailingWidget = Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.amber.shade50,
+            color: AppColor.warningSoft.of(context),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.amber.shade200),
+            border: Border.all(color: AppColor.warningBorder.of(context)),
           ),
           child: Text(
             loc.requested,
             style: TextStyle(
-              color: Colors.amber.shade800,
+              color: AppColor.amberStrong.of(context),
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -396,7 +400,10 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+              icon: Icon(
+                Icons.check_circle_outline,
+                color: AppColor.successGreen.of(context),
+              ),
               onPressed: () async {
                 final success = await ref
                     .read(friendRequestProvider.notifier)
@@ -409,14 +416,19 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                           ? loc.friendRequestAccepted
                           : loc.failedToAcceptRequest,
                     ),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    backgroundColor: success
+                        ? AppColor.success.of(context)
+                        : AppColor.danger.of(context),
                   ),
                 );
               },
               tooltip: loc.accept,
             ),
             IconButton(
-              icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+              icon: Icon(
+                Icons.cancel_outlined,
+                color: AppColor.danger.of(context),
+              ),
               onPressed: () async {
                 final success = await ref
                     .read(friendRequestProvider.notifier)
@@ -429,7 +441,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                           ? loc.friendRequestRejected
                           : loc.failedToRejectRequest,
                     ),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    backgroundColor: success
+                        ? AppColor.success.of(context)
+                        : AppColor.danger.of(context),
                   ),
                 );
               },
@@ -452,7 +466,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     ? loc.friendRequestSentTo(user.username)
                     : loc.failedToSendRequest,
               ),
-              backgroundColor: success ? Colors.green : Colors.red,
+              backgroundColor: success
+                  ? AppColor.success.of(context)
+                  : AppColor.danger.of(context),
             ),
           );
         },
@@ -478,7 +494,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+            color: AppColor.black
+                .of(context)
+                .withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -529,7 +547,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
           Icon(
             Icons.people_outline_rounded,
             size: 64,
-            color: Colors.grey.shade400,
+            color: AppColor.inkSubtle.of(context),
           ),
           const SizedBox(height: 16),
           Text(
@@ -541,7 +559,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             _searchQuery.isNotEmpty
                 ? loc.noMatchingResults
                 : loc.sendFriendRequestsPrompt,
-            style: const TextStyle(color: Colors.grey),
+            style: TextStyle(color: AppColor.inkMuted.of(context)),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -578,7 +596,10 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             children: [
               Text(
                 loc.enterUsernameToSendRequest,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColor.inkMuted.of(context),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -611,7 +632,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(loc.friendRequestSentTo(username)),
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppColor.success.of(context),
                       ),
                     );
                     _addFriendController.clear();
@@ -621,7 +642,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(err ?? loc.failedToSendRequest),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppColor.danger.of(context),
                       ),
                     );
                   }
@@ -655,8 +676,8 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColor.danger.of(context),
+              foregroundColor: AppColor.onMedia.of(context),
             ),
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(loc.unfriend),
@@ -675,7 +696,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
           content: Text(
             success ? loc.friendRemoved : loc.failedToRemoveFriend,
           ),
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success
+              ? AppColor.success.of(this.context)
+              : AppColor.danger.of(this.context),
         ),
       );
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_sync_coordinator.dart';
@@ -110,15 +111,15 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
             icon: Badge.count(
               count: unreadNotifications,
               isLabelVisible: unreadNotifications > 0,
-              backgroundColor: const Color(0xFFE41E3F),
-              textColor: Colors.white,
+              backgroundColor: AppColor.badgeRed.of(context),
+              textColor: AppColor.white.of(context),
               child: const Icon(Icons.notifications_none_rounded),
             ),
             selectedIcon: Badge.count(
               count: unreadNotifications,
               isLabelVisible: unreadNotifications > 0,
-              backgroundColor: const Color(0xFFE41E3F),
-              textColor: Colors.white,
+              backgroundColor: AppColor.badgeRed.of(context),
+              textColor: AppColor.white.of(context),
               child: const Icon(Icons.notifications),
             ),
             label: loc.tabAlerts,
@@ -152,16 +153,16 @@ class PlaceholderTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: Colors.grey),
+            Icon(icon, size: 64, color: AppColor.inkMuted.of(context)),
             const SizedBox(height: 16),
             Text(
               '$title Feature',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'This feature will be implemented in future',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColor.inkMuted.of(context)),
             ),
           ],
         ),

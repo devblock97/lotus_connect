@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -60,9 +61,8 @@ class ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryTextColor = isDark ? Colors.white : Colors.black87;
-    final secondaryTextColor =
-        isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final primaryTextColor = AppColor.inkPrimary.of(context);
+    final secondaryTextColor = AppColor.inkMutedMedium.of(context);
     final loc = AppLocalizations.of(context);
 
     final hasCover = profile.coverUrl != null && profile.coverUrl!.isNotEmpty;
@@ -102,12 +102,12 @@ class ProfileHeader extends StatelessWidget {
                           CachedNetworkImage(
                             imageUrl: profile.coverUrl!,
                             fit: BoxFit.cover,
-                            placeholder: (_, __) => _buildDefaultCover(isDark),
+                            placeholder: (_, __) => _buildDefaultCover(context),
                             errorWidget: (_, __, dynamic ___) =>
-                                _buildDefaultCover(isDark),
+                                _buildDefaultCover(context),
                           )
                         else
-                          _buildDefaultCover(isDark),
+                          _buildDefaultCover(context),
 
                         // Subtle bottom gradient for contrast
                         Positioned(
@@ -121,8 +121,10 @@ class ProfileHeader extends StatelessWidget {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.transparent,
-                                  Colors.black.withValues(alpha: 0.35),
+                                  AppColor.transparent.of(context),
+                                  AppColor.black
+                                      .of(context)
+                                      .withValues(alpha: 0.35),
                                 ],
                               ),
                             ),
@@ -130,11 +132,11 @@ class ProfileHeader extends StatelessWidget {
                         ),
 
                         if (isUploadingCover)
-                          const ColoredBox(
-                            color: Colors.black45,
+                          ColoredBox(
+                            color: AppColor.mediaScrim45.of(context),
                             child: Center(
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: AppColor.onMedia.of(context),
                                 strokeWidth: AppSize.loaderStrokeWidth,
                               ),
                             ),
@@ -146,7 +148,9 @@ class ProfileHeader extends StatelessWidget {
                             right: AppSize.lg,
                             bottom: AppSize.md,
                             child: Material(
-                              color: Colors.black.withValues(alpha: 0.65),
+                              color: AppColor.black
+                                  .of(context)
+                                  .withValues(alpha: 0.65),
                               borderRadius: AppRadius.xl,
                               child: InkWell(
                                 borderRadius: AppRadius.xl,
@@ -157,16 +161,16 @@ class ProfileHeader extends StatelessWidget {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.camera_alt_rounded,
-                                        color: Colors.white,
+                                        color: AppColor.onMedia.of(context),
                                         size: AppSize.iconXs,
                                       ),
                                       AppGap.hXs,
                                       Text(
                                         loc?.edit ?? 'Edit',
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: AppColor.onMedia.of(context),
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -212,7 +216,9 @@ class ProfileHeader extends StatelessWidget {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.16),
+                                color: AppColor.black
+                                    .of(context)
+                                    .withValues(alpha: 0.16),
                                 blurRadius: AppSize.md,
                                 offset: const Offset(0, AppSize.xs),
                               ),
@@ -227,21 +233,21 @@ class ProfileHeader extends StatelessWidget {
                                     imageUrl: profile.avatarUrl!,
                                     fit: BoxFit.cover,
                                     placeholder: (_, __) =>
-                                        _buildInitialsAvatar(theme),
+                                        _buildInitialsAvatar(context, theme),
                                     errorWidget: (_, __, dynamic ___) =>
-                                        _buildInitialsAvatar(theme),
+                                        _buildInitialsAvatar(context, theme),
                                   )
                                 else
-                                  _buildInitialsAvatar(theme),
+                                  _buildInitialsAvatar(context, theme),
                                 if (isUploadingAvatar)
-                                  const ColoredBox(
-                                    color: Colors.black45,
+                                  ColoredBox(
+                                    color: AppColor.mediaScrim45.of(context),
                                     child: Center(
                                       child: SizedBox(
                                         width: AppSize.loaderSizeMd,
                                         height: AppSize.loaderSizeMd,
                                         child: CircularProgressIndicator(
-                                          color: Colors.white,
+                                          color: AppColor.onMedia.of(context),
                                           strokeWidth:
                                               AppSize.loaderStrokeWidth,
                                         ),
@@ -265,9 +271,8 @@ class ProfileHeader extends StatelessWidget {
                                 width: AppSize.iconButtonSm,
                                 height: AppSize.iconButtonSm,
                                 decoration: BoxDecoration(
-                                  color: isDark
-                                      ? const Color(0xFF3A3B3C)
-                                      : const Color(0xFFE4E6EB),
+                                  color:
+                                      AppColor.secondaryControlBg.of(context),
                                   shape: BoxShape.circle,
                                   border: AppBorder.all(
                                     theme.cardColor,
@@ -290,7 +295,7 @@ class ProfileHeader extends StatelessWidget {
                               width: AppSize.xl,
                               height: AppSize.xl,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF22C55E),
+                                color: AppColor.onlineGreen.of(context),
                                 shape: BoxShape.circle,
                                 border: AppBorder.all(
                                   theme.cardColor,
@@ -340,27 +345,28 @@ class ProfileHeader extends StatelessWidget {
                           vertical: AppSize.xxs,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              const Color(0xFF10B981).withValues(alpha: 0.15),
+                          color: AppColor.successBright
+                              .of(context)
+                              .withValues(alpha: 0.15),
                           borderRadius: AppRadius.md,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.star_rounded,
                               size: AppSize.iconXxs,
-                              color: Color(0xFF10B981),
+                              color: AppColor.successBright.of(context),
                             ),
                             AppGap.hXs,
                             Text(
                               loc?.closeFriend ??
                                   loc?.closeFriends ??
                                   'Close Friend',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF10B981),
+                                color: AppColor.successBright.of(context),
                               ),
                             ),
                           ],
@@ -439,36 +445,30 @@ class ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildDefaultCover(bool isDark) {
+  Widget _buildDefaultCover(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? const [
-                  Color(0xFF1E3A8A),
-                  Color(0xFF312E81),
-                  Color(0xFF4C1D95),
-                ]
-              : const [
-                  Color(0xFF2563EB),
-                  Color(0xFF4F46E5),
-                  Color(0xFF7C3AED),
-                ],
+          colors: [
+            AppColor.profileCoverStart.of(context),
+            AppColor.profileCoverMid.of(context),
+            AppColor.profileCoverEnd.of(context),
+          ],
         ),
       ),
       child: Center(
         child: Icon(
           Icons.spa_outlined,
           size: AppSize.iconHero,
-          color: Colors.white.withValues(alpha: 0.18),
+          color: AppColor.onMedia.of(context).withValues(alpha: 0.18),
         ),
       ),
     );
   }
 
-  Widget _buildInitialsAvatar(ThemeData theme) {
+  Widget _buildInitialsAvatar(BuildContext context, ThemeData theme) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -483,8 +483,8 @@ class ProfileHeader extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         profile.initials,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: AppColor.onMedia.of(context),
           fontSize: 38,
           fontWeight: FontWeight.bold,
         ),
@@ -548,9 +548,8 @@ class ProfileHeader extends StatelessWidget {
     bool isDark,
     AppLocalizations? loc,
   ) {
-    final secondaryBg =
-        isDark ? const Color(0xFF3A3B3C) : const Color(0xFFE4E6EB);
-    final secondaryFg = isDark ? Colors.white : Colors.black87;
+    final secondaryBg = AppColor.secondaryControlBg.of(context);
+    final secondaryFg = AppColor.inkPrimary.of(context);
 
     return Row(
       children: [
@@ -570,8 +569,8 @@ class ProfileHeader extends StatelessWidget {
               ),
             ),
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF1877F2),
-              foregroundColor: Colors.white,
+              backgroundColor: AppColor.socialBlue.of(context),
+              foregroundColor: AppColor.onMedia.of(context),
               padding: AppPadding.vMd,
               shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
@@ -634,9 +633,8 @@ class ProfileHeader extends StatelessWidget {
     bool isDark,
     AppLocalizations? loc,
   ) {
-    final secondaryBg =
-        isDark ? const Color(0xFF3A3B3C) : const Color(0xFFE4E6EB);
-    final secondaryFg = isDark ? Colors.white : Colors.black87;
+    final secondaryBg = AppColor.secondaryControlBg.of(context);
+    final secondaryFg = AppColor.inkPrimary.of(context);
 
     return Row(
       children: [
@@ -661,7 +659,8 @@ class ProfileHeader extends StatelessWidget {
             icon: Icon(
               CupertinoIcons.chat_bubble_text_fill,
               size: AppSize.iconSm,
-              color: profile.isFriend ? Colors.white : secondaryFg,
+              color:
+                  profile.isFriend ? AppColor.onMedia.of(context) : secondaryFg,
             ),
             label: Text(
               loc?.message ?? 'Message',
@@ -670,12 +669,15 @@ class ProfileHeader extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: profile.isFriend ? Colors.white : secondaryFg,
+                color: profile.isFriend
+                    ? AppColor.onMedia.of(context)
+                    : secondaryFg,
               ),
             ),
             style: FilledButton.styleFrom(
-              backgroundColor:
-                  profile.isFriend ? const Color(0xFF1877F2) : secondaryBg,
+              backgroundColor: profile.isFriend
+                  ? AppColor.socialBlue.of(context)
+                  : secondaryBg,
               padding: AppPadding.vMd,
               shape: AppBorder.rounded(radius: AppSize.radiusButton),
             ),
@@ -785,8 +787,8 @@ class ProfileHeader extends StatelessWidget {
           ),
         ),
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF1877F2),
-          foregroundColor: Colors.white,
+          backgroundColor: AppColor.socialBlue.of(context),
+          foregroundColor: AppColor.onMedia.of(context),
           padding: AppPadding.vMd,
           shape: AppBorder.rounded(radius: AppSize.radiusButton),
         ),
@@ -828,8 +830,8 @@ class ProfileHeader extends StatelessWidget {
         ),
       ),
       style: FilledButton.styleFrom(
-        backgroundColor: const Color(0xFF1877F2),
-        foregroundColor: Colors.white,
+        backgroundColor: AppColor.socialBlue.of(context),
+        foregroundColor: AppColor.onMedia.of(context),
         padding: AppPadding.vMd,
         shape: AppBorder.rounded(radius: AppSize.radiusButton),
       ),
@@ -862,12 +864,12 @@ class ProfileHeader extends StatelessWidget {
                 profile.isCloseFriend
                     ? Icons.star_rounded
                     : Icons.star_border_rounded,
-                color: const Color(0xFF10B981),
+                color: AppColor.successBright.of(context),
               ),
               title: Text(loc?.closeFriends ?? 'Close Friends'),
               trailing: Switch.adaptive(
                 value: profile.isCloseFriend,
-                activeThumbColor: const Color(0xFF10B981),
+                activeThumbColor: AppColor.successBright.of(context),
                 onChanged: (_) {
                   Navigator.pop(ctx);
                   onToggleCloseFriendTap?.call();
@@ -879,14 +881,14 @@ class ProfileHeader extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.person_remove_outlined,
-                color: Colors.redAccent,
+                color: AppColor.dangerAccent.of(context),
               ),
               title: Text(
                 loc?.unfriend ?? 'Unfriend',
-                style: const TextStyle(
-                  color: Colors.redAccent,
+                style: TextStyle(
+                  color: AppColor.dangerAccent.of(context),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -924,9 +926,9 @@ class ProfileHeader extends StatelessWidget {
             ),
             AppGap.vMd,
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.check_circle_outline_rounded,
-                color: Color(0xFF16A34A),
+                color: AppColor.success.of(context),
               ),
               title: Text(
                 loc?.confirmFriendRequest ?? 'Confirm friend request',
@@ -937,13 +939,13 @@ class ProfileHeader extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(
+              leading: Icon(
                 Icons.cancel_outlined,
-                color: Colors.redAccent,
+                color: AppColor.dangerAccent.of(context),
               ),
               title: Text(
                 loc?.deleteFriendRequest ?? 'Delete request',
-                style: const TextStyle(color: Colors.redAccent),
+                style: TextStyle(color: AppColor.dangerAccent.of(context)),
               ),
               onTap: () {
                 Navigator.pop(ctx);
