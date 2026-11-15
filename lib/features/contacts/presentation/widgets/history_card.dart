@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -34,17 +35,20 @@ class HistoryCard extends ConsumerWidget {
     Color badgeColor;
     if (isMissed) {
       badgeIcon = Icons.close;
-      badgeColor = Colors.red;
+      badgeColor = AppColor.danger.of(context);
     } else {
       final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
       final isOutgoing = log.hostId == currentUserId;
       badgeIcon = isOutgoing ? Icons.arrow_upward : Icons.arrow_downward;
-      badgeColor = isOutgoing ? Colors.blue : Colors.green;
+      badgeColor = isOutgoing
+          ? AppColor.infoBlue.of(context)
+          : AppColor.successGreen.of(context);
     }
 
     final isDark = theme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final cardColor = isDark
+        ? theme.colorScheme.surfaceContainer
+        : AppColor.surfaceCard.of(context);
     final borderColor = isDark
         ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
@@ -57,7 +61,9 @@ class HistoryCard extends ConsumerWidget {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            color: AppColor.black
+                .of(context)
+                .withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -70,13 +76,13 @@ class HistoryCard extends ConsumerWidget {
             CircleAvatar(
               radius: 22,
               backgroundColor: isMissed
-                  ? Colors.red.withValues(alpha: 0.12)
+                  ? AppColor.danger.of(context).withValues(alpha: 0.12)
                   : theme.colorScheme.primaryContainer,
               child: Text(
                 initials,
                 style: TextStyle(
                   color: isMissed
-                      ? Colors.red
+                      ? AppColor.danger.of(context)
                       : theme.colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -94,7 +100,11 @@ class HistoryCard extends ConsumerWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: cardColor, width: 2),
                 ),
-                child: Icon(badgeIcon, size: 10, color: Colors.white),
+                child: Icon(
+                  badgeIcon,
+                  size: 10,
+                  color: AppColor.onMedia.of(context),
+                ),
               ),
             ),
           ],
@@ -113,7 +123,7 @@ class HistoryCard extends ConsumerWidget {
               log.isVideo ? Icons.videocam_outlined : Icons.phone_outlined,
               size: 14,
               color: isMissed
-                  ? Colors.red.shade400
+                  ? AppColor.dangerAccent.of(context)
                   : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
             ),
             const SizedBox(width: 4),
@@ -121,7 +131,7 @@ class HistoryCard extends ConsumerWidget {
               log.isVideo ? loc.videoCall : loc.voiceCall,
               style: TextStyle(
                 color: isMissed
-                    ? Colors.red.shade400
+                    ? AppColor.dangerAccent.of(context)
                     : theme.colorScheme.onSurfaceVariant
                         .withValues(alpha: 0.75),
                 fontSize: 13,
@@ -140,7 +150,7 @@ class HistoryCard extends ConsumerWidget {
                 _formatDurationText(loc, log.durationSeconds),
                 style: TextStyle(
                   color: isMissed
-                      ? Colors.red.shade400
+                      ? AppColor.dangerAccent.of(context)
                       : theme.colorScheme.onSurfaceVariant
                           .withValues(alpha: 0.75),
                   fontSize: 13,

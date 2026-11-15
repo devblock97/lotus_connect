@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -61,8 +62,10 @@ class ConversationListView extends ConsumerWidget {
                 child: Wrap(
                   children: [
                     ListTile(
-                      leading:
-                          const Icon(Icons.person_outline, color: Colors.green),
+                      leading: Icon(
+                        Icons.person_outline,
+                        color: AppColor.successGreen.of(context),
+                      ),
                       title: Text(loc.startChatWithUserUuid),
                       onTap: () {
                         Navigator.pop(context);
@@ -70,9 +73,9 @@ class ConversationListView extends ConsumerWidget {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.contacts_outlined,
-                        color: Colors.amber,
+                        color: AppColor.amber.of(context),
                       ),
                       title: Text(loc.viewContactsAndFriends),
                       onTap: () {
@@ -86,8 +89,8 @@ class ConversationListView extends ConsumerWidget {
             },
           );
         },
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColor.authCtaBg.of(context),
+        child: Icon(Icons.add, color: AppColor.authCtaFg.of(context)),
       ),
       body: Column(
         children: [
@@ -150,8 +153,9 @@ class ConversationListView extends ConsumerWidget {
                               child: Text(
                                 loc.noPrivateChatsFound,
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium
-                                    ?.copyWith(color: Colors.grey),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: AppColor.inkMuted.of(context),
+                                ),
                               ),
                             ),
                           ),
@@ -232,8 +236,8 @@ class ConversationListView extends ConsumerWidget {
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: AppSize.xl),
-            color: Colors.red,
-            child: const Icon(Icons.delete, color: Colors.white),
+            color: AppColor.danger.of(context),
+            child: Icon(Icons.delete, color: AppColor.white.of(context)),
           ),
           onDismissed: (_) {
             notifier.deleteConversation(conversation.id);
@@ -261,12 +265,12 @@ class ConversationListView extends ConsumerWidget {
                   ),
                 ),
                 if (conversation.isPinned)
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSize.xs),
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSize.xs),
                     child: Icon(
                       Icons.push_pin,
                       size: AppSize.iconXs,
-                      color: Colors.amber,
+                      color: AppColor.amber.of(context),
                     ),
                   ),
               ],
@@ -279,7 +283,7 @@ class ConversationListView extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: conversation.draftMessage?.isNotEmpty ?? false
-                    ? Colors.redAccent
+                    ? AppColor.dangerAccent.of(context)
                     : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.6),
               ),
             ),

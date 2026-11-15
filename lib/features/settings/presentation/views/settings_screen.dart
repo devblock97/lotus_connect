@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/app/theme/app_theme.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/features/profile/application/profile_providers.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -60,15 +61,15 @@ class SettingsScreen extends ConsumerWidget {
                           children: [
                             CircleAvatar(
                               radius: AppSize.avatarXxl / 2,
-                              backgroundColor: Colors.grey,
+                              backgroundColor: AppColor.inkMuted.of(context),
                               backgroundImage: settings.avatarUrl.isNotEmpty
                                   ? NetworkImage(settings.avatarUrl)
                                   : null,
                               child: settings.avatarUrl.isEmpty
-                                  ? const Icon(
+                                  ? Icon(
                                       Icons.person,
                                       size: AppSize.iconXxl,
-                                      color: Colors.white,
+                                      color: AppColor.white.of(context),
                                     )
                                   : null,
                             ),
@@ -77,13 +78,13 @@ class SettingsScreen extends ConsumerWidget {
                               right: AppSize.none,
                               child: Container(
                                 padding: AppPadding.xxs,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration: BoxDecoration(
+                                  color: AppColor.cardSurface.of(context),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.camera_alt_outlined,
-                                  color: Colors.blue,
+                                  color: AppColor.infoBlue.of(context),
                                   size: AppSize.iconSm,
                                 ),
                               ),
@@ -215,7 +216,7 @@ class SettingsScreen extends ConsumerWidget {
                           mode: AppThemeMode.light,
                           title: loc.themeLight,
                           isSelected: settings.themeMode == AppThemeMode.light,
-                          bgColor: const Color(0xFFFFFFFF),
+                          bgColor: AppColor.cardSurface.light,
                           onTap: () =>
                               notifier.setThemeMode(AppThemeMode.light),
                         ),
@@ -227,7 +228,7 @@ class SettingsScreen extends ConsumerWidget {
                           mode: AppThemeMode.dark,
                           title: loc.themeDark,
                           isSelected: settings.themeMode == AppThemeMode.dark,
-                          bgColor: const Color(0xFF1E1E22),
+                          bgColor: AppColor.cardSurface.dark,
                           onTap: () => notifier.setThemeMode(AppThemeMode.dark),
                         ),
                       ),
@@ -238,7 +239,7 @@ class SettingsScreen extends ConsumerWidget {
                           mode: AppThemeMode.sepia,
                           title: loc.themeSepia,
                           isSelected: settings.themeMode == AppThemeMode.sepia,
-                          bgColor: const Color(0xFFF4ECD8),
+                          bgColor: AppColor.surface.sepia,
                           onTap: () =>
                               notifier.setThemeMode(AppThemeMode.sepia),
                         ),
@@ -261,15 +262,18 @@ class SettingsScreen extends ConsumerWidget {
                   title: Text(loc.about),
                   trailing: Text(
                     loc.appVersion('1.0.0'),
-                    style: const TextStyle(color: Colors.grey),
+                    style: TextStyle(color: AppColor.inkMuted.of(context)),
                   ),
                 ),
                 const Divider(height: AppSize.dividerThickness),
                 ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
+                  leading: Icon(
+                    Icons.logout,
+                    color: AppColor.danger.of(context),
+                  ),
                   title: Text(
                     loc.logOut,
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: AppColor.danger.of(context)),
                   ),
                   onTap: () {
                     ref.read(authStateProvider.notifier).logout();
@@ -292,11 +296,11 @@ class SettingsScreen extends ConsumerWidget {
       ),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1,
-          color: Colors.grey,
+          color: AppColor.inkMuted.of(context),
         ),
       ),
     );
@@ -318,7 +322,9 @@ class SettingsScreen extends ConsumerWidget {
           color: bgColor,
           borderRadius: AppRadius.md,
           border: AppBorder.all(
-            isSelected ? Colors.black : Colors.transparent,
+            isSelected
+                ? AppColor.inkSolid.of(context)
+                : AppColor.transparent.of(context),
             width: isSelected ? AppSize.borderThick : AppSize.borderThin,
           ),
         ),
@@ -327,7 +333,7 @@ class SettingsScreen extends ConsumerWidget {
             Container(
               height: AppSize.xxxl,
               decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.2),
+                color: AppColor.inkMuted.of(context).withValues(alpha: 0.2),
                 borderRadius: AppRadius.sm,
               ),
             ),
@@ -337,11 +343,7 @@ class SettingsScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: mode == AppThemeMode.light
-                    ? Colors.black
-                    : (mode == AppThemeMode.dark
-                        ? Colors.white
-                        : const Color(0xFF4A3B32)),
+                color: AppColor.textPrimary.byMode(mode),
               ),
             ),
           ],

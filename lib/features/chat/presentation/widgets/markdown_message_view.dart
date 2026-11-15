@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/theme_map.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:markdown/markdown.dart' as md;
 
@@ -21,6 +22,11 @@ class MarkdownMessageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final codeBlockBg = AppColor.codeBlockBg.of(context);
+    final codeBlockHeaderBg = AppColor.codeBlockHeaderBg.of(context);
+    final codeBlockCanvas = AppColor.codeBlockCanvas.of(context);
+    final codeBlockBorder = AppColor.white.of(context).withValues(alpha: 0.1);
+    final mutedColor = AppColor.inkMuted.of(context);
 
     return MarkdownBody(
       data: content,
@@ -31,17 +37,23 @@ class MarkdownMessageView extends StatelessWidget {
         strong: TextStyle(color: textColor, fontWeight: FontWeight.bold),
         code: TextStyle(
           color: textColor,
-          backgroundColor: Colors.black.withValues(alpha: 0.15),
+          backgroundColor: AppColor.black.of(context).withValues(alpha: 0.15),
           fontFamily: 'monospace',
           fontSize: 13.5,
         ),
-        codeblockDecoration: const BoxDecoration(
-          color: Color(0xFF1E1E2E),
+        codeblockDecoration: BoxDecoration(
+          color: codeBlockBg,
           borderRadius: AppRadius.md,
         ),
       ),
       builders: {
-        'code': CodeElementBuilder(copyLabel: loc?.copy ?? 'Copy'),
+        'code': CodeElementBuilder(
+          copyLabel: loc?.copy ?? 'Copy',
+          containerBg: codeBlockHeaderBg,
+          headerBg: codeBlockCanvas,
+          borderColor: codeBlockBorder,
+          mutedColor: mutedColor,
+        ),
       },
     );
   }
@@ -49,9 +61,19 @@ class MarkdownMessageView extends StatelessWidget {
 
 /// Custom code block element builder supporting syntax highlighting.
 class CodeElementBuilder extends MarkdownElementBuilder {
-  CodeElementBuilder({this.copyLabel = 'Copy'});
+  CodeElementBuilder({
+    required this.containerBg,
+    required this.headerBg,
+    required this.borderColor,
+    required this.mutedColor,
+    this.copyLabel = 'Copy',
+  });
 
   final String copyLabel;
+  final Color containerBg;
+  final Color headerBg;
+  final Color borderColor;
+  final Color mutedColor;
 
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
@@ -62,9 +84,9 @@ class CodeElementBuilder extends MarkdownElementBuilder {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: AppSize.sm),
       decoration: BoxDecoration(
-        color: const Color(0xFF181825),
+        color: containerBg,
         borderRadius: AppRadius.md,
-        border: AppBorder.all(Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,9 +94,9 @@ class CodeElementBuilder extends MarkdownElementBuilder {
           // Header with language tag and Copy button
           Container(
             padding: AppPadding.chip,
-            decoration: const BoxDecoration(
-              color: Color(0xFF11111B),
-              borderRadius: BorderRadius.vertical(
+            decoration: BoxDecoration(
+              color: headerBg,
+              borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppSize.radiusMd - AppSize.borderThin),
               ),
             ),
@@ -83,8 +105,8 @@ class CodeElementBuilder extends MarkdownElementBuilder {
               children: [
                 Text(
                   language,
-                  style: const TextStyle(
-                    color: Colors.grey,
+                  style: TextStyle(
+                    color: mutedColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -95,16 +117,16 @@ class CodeElementBuilder extends MarkdownElementBuilder {
                   },
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.copy_rounded,
                         size: AppSize.iconXs,
-                        color: Colors.grey,
+                        color: mutedColor,
                       ),
                       AppGap.hXs,
                       Text(
                         copyLabel,
-                        style: const TextStyle(
-                          color: Colors.grey,
+                        style: TextStyle(
+                          color: mutedColor,
                           fontSize: 12,
                         ),
                       ),

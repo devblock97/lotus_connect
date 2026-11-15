@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:video_player/video_player.dart';
 
 class MediaVideoThumbnail extends StatefulWidget {
@@ -53,9 +54,9 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
     final hasValidSize = size.width > 0 && size.height > 0;
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         borderRadius: AppRadius.media,
-        color: Colors.black12,
+        color: AppColor.dividerSubtle.of(context),
       ),
       clipBehavior: Clip.antiAlias,
       child: _isInitialized
@@ -84,12 +85,14 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
                   child: Container(
                     padding: AppPadding.xs,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
+                      color: AppColor.mediaBackdrop
+                          .of(context)
+                          .withValues(alpha: 0.5),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.play_arrow_rounded,
-                      color: Colors.white,
+                      color: AppColor.onMedia.of(context),
                       size: AppSize.iconSm,
                     ),
                   ),

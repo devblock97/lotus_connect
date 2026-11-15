@@ -2,7 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/profile/application/profile_providers.dart';
 import 'package:lotus_connect/features/profile/domain/entities/update_profile_params.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
@@ -74,7 +75,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     'Failed to upload profile picture.'),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success
+              ? AppColor.successGreen.of(context)
+              : AppColor.danger.of(context),
         ),
       );
     } on Object catch (e) {
@@ -116,7 +119,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 : (loc?.failedToUploadCover ?? 'Failed to upload cover photo.'),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: success ? Colors.green : Colors.red,
+          backgroundColor: success
+              ? AppColor.successGreen.of(context)
+              : AppColor.danger.of(context),
         ),
       );
     } on Object catch (e) {
@@ -183,7 +188,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             loc?.profileUpdatedSuccess ?? 'Profile updated successfully!',
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.green,
+          backgroundColor: AppColor.successGreen.of(context),
         ),
       );
       Navigator.pop(context, true);
@@ -195,7 +200,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             err ?? (loc?.failedToUpdateProfile ?? 'Failed to update profile'),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.danger.of(context),
         ),
       );
     }
@@ -232,10 +237,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   )
                 : Text(
                     loc?.save ?? 'Save',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
-                      color: Color(0xFF1877F2),
+                      color: AppColor.socialBlue.of(context),
                     ),
                   ),
           ),
@@ -248,6 +253,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           children: [
             // 1. Profile Picture Section
             _buildSectionHeader(
+              context: context,
               title: loc?.profilePicture ?? 'Profile Picture',
               actionLabel: loc?.edit ?? 'Edit',
               onActionTap:
@@ -289,6 +295,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             // 2. Cover Photo Section
             _buildSectionHeader(
+              context: context,
               title: loc?.coverPhoto ?? 'Cover Photo',
               actionLabel: loc?.edit ?? 'Edit',
               onActionTap: state.isUploadingCover ? null : _pickAndUploadCover,
@@ -313,28 +320,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: isDark
-                                  ? const [Color(0xFF1E3A8A), Color(0xFF4C1D95)]
-                                  : const [
-                                      Color(0xFF2563EB),
-                                      Color(0xFF7C3AED),
-                                    ],
+                              colors: [
+                                AppColor.profileCoverStart.of(context),
+                                AppColor.profileCoverEnd.of(context),
+                              ],
                             ),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.add_photo_alternate_outlined,
                               size: AppSize.iconXxl,
-                              color: Colors.white70,
+                              color: AppColor.onMedia70.of(context),
                             ),
                           ),
                         ),
                       if (state.isUploadingCover)
-                        const ColoredBox(
-                          color: Colors.black45,
+                        ColoredBox(
+                          color: AppColor.mediaScrim45.of(context),
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: AppColor.onMedia.of(context),
                             ),
                           ),
                         ),
@@ -428,8 +433,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               child: FilledButton(
                 onPressed: state.isUpdatingProfile ? null : _saveProfile,
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF1877F2),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColor.socialBlue.of(context),
+                  foregroundColor: AppColor.onMedia.of(context),
                   shape: AppBorder.rounded(radius: AppSize.radiusButton),
                 ),
                 child: Text(
@@ -449,6 +454,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Widget _buildSectionHeader({
+    required BuildContext context,
     required String title,
     required String actionLabel,
     required VoidCallback? onActionTap,
@@ -464,8 +470,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           onPressed: onActionTap,
           child: Text(
             actionLabel,
-            style: const TextStyle(
-              color: Color(0xFF1877F2),
+            style: TextStyle(
+              color: AppColor.socialBlue.of(context),
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),

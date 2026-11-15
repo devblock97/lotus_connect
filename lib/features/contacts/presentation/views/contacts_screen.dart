@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/friend_screen.dart';
@@ -42,21 +43,13 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final pendingCount = ref.watch(friendRequestProvider).requests.length;
 
-    final indicatorGradient = isDark
-        ? const LinearGradient(
-            colors: [
-              Color(0xFFDEC08F),
-              Color(0xFFF7D9A4),
-              Color(0xFFB7CEA0),
-            ],
-          )
-        : const LinearGradient(
-            colors: [
-              Color(0xFF6F5B40),
-              Color(0xFFC07F39),
-              Color(0xFFE29F52),
-            ],
-          );
+    final indicatorGradient = LinearGradient(
+      colors: [
+        AppColor.contactsBannerStart.of(context),
+        AppColor.contactsBannerMid.of(context),
+        AppColor.contactsBannerEnd.of(context),
+      ],
+    );
 
     return DefaultTabController(
       length: 3,
@@ -95,7 +88,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.06)
+                      ? AppColor.onMedia.of(context).withValues(alpha: 0.06)
                       : theme.colorScheme.surfaceContainerHighest
                           .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(24),
@@ -107,9 +100,8 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     borderRadius: BorderRadius.circular(22),
                     boxShadow: [
                       BoxShadow(
-                        color: (isDark
-                                ? const Color(0xFFDEC08F)
-                                : const Color(0xFF6F5B40))
+                        color: AppColor.contactsSelectedTabBg
+                            .of(context)
                             .withValues(alpha: 0.28),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
@@ -117,9 +109,11 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     ],
                   ),
                   indicatorPadding: const EdgeInsets.all(3),
-                  dividerColor: Colors.transparent,
-                  overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  labelColor: isDark ? const Color(0xFF271905) : Colors.white,
+                  dividerColor: AppColor.transparent.of(context),
+                  overlayColor: WidgetStateProperty.all(
+                    AppColor.transparent.of(context),
+                  ),
+                  labelColor: AppColor.contactsTabLabel.of(context),
                   unselectedLabelColor:
                       theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                   labelStyle: const TextStyle(
@@ -156,18 +150,15 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                                 vertical: 1.5,
                               ),
                               decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF271905)
-                                        .withValues(alpha: 0.18)
-                                    : Colors.white.withValues(alpha: 0.3),
+                                color: AppColor.contactsTabLabel
+                                    .of(context)
+                                    .withValues(alpha: isDark ? 0.18 : 0.3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 '$pendingCount',
                                 style: TextStyle(
-                                  color: isDark
-                                      ? const Color(0xFF271905)
-                                      : Colors.white,
+                                  color: AppColor.contactsTabLabel.of(context),
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -207,7 +198,10 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
             children: [
               Text(
                 loc.enterUsernameToSendRequest,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColor.inkMuted.of(context),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -240,7 +234,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(loc.friendRequestSentTo(username)),
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppColor.success.of(context),
                       ),
                     );
                     _addFriendController.clear();
@@ -250,7 +244,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(err ?? loc.failedToSendRequest),
-                        backgroundColor: Colors.red,
+                        backgroundColor: AppColor.danger.of(context),
                       ),
                     );
                   }

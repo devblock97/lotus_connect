@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/profile/domain/entities/user_profile.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -19,8 +20,8 @@ class ProfileIntroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = isDark ? Colors.white : Colors.black87;
-    final iconColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final primaryColor = AppColor.inkPrimary.of(context);
+    final iconColor = AppColor.inkMutedMedium.of(context);
     final loc = AppLocalizations.of(context);
 
     final hasLocation =
@@ -111,9 +112,9 @@ class ProfileIntroSection extends StatelessWidget {
                     Expanded(
                       child: Text(
                         profile.website!.trim(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14.5,
-                          color: Color(0xFF1877F2),
+                          color: AppColor.socialBlue.of(context),
                           fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
@@ -169,10 +170,8 @@ class ProfileIntroSection extends StatelessWidget {
               child: FilledButton(
                 onPressed: onEditDetailsTap,
                 style: FilledButton.styleFrom(
-                  backgroundColor: isDark
-                      ? const Color(0xFF1877F2).withValues(alpha: 0.18)
-                      : const Color(0xFFE7F3FF),
-                  foregroundColor: const Color(0xFF1877F2),
+                  backgroundColor: AppColor.socialBlueTint.of(context),
+                  foregroundColor: AppColor.socialBlue.of(context),
                   elevation: AppSize.elevationNone,
                   padding: AppPadding.vMd,
                   shape: AppBorder.rounded(radius: AppSize.radiusChip),

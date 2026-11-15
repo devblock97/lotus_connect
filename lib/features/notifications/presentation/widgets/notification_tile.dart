@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
 class NotificationTile extends StatelessWidget {
@@ -25,19 +26,18 @@ class NotificationTile extends StatelessWidget {
   final VoidCallback? onDeclineRequest;
   final VoidCallback? onPrimaryAction;
 
-  static const Color _fbUnreadBlue = Color(0xFF1877F2);
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final unreadDotColor = isDark ? theme.colorScheme.primary : _fbUnreadBlue;
+    final unreadDotColor =
+        isDark ? theme.colorScheme.primary : AppColor.socialBlue.of(context);
 
     final rowBgColor = notification.isRead
-        ? Colors.transparent
+        ? AppColor.transparent.of(context)
         : (isDark
             ? theme.colorScheme.primary.withValues(alpha: 0.13)
-            : const Color(0xFFE7F3FF).withValues(alpha: 0.72));
+            : AppColor.socialBlueTint.of(context).withValues(alpha: 0.72));
 
     final timeString = formatRelativeTime(notification.createdAt);
 
@@ -55,14 +55,14 @@ class NotificationTile extends StatelessWidget {
                 notification.isRead
                     ? Icons.mark_chat_unread_rounded
                     : Icons.done_all_rounded,
-                color: Colors.white,
+                color: AppColor.onMedia.of(context),
                 size: 22,
               ),
               const SizedBox(width: 8),
               Text(
                 notification.isRead ? 'Unread' : 'Read',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppColor.onMedia.of(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                 ),
@@ -71,24 +71,24 @@ class NotificationTile extends StatelessWidget {
           ),
         ),
         secondaryBackground: Container(
-          color: const Color(0xFFE41E3F),
+          color: AppColor.badgeRed.of(context),
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 'Remove',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColor.onMedia.of(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Icon(
                 Icons.delete_outline_rounded,
-                color: Colors.white,
+                color: AppColor.onMedia.of(context),
                 size: 22,
               ),
             ],
@@ -383,7 +383,7 @@ class NotificationTile extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final secondaryBtnBg = isDark
-        ? Colors.white.withValues(alpha: 0.12)
+        ? AppColor.onMedia12.of(context)
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.75);
 
     if (notification.kind == NotificationKind.friendRequest) {
@@ -396,10 +396,12 @@ class NotificationTile extends StatelessWidget {
                 child: FilledButton(
                   onPressed: onAcceptRequest,
                   style: FilledButton.styleFrom(
-                    backgroundColor:
-                        isDark ? theme.colorScheme.primary : _fbUnreadBlue,
-                    foregroundColor:
-                        isDark ? theme.colorScheme.onPrimary : Colors.white,
+                    backgroundColor: isDark
+                        ? theme.colorScheme.primary
+                        : AppColor.socialBlue.of(context),
+                    foregroundColor: isDark
+                        ? theme.colorScheme.onPrimary
+                        : AppColor.onMedia.of(context),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -545,8 +547,12 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
     final avatarUrl = notification.actorAvatarUrl;
     final seedText = (notification.actorName ?? notification.title).trim();
     final initials = _extractInitials(seedText);
-    final avatarColor = _avatarColorFor(seedText);
-    final badgeSpec = _BadgeSpec.forKind(notification.kind, Theme.of(context));
+    final avatarColor = _avatarColorFor(context, seedText);
+    final badgeSpec = _BadgeSpec.forKind(
+      context,
+      notification.kind,
+      Theme.of(context),
+    );
 
     return SizedBox(
       width: 58,
@@ -626,7 +632,7 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
                 child: Icon(
                   badgeSpec.icon,
                   size: 13,
-                  color: Colors.white,
+                  color: AppColor.onMedia.of(context),
                 ),
               ),
             ),
@@ -647,19 +653,10 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
     return cleaned.substring(0, 1).toUpperCase();
   }
 
-  static Color _avatarColorFor(String seed) {
-    const palette = <Color>[
-      Color(0xFF1877F2),
-      Color(0xFFE41E3F),
-      Color(0xFF00A400),
-      Color(0xFF8B5CF6),
-      Color(0xFFF59E0B),
-      Color(0xFF0EA5E9),
-      Color(0xFFEC4899),
-      Color(0xFF14B8A6),
-    ];
-    if (seed.isEmpty) return palette.first;
-    return palette[seed.hashCode.abs() % palette.length];
+  static Color _avatarColorFor(BuildContext context, String seed) {
+    const palette = AppColor.notificationAvatarPalette;
+    if (seed.isEmpty) return palette.first.of(context);
+    return palette[seed.hashCode.abs() % palette.length].of(context);
   }
 }
 
@@ -705,63 +702,100 @@ class _BadgeSpec {
     required this.colors,
   });
 
-  factory _BadgeSpec.forKind(NotificationKind kind, ThemeData theme) {
+  factory _BadgeSpec.forKind(
+    BuildContext context,
+    NotificationKind kind,
+    ThemeData theme,
+  ) {
     switch (kind) {
       case NotificationKind.like:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.thumb_up_alt_rounded,
-          colors: [Color(0xFF3B82F6), Color(0xFF1877F2)],
+          colors: [
+            AppColor.badgeBlueLight.of(context),
+            AppColor.socialBlue.of(context),
+          ],
         );
       case NotificationKind.love:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.favorite_rounded,
-          colors: [Color(0xFFFF4B72), Color(0xFFE41E3F)],
+          colors: [
+            AppColor.badgePinkLight.of(context),
+            AppColor.badgeRed.of(context),
+          ],
         );
       case NotificationKind.comment:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.mode_comment_rounded,
-          colors: [Color(0xFF34D399), Color(0xFF10B981)],
+          colors: [
+            AppColor.badgeMintLight.of(context),
+            AppColor.successBright.of(context),
+          ],
         );
       case NotificationKind.mention:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.alternate_email_rounded,
-          colors: [Color(0xFF38BDF8), Color(0xFF0284C7)],
+          colors: [
+            AppColor.badgeSkyLight.of(context),
+            AppColor.badgeSkyDark.of(context),
+          ],
         );
       case NotificationKind.friendRequest:
       case NotificationKind.friendAccept:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.person_rounded,
-          colors: [Color(0xFF3B82F6), Color(0xFF1877F2)],
+          colors: [
+            AppColor.badgeBlueLight.of(context),
+            AppColor.socialBlue.of(context),
+          ],
         );
       case NotificationKind.missedCall:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.call_missed_rounded,
-          colors: [Color(0xFFF87171), Color(0xFFDC2626)],
+          colors: [
+            AppColor.badgeRedLight.of(context),
+            AppColor.badgeRedDark.of(context),
+          ],
         );
       case NotificationKind.call:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.phone_in_talk_rounded,
-          colors: [Color(0xFFA78BFA), Color(0xFF7C3AED)],
+          colors: [
+            AppColor.badgePurpleLight.of(context),
+            AppColor.purpleAccent.of(context),
+          ],
         );
       case NotificationKind.chat:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.chat_bubble_rounded,
-          colors: [Color(0xFF00B2FF), Color(0xFF006AFF)],
+          colors: [
+            AppColor.badgeMessengerLight.of(context),
+            AppColor.badgeMessengerDark.of(context),
+          ],
         );
       case NotificationKind.livestream:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.sensors_rounded,
-          colors: [Color(0xFFFF416C), Color(0xFFFF0844)],
+          colors: [
+            AppColor.postCoralStart.of(context),
+            AppColor.badgeRed.of(context),
+          ],
         );
       case NotificationKind.story:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.auto_awesome_rounded,
-          colors: [Color(0xFFFBBF24), Color(0xFFD97706)],
+          colors: [
+            AppColor.badgeAmberLight.of(context),
+            AppColor.badgeAmberDark.of(context),
+          ],
         );
       case NotificationKind.post:
-        return const _BadgeSpec(
+        return _BadgeSpec(
           icon: Icons.article_rounded,
-          colors: [Color(0xFF60A5FA), Color(0xFF2563EB)],
+          colors: [
+            AppColor.badgeBlueSoft.of(context),
+            AppColor.profileCoverStart.of(context),
+          ],
         );
       case NotificationKind.system:
         return _BadgeSpec(

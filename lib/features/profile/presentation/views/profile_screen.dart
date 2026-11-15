@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -254,11 +255,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primaryTextColor = isDark ? Colors.white : Colors.black87;
-    final secondaryTextColor =
-        isDark ? Colors.grey.shade400 : Colors.grey.shade600;
-    final sectionDividerColor =
-        isDark ? const Color(0xFF18191A) : const Color(0xFFF0F2F5);
+    final primaryTextColor = AppColor.inkPrimary.of(context);
+    final secondaryTextColor = AppColor.inkMutedMedium.of(context);
+    final sectionDividerColor = AppColor.feedBackground.of(context);
     final loc = AppLocalizations.of(context);
 
     final state = _watchState();
@@ -568,8 +567,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF1877F2).withValues(alpha: 0.14)
-                        : Colors.transparent,
+                        ? AppColor.socialBlueTint.of(context)
+                        : AppColor.transparent.of(context),
                     borderRadius: AppRadius.xl,
                   ),
                   child: Text(
@@ -579,8 +578,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       fontWeight:
                           isSelected ? FontWeight.w700 : FontWeight.w600,
                       color: isSelected
-                          ? const Color(0xFF1877F2)
-                          : (isDark ? Colors.grey.shade300 : Colors.black87),
+                          ? AppColor.socialBlue.of(context)
+                          : AppColor.inkPrimary.of(context),
                     ),
                   ),
                 ),
@@ -943,11 +942,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required VoidCallback onTap,
   }) {
     final bgColor = isSelected
-        ? const Color(0xFF1877F2).withValues(alpha: 0.14)
-        : (isDark ? const Color(0xFF3A3B3C) : const Color(0xFFE4E6EB));
+        ? AppColor.socialBlueTint.of(context)
+        : AppColor.secondaryControlBg.of(context);
     final fgColor = isSelected
-        ? const Color(0xFF1877F2)
-        : (isDark ? Colors.white : Colors.black87);
+        ? AppColor.socialBlue.of(context)
+        : AppColor.inkPrimary.of(context);
 
     return InkWell(
       onTap: onTap,
@@ -1044,7 +1043,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: Icons.link_rounded,
                 title: loc?.websiteRowLabel ?? 'Website',
                 value: profile.website!.trim(),
-                primaryTextColor: const Color(0xFF1877F2),
+                primaryTextColor: AppColor.socialBlue.of(context),
                 secondaryTextColor: secondaryTextColor,
               ),
             ],
@@ -1127,10 +1126,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.person_off_outlined,
               size: AppSize.iconHero,
-              color: Colors.grey,
+              color: AppColor.inkMuted.of(context),
             ),
             AppGap.vMd,
             Text(

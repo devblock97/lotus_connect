@@ -1,11 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/application/active_call_notifier.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
@@ -593,7 +595,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            const Icon(Icons.terminal, color: Colors.blue),
+            Icon(Icons.terminal, color: AppColor.infoBlue.of(context)),
             AppGap.hSm,
             Text(loc.signalingEventLogs),
           ],
@@ -603,16 +605,16 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           height: 350,
           padding: AppPadding.md,
           decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: AppRadius.md,
-            border: AppBorder.all(Colors.white10),
+            color: AppColor.mediaBackdrop.of(context),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColor.onMedia10.of(context)),
           ),
           child: _consoleLogs.isEmpty
               ? Center(
                   child: Text(
                     loc.noEventsLoggedYet,
-                    style: const TextStyle(
-                      color: Colors.white30,
+                    style: TextStyle(
+                      color: AppColor.onMedia30.of(context),
                       fontFamily: 'monospace',
                       fontSize: 11,
                     ),
@@ -624,8 +626,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: AppSize.xxs),
                     child: Text(
                       _consoleLogs[index],
-                      style: const TextStyle(
-                        color: Colors.greenAccent,
+                      style: TextStyle(
+                        color: AppColor.terminalGreen.of(context),
                         fontFamily: 'monospace',
                         fontSize: 11,
                       ),
@@ -662,7 +664,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           children: [
             Text(
               loc.enterUserAddressToPlaceCall,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColor.inkMuted.of(context),
+              ),
             ),
             AppGap.vMd,
             TextField(
@@ -793,8 +798,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             child: Container(
               height: AppSize.tabBarHeight,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: AppRadius.xxl,
+                color: AppColor.surfaceTrack.of(context),
+                borderRadius: BorderRadius.circular(24),
               ),
               child: Padding(
                 padding: AppPadding.xs,
@@ -810,16 +815,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: _showFriendsTab
-                                ? Colors.white
-                                : Colors.transparent,
-                            borderRadius: AppRadius.xl,
+                                ? AppColor.surfaceElevated.of(context)
+                                : AppColor.transparent.of(context),
+                            borderRadius: BorderRadius.circular(20),
                             boxShadow: _showFriendsTab
                                 ? [
                                     BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.05),
-                                      blurRadius: AppSize.xs,
-                                      offset: const Offset(0, AppSize.xxs),
+                                      color: AppColor.black
+                                          .of(context)
+                                          .withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ]
                                 : null,
@@ -832,8 +838,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: _showFriendsTab
-                                  ? Colors.black
-                                  : Colors.grey.shade600,
+                                  ? AppColor.inkSolid.of(context)
+                                  : AppColor.inkMutedMedium.of(context),
                             ),
                           ),
                         ),
@@ -849,16 +855,17 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             color: !_showFriendsTab
-                                ? Colors.white
-                                : Colors.transparent,
-                            borderRadius: AppRadius.xl,
+                                ? AppColor.surfaceElevated.of(context)
+                                : AppColor.transparent.of(context),
+                            borderRadius: BorderRadius.circular(20),
                             boxShadow: !_showFriendsTab
                                 ? [
                                     BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.05),
-                                      blurRadius: AppSize.xs,
-                                      offset: const Offset(0, AppSize.xxs),
+                                      color: AppColor.black
+                                          .of(context)
+                                          .withValues(alpha: 0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ]
                                 : null,
@@ -871,8 +878,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                                   ? FontWeight.bold
                                   : FontWeight.normal,
                               color: !_showFriendsTab
-                                  ? Colors.black
-                                  : Colors.grey.shade600,
+                                  ? AppColor.inkSolid.of(context)
+                                  : AppColor.inkMutedMedium.of(context),
                             ),
                           ),
                         ),
@@ -911,11 +918,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: Colors.grey.shade100,
-                contentPadding: AppPadding.zero,
-                border: const OutlineInputBorder(
-                  borderRadius: AppRadius.lg,
-                  borderSide: AppBorder.none,
+                fillColor: AppColor.surfaceTrack.of(context),
+                contentPadding: EdgeInsets.zero,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
@@ -938,8 +945,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: null,
         onPressed: _showStartNewCallManualDialog,
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColor.inkSolid.of(context),
+        foregroundColor: AppColor.surfaceElevated.of(context),
         icon: const Icon(Icons.add_call),
         label: Text(loc.startNewCall),
         shape: AppBorder.rounded(radius: AppSize.radiusXxxl),
@@ -965,7 +972,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
+                color: AppColor.inkMutedDark.of(context),
               ),
             ),
           ],
@@ -1013,7 +1020,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             Icon(
               Icons.call_missed_outgoing,
               size: AppSize.iconHero,
-              color: Colors.grey.shade400,
+              color: AppColor.inkSubtle.of(context),
             ),
             AppGap.vLg,
             Text(
@@ -1021,7 +1028,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
+                color: AppColor.inkMutedDark.of(context),
               ),
             ),
           ],
@@ -1061,10 +1068,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       ),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.grey,
+          color: AppColor.inkMuted.of(context),
           letterSpacing: 0.5,
         ),
       ),
@@ -1078,7 +1085,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
 
     final isMissed = log.status == 'missed' || log.status == 'rejected';
-    final nameColor = isMissed ? Colors.red : Colors.black;
+    final nameColor =
+        isMissed ? AppColor.danger.of(context) : AppColor.inkSolid.of(context);
     final timeText = DateFormat('h:mm a').format(log.createdAt);
 
     // Call icon badge overlay
@@ -1086,18 +1094,23 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     Color badgeColor;
     if (isMissed) {
       badgeIcon = Icons.close;
-      badgeColor = Colors.red;
+      badgeColor = AppColor.danger.of(context);
     } else {
       final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
       final isOutgoing = log.hostId == currentUserId;
       badgeIcon = isOutgoing ? Icons.arrow_upward : Icons.arrow_downward;
-      badgeColor = isOutgoing ? Colors.blue : Colors.green;
+      badgeColor = isOutgoing
+          ? AppColor.infoBlue.of(context)
+          : AppColor.successGreen.of(context);
     }
 
     return Card(
       elevation: AppSize.elevationNone,
       margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
-      shape: AppBorder.rounded(color: Colors.grey.shade100),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: AppColor.surfaceTrack.of(context)),
+      ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSize.md,
@@ -1106,12 +1119,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         leading: Stack(
           children: [
             CircleAvatar(
-              backgroundColor:
-                  isMissed ? Colors.red.shade50 : Colors.grey.shade100,
+              backgroundColor: isMissed
+                  ? AppColor.dangerSoft.of(context)
+                  : AppColor.surfaceTrack.of(context),
               child: Text(
                 initials,
                 style: TextStyle(
-                  color: isMissed ? Colors.red : Colors.grey.shade800,
+                  color: isMissed
+                      ? AppColor.danger.of(context)
+                      : AppColor.inkMutedStrong.of(context),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1126,14 +1142,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   color: badgeColor,
                   shape: BoxShape.circle,
                   border: AppBorder.all(
-                    Colors.white,
+                    AppColor.surfaceElevated.of(context),
                     width: AppSize.borderThick,
                   ),
                 ),
                 child: Icon(
                   badgeIcon,
                   size: AppSize.iconXxs,
-                  color: Colors.white,
+                  color: AppColor.onMedia.of(context),
                 ),
               ),
             ),
@@ -1141,19 +1157,22 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         ),
         title: Text(
           peerName,
-          style: theme.textTheme.titleMedium,
+          style: theme.textTheme.titleMedium?.copyWith(color: nameColor),
         ),
         subtitle: Row(
           children: [
             Icon(
               log.isVideo ? Icons.videocam_outlined : Icons.phone_outlined,
               size: AppSize.iconXs,
-              color: Colors.grey.shade600,
+              color: AppColor.inkMutedMedium.of(context),
             ),
             AppGap.hXs,
             Text(
               log.isVideo ? loc.videoCall : loc.voiceCall,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              style: TextStyle(
+                color: AppColor.inkMutedMedium.of(context),
+                fontSize: 13,
+              ),
             ),
             if (log.durationSeconds > 0) ...[
               AppGap.hSm,
@@ -1161,7 +1180,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               AppGap.hSm,
               Text(
                 _formatDurationText(log.durationSeconds),
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                style: TextStyle(
+                  color: AppColor.inkMutedMedium.of(context),
+                  fontSize: 13,
+                ),
               ),
             ],
           ],
@@ -1171,7 +1193,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           children: [
             Text(
               timeText,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+              style: TextStyle(
+                color: AppColor.inkMuted.of(context),
+                fontSize: 12,
+              ),
             ),
             AppGap.hMd,
             CircleAvatar(
@@ -1225,13 +1250,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE8E5E0),
-              Color(0xFFF7F5F2),
+              AppColor.callRingingBgStart.of(context),
+              AppColor.callRingingBgEnd.of(context),
             ],
           ),
         ),
@@ -1262,7 +1287,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         ],
                       ),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: AppColor.inkMuted
+                            .of(context)
+                            .withValues(alpha: 0.1),
                         child: Text(
                           initialName,
                           style: Theme.of(context)
@@ -1279,10 +1306,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   AppGap.vXxxl,
                   Text(
                     displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColor.inkPrimary.of(context),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -1291,10 +1318,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     _isVideo
                         ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
                         : '${loc.incomingCall.toUpperCase()} (${loc.voice.toUpperCase()})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black54,
+                      color: AppColor.inkSecondary.of(context),
                       letterSpacing: 2,
                     ),
                   ),
@@ -1331,8 +1358,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           iconSize: AppSize.iconXl,
                           padding: AppPadding.xl,
                           style: IconButton.styleFrom(
-                            backgroundColor: const Color(0xFFD63A2F),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColor.callDeclineRed.of(
+                              context,
+                            ),
+                            foregroundColor: AppColor.onMedia.of(context),
                             shape: const CircleBorder(),
                             elevation: AppSize.elevationMd,
                           ),
@@ -1341,10 +1370,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         AppGap.vMd,
                         Text(
                           loc.decline,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColor.inkPrimary.of(context),
                           ),
                         ),
                       ],
@@ -1357,8 +1386,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                           iconSize: AppSize.iconXl,
                           padding: AppPadding.xl,
                           style: IconButton.styleFrom(
-                            backgroundColor: const Color(0xFF34C759),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColor.callAcceptGreen.of(
+                              context,
+                            ),
+                            foregroundColor: AppColor.onMedia.of(context),
                             shape: const CircleBorder(),
                             elevation: AppSize.elevationMd,
                           ),
@@ -1367,10 +1398,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         AppGap.vMd,
                         Text(
                           loc.accept,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: AppColor.inkPrimary.of(context),
                           ),
                         ),
                       ],
@@ -1400,13 +1431,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     return Scaffold(
       body: Container(
         width: double.maxFinite,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE8E5E0),
-              Color(0xFFF7F5F2),
+              AppColor.callRingingBgStart.of(context),
+              AppColor.callRingingBgEnd.of(context),
             ],
           ),
         ),
@@ -1436,7 +1467,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         ],
                       ),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: AppColor.inkMuted
+                            .of(context)
+                            .withValues(alpha: 0.1),
                         child: Text(
                           initialName,
                           style: Theme.of(context)
@@ -1453,10 +1486,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   AppGap.vXxxl,
                   Text(
                     displayName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColor.inkPrimary.of(context),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -1465,10 +1498,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     _isVideo
                         ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
                         : '${loc.calling.toUpperCase()} (${loc.voice.toUpperCase()})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black54,
+                      color: AppColor.inkSecondary.of(context),
                       letterSpacing: 2,
                     ),
                   ),
@@ -1483,8 +1516,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       iconSize: AppSize.iconXl,
                       padding: AppPadding.xl,
                       style: IconButton.styleFrom(
-                        backgroundColor: const Color(0xFFD63A2F),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColor.callDeclineRed.of(context),
+                        foregroundColor: AppColor.onMedia.of(context),
                         shape: const CircleBorder(),
                         elevation: AppSize.elevationMd,
                       ),
@@ -1493,10 +1526,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     AppGap.vMd,
                     Text(
                       loc.cancel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: AppColor.inkPrimary.of(context),
                       ),
                     ),
                   ],
@@ -1534,11 +1567,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             )
           else
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                  colors: [
+                    AppColor.callConnectedBgStart.of(context),
+                    AppColor.callConnectedBgEnd.of(context),
+                  ],
                 ),
               ),
               child: Center(
@@ -1556,7 +1592,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         ),
                       ),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                        backgroundColor: AppColor.inkMuted
+                            .of(context)
+                            .withValues(alpha: 0.1),
                         child: Text(
                           initialName,
                           style: Theme.of(context)
@@ -1572,8 +1610,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     AppGap.vLg,
                     Text(
                       displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppColor.onMedia.of(context),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1581,8 +1619,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     AppGap.vSm,
                     Text(
                       loc.voiceConnected,
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: AppColor.onMedia70.of(context),
                         fontSize: 13,
                         letterSpacing: 0.5,
                       ),
@@ -1606,13 +1644,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   child: Container(
                     padding: AppPadding.sm,
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.4),
+                      color: AppColor.black.of(context).withValues(alpha: 0.4),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.chevron_left,
-                      color: Colors.white,
                       size: AppSize.iconMd,
+                      color: AppColor.onMedia.of(context),
                     ),
                   ),
                 ),
@@ -1624,21 +1662,21 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     horizontal: AppSize.lg,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: AppRadius.xl,
+                    color: AppColor.black.of(context).withValues(alpha: 0.4),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.lock,
-                        color: Color(0xFF34C759),
                         size: AppSize.iconXs,
+                        color: AppColor.callAcceptGreen.of(context),
                       ),
                       AppGap.hXs,
                       Text(
                         loc.endToEndEncrypted.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColor.onMedia.of(context),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -1652,13 +1690,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 Container(
                   padding: AppPadding.chip,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.4),
                     borderRadius: AppRadius.md,
+                    color: AppColor.black.of(context).withValues(alpha: 0.4),
                   ),
                   child: Text(
                     _formatDuration(_secondsElapsed),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColor.onMedia.of(context),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       fontFamily: 'monospace',
@@ -1701,12 +1739,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 decoration: BoxDecoration(
                   borderRadius: AppRadius.lg,
                   border: AppBorder.all(
-                    Colors.white24,
+                    AppColor.onMedia24.of(context),
                     width: AppSize.borderMedium,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
+                      color: AppColor.black.of(context).withValues(alpha: 0.25),
                       blurRadius: AppSize.md,
                     ),
                   ],
@@ -1728,13 +1766,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       child: Container(
                         padding: AppPadding.badge,
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
                           borderRadius: AppRadius.xs,
+                          color:
+                              AppColor.black.of(context).withValues(alpha: 0.5),
                         ),
                         child: Text(
                           loc.you.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColor.onMedia.of(context),
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1757,13 +1796,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                 horizontal: AppSize.xl,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.85),
                 borderRadius: AppRadius.full,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
                     blurRadius: AppSize.xl,
                     offset: const Offset(0, AppSize.sm),
+                    color: AppColor.callControlBarBg
+                        .of(context)
+                        .withValues(alpha: 0.85),
                   ),
                 ],
               ),
@@ -1784,11 +1824,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       );
                     },
                     icon: Icon(_isMuted ? Icons.mic_off : Icons.mic),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          _isMuted ? Colors.white24 : Colors.transparent,
-                      padding: AppPadding.md,
+                      backgroundColor: _isMuted
+                          ? AppColor.onMedia24.of(context)
+                          : AppColor.transparent.of(context),
+                      padding: const EdgeInsets.all(12),
                     ),
                   ),
 
@@ -1811,11 +1852,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       icon: Icon(
                         _isVideoOff ? Icons.videocam_off : Icons.videocam,
                       ),
-                      color: Colors.white,
+                      color: AppColor.onMedia.of(context),
                       style: IconButton.styleFrom(
-                        backgroundColor:
-                            _isVideoOff ? Colors.white24 : Colors.transparent,
-                        padding: AppPadding.md,
+                        backgroundColor: _isVideoOff
+                            ? AppColor.onMedia24.of(context)
+                            : AppColor.transparent.of(context),
+                        padding: const EdgeInsets.all(12),
                       ),
                     ),
 
@@ -1829,7 +1871,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       );
                     },
                     icon: const Icon(Icons.ios_share),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
                       padding: AppPadding.md,
                     ),
@@ -1847,11 +1889,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     icon: Icon(
                       _isSpeakerOn ? Icons.volume_up : Icons.volume_down,
                     ),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          _isSpeakerOn ? Colors.white24 : Colors.transparent,
-                      padding: AppPadding.md,
+                      backgroundColor: _isSpeakerOn
+                          ? AppColor.onMedia24.of(context)
+                          : AppColor.transparent.of(context),
+                      padding: const EdgeInsets.all(12),
                     ),
                   ),
 
@@ -1859,10 +1902,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                   IconButton(
                     onPressed: _hangUp,
                     icon: const Icon(Icons.call_end),
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFD63A2F),
                       padding: AppPadding.md,
+                      backgroundColor: AppColor.callDeclineRed.of(context),
                     ),
                   ),
                 ],
@@ -1880,18 +1923,20 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
         Container(
           padding: AppPadding.sm,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.6),
+            color: AppColor.onMedia.of(context).withValues(alpha: 0.6),
             shape: BoxShape.circle,
-            border: AppBorder.all(Colors.black.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: AppColor.black.of(context).withValues(alpha: 0.05),
+            ),
           ),
-          child: Icon(icon, color: Colors.black87, size: AppSize.iconMd),
+          child: Icon(icon, color: AppColor.inkPrimary.of(context), size: 22),
         ),
         AppGap.vSm,
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: Colors.black54,
+            color: AppColor.inkSecondary.of(context),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1905,10 +1950,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       child: Container(
         padding: AppPadding.sm,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.4),
+          color: AppColor.black.of(context).withValues(alpha: 0.4),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: AppSize.iconMd),
+        child: Icon(
+          icon,
+          color: AppColor.onMedia.of(context),
+          size: AppSize.iconMd,
+        ),
       ),
     );
   }

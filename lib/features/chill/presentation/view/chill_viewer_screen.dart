@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/chill/presentation/widgets/video_item.dart';
 import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
@@ -131,7 +132,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColor.mediaBackdrop.of(context),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -150,9 +151,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
     final loc = AppLocalizations.of(context)!;
 
     if (chillState.status == ChillStatus.loading && chillState.chills.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Colors.white,
+          color: AppColor.onMedia.of(context),
           strokeWidth: 2.5,
         ),
       );
@@ -165,16 +166,19 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 CupertinoIcons.exclamationmark_circle,
-                color: Colors.white60,
+                color: AppColor.onMedia60.of(context),
                 size: 48,
               ),
               const SizedBox(height: 12),
               Text(
                 chillState.message ?? loc.unableToLoadChills,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(
+                  color: AppColor.onMedia70.of(context),
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
@@ -197,9 +201,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               CupertinoIcons.film,
-              color: Colors.white54,
+              color: AppColor.onMedia54.of(context),
               size: 52,
             ),
             const SizedBox(height: 12),
@@ -207,8 +211,8 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
               chillState.activeTag != null
                   ? loc.noChillsFoundForTag(chillState.activeTag!)
                   : loc.noChillsAvailableYet,
-              style: const TextStyle(
-                color: Colors.white70,
+              style: TextStyle(
+                color: AppColor.onMedia70.of(context),
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -229,8 +233,8 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
 
     return RefreshIndicator(
       onRefresh: () => ref.read(chillNotifierProvider.notifier).refresh(),
-      color: Colors.redAccent,
-      backgroundColor: Colors.grey.shade900,
+      color: AppColor.dangerAccent.of(context),
+      backgroundColor: AppColor.mediaDarkTrack.of(context),
       child: PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -259,14 +263,14 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
       left: 0,
       right: 0,
       child: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black87,
-              Colors.black38,
-              Colors.transparent,
+              AppColor.mediaScrim87.of(context),
+              AppColor.mediaScrim38.of(context),
+              AppColor.transparent.of(context),
             ],
           ),
         ),
@@ -282,9 +286,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
               if (widget.isModal) ...[
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     size: 20,
                   ),
                 ),
@@ -293,8 +297,8 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 const SizedBox(width: 4),
               Text(
                 loc.chillsTitle,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: AppColor.onMedia.of(context),
                   fontWeight: FontWeight.w800,
                   fontSize: 22,
                   letterSpacing: 0.3,
@@ -312,7 +316,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent.withValues(alpha: 0.85),
+                      color: AppColor.dangerAccent
+                          .of(context)
+                          .withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
@@ -320,16 +326,16 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                       children: [
                         Text(
                           '#${chillState.activeTag}',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColor.onMedia.of(context),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(
+                        Icon(
                           Icons.close_rounded,
-                          color: Colors.white,
+                          color: AppColor.onMedia.of(context),
                           size: 14,
                         ),
                       ],
@@ -347,14 +353,16 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColor.mediaBackdrop
+                        .of(context)
+                        .withValues(alpha: 0.45),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     chillState.isMuted
                         ? CupertinoIcons.volume_off
                         : CupertinoIcons.volume_up,
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     size: 20,
                   ),
                 ),
@@ -369,12 +377,14 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColor.mediaBackdrop
+                        .of(context)
+                        .withValues(alpha: 0.45),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.refresh,
-                    color: Colors.white,
+                    color: AppColor.onMedia.of(context),
                     size: 20,
                   ),
                 ),

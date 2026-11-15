@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/application/auth_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -49,9 +50,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
     final authState = ref.watch(authStateProvider);
     final strength = _calculatePasswordStrength(_passwordController.text);
+    final authInk = AppColor.authInk.of(context);
+    final muted = AppColor.inkMuted.of(context);
+    final solidInk = AppColor.inkSolid.of(context);
+    final dividerColor = AppColor.authDivider.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppColor.authBackground.of(context),
       body: SafeArea(
         child: ListView(
           padding: AppPadding.screenHorizontal,
@@ -71,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   loc?.appName ?? 'Lotus Connect',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineLarge!.copyWith(
-                    color: const Color(0xFF222222),
+                    color: authInk,
                   ),
                 ),
                 Form(
@@ -89,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 'Join the future of secure communication.'),
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium!.copyWith(
-                          color: const Color(0xFF222222),
+                          color: authInk,
                         ),
                       ),
                       AppGap.vXxxl,
@@ -98,7 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           loc?.fullNameLabel ?? 'FULL NAME',
                           style: theme.textTheme.titleSmall!.copyWith(
-                            color: const Color(0xFF222222),
+                            color: authInk,
                           ),
                         ),
                         AppGap.vSm,
@@ -108,9 +113,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: loc?.enterFullNameHint ??
                                 'Enter your full name',
                             hintStyle: theme.textTheme.labelMedium,
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.person_outline,
-                              color: Colors.grey,
+                              color: muted,
                               size: AppSize.iconSm,
                             ),
                             filled: true,
@@ -127,7 +132,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           loc?.usernameLabel ?? 'USERNAME',
                           style: theme.textTheme.titleSmall!.copyWith(
-                            color: const Color(0xFF222222),
+                            color: authInk,
                           ),
                         ),
                         AppGap.vSm,
@@ -137,9 +142,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: loc?.chooseUsernameHint ??
                                 'Choose a unique username',
                             hintStyle: theme.textTheme.labelMedium,
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.alternate_email,
-                              color: Colors.grey,
+                              color: muted,
                               size: AppSize.iconSm,
                             ),
                             filled: true,
@@ -170,7 +175,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         loc?.emailAddressLabel ?? 'EMAIL ADDRESS',
                         style: theme.textTheme.titleSmall!.copyWith(
-                          color: const Color(0xFF222222),
+                          color: authInk,
                         ),
                       ),
                       AppGap.vSm,
@@ -180,9 +185,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         decoration: InputDecoration(
                           hintText: loc?.emailHint ?? 'name@company.com',
                           hintStyle: theme.textTheme.labelMedium,
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.mail_outline,
-                            color: Colors.grey,
+                            color: muted,
                             size: AppSize.iconSm,
                           ),
                           filled: true,
@@ -200,7 +205,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Text(
                         loc?.passwordLabel ?? 'PASSWORD',
                         style: theme.textTheme.titleSmall!.copyWith(
-                          color: const Color(0xFF222222),
+                          color: authInk,
                         ),
                       ),
                       AppGap.vSm,
@@ -214,9 +219,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               : (loc?.createPasswordHint ??
                                   'Create a strong password'),
                           hintStyle: theme.textTheme.labelMedium,
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.lock_outline,
-                            color: Colors.grey,
+                            color: muted,
                             size: AppSize.iconSm,
                           ),
                           suffixIcon: IconButton(
@@ -224,7 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               _obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: Colors.grey,
+                              color: muted,
                               size: AppSize.iconSm,
                             ),
                             tooltip: _obscurePassword
@@ -255,14 +260,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Row(
                             children: List.generate(4, (index) {
                               final filled = index < strength;
-                              var color = Colors.grey.shade300;
+                              var color = AppColor.inkSubtle.of(context);
                               if (filled) {
-                                if (strength == 1) color = Colors.red;
-                                if (strength == 2) color = Colors.orange;
-                                if (strength == 3) {
-                                  color = Colors.yellow.shade700;
+                                if (strength == 1) {
+                                  color = AppColor.danger.of(context);
                                 }
-                                if (strength == 4) color = Colors.green;
+                                if (strength == 2) {
+                                  color = AppColor.orange.of(context);
+                                }
+                                if (strength == 3) {
+                                  color = AppColor.warningYellow.of(context);
+                                }
+                                if (strength == 4) {
+                                  color = AppColor.successGreen.of(context);
+                                }
                               }
                               return Expanded(
                                 child: Container(
@@ -286,7 +297,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           loc?.confirmPasswordLabel ?? 'CONFIRM PASSWORD',
                           style: theme.textTheme.titleSmall!.copyWith(
-                            color: const Color(0xFF222222),
+                            color: authInk,
                           ),
                         ),
                         AppGap.vSm,
@@ -297,9 +308,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             hintText: loc?.repeatPasswordHint ??
                                 'Repeat your password',
                             hintStyle: theme.textTheme.labelMedium,
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.refresh,
-                              color: Colors.grey,
+                              color: muted,
                               size: AppSize.iconSm,
                             ),
                             suffixIcon: IconButton(
@@ -307,7 +318,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 _obscureConfirmPassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: Colors.grey,
+                                color: muted,
                                 size: AppSize.iconSm,
                               ),
                               tooltip: _obscureConfirmPassword
@@ -341,7 +352,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             Checkbox(
                               value: _agreeToTerms,
-                              activeColor: Colors.black,
+                              activeColor: solidInk,
                               onChanged: (val) =>
                                   setState(() => _agreeToTerms = val ?? false),
                             ),
@@ -349,7 +360,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: RichText(
                                 text: TextSpan(
                                   style: TextStyle(
-                                    color: Colors.grey.shade600,
+                                    color: AppColor.inkMutedDark.of(context),
                                     fontSize: 13,
                                   ),
                                   children: [
@@ -360,9 +371,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     TextSpan(
                                       text: loc?.termsOfService ??
                                           'Terms of Service',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: solidInk,
                                       ),
                                     ),
                                     TextSpan(
@@ -371,9 +382,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     TextSpan(
                                       text: loc?.privacyPolicy ??
                                           'Privacy Policy',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                                        color: solidInk,
                                       ),
                                     ),
                                     TextSpan(
@@ -395,8 +406,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onPressed: () {},
                             child: Text(
                               loc?.forgotPassword ?? 'Forgot Password?',
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: solidInk,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),
@@ -409,8 +420,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ElevatedButton(
                         onPressed: authState.isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColor.authCtaBg.of(context),
+                          foregroundColor: AppColor.authCtaFg.of(context),
                           padding: AppPadding.vLg,
                           shape: AppBorder.rounded(
                             radius: AppSize.radiusButton,
@@ -418,13 +429,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           elevation: AppSize.elevationNone,
                         ),
                         child: authState.isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: AppSize.loaderSizeSm,
                                 width: AppSize.loaderSizeSm,
                                 child: CircularProgressIndicator(
                                   strokeWidth: AppSize.borderThick,
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation(
+                                    AppColor.authCtaFg.of(context),
+                                  ),
                                 ),
                               )
                             : Row(
@@ -453,19 +465,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: Divider(color: Colors.grey.shade200),
+                            child: Divider(color: dividerColor),
                           ),
                           Padding(
                             padding: AppPadding.hLg,
                             child: Text(
                               loc?.orContinueWith ?? 'OR CONTINUE WITH',
                               style: theme.textTheme.labelSmall!.copyWith(
-                                color: const Color(0xFF222222),
+                                color: authInk,
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Divider(color: Colors.grey.shade200),
+                            child: Divider(color: dividerColor),
                           ),
                         ],
                       ),
@@ -478,7 +490,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
                                 padding: AppPadding.vMd,
-                                side: AppBorder.thin(Colors.grey.shade200),
+                                side: BorderSide(color: dividerColor),
                                 shape: AppBorder.rounded(
                                   radius: AppSize.radiusButton,
                                 ),
@@ -490,18 +502,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     'assets/icons/google-logo.jpg',
                                     height: AppSize.iconSm,
                                     errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(
+                                        (context, error, stackTrace) => Icon(
                                       Icons.g_mobiledata,
-                                      color: Colors.blue,
+                                      color: AppColor.infoBlue.of(context),
                                       size: AppSize.iconMd,
                                     ),
                                   ),
                                   AppGap.hSm,
                                   Text(
                                     loc?.google ?? 'Google',
-                                    style: const TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle(
+                                      color: solidInk,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -516,7 +527,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
                                 padding: AppPadding.vMd,
-                                side: AppBorder.thin(Colors.grey.shade200),
+                                side: BorderSide(color: dividerColor),
                                 shape: AppBorder.rounded(
                                   radius: AppSize.radiusButton,
                                 ),
@@ -524,16 +535,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.apple,
-                                    color: Colors.black,
+                                    color: solidInk,
                                     size: AppSize.iconSm,
                                   ),
                                   AppGap.hSm,
                                   Text(
                                     loc?.apple ?? 'Apple',
-                                    style: const TextStyle(
-                                      color: Colors.black,
+                                    style: TextStyle(
+                                      color: solidInk,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -556,7 +567,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 : (loc?.alreadyHaveAccount ??
                                     'Already have an account? '),
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: AppColor.inkMutedDark.of(context),
                               fontSize: 14,
                             ),
                           ),
@@ -570,8 +581,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               _isLogin
                                   ? (loc?.registerAction ?? 'Register')
                                   : (loc?.logInButton ?? 'Log In'),
-                              style: const TextStyle(
-                                color: Colors.black,
+                              style: TextStyle(
+                                color: solidInk,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
@@ -602,7 +613,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             loc?.mustAgreeTerms ??
                 'You must agree to the Terms of Service & Privacy Policy.',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.danger.of(context),
         ),
       );
       return;
@@ -615,7 +626,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           content: Text(
             loc?.passwordsDoNotMatch ?? 'Passwords do not match',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.danger.of(context),
         ),
       );
       return;
@@ -647,7 +658,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               loc?.registrationSuccess ??
                   'Registration successful! Please login.',
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColor.successGreen.of(context),
           ),
         );
       }
@@ -667,7 +678,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         loc?.authenticationFailed ??
                         'Failed to register')),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColor.danger.of(context),
         ),
       );
     }

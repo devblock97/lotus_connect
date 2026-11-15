@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 
 class RippleAnimation extends StatefulWidget {
   const RippleAnimation({required this.child, super.key});
@@ -43,7 +44,8 @@ class _RippleAnimationState extends State<RippleAnimation>
                 height: 140 + progress * 180,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF8B857B)
+                  color: AppColor.callRipple
+                      .of(context)
                       .withValues(alpha: (1.0 - progress) * 0.15),
                 ),
               );

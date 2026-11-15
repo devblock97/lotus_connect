@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -46,7 +47,7 @@ class HistoryScreen extends ConsumerWidget {
             Icon(
               Icons.call_missed_outgoing,
               size: 64,
-              color: Colors.grey.shade400,
+              color: AppColor.inkSubtle.of(context),
             ),
             const SizedBox(height: 16),
             Text(
@@ -54,7 +55,7 @@ class HistoryScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade700,
+                color: AppColor.inkMutedDark.of(context),
               ),
             ),
           ],
@@ -66,7 +67,7 @@ class HistoryScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         if (todayLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(loc.today),
+          _buildHistorySectionHeader(context, loc.today),
           ...todayLogs.map(
             (log) => HistoryCard(
               log: log,
@@ -76,7 +77,7 @@ class HistoryScreen extends ConsumerWidget {
           const SizedBox(height: 12),
         ],
         if (yesterdayLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(loc.yesterday),
+          _buildHistorySectionHeader(context, loc.yesterday),
           ...yesterdayLogs.map(
             (log) => HistoryCard(
               log: log,
@@ -86,7 +87,7 @@ class HistoryScreen extends ConsumerWidget {
           const SizedBox(height: 12),
         ],
         if (olderLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(loc.older),
+          _buildHistorySectionHeader(context, loc.older),
           ...olderLogs.map(
             (log) => HistoryCard(
               log: log,
@@ -98,15 +99,15 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHistorySectionHeader(String title) {
+  Widget _buildHistorySectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: Colors.grey,
+          color: AppColor.inkMuted.of(context),
           letterSpacing: 0.5,
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 
 class SettingCard extends StatelessWidget {
   const SettingCard({

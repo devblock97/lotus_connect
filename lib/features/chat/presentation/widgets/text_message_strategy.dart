@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_strategy.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';

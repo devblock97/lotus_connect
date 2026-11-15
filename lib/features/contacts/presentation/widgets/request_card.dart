@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -22,16 +23,18 @@ class RequestCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final avatarColor =
-        Colors.primaries[user.username.hashCode % Colors.primaries.length];
+    final avatarColor = AppColor
+        .avatarPalette[user.username.hashCode % AppColor.avatarPalette.length]
+        .of(context);
     final displayName = user.fullName ?? user.username;
     final initials = displayName.isNotEmpty
         ? displayName.substring(0, 1).toUpperCase()
         : '?';
 
     final isDark = theme.brightness == Brightness.dark;
-    final cardColor =
-        isDark ? theme.colorScheme.surfaceContainer : Colors.white;
+    final cardColor = isDark
+        ? theme.colorScheme.surfaceContainer
+        : AppColor.surfaceCard.of(context);
     final borderColor = isDark
         ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
@@ -44,7 +47,9 @@ class RequestCard extends ConsumerWidget {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            color: AppColor.black
+                .of(context)
+                .withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -101,9 +106,9 @@ class RequestCard extends ConsumerWidget {
                 constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
               ),
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.check_circle_rounded,
-                color: Color(0xFF16A34A),
+                color: AppColor.successGreen.of(context),
                 size: 24,
               ),
               onPressed: () async {
@@ -118,7 +123,9 @@ class RequestCard extends ConsumerWidget {
                             ? loc.friendRequestAccepted
                             : loc.failedToAcceptRequest,
                       ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                      backgroundColor: success
+                          ? AppColor.success.of(context)
+                          : AppColor.danger.of(context),
                     ),
                   );
                 }
@@ -131,7 +138,7 @@ class RequestCard extends ConsumerWidget {
             IconButton(
               icon: Icon(
                 Icons.cancel_rounded,
-                color: Colors.red.shade400,
+                color: AppColor.dangerAccent.of(context),
                 size: 24,
               ),
               onPressed: () async {
@@ -146,7 +153,9 @@ class RequestCard extends ConsumerWidget {
                             ? loc.friendRequestRejected
                             : loc.failedToRejectRequest,
                       ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                      backgroundColor: success
+                          ? AppColor.success.of(context)
+                          : AppColor.danger.of(context),
                     ),
                   );
                 }

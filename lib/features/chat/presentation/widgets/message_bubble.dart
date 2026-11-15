@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/app/theme/theme_extensions.dart';
-import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/markdown_message_view.dart';
 import 'package:lotus_connect/features/chat_core/domain/entities/message.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -44,13 +45,15 @@ class MessageBubble extends StatelessWidget {
             Container(
               padding: AppPadding.listTile,
               decoration: BoxDecoration(
-                color: chatTheme?.userBubbleBg ?? Colors.black,
+                color: chatTheme?.userBubbleBg ??
+                    AppColor.userBubbleBg.of(context),
                 borderRadius: AppRadius.chatBubbleOwn,
               ),
               child: Text(
                 message.content,
                 style: TextStyle(
-                  color: chatTheme?.userBubbleFg ?? Colors.white,
+                  color: chatTheme?.userBubbleFg ??
+                      AppColor.userBubbleFg.of(context),
                   fontSize: 15,
                   height: 1.4,
                 ),
