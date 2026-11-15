@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_colors.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_body_factory.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/message_render_context.dart';
@@ -58,14 +59,22 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     );
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(isMine ? 72 : 16, 6, isMine ? 16 : 72, 6),
+      padding: EdgeInsets.fromLTRB(
+        isMine ? AppSize.giant + AppSize.sm : AppSize.lg,
+        AppSize.chipVertical,
+        isMine ? AppSize.lg : AppSize.giant + AppSize.sm,
+        AppSize.chipVertical,
+      ),
       child: Column(
         crossAxisAlignment:
             isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           if (!isMine) ...[
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 4),
+              padding: const EdgeInsets.only(
+                left: AppSize.xs,
+                bottom: AppSize.xs,
+              ),
               child: Text(
                 widget.peerName,
                 style: TextStyle(
@@ -78,15 +87,12 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
           ],
           if (widget.repliedToMessage != null) ...[
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: AppPadding.chatBubble,
               decoration: BoxDecoration(
                 color: background,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isMine ? 18 : 4),
-                  bottomRight: Radius.circular(isMine ? 4 : 18),
-                ),
+                borderRadius: isMine
+                    ? AppRadius.chatBubbleOwn
+                    : AppRadius.chatBubbleOther,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +121,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
           ],
           if (widget.message.reactions.isNotEmpty)
             _buildReactionBadges(context, theme, isMine),
-          const SizedBox(height: 3),
+          AppGap.vXxs,
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -128,7 +134,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                 ),
               ),
               if (isMine) ...[
-                const SizedBox(width: 3),
+                AppGap.hXxs,
                 GestureDetector(
                   onTap: () {
                     if (widget.message.isError) {
@@ -141,7 +147,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                     widget.message.isError
                         ? Icons.loop
                         : Icons.done_all_rounded,
-                    size: 14,
+                    size: AppSize.iconXs,
                     color: widget.message.isError
                         ? theme.colorScheme.error
                         : (widget.message.status == MessageStatus.read
@@ -197,23 +203,26 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
       context: context,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          shape: AppBorder.rounded(radius: AppSize.radiusXl),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSize.lg,
+              horizontal: AppSize.md,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSize.sm,
+                    vertical: AppSize.chipVertical,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context)
                         .colorScheme
                         .surfaceContainerHighest
                         .withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: AppRadius.full,
                   ),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -222,7 +231,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                       children: defaultEmojis
                           .map(
                             (emoji) => InkWell(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: AppRadius.xl,
                               onTap: () {
                                 Navigator.of(context).pop();
                                 widget.onSelectReaction
@@ -230,8 +239,8 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 4,
+                                  horizontal: AppSize.badgeHorizontal,
+                                  vertical: AppSize.xs,
                                 ),
                                 child: Text(
                                   emoji,
@@ -244,12 +253,15 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Divider(height: 1),
-                const SizedBox(height: 4),
+                AppGap.vMd,
+                const Divider(height: AppSize.dividerThickness),
+                AppGap.vXs,
                 // Action options
                 ListTile(
-                  leading: const Icon(Icons.reply_rounded, size: 20),
+                  leading: const Icon(
+                    Icons.reply_rounded,
+                    size: AppSize.iconSm,
+                  ),
                   title: Text(loc.replyAction),
                   dense: true,
                   onTap: () {
@@ -261,7 +273,10 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                 ),
                 if (isMine) ...[
                   ListTile(
-                    leading: const Icon(Icons.edit_rounded, size: 20),
+                    leading: const Icon(
+                      Icons.edit_rounded,
+                      size: AppSize.iconSm,
+                    ),
                     title: Text(loc.editMessage),
                     dense: true,
                     onTap: () {
@@ -272,7 +287,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                   ListTile(
                     leading: Icon(
                       Icons.delete_rounded,
-                      size: 20,
+                      size: AppSize.iconSm,
                       color: Theme.of(context).colorScheme.error,
                     ),
                     title: Text(
@@ -343,14 +358,14 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
     bool isMine,
   ) {
     if (widget.message.reactions.isEmpty) {
-      return const SizedBox.shrink();
+      return AppGap.shrink;
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 6),
+      padding: const EdgeInsets.only(top: AppSize.chipVertical),
       child: Wrap(
-        spacing: 4,
-        runSpacing: 4,
+        spacing: AppSize.xs,
+        runSpacing: AppSize.xs,
         children: widget.message.reactions.map((entry) {
           return GestureDetector(
             onTap: () =>
@@ -358,15 +373,14 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
             child: Stack(
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: AppPadding.badge,
                   decoration: BoxDecoration(
                     color: isMine
                         ? theme.colorScheme.onPrimary.withValues(alpha: 0.18)
                         : theme.colorScheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: (isMine
+                    borderRadius: AppRadius.md,
+                    border: AppBorder.all(
+                      (isMine
                               ? theme.colorScheme.onPrimary
                               : theme.dividerColor)
                           .withValues(alpha: 0.25),
@@ -422,22 +436,25 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
         isMine ? theme.colorScheme.onPrimary : theme.colorScheme.primary;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.sm,
+        vertical: AppSize.chipVertical,
+      ),
       decoration: BoxDecoration(
         color: isMine
             ? theme.colorScheme.onPrimary.withValues(alpha: 0.1)
             : theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppRadius.sm,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 3,
-            height: 24,
+            width: AppSize.borderHeavy,
+            height: AppSize.xxl,
             color: barColor,
           ),
-          const SizedBox(width: 6),
+          AppGap.hXs,
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +470,7 @@ class _PersonMessageBubbleState extends ConsumerState<PersonMessageBubble> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 1),
+                AppGap.vXxs,
                 Text(
                   repliedTo.content,
                   style: TextStyle(

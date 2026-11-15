@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/typedefs.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -53,7 +54,7 @@ class ConversationListView extends ConsumerWidget {
           showModalBottomSheet<void>(
             context: context,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: AppRadius.bottomSheetTop,
             ),
             builder: (context) {
               return SafeArea(
@@ -91,7 +92,10 @@ class ConversationListView extends ConsumerWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.screenPadding,
+              vertical: AppSize.sm,
+            ),
             child: TextField(
               onChanged: notifier.setSearchQuery,
               decoration: InputDecoration(
@@ -100,10 +104,10 @@ class ConversationListView extends ConsumerWidget {
                 filled: true,
                 fillColor: theme.colorScheme.surfaceContainerHighest
                     .withValues(alpha: 0.5),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
+                contentPadding: AppPadding.hLg,
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.xxl,
+                  borderSide: AppBorder.none,
                 ),
               ),
             ),
@@ -114,7 +118,7 @@ class ConversationListView extends ConsumerWidget {
                 : RefreshIndicator(
                     onRefresh: notifier.loadRemoteConversations,
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: AppPadding.vSm,
                       children: [
                         if (pinnedConversations.isNotEmpty) ...[
                           _buildSectionHeader(context, loc.pinnedSection),
@@ -141,7 +145,7 @@ class ConversationListView extends ConsumerWidget {
                         ],
                         if (conversations.isEmpty)
                           Padding(
-                            padding: const EdgeInsets.all(32),
+                            padding: AppPadding.xxxl,
                             child: Center(
                               child: Text(
                                 loc.noPrivateChatsFound,
@@ -163,7 +167,7 @@ class ConversationListView extends ConsumerWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: AppPadding.listTile,
       child: Row(
         children: [
           Expanded(
@@ -172,7 +176,7 @@ class ConversationListView extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: AppPadding.hMd,
             child: Text(
               title,
               style: theme.textTheme.labelSmall?.copyWith(
@@ -227,7 +231,7 @@ class ConversationListView extends ConsumerWidget {
           direction: DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: AppSize.xl),
             color: Colors.red,
             child: const Icon(Icons.delete, color: Colors.white),
           ),
@@ -258,8 +262,12 @@ class ConversationListView extends ConsumerWidget {
                 ),
                 if (conversation.isPinned)
                   const Padding(
-                    padding: EdgeInsets.only(left: 4),
-                    child: Icon(Icons.push_pin, size: 14, color: Colors.amber),
+                    padding: EdgeInsets.only(left: AppSize.xs),
+                    child: Icon(
+                      Icons.push_pin,
+                      size: AppSize.iconXs,
+                      color: Colors.amber,
+                    ),
                   ),
               ],
             ),
@@ -341,7 +349,7 @@ class ConversationListView extends ConsumerWidget {
                   border: const OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 
 class MessageRenderContext {
   const MessageRenderContext({
@@ -21,10 +22,6 @@ class MessageRenderContext {
   final int mediaLength;
   final void Function(String)? onSelectReaction;
 
-  BorderRadius get bubbleBorderRadius => BorderRadius.only(
-        topLeft: const Radius.circular(18),
-        topRight: const Radius.circular(18),
-        bottomLeft: Radius.circular(isMine ? 18 : 4),
-        bottomRight: Radius.circular(isMine ? 4 : 18),
-      );
+  BorderRadius get bubbleBorderRadius =>
+      isMine ? AppRadius.chatBubbleOwn : AppRadius.chatBubbleOther;
 }

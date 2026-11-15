@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/chat/application/conversation_notifier.dart';
@@ -111,10 +112,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              radius: 18,
+              radius: AppSize.avatarMd / 2,
               child: Text(_initial(displayName)),
             ),
-            const SizedBox(width: 10),
+            AppGap.hMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,14 +127,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   Row(
                     children: [
                       Container(
-                        width: 7,
-                        height: 7,
+                        width: AppSize.statusDotSm,
+                        height: AppSize.statusDotSm,
                         decoration: BoxDecoration(
                           color: isOnline ? Colors.green : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      AppGap.hXs,
                       Text(
                         isOnline
                             ? loc.online
@@ -169,7 +170,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             child: ListView.builder(
               controller: _scrollController,
               reverse: true,
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: AppPadding.vMd,
               itemCount: activeState.messages.length +
                   (activeState.hasLoadMore ? 1 : 0),
               itemBuilder: (_, index) {
@@ -177,13 +178,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   if (activeState.hasLoadMore) {
                     return const Center(
                       child: SizedBox(
-                        width: 24,
-                        height: 24,
+                        width: AppSize.loaderSizeMd,
+                        height: AppSize.loaderSizeMd,
                         child: CircularProgressIndicator(),
                       ),
                     );
                   }
-                  return const SizedBox.shrink();
+                  return AppGap.shrink;
                 }
 
                 final msgIndex = activeState.messages.length - 1 - index;
@@ -215,7 +216,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           if (isPeerTyping)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.screenPadding,
+                vertical: AppSize.sm,
+              ),
               child: Row(
                 children: [
                   Text(
@@ -267,10 +271,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           child: InkWell(
             onTap: _hideNewMessageAlert,
             child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
+              padding: AppPadding.md,
+              decoration: const BoxDecoration(
                 color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppRadius.sm,
               ),
               child: Text(
                 loc.newMessage,
@@ -304,16 +308,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final senderName = isMine ? loc.senderYou : peerName;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       color: theme.colorScheme.surfaceContainerLow,
       child: Row(
         children: [
           Container(
-            width: 4,
-            height: 36,
+            width: AppSize.xs,
+            height: AppSize.buttonHeightSm,
             color: theme.colorScheme.primary,
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +334,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     color: theme.colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                AppGap.vXxs,
                 Text(
                   replyingTo.content,
                   maxLines: 1,
@@ -342,7 +349,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 20),
+            icon: const Icon(Icons.close_rounded, size: AppSize.iconSm),
             onPressed: notifier.cancelReply,
           ),
         ],

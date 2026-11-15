@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
+import 'package:lotus_connect/core/theme/app_size.dart';
 import 'package:video_player/video_player.dart';
 
 class MediaVideoThumbnail extends StatefulWidget {
@@ -52,8 +53,8 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
     final hasValidSize = size.width > 0 && size.height > 0;
 
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+      decoration: const BoxDecoration(
+        borderRadius: AppRadius.media,
         color: Colors.black12,
       ),
       clipBehavior: Clip.antiAlias,
@@ -81,7 +82,7 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
                   ),
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: AppPadding.xs,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
@@ -89,7 +90,7 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
                     child: const Icon(
                       Icons.play_arrow_rounded,
                       color: Colors.white,
-                      size: 20,
+                      size: AppSize.iconSm,
                     ),
                   ),
                 ),
@@ -97,9 +98,11 @@ class MediaVideoThumbnailState extends State<MediaVideoThumbnail> {
             )
           : const Center(
               child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                width: AppSize.loaderSizeSm,
+                height: AppSize.loaderSizeSm,
+                child: CircularProgressIndicator(
+                  strokeWidth: AppSize.borderThick,
+                ),
               ),
             ),
     );
