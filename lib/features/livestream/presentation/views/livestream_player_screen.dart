@@ -38,6 +38,9 @@ class LiveStreamPlayerScreen extends ConsumerStatefulWidget {
 
 class _LiveStreamPlayerScreenState
     extends ConsumerState<LiveStreamPlayerScreen> {
+  static const _foregroundChannel =
+      MethodChannel('devblock.tech.lotus_connect/foreground');
+
   static const Map<String, dynamic> _rtcIceConfiguration = {
     'iceServers': [
       {
@@ -122,6 +125,7 @@ class _LiveStreamPlayerScreenState
   @override
   void initState() {
     super.initState();
+    unawaited(_setKeepScreenOn(true));
     _initVideoPlayer();
     _startDurationTimer();
     _initRenderers().then((_) {
@@ -480,8 +484,18 @@ class _LiveStreamPlayerScreenState
     } on Object catch (_) {}
   }
 
+  Future<void> _setKeepScreenOn(bool enable) async {
+    try {
+      await _foregroundChannel.invokeMethod<void>(
+        'setKeepScreenOn',
+        {'enable': enable},
+      );
+    } on Object catch (_) {}
+  }
+
   @override
   void dispose() {
+    unawaited(_setKeepScreenOn(false));
     _durationTimer?.cancel();
     _videoController?.dispose();
     _commentController.dispose();

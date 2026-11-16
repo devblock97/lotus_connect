@@ -12,5 +12,23 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    let channel = FlutterMethodChannel(
+      name: "devblock.tech.lotus_connect/foreground",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+
+    channel.setMethodCallHandler { call, result in
+      if call.method == "setKeepScreenOn",
+         let args = call.arguments as? [String: Any],
+         let enable = args["enable"] as? Bool {
+        DispatchQueue.main.async {
+          UIApplication.shared.isIdleTimerDisabled = enable
+        }
+        result(true)
+      } else {
+        result(FlutterMethodNotImplemented)
+      }
+    }
   }
 }

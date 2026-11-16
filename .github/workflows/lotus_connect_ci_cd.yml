@@ -60,6 +60,34 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
+
+      - name: Configure Gradle Mirror for CI (Avoid Maven 429 Rate Limit)
+        run: |
+          mkdir -p ~/.gradle/init.d
+          cat << 'EOF' > ~/.gradle/init.d/maven-mirror.init.gradle.kts
+          beforeSettings {
+              pluginManagement.repositories {
+                  maven("https://maven-central.storage-download.googleapis.com/maven2/")
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+              dependencyResolutionManagement.repositories {
+                  maven("https://maven-central.storage-download.googleapis.com/maven2/")
+                  google()
+                  mavenCentral()
+              }
+          }
+          beforeProject {
+              buildscript.repositories {
+                  maven("https://maven-central.storage-download.googleapis.com/maven2/")
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          EOF
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
