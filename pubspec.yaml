@@ -58,6 +58,7 @@ dev_dependencies:
   riverpod_generator: ^2.6.3
   video_player_platform_interface: ^6.9.0
   very_good_analysis: ^7.0.0
+  wakelock_plus: ^1.8.2
 
 flutter:
   uses-material-design: true
