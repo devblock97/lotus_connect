@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_leaderboard_item.dart';
 
@@ -32,9 +33,14 @@ class LeaderboardSheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF161823),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
-      padding: const EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 24),
+      padding: const EdgeInsets.only(
+        top: AppSize.md,
+        left: AppSize.lg,
+        right: AppSize.lg,
+        bottom: AppSize.xxl,
+      ),
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
@@ -43,15 +49,15 @@ class LeaderboardSheet extends StatelessWidget {
         children: [
           Center(
             child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
+              decoration: const BoxDecoration(
                 color: Colors.white24,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -69,12 +75,16 @@ class LeaderboardSheet extends StatelessWidget {
                 ],
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: Colors.white60, size: 20),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white60,
+                  size: AppSize.iconSm,
+                ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
           if (supporters.isEmpty)
             const Expanded(
               child: Center(
@@ -87,25 +97,30 @@ class LeaderboardSheet extends StatelessWidget {
           else ...[
             // Top 3 Podium
             _buildPodium(top3),
-            const SizedBox(height: 16),
+            AppGap.vLg,
 
             // Remaining list
             if (remaining.isNotEmpty) ...[
-              const Divider(color: Colors.white12, height: 1),
+              const Divider(
+                color: Colors.white12,
+                height: AppSize.dividerThickness,
+              ),
               Expanded(
                 child: ListView.separated(
                   itemCount: remaining.length,
-                  separatorBuilder: (_, __) =>
-                      const Divider(color: Colors.white12, height: 1),
+                  separatorBuilder: (_, __) => const Divider(
+                    color: Colors.white12,
+                    height: AppSize.dividerThickness,
+                  ),
                   itemBuilder: (context, index) {
                     final item = remaining[index];
                     return ListTile(
-                      contentPadding: EdgeInsets.zero,
+                      contentPadding: AppPadding.zero,
                       leading: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(
-                            width: 24,
+                            width: AppSize.xxl,
                             child: Text(
                               '${index + 4}',
                               style: const TextStyle(
@@ -114,7 +129,7 @@ class LeaderboardSheet extends StatelessWidget {
                               ),
                             ),
                           ),
-                          _buildAvatar(item.user, 36),
+                          _buildAvatar(item.user, AppSize.buttonHeightSm),
                         ],
                       ),
                       title: Text(
@@ -196,15 +211,19 @@ class LeaderboardSheet extends StatelessWidget {
     required String crown,
   }) {
     return Container(
-      width: 96,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: AppSize.avatarProfile,
+      margin: AppPadding.hXs,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(crown, style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 4),
-          _buildAvatar(item.user, rank == 1 ? 52 : 44, borderColor: color),
-          const SizedBox(height: 6),
+          AppGap.vXs,
+          _buildAvatar(
+            item.user,
+            rank == 1 ? AppSize.buttonHeightLg : AppSize.buttonHeightMd,
+            borderColor: color,
+          ),
+          AppGap.vXs,
           Text(
             item.user.username,
             maxLines: 1,
@@ -215,7 +234,7 @@ class LeaderboardSheet extends StatelessWidget {
               fontSize: 12,
             ),
           ),
-          const SizedBox(height: 2),
+          AppGap.vXxs,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -243,7 +262,7 @@ class LeaderboardSheet extends StatelessWidget {
         shape: BoxShape.circle,
         color: Colors.white24,
         border: borderColor != null
-            ? Border.all(color: borderColor, width: 2)
+            ? AppBorder.all(borderColor, width: AppSize.borderThick)
             : null,
       ),
       clipBehavior: Clip.antiAlias,

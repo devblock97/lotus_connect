@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoryTrashBin extends StatelessWidget {
@@ -18,9 +19,9 @@ class StoryTrashBin extends StatelessWidget {
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutCubic,
-      bottom: isVisible ? 36.0 : -90.0,
-      left: 0,
-      right: 0,
+      bottom: isVisible ? AppSize.xxxl : -90.0,
+      left: AppSize.none,
+      right: AppSize.none,
       child: Center(
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 150),
@@ -31,31 +32,33 @@ class StoryTrashBin extends StatelessWidget {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOutBack,
-                width: isOverTrash ? 64 : 52,
-                height: isOverTrash ? 64 : 52,
+                width: isOverTrash ? AppSize.giant : AppSize.buttonHeightLg,
+                height: isOverTrash ? AppSize.giant : AppSize.buttonHeightLg,
                 decoration: BoxDecoration(
                   color: isOverTrash
                       ? const Color(0xFFFF2D55)
                       : Colors.black.withValues(alpha: 0.65),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isOverTrash ? Colors.white : Colors.white30,
-                    width: isOverTrash ? 2.5 : 1.5,
+                  border: AppBorder.all(
+                    isOverTrash ? Colors.white : Colors.white30,
+                    width: isOverTrash
+                        ? AppSize.borderThick
+                        : AppSize.borderMedium,
                   ),
                   boxShadow: isOverTrash
                       ? [
                           BoxShadow(
                             color:
                                 const Color(0xFFFF2D55).withValues(alpha: 0.6),
-                            blurRadius: 18,
-                            spreadRadius: 4,
+                            blurRadius: AppSize.xl,
+                            spreadRadius: AppSize.xs,
                           ),
                         ]
                       : const [
                           BoxShadow(
                             color: Colors.black38,
-                            blurRadius: 8,
-                            offset: Offset(0, 3),
+                            blurRadius: AppSize.sm,
+                            offset: Offset(AppSize.none, AppSize.xs),
                           ),
                         ],
                 ),
@@ -64,10 +67,10 @@ class StoryTrashBin extends StatelessWidget {
                       ? CupertinoIcons.trash_fill
                       : CupertinoIcons.trash,
                   color: Colors.white,
-                  size: isOverTrash ? 30 : 24,
+                  size: isOverTrash ? AppSize.iconXl : AppSize.iconMd,
                 ),
               ),
-              const SizedBox(height: 6),
+              AppGap.vXs,
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 150),
                 style: TextStyle(

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Clean, beautiful empty state displayed when there are no comments yet.
@@ -21,14 +22,17 @@ class CommentEmptyState extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.xxxl,
+          vertical: AppSize.huge,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Elegant badge / icon with subtle glow
             Container(
-              width: 76,
-              height: 76,
+              width: AppSize.avatarXxl,
+              height: AppSize.avatarXxl,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -39,18 +43,18 @@ class CommentEmptyState extends StatelessWidget {
                     theme.colorScheme.secondary.withValues(alpha: 0.08),
                   ],
                 ),
-                border: Border.all(
-                  color: theme.primaryColor.withValues(alpha: 0.25),
-                  width: 1.5,
+                border: AppBorder.all(
+                  theme.primaryColor.withValues(alpha: 0.25),
+                  width: AppSize.borderMedium,
                 ),
               ),
               child: Icon(
                 CupertinoIcons.chat_bubble_2,
-                size: 34,
+                size: AppSize.iconXl,
                 color: theme.primaryColor,
               ),
             ),
-            const SizedBox(height: 18),
+            AppGap.vLg,
 
             Text(
               loc?.noCommentsYet ?? 'No comments yet',
@@ -61,7 +65,7 @@ class CommentEmptyState extends StatelessWidget {
                 letterSpacing: -0.3,
               ),
             ),
-            const SizedBox(height: 6),
+            AppGap.vXs,
 
             Text(
               loc?.startConversationPrompt ??
@@ -73,26 +77,21 @@ class CommentEmptyState extends StatelessWidget {
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 18),
+            AppGap.vLg,
 
             if (onStartCommentTap != null)
               OutlinedButton.icon(
                 onPressed: onStartCommentTap,
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: theme.primaryColor.withValues(alpha: 0.4),
+                  side: AppBorder.thin(
+                    theme.primaryColor.withValues(alpha: 0.4),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 10,
-                  ),
+                  shape: AppBorder.rounded(radius: AppSize.radiusXl),
+                  padding: AppPadding.buttonCompact,
                 ),
                 icon: Icon(
                   Icons.edit_outlined,
-                  size: 16,
+                  size: AppSize.iconXs,
                   color: theme.primaryColor,
                 ),
                 label: Text(

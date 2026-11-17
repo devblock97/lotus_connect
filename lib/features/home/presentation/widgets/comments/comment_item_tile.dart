@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
@@ -110,24 +111,26 @@ class _CommentItemTileState extends State<CommentItemTile>
         return Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppSize.radiusXl),
+            ),
           ),
           padding: EdgeInsets.only(
-            top: 12,
-            bottom: MediaQuery.of(ctx).padding.bottom + 16,
+            top: AppSize.md,
+            bottom: MediaQuery.of(ctx).padding.bottom + AppSize.lg,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 38,
-                height: 4,
+                width: AppSize.sheetHandleWidth,
+                height: AppSize.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: theme.dividerColor.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppRadius.full,
                 ),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
 
               // Pin/Unpin option (available to Post Author on top-level comments)
               if (_isPostAuthor && widget.comment.isRoot)
@@ -283,12 +286,12 @@ class _CommentItemTileState extends State<CommentItemTile>
       context: context,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(16),
+        insetPadding: AppPadding.lg,
         child: Stack(
           alignment: Alignment.center,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadius.card,
               child: isNetwork
                   ? CachedNetworkImage(
                       imageUrl: url,
@@ -300,15 +303,19 @@ class _CommentItemTileState extends State<CommentItemTile>
                       errorBuilder: (_, __, dynamic ___) => const Icon(
                         Icons.broken_image_outlined,
                         color: Colors.white70,
-                        size: 48,
+                        size: AppSize.iconXxl,
                       ),
                     ),
             ),
             Positioned(
-              top: 8,
-              right: 8,
+              top: AppSize.sm,
+              right: AppSize.sm,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: AppSize.iconLg,
+                ),
                 onPressed: () => Navigator.of(ctx).pop(),
               ),
             ),
@@ -320,7 +327,7 @@ class _CommentItemTileState extends State<CommentItemTile>
 
   Widget _buildAvatar(ThemeData theme) {
     final author = widget.comment.author;
-    final size = widget.isReply ? 30.0 : 36.0;
+    final size = widget.isReply ? AppSize.avatarSm : AppSize.avatarMd;
 
     return GestureDetector(
       onTap: () => widget.onAuthorTap?.call(author),
@@ -378,10 +385,10 @@ class _CommentItemTileState extends State<CommentItemTile>
 
     return Padding(
       padding: EdgeInsets.only(
-        left: widget.isReply ? 46 : 16,
-        right: 16,
-        top: 6,
-        bottom: 8,
+        left: widget.isReply ? AppSize.massive : AppSize.lg,
+        right: AppSize.lg,
+        top: AppSize.xs,
+        bottom: AppSize.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,14 +396,17 @@ class _CommentItemTileState extends State<CommentItemTile>
           // Pinned badge banner if comment is pinned
           if (comment.isPinned && !widget.isReply)
             Container(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              margin: const EdgeInsets.only(bottom: AppSize.xs),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.sm,
+                vertical: AppSize.xxs,
+              ),
               decoration: BoxDecoration(
                 color: Colors.amber.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.amber.withValues(alpha: 0.35),
-                  width: 0.8,
+                borderRadius: AppRadius.md,
+                border: AppBorder.all(
+                  Colors.amber.withValues(alpha: 0.35),
+                  width: AppSize.borderHairline,
                 ),
               ),
               child: Row(
@@ -404,10 +414,10 @@ class _CommentItemTileState extends State<CommentItemTile>
                 children: [
                   const Icon(
                     CupertinoIcons.pin_fill,
-                    size: 11,
+                    size: AppSize.iconXxs,
                     color: Colors.amber,
                   ),
-                  const SizedBox(width: 4),
+                  AppGap.hXs,
                   Text(
                     loc?.pinnedByCreator ?? 'Pinned by creator',
                     style: const TextStyle(
@@ -425,7 +435,7 @@ class _CommentItemTileState extends State<CommentItemTile>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildAvatar(theme),
-              const SizedBox(width: 10),
+              AppGap.hMd,
 
               // Comment Content Body
               Expanded(
@@ -438,8 +448,8 @@ class _CommentItemTileState extends State<CommentItemTile>
                       // Header line: Username + badges + timestamp
                       Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 6,
-                        runSpacing: 2,
+                        spacing: AppSize.xs,
+                        runSpacing: AppSize.xxs,
                         children: [
                           GestureDetector(
                             onTap: () =>
@@ -457,14 +467,11 @@ class _CommentItemTileState extends State<CommentItemTile>
                           // Creator / Post Author badge
                           if (_isCommenterPostAuthor)
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 1.5,
-                              ),
+                              padding: AppPadding.badge,
                               decoration: BoxDecoration(
                                 color:
                                     theme.primaryColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: AppRadius.xs,
                               ),
                               child: Text(
                                 loc?.authorBadge ?? 'Author',
@@ -497,7 +504,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                             ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      AppGap.vXxs,
 
                       // Comment Text (with hashtags & mentions highlight)
                       if (comment.content.trim().isNotEmpty) ...[
@@ -510,12 +517,11 @@ class _CommentItemTileState extends State<CommentItemTile>
 
                       // Attached Media / Sticker (if any)
                       if (comment.hasMedia) ...[
-                        if (comment.content.trim().isNotEmpty)
-                          const SizedBox(height: 6),
+                        if (comment.content.trim().isNotEmpty) AppGap.vXs,
                         GestureDetector(
                           onTap: () => _showMediaPreview(comment.mediaUrl!),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadius.md,
                             child: Container(
                               constraints: const BoxConstraints(
                                 maxHeight: 150,
@@ -531,7 +537,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                           ),
                         ),
                       ],
-                      const SizedBox(height: 6),
+                      AppGap.vXs,
 
                       // Action Subrow: [Like Count] · [Reply] · [3-Dots]
                       Row(
@@ -543,7 +549,9 @@ class _CommentItemTileState extends State<CommentItemTile>
                                 comment: comment,
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.only(right: 12),
+                                padding: const EdgeInsets.only(
+                                  right: AppSize.md,
+                                ),
                                 child: Text(
                                   comment.likeCount == 1
                                       ? (loc?.likeCountSingular ?? '1 like')
@@ -564,7 +572,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                           GestureDetector(
                             onTap: () => widget.onReply?.call(comment),
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 12),
+                              padding: const EdgeInsets.only(right: AppSize.md),
                               child: Text(
                                 loc?.replyAction ?? 'Reply',
                                 style: TextStyle(
@@ -581,7 +589,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                             onTap: _showOptionsMenu,
                             child: Icon(
                               Icons.more_horiz,
-                              size: 16,
+                              size: AppSize.iconXs,
                               color: subtextColor,
                             ),
                           ),
@@ -592,7 +600,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                 ),
               ),
 
-              const SizedBox(width: 8),
+              AppGap.hSm,
 
               // Like / Heart Reaction Button
               GestureDetector(
@@ -601,7 +609,11 @@ class _CommentItemTileState extends State<CommentItemTile>
                 onLongPress: _showReactionPicker,
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 4, left: 6, right: 2),
+                  padding: const EdgeInsets.only(
+                    top: AppSize.xs,
+                    left: AppSize.sm,
+                    right: AppSize.xxs,
+                  ),
                   child: ScaleTransition(
                     scale: _heartScaleAnimation,
                     child: comment.userReaction != null &&
@@ -616,7 +628,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                             comment.userHasLiked
                                 ? CupertinoIcons.heart_fill
                                 : CupertinoIcons.heart,
-                            size: 15,
+                            size: AppSize.iconXs,
                             color: comment.userHasLiked
                                 ? const Color(0xFFED4956)
                                 : subtextColor,
@@ -629,9 +641,9 @@ class _CommentItemTileState extends State<CommentItemTile>
 
           // Threaded Replies Accordion (if root comment and has replies)
           if (!widget.isReply && comment.hasReplies) ...[
-            const SizedBox(height: 6),
+            AppGap.vXs,
             Padding(
-              padding: const EdgeInsets.only(left: 46),
+              padding: const EdgeInsets.only(left: AppSize.massive),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -639,16 +651,16 @@ class _CommentItemTileState extends State<CommentItemTile>
                   GestureDetector(
                     onTap: () => widget.onToggleReplies?.call(comment),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: AppPadding.vXs,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 24,
-                            height: 1,
+                            width: AppSize.xxl,
+                            height: AppSize.dividerThickness,
                             color: subtextColor.withValues(alpha: 0.5),
                           ),
-                          const SizedBox(width: 8),
+                          AppGap.hSm,
                           Text(
                             comment.isRepliesExpanded
                                 ? (loc?.hideReplies ?? 'Hide replies')
@@ -662,12 +674,12 @@ class _CommentItemTileState extends State<CommentItemTile>
                               color: subtextColor,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          AppGap.hXs,
                           Icon(
                             comment.isRepliesExpanded
                                 ? CupertinoIcons.chevron_up
                                 : CupertinoIcons.chevron_down,
-                            size: 12,
+                            size: AppSize.iconXxs,
                             color: subtextColor,
                           ),
                         ],
@@ -679,8 +691,8 @@ class _CommentItemTileState extends State<CommentItemTile>
                   if (comment.isRepliesExpanded) ...[
                     if (comment.isLoadingReplies)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        child: CupertinoActivityIndicator(radius: 8),
+                        padding: AppPadding.vSm,
+                        child: CupertinoActivityIndicator(radius: AppSize.sm),
                       )
                     else ...[
                       ...comment.replies.map(
@@ -702,7 +714,7 @@ class _CommentItemTileState extends State<CommentItemTile>
                         GestureDetector(
                           onTap: () => widget.onLoadMoreReplies?.call(comment),
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 4, bottom: 4),
+                            padding: AppPadding.vXs,
                             child: Text(
                               loc?.viewMoreReplies ?? 'Load more replies...',
                               style: TextStyle(
@@ -787,7 +799,7 @@ class _CommentItemTileState extends State<CommentItemTile>
           GestureDetector(
             onTap: () => setState(() => _isTextExpanded = true),
             child: Padding(
-              padding: const EdgeInsets.only(top: 2),
+              padding: const EdgeInsets.only(top: AppSize.xxs),
               child: Text(
                 AppLocalizations.of(context)?.seeMore ?? 'more',
                 style: const TextStyle(
@@ -809,8 +821,8 @@ class _CommentItemTileState extends State<CommentItemTile>
         imageUrl: url,
         fit: BoxFit.cover,
         placeholder: (_, __) => Container(
-          width: 100,
-          height: 100,
+          width: AppSize.avatarProfile,
+          height: AppSize.avatarProfile,
           color: isDark ? Colors.white10 : Colors.black12,
           child: const Center(
             child: CupertinoActivityIndicator(),

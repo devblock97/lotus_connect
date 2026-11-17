@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_gift.dart';
 
 /// Modal bottom sheet allowing viewers to pick and send virtual gifts
@@ -39,13 +40,13 @@ class _GiftSheetState extends State<GiftSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF161823),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       padding: EdgeInsets.only(
-        top: 12,
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        top: AppSize.md,
+        left: AppSize.lg,
+        right: AppSize.lg,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSize.xl,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -54,15 +55,15 @@ class _GiftSheetState extends State<GiftSheet> {
           // Drag handle
           Center(
             child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
+              decoration: const BoxDecoration(
                 color: Colors.white24,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
 
           // Header with Balance & Title
           Row(
@@ -77,12 +78,14 @@ class _GiftSheetState extends State<GiftSheet> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.md,
+                  vertical: AppSize.xs,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white12),
+                  borderRadius: AppRadius.lg,
+                  border: AppBorder.all(Colors.white12),
                 ),
                 child: Row(
                   children: [
@@ -95,7 +98,7 @@ class _GiftSheetState extends State<GiftSheet> {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    AppGap.hXs,
                     const Text(
                       'Recharge',
                       style: TextStyle(
@@ -109,7 +112,7 @@ class _GiftSheetState extends State<GiftSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
 
           // Gift Items Grid
           GridView.builder(
@@ -118,8 +121,8 @@ class _GiftSheetState extends State<GiftSheet> {
             itemCount: LiveGiftType.all.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: AppSize.md,
+              crossAxisSpacing: AppSize.md,
               childAspectRatio: 0.82,
             ),
             itemBuilder: (context, index) {
@@ -136,19 +139,19 @@ class _GiftSheetState extends State<GiftSheet> {
                     color: isSelected
                         ? const Color(0xFF2E3244)
                         : Colors.white.withValues(alpha: 0.04),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isSelected
+                    borderRadius: AppRadius.md,
+                    border: AppBorder.all(
+                      isSelected
                           ? gift.gradientColors.first
                           : Colors.transparent,
-                      width: 1.5,
+                      width: AppSize.borderMedium,
                     ),
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
                               color: gift.gradientColors.first
                                   .withValues(alpha: 0.3),
-                              blurRadius: 10,
+                              blurRadius: AppSize.md,
                             ),
                           ]
                         : null,
@@ -160,7 +163,7 @@ class _GiftSheetState extends State<GiftSheet> {
                         gift.icon,
                         style: const TextStyle(fontSize: 32),
                       ),
-                      const SizedBox(height: 4),
+                      AppGap.vXs,
                       Text(
                         gift.name,
                         maxLines: 1,
@@ -171,7 +174,7 @@ class _GiftSheetState extends State<GiftSheet> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      AppGap.vXxs,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -192,7 +195,7 @@ class _GiftSheetState extends State<GiftSheet> {
               );
             },
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
 
           // Bottom Bar: Count selector + Send Button
           Row(
@@ -201,9 +204,12 @@ class _GiftSheetState extends State<GiftSheet> {
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppRadius.xl,
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.xs,
+                  vertical: AppSize.xxs,
+                ),
                 child: Row(
                   children: _countOptions.map((count) {
                     final isChosen = count == _selectedCount;
@@ -211,14 +217,14 @@ class _GiftSheetState extends State<GiftSheet> {
                       onTap: () => setState(() => _selectedCount = count),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                          horizontal: AppSize.md,
+                          vertical: AppSize.chipVertical,
                         ),
                         decoration: BoxDecoration(
                           color: isChosen
                               ? const Color(0xFFFF2D55)
                               : Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: AppRadius.lg,
                         ),
                         child: Text(
                           'x$count',
@@ -240,12 +246,12 @@ class _GiftSheetState extends State<GiftSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF2D55),
                   foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSize.xxl,
+                    vertical: AppSize.md,
                   ),
-                  elevation: 6,
+                  shape: AppBorder.rounded(radius: AppSize.radiusXxl),
+                  elevation: AppSize.elevationLg,
                   shadowColor: const Color(0xFFFF2D55).withValues(alpha: 0.5),
                 ),
                 onPressed: () {
@@ -254,8 +260,8 @@ class _GiftSheetState extends State<GiftSheet> {
                 },
                 child: Row(
                   children: [
-                    const Icon(Icons.card_giftcard, size: 18),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.card_giftcard, size: AppSize.iconSm),
+                    AppGap.hXs,
                     Text(
                       'Send (${_selectedGift.coins * _selectedCount})',
                       style: const TextStyle(

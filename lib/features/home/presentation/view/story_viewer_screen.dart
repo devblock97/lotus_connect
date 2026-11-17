@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/story.dart';
@@ -352,9 +353,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 6),
+                            AppGap.vXs,
                             _buildProgressIndicators(group),
-                            const SizedBox(height: 10),
+                            AppGap.vSm,
                             _buildStoryHeader(group, story),
                           ],
                         ),
@@ -414,7 +415,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
 
   Widget _buildStoryMedia(Story story, bool isCurrentPage) {
     if (story.mediaUrl == null || !isValidUrl(story.mediaUrl ?? '')) {
-      return const SizedBox.shrink();
+      return AppGap.shrink;
     }
 
     if (story.isVideo && isCurrentPage && _videoController != null) {
@@ -434,10 +435,10 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         fit: BoxFit.contain,
         placeholder: (_, __) => const Center(
           child: SizedBox(
-            width: 32,
-            height: 32,
+            width: AppSize.iconXl,
+            height: AppSize.iconXl,
             child: CircularProgressIndicator(
-              strokeWidth: 2.5,
+              strokeWidth: AppSize.loaderStrokeWidth,
               color: Colors.white,
             ),
           ),
@@ -445,7 +446,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         errorWidget: (_, __, dynamic ___) => const Center(
           child: Icon(
             Icons.broken_image_rounded,
-            size: 64,
+            size: AppSize.iconHero,
             color: Colors.white54,
           ),
         ),
@@ -456,15 +457,15 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   Widget _buildProgressIndicators(UserStory group) {
     final count = group.stories.length;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: AppPadding.hSm,
       child: Row(
         children: List.generate(count, (index) {
           return Expanded(
             child: Container(
-              height: 2.5,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
+              height: AppSize.xxs,
+              margin: const EdgeInsets.symmetric(horizontal: AppSize.xxs),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
                 color: Colors.white.withValues(alpha: 0.35),
               ),
               child: AnimatedBuilder(
@@ -483,8 +484,8 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                     alignment: Alignment.centerLeft,
                     widthFactor: factor,
                     child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
+                      decoration: const BoxDecoration(
+                        borderRadius: AppRadius.full,
                         color: Colors.white,
                       ),
                     ),
@@ -505,16 +506,19 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         : story.timeAgo;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      padding: AppPadding.hLg,
       child: Row(
         children: [
           // User Avatar
           Container(
-            width: 36,
-            height: 36,
+            width: AppSize.buttonHeightSm,
+            height: AppSize.buttonHeightSm,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white54, width: 1.2),
+              border: AppBorder.all(
+                Colors.white54,
+                width: AppSize.borderMedium,
+              ),
             ),
             child: ClipOval(
               child: group.avatarUrl != null && group.avatarUrl!.isNotEmpty
@@ -529,7 +533,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                   : _buildInitials(group.user.initials),
             ),
           ),
-          const SizedBox(width: 10),
+          AppGap.hSm,
 
           // Username & TimeAgo
           Expanded(
@@ -553,7 +557,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    AppGap.hSm,
                     Text(
                       timeAgoDisplay,
                       style: TextStyle(
@@ -566,25 +570,22 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                 ),
                 if (story.isCloseFriendsStory)
                   Padding(
-                    padding: const EdgeInsets.only(top: 2),
+                    padding: const EdgeInsets.only(top: AppSize.xxs),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 1.5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981),
-                        borderRadius: BorderRadius.circular(4),
+                      padding: AppPadding.badge,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
+                        borderRadius: AppRadius.xs,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(
                             Icons.star_rounded,
-                            size: 11,
+                            size: AppSize.iconXxs,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 3),
+                          AppGap.hXxs,
                           Text(
                             loc?.closeFriends ?? 'Close Friends',
                             style: const TextStyle(
@@ -604,7 +605,11 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
           // Close button
           IconButton(
             tooltip: loc?.close ?? 'Close',
-            icon: const Icon(Icons.close, color: Colors.white, size: 26),
+            icon: const Icon(
+              Icons.close,
+              color: Colors.white,
+              size: AppSize.iconLg,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -630,7 +635,10 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   Widget _buildStoryCaption(String caption) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.lg,
+        vertical: AppSize.bubbleVertical,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
@@ -681,7 +689,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         textOffsetMap != null;
 
     if (stickers.isEmpty && !hasPositionedCaption) {
-      return const SizedBox.shrink();
+      return AppGap.shrink;
     }
 
     return LayoutBuilder(
@@ -807,15 +815,13 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
           )..rotateZ(rotation),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 320),
-            padding: hasHighlight
-                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-                : EdgeInsets.zero,
+            padding: hasHighlight ? AppPadding.buttonCompact : AppPadding.zero,
             decoration: hasHighlight
                 ? BoxDecoration(
                     color: textColor == Colors.white
                         ? Colors.white
                         : Colors.black.withValues(alpha: 0.75),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppRadius.md,
                   )
                 : null,
             child: Text(
@@ -833,11 +839,11 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
     switch (sticker.type) {
       case StoryStickerType.location:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
+          padding: AppPadding.buttonCompact,
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
+            borderRadius: AppRadius.xl,
+            boxShadow: [
               BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10,
@@ -851,9 +857,9 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               const Icon(
                 Icons.location_on,
                 color: Color(0xFFFF3B30),
-                size: 18,
+                size: AppSize.iconSm,
               ),
-              const SizedBox(width: 6),
+              AppGap.hSm,
               Text(
                 sticker.text,
                 style: const TextStyle(
@@ -867,17 +873,21 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         );
       case StoryStickerType.time:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: AppPadding.buttonCompact,
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.65),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white30),
+            borderRadius: AppRadius.xl,
+            border: AppBorder.all(Colors.white30),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(CupertinoIcons.time, color: Colors.white, size: 16),
-              const SizedBox(width: 6),
+              const Icon(
+                CupertinoIcons.time,
+                color: Colors.white,
+                size: AppSize.iconXs,
+              ),
+              AppGap.hSm,
               Text(
                 sticker.text,
                 style: const TextStyle(
@@ -891,12 +901,12 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         );
       case StoryStickerType.mention:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          padding: AppPadding.buttonCompact,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [Color(0xFFFF2D55), Color(0xFFFF9500)],
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xl,
           ),
           child: Text(
             sticker.text.startsWith('@') ? sticker.text : '@${sticker.text}',
@@ -909,10 +919,10 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
         );
       case StoryStickerType.tag:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: AppPadding.buttonCompact,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xl,
           ),
           child: Text(
             sticker.text,
@@ -943,21 +953,21 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
   Widget _buildBottomReplyBar(Story story) {
     final loc = AppLocalizations.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: AppPadding.buttonCompact,
       color: Colors.black.withValues(alpha: 0.4),
       child: Row(
         children: [
           // Input field
           Expanded(
             child: Container(
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              height: AppSize.buttonHeightMd,
+              padding: AppPadding.hLg,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  width: 0.8,
+                borderRadius: AppRadius.xxl,
+                border: AppBorder.all(
+                  Colors.white.withValues(alpha: 0.3),
+                  width: AppSize.borderHairline,
                 ),
               ),
               alignment: Alignment.center,
@@ -974,14 +984,14 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
                   ),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: AppPadding.zero,
                   suffixIcon: _replyController.text.isNotEmpty
                       ? IconButton(
                           tooltip: loc?.send ?? 'Send',
                           icon: const Icon(
                             Icons.send_rounded,
                             color: Colors.white,
-                            size: 20,
+                            size: AppSize.iconSm,
                           ),
                           onPressed: _sendReply,
                         )
@@ -992,7 +1002,7 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          AppGap.hSm,
 
           // Heart Reaction button
           Semantics(
@@ -1003,20 +1013,20 @@ class _StoryViewerScreenState extends ConsumerState<StoryViewerScreen>
               child: GestureDetector(
                 onTap: _sendHeartReaction,
                 child: Container(
-                  width: 44,
-                  height: 44,
+                  width: AppSize.buttonHeightMd,
+                  height: AppSize.buttonHeightMd,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white.withValues(alpha: 0.15),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 0.8,
+                    border: AppBorder.all(
+                      Colors.white.withValues(alpha: 0.3),
+                      width: AppSize.borderHairline,
                     ),
                   ),
                   child: const Icon(
                     CupertinoIcons.heart_fill,
                     color: Colors.white,
-                    size: 24,
+                    size: AppSize.iconMd,
                   ),
                 ),
               ),

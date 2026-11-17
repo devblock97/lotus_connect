@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -65,13 +66,21 @@ class CreatePostBar extends ConsumerWidget {
     final avatarUrl = settings.avatarUrl;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.sm,
+      ),
+      padding: const EdgeInsets.fromLTRB(
+        AppSize.md,
+        AppSize.md,
+        AppSize.md,
+        AppSize.bubbleVertical,
+      ),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.dividerColor.withValues(alpha: 0.1),
+        borderRadius: AppRadius.card,
+        border: AppBorder.all(
+          theme.dividerColor.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
@@ -87,7 +96,7 @@ class CreatePostBar extends ConsumerWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: AppSize.avatarMd / 2,
                 backgroundColor: theme.colorScheme.primaryContainer,
                 backgroundImage: avatarUrl.isNotEmpty
                     ? CachedNetworkImageProvider(avatarUrl)
@@ -103,20 +112,20 @@ class CreatePostBar extends ConsumerWidget {
                       )
                     : null,
               ),
-              const SizedBox(width: 12),
+              AppGap.hMd,
               Expanded(
                 child: GestureDetector(
                   onTap: () => _openCreatePost(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: AppSize.lg,
+                      vertical: AppSize.bubbleVertical,
                     ),
                     decoration: BoxDecoration(
                       color: theme.scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: theme.dividerColor.withValues(alpha: 0.15),
+                      borderRadius: AppRadius.xxl,
+                      border: AppBorder.all(
+                        theme.dividerColor.withValues(alpha: 0.15),
                       ),
                     ),
                     child: Text(
@@ -135,13 +144,13 @@ class CreatePostBar extends ConsumerWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
+          AppGap.vSm,
           Divider(
-            height: 1,
-            thickness: 0.5,
+            height: AppSize.dividerThickness,
+            thickness: AppSize.borderHairline,
             color: theme.dividerColor.withValues(alpha: 0.1),
           ),
-          const SizedBox(height: 6),
+          AppGap.vXs,
 
           // Bottom Quick Action Buttons
           Row(
@@ -200,13 +209,13 @@ class _QuickActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppRadius.sm,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: AppPadding.chip,
         child: Row(
           children: [
-            Icon(icon, color: iconColor, size: 20),
-            const SizedBox(width: 6),
+            Icon(icon, color: iconColor, size: AppSize.iconSm),
+            AppGap.hXs,
             Text(
               label,
               style: TextStyle(

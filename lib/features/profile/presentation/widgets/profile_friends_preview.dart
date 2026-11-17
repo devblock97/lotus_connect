@@ -340,7 +340,7 @@ class _ProfileFriendsSheetState extends State<ProfileFriendsSheet> {
                     fillColor: theme.cardColor,
                     border: const OutlineInputBorder(
                       borderRadius: AppRadius.input,
-                      borderSide: BorderSide.none,
+                      borderSide: AppBorder.none,
                     ),
                   ),
                 ),

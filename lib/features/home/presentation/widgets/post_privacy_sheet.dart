@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 /// Modal bottom sheet allowing users to pick post visibility
@@ -63,27 +64,27 @@ class PostPrivacySheet extends StatelessWidget {
 
     return Material(
       color: theme.scaffoldBackgroundColor,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: AppRadius.bottomSheetTop,
       child: Padding(
         padding: EdgeInsets.only(
-          top: 12,
-          bottom: MediaQuery.of(context).padding.bottom + 16,
+          top: AppSize.md,
+          bottom: MediaQuery.of(context).padding.bottom + AppSize.lg,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
             Container(
-              width: 40,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: theme.dividerColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: AppPadding.hXl,
               child: Row(
                 children: [
                   Text(
@@ -96,41 +97,45 @@ class PostPrivacySheet extends StatelessWidget {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, size: 20),
-                    splashRadius: 18,
+                    icon: const Icon(Icons.close, size: AppSize.iconSm),
+                    splashRadius: AppSize.iconSm,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Divider(
-              height: 1,
-              thickness: 0.5,
+              height: AppSize.dividerThickness,
+              thickness: AppSize.borderHairline,
               color: theme.dividerColor.withValues(alpha: 0.15),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             ...options.map((opt) {
               final isSelected = opt.value == currentVisibility;
               return InkWell(
                 onTap: () => onSelect(opt.value),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
+                    horizontal: AppSize.xl,
+                    vertical: AppSize.md,
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 44,
-                        height: 44,
+                        width: AppSize.buttonHeightMd,
+                        height: AppSize.buttonHeightMd,
                         decoration: BoxDecoration(
                           color: opt.color.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(opt.icon, color: opt.color, size: 22),
+                        child: Icon(
+                          opt.icon,
+                          color: opt.color,
+                          size: AppSize.iconMd,
+                        ),
                       ),
-                      const SizedBox(width: 14),
+                      AppGap.hMd,
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +148,7 @@ class PostPrivacySheet extends StatelessWidget {
                                 color: primaryTextColor,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            AppGap.vXxs,
                             Text(
                               opt.subtitle,
                               style: TextStyle(
@@ -154,17 +159,17 @@ class PostPrivacySheet extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      AppGap.hMd,
                       Container(
-                        width: 22,
-                        height: 22,
+                        width: AppSize.iconMd,
+                        height: AppSize.iconMd,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
+                          border: AppBorder.all(
+                            isSelected
                                 ? theme.colorScheme.primary
                                 : subtextColor.withValues(alpha: 0.5),
-                            width: isSelected ? 6 : 1.5,
+                            width: isSelected ? 6 : AppSize.borderMedium,
                           ),
                         ),
                       ),

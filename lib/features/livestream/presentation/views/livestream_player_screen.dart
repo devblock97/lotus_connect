@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
@@ -601,8 +602,8 @@ class _LiveStreamPlayerScreenState
 
             // Floating Hearts Particle System (Bottom Right)
             Positioned(
-              bottom: 60,
-              right: 12,
+              bottom: AppSize.giant,
+              right: AppSize.md,
               child: FloatingHeartsOverlay(
                 burstTick: roomState.reactionBurstTick,
               ),
@@ -612,7 +613,7 @@ class _LiveStreamPlayerScreenState
             if (roomState.activeGift != null)
               Positioned(
                 top: 130,
-                left: 0,
+                left: AppSize.none,
                 child: GiftAnimationOverlay(
                   giftEvent: roomState.activeGift!,
                 ),
@@ -638,7 +639,7 @@ class _LiveStreamPlayerScreenState
                     onUnpinComment: roomNotifier.unpinComment,
                   ),
 
-                  const SizedBox(height: 10),
+                  AppGap.vSm,
 
                   // Bottom Action Bar or Text Input
                   if (_isCommentInputActive)
@@ -682,10 +683,10 @@ class _LiveStreamPlayerScreenState
             children: [
               Icon(
                 _isCameraFront ? Icons.camera_front : Icons.camera_rear,
-                size: 64,
+                size: AppSize.iconHero,
                 color: Colors.white24,
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               Text(
                 AppLocalizations.of(context)?.cameraInitializing ??
                     'Camera initializing...',
@@ -754,11 +755,14 @@ class _LiveStreamPlayerScreenState
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 90,
-              height: 90,
+              width: AppSize.avatarProfile,
+              height: AppSize.avatarProfile,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white24, width: 2),
+                border: AppBorder.all(
+                  Colors.white24,
+                  width: AppSize.borderThick,
+                ),
               ),
               clipBehavior: Clip.antiAlias,
               child: stream.host.avatarUrl != null &&
@@ -787,7 +791,7 @@ class _LiveStreamPlayerScreenState
                       ),
                     ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             Text(
               stream.title,
               style: const TextStyle(
@@ -796,12 +800,12 @@ class _LiveStreamPlayerScreenState
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            AppGap.vXs,
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const LiveBadge(isCompact: true),
-                const SizedBox(width: 8),
+                AppGap.hSm,
                 Text(
                   _formatTimer(_streamElapsedSeconds),
                   style: const TextStyle(
@@ -826,22 +830,25 @@ class _LiveStreamPlayerScreenState
     final host = roomState.stream.host;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: AppPadding.buttonCompact,
       child: Row(
         children: [
           // Streamer Profile Pill
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.chipVertical,
+              vertical: AppSize.xs,
+            ),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white12),
+              borderRadius: AppRadius.xxl,
+              border: AppBorder.all(Colors.white12),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildAvatar(host, 34),
-                const SizedBox(width: 6),
+                AppGap.hSm,
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -861,7 +868,7 @@ class _LiveStreamPlayerScreenState
                     Row(
                       children: [
                         const LiveBadge(isCompact: true),
-                        const SizedBox(width: 4),
+                        AppGap.hXs,
                         Text(
                           _formatTimer(_streamElapsedSeconds),
                           style: const TextStyle(
@@ -874,16 +881,18 @@ class _LiveStreamPlayerScreenState
                   ],
                 ),
                 if (!isHost) ...[
-                  const SizedBox(width: 8),
+                  AppGap.hSm,
                   Container(
-                    height: 26,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    height: AppSize.iconLg,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSize.bubbleVertical,
+                    ),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
                         colors: [Color(0xFFFF0844), Color(0xFFFF4E50)],
                       ),
-                      borderRadius: BorderRadius.circular(13),
+                      borderRadius: AppRadius.full,
                     ),
                     child: Text(
                       AppLocalizations.of(context)?.follow ?? 'Follow',
@@ -909,20 +918,23 @@ class _LiveStreamPlayerScreenState
               totalCount: roomState.stream.viewerCount,
             ),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.sm,
+                vertical: AppSize.xs,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.55),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white12),
+                borderRadius: AppRadius.xl,
+                border: AppBorder.all(Colors.white12),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.remove_red_eye_rounded,
                     color: Colors.white70,
-                    size: 14,
+                    size: AppSize.iconXxs,
                   ),
-                  const SizedBox(width: 4),
+                  AppGap.hXs,
                   Text(
                     '${roomState.stream.viewerCount}',
                     style: const TextStyle(
@@ -936,23 +948,23 @@ class _LiveStreamPlayerScreenState
             ),
           ),
 
-          const SizedBox(width: 8),
+          AppGap.hSm,
 
           // Exit / Close button
           GestureDetector(
             onTap: () => _handleExit(isHost, roomNotifier),
             child: Container(
-              width: 32,
-              height: 32,
+              width: AppSize.iconButtonSm,
+              height: AppSize.iconButtonSm,
               decoration: BoxDecoration(
                 color: Colors.black.withValues(alpha: 0.55),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white12),
+                border: AppBorder.all(Colors.white12),
               ),
               child: const Icon(
                 Icons.close,
                 color: Colors.white,
-                size: 18,
+                size: AppSize.iconSm,
               ),
             ),
           ),
@@ -967,7 +979,10 @@ class _LiveStreamPlayerScreenState
     bool isHost,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.sm,
+      ),
       child: Row(
         children: [
           // "Add comment" rounded pill button
@@ -978,12 +993,14 @@ class _LiveStreamPlayerScreenState
                 _commentFocusNode.requestFocus();
               },
               child: Container(
-                height: 42,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
+                height: AppSize.buttonHeightMd,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.bubbleHorizontal,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(21),
-                  border: Border.all(color: Colors.white12),
+                  borderRadius: AppRadius.full,
+                  border: AppBorder.all(Colors.white12),
                 ),
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -994,7 +1011,7 @@ class _LiveStreamPlayerScreenState
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          AppGap.hMd,
 
           // Viewers only: Gift & Like buttons
           if (!isHost) ...[
@@ -1010,7 +1027,7 @@ class _LiveStreamPlayerScreenState
                 );
               },
             ),
-            const SizedBox(width: 8),
+            AppGap.hSm,
 
             // Like Button
             _buildCircleActionButton(
@@ -1024,7 +1041,7 @@ class _LiveStreamPlayerScreenState
                 roomNotifier.sendReactionBurst(count: 5);
               },
             ),
-            const SizedBox(width: 8),
+            AppGap.hSm,
           ],
 
           _buildCircleActionButton(
@@ -1040,7 +1057,7 @@ class _LiveStreamPlayerScreenState
 
           // Host broadcast controls (Mic mute, Flip camera)
           if (isHost) ...[
-            const SizedBox(width: 8),
+            AppGap.hSm,
             _buildCircleActionButton(
               icon: _isMicMuted ? Icons.mic_off : Icons.mic,
               backgroundColor: _isMicMuted
@@ -1048,7 +1065,7 @@ class _LiveStreamPlayerScreenState
                   : Colors.black.withValues(alpha: 0.5),
               onTap: _toggleMic,
             ),
-            const SizedBox(width: 8),
+            AppGap.hSm,
             _buildCircleActionButton(
               icon: Icons.flip_camera_ios,
               backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -1058,7 +1075,7 @@ class _LiveStreamPlayerScreenState
               },
             ),
           ] else ...[
-            const SizedBox(width: 8),
+            AppGap.hSm,
             _buildCircleActionButton(
               icon: Icons.share_outlined,
               backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -1100,15 +1117,15 @@ class _LiveStreamPlayerScreenState
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: AppSize.buttonHeightMd,
+            height: AppSize.buttonHeightMd,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: backgroundColor,
               gradient: gradientColors != null
                   ? LinearGradient(colors: gradientColors)
                   : null,
-              border: Border.all(color: Colors.white12),
+              border: AppBorder.all(Colors.white12),
               boxShadow: gradientColors != null
                   ? [
                       BoxShadow(
@@ -1118,18 +1135,21 @@ class _LiveStreamPlayerScreenState
                     ]
                   : null,
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
+            child: Icon(icon, color: Colors.white, size: AppSize.iconSm),
           ),
           if (badgeText != null)
             Positioned(
-              top: -4,
-              right: -4,
+              top: -AppSize.xs,
+              right: -AppSize.xs,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                padding: AppPadding.badge,
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF0844),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(width: 1.5),
+                  borderRadius: AppRadius.full,
+                  border: AppBorder.all(
+                    Colors.black,
+                    width: AppSize.borderMedium,
+                  ),
                 ),
                 child: Text(
                   badgeText,
@@ -1150,10 +1170,10 @@ class _LiveStreamPlayerScreenState
     return Container(
       color: Colors.black.withValues(alpha: 0.85),
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 8,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
+        left: AppSize.md,
+        right: AppSize.md,
+        top: AppSize.sm,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSize.sm,
       ),
       child: Row(
         children: [
@@ -1168,11 +1188,10 @@ class _LiveStreamPlayerScreenState
                 hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.1),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
+                contentPadding: AppPadding.chatBubble,
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.xl,
+                  borderSide: AppBorder.none,
                 ),
               ),
               onSubmitted: (text) {
@@ -1185,7 +1204,7 @@ class _LiveStreamPlayerScreenState
               },
             ),
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           IconButton(
             icon: const Icon(Icons.send_rounded, color: Color(0xFFFF0844)),
             onPressed: () {

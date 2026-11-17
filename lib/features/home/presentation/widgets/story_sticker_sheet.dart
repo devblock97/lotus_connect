@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/presentation/models/story_sticker_item.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
@@ -90,26 +91,32 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
       height: MediaQuery.of(context).size.height * 0.65,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E24) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       child: Column(
         children: [
           // Drag Handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 38,
-              height: 4.5,
+              margin: const EdgeInsets.only(
+                top: AppSize.md,
+                bottom: AppSize.sm,
+              ),
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: Colors.grey.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2.5),
+                borderRadius: AppRadius.full,
               ),
             ),
           ),
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.lg,
+              vertical: AppSize.sm,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -120,7 +127,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: const Icon(Icons.close, size: AppSize.iconSm),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -129,7 +136,10 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
 
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.lg,
+                vertical: AppSize.sm,
+              ),
               children: [
                 // Top Quick Interactive Badges (Location & Time & Mention)
                 Row(
@@ -142,17 +152,14 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                           currentTimeStr,
                         ),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
+                          padding: AppPadding.cardCompact,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF2A2A36)
                                 : const Color(0xFFF1F3F5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isDark
+                            borderRadius: AppRadius.card,
+                            border: AppBorder.all(
+                              isDark
                                   ? Colors.white10
                                   : Colors.black.withValues(alpha: 0.05),
                             ),
@@ -163,9 +170,9 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                               const Icon(
                                 CupertinoIcons.time,
                                 color: Color(0xFF0095F6),
-                                size: 26,
+                                size: AppSize.iconLg,
                               ),
-                              const SizedBox(height: 6),
+                              AppGap.vXs,
                               Text(
                                 currentTimeStr,
                                 style: const TextStyle(
@@ -178,7 +185,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    AppGap.hMd,
 
                     // Mention Badge
                     Expanded(
@@ -189,17 +196,14 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                           type: StoryStickerType.mention,
                         ),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 14,
-                          ),
+                          padding: AppPadding.cardCompact,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF2A2A36)
                                 : const Color(0xFFF1F3F5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isDark
+                            borderRadius: AppRadius.card,
+                            border: AppBorder.all(
+                              isDark
                                   ? Colors.white10
                                   : Colors.black.withValues(alpha: 0.05),
                             ),
@@ -210,9 +214,9 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                               Icon(
                                 CupertinoIcons.at,
                                 color: Color(0xFFFF2D55),
-                                size: 26,
+                                size: AppSize.iconLg,
                               ),
-                              SizedBox(height: 6),
+                              AppGap.vXs,
                               Text(
                                 '@MENTION',
                                 style: TextStyle(
@@ -227,7 +231,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                AppGap.vXl,
 
                 // Location Chips
                 Text(
@@ -237,16 +241,16 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 8),
+                AppGap.vSm,
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: AppSize.sm,
+                  runSpacing: AppSize.sm,
                   children: [
                     ..._kLocations.map(
                       (locationName) => ActionChip(
                         avatar: const Icon(
                           Icons.location_on,
-                          size: 16,
+                          size: AppSize.iconXs,
                           color: Color(0xFFFF3B30),
                         ),
                         label: Text(locationName),
@@ -257,7 +261,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                       ),
                     ),
                     ActionChip(
-                      avatar: const Icon(Icons.add, size: 16),
+                      avatar: const Icon(Icons.add, size: AppSize.iconXs),
                       label: Text(loc?.customLocation ?? 'Custom...'),
                       onPressed: () => _promptCustomText(
                         title: loc?.addLocation ?? 'Add Location',
@@ -267,7 +271,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                AppGap.vXl,
 
                 // Mood / Status Tags
                 Text(
@@ -277,10 +281,10 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 8),
+                AppGap.vSm,
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: AppSize.sm,
+                  runSpacing: AppSize.sm,
                   children: _kMoodTags
                       .map(
                         (tag) => ActionChip(
@@ -293,7 +297,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                       )
                       .toList(),
                 ),
-                const SizedBox(height: 20),
+                AppGap.vXl,
 
                 // Popular Emojis
                 Text(
@@ -303,15 +307,15 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 10),
+                AppGap.vSm,
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _kEmojis.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 6,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
+                    mainAxisSpacing: AppSize.sm,
+                    crossAxisSpacing: AppSize.sm,
                   ),
                   itemBuilder: (context, index) {
                     final emoji = _kEmojis[index];
@@ -325,7 +329,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                           color: isDark
                               ? const Color(0xFF2A2A36)
                               : const Color(0xFFF1F3F5),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadius.md,
                         ),
                         alignment: Alignment.center,
                         child: Text(
@@ -336,7 +340,7 @@ class _StoryStickerSheetState extends State<StoryStickerSheet> {
                     );
                   },
                 ),
-                const SizedBox(height: 24),
+                AppGap.vXxl,
               ],
             ),
           ),

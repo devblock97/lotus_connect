@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 
 /// Pulsing, glowing LIVE badge with TikTok/Instagram broadcast styling.
 class LiveBadge extends StatefulWidget {
@@ -60,8 +61,8 @@ class _LiveBadgeState extends State<LiveBadge>
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isCompact ? 5 : 8,
-        vertical: isCompact ? 2 : 3,
+        horizontal: isCompact ? AppSize.xs : AppSize.sm,
+        vertical: AppSize.xxs,
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -70,12 +71,12 @@ class _LiveBadgeState extends State<LiveBadge>
             Color(0xFFFF4E50),
           ],
         ),
-        borderRadius: BorderRadius.circular(isCompact ? 4 : 6),
+        borderRadius: isCompact ? AppRadius.xs : AppRadius.sm,
         boxShadow: [
           BoxShadow(
             color: const Color(0xFFFF0844).withValues(alpha: 0.4 * glow),
-            blurRadius: 6 * glow,
-            spreadRadius: 1 * glow,
+            blurRadius: AppSize.chipVertical * glow,
+            spreadRadius: AppSize.elevationXs * glow,
           ),
         ],
       ),
@@ -83,14 +84,14 @@ class _LiveBadgeState extends State<LiveBadge>
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: isCompact ? 5 : 6,
-            height: isCompact ? 5 : 6,
+            width: isCompact ? AppSize.xs : AppSize.chipVertical,
+            height: isCompact ? AppSize.xs : AppSize.chipVertical,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: glow),
               shape: BoxShape.circle,
             ),
           ),
-          SizedBox(width: isCompact ? 3 : 4),
+          SizedBox(width: isCompact ? AppSize.xxs : AppSize.xs),
           Text(
             'LIVE',
             style: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/home/application/feed_notifier.dart';
@@ -100,8 +101,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
+        elevation: AppSize.elevationNone,
+        scrolledUnderElevation: AppSize.elevationNone,
         title: Text(
           'Lotus Connect',
           style: TextStyle(
@@ -117,9 +118,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: const Icon(
               Icons.sensors,
               color: Color(0xFFFF0844),
-              size: 24,
+              size: AppSize.iconMd,
             ),
-            splashRadius: 20,
+            splashRadius: AppSize.iconSm,
             tooltip: loc?.liveStreams ?? 'Live streams',
             onPressed: () {
               Navigator.of(context).push<void>(
@@ -133,9 +134,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: Icon(
               CupertinoIcons.plus_app,
               color: primaryTextColor,
-              size: 24,
+              size: AppSize.iconMd,
             ),
-            splashRadius: 20,
+            splashRadius: AppSize.iconSm,
             tooltip: loc?.createPost ?? 'Create post',
             onPressed: () {
               Navigator.of(context).push<void>(
@@ -149,9 +150,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             icon: Icon(
               CupertinoIcons.paperplane,
               color: primaryTextColor,
-              size: 24,
+              size: AppSize.iconMd,
             ),
-            splashRadius: 20,
+            splashRadius: AppSize.iconSm,
             tooltip: loc?.chat ?? 'Chat',
             onPressed: () {
               Navigator.of(context).push<void>(
@@ -159,7 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               );
             },
           ),
-          const SizedBox(width: 4),
+          AppGap.hXs,
         ],
       ),
       body: RefreshIndicator(
@@ -179,8 +180,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             SliverToBoxAdapter(
               child: Divider(
-                height: 1,
-                thickness: 0.5,
+                height: AppSize.dividerThickness,
+                thickness: AppSize.borderHairline,
                 color: theme.dividerColor.withValues(alpha: 0.15),
               ),
             ),
@@ -189,8 +190,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             SliverToBoxAdapter(
               child: Divider(
-                height: 1,
-                thickness: 0.5,
+                height: AppSize.dividerThickness,
+                thickness: AppSize.borderHairline,
                 color: theme.dividerColor.withValues(alpha: 0.15),
               ),
             ),
@@ -319,8 +320,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       if (index < feedState.posts.length - 1)
                         Divider(
-                          height: 1,
-                          thickness: 0.5,
+                          height: AppSize.dividerThickness,
+                          thickness: AppSize.borderHairline,
                           color: theme.dividerColor.withValues(alpha: 0.1),
                         ),
                     ],

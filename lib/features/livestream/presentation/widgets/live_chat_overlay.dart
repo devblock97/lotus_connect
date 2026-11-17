@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_comment.dart';
 
@@ -62,7 +63,7 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
         if (widget.pinnedComment != null)
           _buildPinnedComment(widget.pinnedComment!),
 
-        const SizedBox(height: 6),
+        AppGap.vXs,
 
         // Real-Time Chat messages list
         ConstrainedBox(
@@ -80,7 +81,10 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
             child: ListView.builder(
               controller: _scrollController,
               shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.md,
+                vertical: AppSize.xs,
+              ),
               itemCount: widget.comments.length,
               itemBuilder: (context, index) {
                 final comment = widget.comments[index];
@@ -95,19 +99,22 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
 
   Widget _buildPinnedComment(LiveComment pinned) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: AppPadding.hMd,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.sm,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E2E).withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFFFD700).withValues(alpha: 0.8),
-          width: 1.2,
+        borderRadius: AppRadius.md,
+        border: AppBorder.all(
+          const Color(0xFFFFD700).withValues(alpha: 0.8),
+          width: AppSize.borderMedium,
         ),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFFFFD700).withValues(alpha: 0.25),
-            blurRadius: 10,
+            blurRadius: AppSize.md,
           ),
         ],
       ),
@@ -117,9 +124,9 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
           const Icon(
             Icons.push_pin,
             color: Color(0xFFFFD700),
-            size: 16,
+            size: AppSize.iconXs,
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,15 +144,15 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    AppGap.hXs,
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 1,
+                        horizontal: AppSize.xs,
+                        vertical: AppSize.xxs,
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFD700).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppRadius.xs,
                       ),
                       child: const Text(
                         'PINNED',
@@ -158,7 +165,7 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 2),
+                AppGap.vXxs,
                 Text(
                   pinned.content,
                   style: const TextStyle(
@@ -173,11 +180,11 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
             GestureDetector(
               onTap: widget.onUnpinComment,
               child: const Padding(
-                padding: EdgeInsets.only(left: 6),
+                padding: EdgeInsets.only(left: AppSize.xs),
                 child: Icon(
                   Icons.close,
                   color: Colors.white60,
-                  size: 16,
+                  size: AppSize.iconXs,
                 ),
               ),
             ),
@@ -192,11 +199,14 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
 
     if (isSystem) {
       return Container(
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        margin: const EdgeInsets.only(bottom: AppSize.xs),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.md,
+          vertical: AppSize.xs,
+        ),
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadius.md,
         ),
         child: Text(
           '${comment.user.username} ${comment.content}',
@@ -214,16 +224,19 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
           ? () => _showCommentActions(comment)
           : null,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        margin: const EdgeInsets.only(bottom: AppSize.xs),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.md,
+          vertical: AppSize.xs,
+        ),
         decoration: BoxDecoration(
           color: isStreamer
               ? const Color(0xFFFF0844).withValues(alpha: 0.4)
               : Colors.black.withValues(alpha: 0.45),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.lg,
           border: isStreamer
-              ? Border.all(
-                  color: const Color(0xFFFF0844).withValues(alpha: 0.6),
+              ? AppBorder.all(
+                  const Color(0xFFFF0844).withValues(alpha: 0.6),
                 )
               : null,
         ),
@@ -232,7 +245,7 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSmallAvatar(comment.user),
-            const SizedBox(width: 6),
+            AppGap.hXs,
             Flexible(
               child: RichText(
                 text: TextSpan(
@@ -251,7 +264,7 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
                       const WidgetSpan(
                         alignment: PlaceholderAlignment.middle,
                         child: Padding(
-                          padding: EdgeInsets.only(right: 4),
+                          padding: EdgeInsets.only(right: AppSize.xs),
                           child: Text('👑', style: TextStyle(fontSize: 11)),
                         ),
                       ),
@@ -274,8 +287,8 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
 
   Widget _buildSmallAvatar(PostAuthor user) {
     return Container(
-      width: 20,
-      height: 20,
+      width: AppSize.iconSm,
+      height: AppSize.iconSm,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white24,
@@ -310,7 +323,7 @@ class _LiveChatOverlayState extends State<LiveChatOverlay> {
       context: context,
       backgroundColor: const Color(0xFF1E1E2E),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: AppRadius.topLg,
       ),
       builder: (ctx) {
         return SafeArea(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 
 /// Supported comment reactions corresponding to backend capabilities.
 const List<String> kAvailableCommentReactions = [
@@ -56,8 +57,10 @@ class CommentReactionsOverlay extends StatefulWidget {
               right: (MediaQuery.of(ctx).size.width -
                       targetPosition.dx -
                       targetSize.width)
-                  .clamp(16.0, MediaQuery.of(ctx).size.width - 260.0),
-              bottom: MediaQuery.of(ctx).size.height - targetPosition.dy + 8,
+                  .clamp(AppSize.lg, MediaQuery.of(ctx).size.width - 260.0),
+              bottom: MediaQuery.of(ctx).size.height -
+                  targetPosition.dy +
+                  AppSize.sm,
               child: Material(
                 color: Colors.transparent,
                 child: CommentReactionsOverlay(
@@ -122,10 +125,10 @@ class _CommentReactionsOverlayState extends State<CommentReactionsOverlay>
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: AppPadding.chip,
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF26262B) : const Color(0xFFFFFFFF),
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: AppRadius.full,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
@@ -133,11 +136,11 @@ class _CommentReactionsOverlayState extends State<CommentReactionsOverlay>
                 offset: const Offset(0, 6),
               ),
             ],
-            border: Border.all(
-              color: isDark
+            border: AppBorder.all(
+              isDark
                   ? Colors.white.withValues(alpha: 0.12)
                   : Colors.black.withValues(alpha: 0.08),
-              width: 0.8,
+              width: AppSize.borderHairline,
             ),
           ),
           child: Row(
@@ -190,8 +193,8 @@ class _ReactionItemState extends State<_ReactionItem> {
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.all(5),
+          margin: AppPadding.hXs,
+          padding: AppPadding.xs,
           decoration: widget.isSelected
               ? BoxDecoration(
                   color: Colors.amber.withValues(alpha: 0.15),

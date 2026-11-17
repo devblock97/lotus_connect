@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/application/create_story_notifier.dart';
 import 'package:lotus_connect/features/home/application/create_story_state.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
@@ -351,10 +352,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                 ignoring: _isDragging,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                    padding: AppPadding.buttonCompact,
                     child: Row(
                       children: [
                         // Close button
@@ -371,7 +369,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                           tooltip: loc?.textToolTooltip ?? 'Text',
                           onTap: _openTextEditor,
                         ),
-                        const SizedBox(width: 8),
+                        AppGap.hSm,
 
                         // Color palette button (gradients)
                         _buildTopIconButton(
@@ -383,7 +381,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                             notifier.cycleBackgroundPreset();
                           },
                         ),
-                        const SizedBox(width: 8),
+                        AppGap.hSm,
 
                         // Filter button (Stars)
                         _buildTopIconButton(
@@ -391,7 +389,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                           tooltip: loc?.photoFilterTooltip ?? 'Photo filter',
                           onTap: _cycleFilter,
                         ),
-                        const SizedBox(width: 8),
+                        AppGap.hSm,
 
                         // Stickers button
                         _buildTopIconButton(
@@ -402,7 +400,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
                         // Video audio mute toggle if video
                         if (storyState.isVideoMode) ...[
-                          const SizedBox(width: 8),
+                          AppGap.hSm,
                           _buildTopIconButton(
                             icon: storyState.isMuted
                                 ? CupertinoIcons.volume_off
@@ -425,9 +423,9 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
           // Bottom Controls & Sharing Bar
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: AppSize.none,
+            left: AppSize.none,
+            right: AppSize.none,
             child: AnimatedOpacity(
               opacity: _isDragging ? 0.0 : 1.0,
               duration: const Duration(milliseconds: 150),
@@ -440,10 +438,10 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                     children: [
                       // Mode Picker Pills (Create / Gallery / Camera)
                       _buildModeSelector(storyState, notifier, loc),
-                      const SizedBox(height: 12),
+                      AppGap.vMd,
 
                       _buildInstagramShareBar(settings, storyState, loc),
-                      const SizedBox(height: 10),
+                      AppGap.vSm,
                     ],
                   ),
                 ),
@@ -460,14 +458,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(
-                    width: 48,
-                    height: 48,
+                    width: AppSize.iconXxl,
+                    height: AppSize.iconXxl,
                     child: CircularProgressIndicator(
-                      strokeWidth: 3,
+                      strokeWidth: AppSize.borderHeavy,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  AppGap.vLg,
                   Text(
                     loc?.sharingStory ?? 'Sharing story...',
                     style: const TextStyle(
@@ -533,7 +531,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                   ),
                 ),
               )
-            : const SizedBox.shrink(),
+            : AppGap.shrink,
       );
     }
 
@@ -600,15 +598,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 320),
-      padding: state.hasTextHighlight
-          ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-          : EdgeInsets.zero,
+      padding:
+          state.hasTextHighlight ? AppPadding.buttonCompact : AppPadding.zero,
       decoration: state.hasTextHighlight
           ? BoxDecoration(
               color: state.textColor == Colors.white
                   ? Colors.white
                   : Colors.black.withValues(alpha: 0.75),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: AppRadius.md,
             )
           : null,
       child: Text(
@@ -655,11 +652,11 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     switch (sticker.type) {
       case StoryStickerType.location:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
+          padding: AppPadding.buttonCompact,
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
+            borderRadius: AppRadius.xl,
+            boxShadow: [
               BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10,
@@ -673,9 +670,9 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               const Icon(
                 Icons.location_on,
                 color: Color(0xFFFF3B30),
-                size: 18,
+                size: AppSize.iconSm,
               ),
-              const SizedBox(width: 6),
+              AppGap.hSm,
               Text(
                 sticker.text,
                 style: const TextStyle(
@@ -689,17 +686,21 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         );
       case StoryStickerType.time:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: AppPadding.buttonCompact,
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.65),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white30),
+            borderRadius: AppRadius.xl,
+            border: AppBorder.all(Colors.white30),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(CupertinoIcons.time, color: Colors.white, size: 16),
-              const SizedBox(width: 6),
+              const Icon(
+                CupertinoIcons.time,
+                color: Colors.white,
+                size: AppSize.iconXs,
+              ),
+              AppGap.hSm,
               Text(
                 sticker.text,
                 style: const TextStyle(
@@ -713,12 +714,12 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         );
       case StoryStickerType.mention:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          padding: AppPadding.buttonCompact,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [Color(0xFFFF2D55), Color(0xFFFF9500)],
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xl,
           ),
           child: Text(
             sticker.text.startsWith('@') ? sticker.text : '@${sticker.text}',
@@ -731,10 +732,10 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         );
       case StoryStickerType.tag:
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: AppPadding.buttonCompact,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.xl,
           ),
           child: Text(
             sticker.text,
@@ -770,13 +771,13 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     final button = GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 38,
-        height: 38,
+        width: AppSize.iconButtonMd,
+        height: AppSize.iconButtonMd,
         decoration: BoxDecoration(
           color: Colors.black.withValues(alpha: 0.45),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: Colors.white, size: AppSize.iconSm),
       ),
     );
 
@@ -795,10 +796,13 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     AppLocalizations? loc,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.sm,
+        vertical: AppSize.xs,
+      ),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppRadius.xxl,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -812,14 +816,14 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               _videoPlayerController?.pause();
             },
           ),
-          const SizedBox(width: 4),
+          AppGap.hXs,
           _buildModeChip(
             label: loc?.modeGallery ?? 'Gallery',
             icon: Icons.photo_library_outlined,
             isSelected: state.isImageMode || state.isVideoMode,
             onTap: _showMediaPickerSheet,
           ),
-          const SizedBox(width: 4),
+          AppGap.hXs,
           _buildModeChip(
             label: loc?.modeCamera ?? 'Camera',
             icon: Icons.camera_alt_outlined,
@@ -840,16 +844,16 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: AppPadding.chip,
         decoration: BoxDecoration(
           color: isSelected ? Colors.white24 : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.lg,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Colors.white, size: 15),
-            const SizedBox(width: 5),
+            Icon(icon, color: Colors.white, size: AppSize.iconXs),
+            AppGap.hXs,
             Text(
               label,
               style: TextStyle(
@@ -870,7 +874,9 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
       context: context,
       backgroundColor: const Color(0xFF1E1E24),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSize.radiusXl),
+        ),
       ),
       builder: (sheetCtx) => SafeArea(
         child: Column(
@@ -914,7 +920,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
         settings.fullName.isNotEmpty ? settings.fullName[0].toUpperCase() : 'U';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: AppPadding.hLg,
       child: Row(
         children: [
           // "Your story" Button (Instant Public share)
@@ -922,20 +928,20 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
             child: GestureDetector(
               onTap: () => _submitStory(customVisibility: 'public'),
               child: Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                height: AppSize.buttonHeightMd,
+                padding: AppPadding.hSm,
                 decoration: BoxDecoration(
                   color: const Color(0xFF262626),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white12),
+                  borderRadius: AppRadius.xxl,
+                  border: AppBorder.all(Colors.white12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // User Avatar Thumbnail
                     Container(
-                      width: 26,
-                      height: 26,
+                      width: AppSize.avatarXs,
+                      height: AppSize.avatarXs,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color(0xFF3E3E48),
@@ -967,7 +973,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                               ),
                             ),
                     ),
-                    const SizedBox(width: 8),
+                    AppGap.hSm,
                     Flexible(
                       child: Text(
                         loc?.yourStory ?? 'Your story',
@@ -985,7 +991,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
 
           // "Close Friends" Button
           // (Instant Close Friends share with green star)
@@ -993,12 +999,12 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
             child: GestureDetector(
               onTap: () => _submitStory(customVisibility: 'close_friends'),
               child: Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                height: AppSize.buttonHeightMd,
+                padding: AppPadding.hSm,
                 decoration: BoxDecoration(
                   color: const Color(0xFF262626),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white12),
+                  borderRadius: AppRadius.xxl,
+                  border: AppBorder.all(Colors.white12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1010,16 +1016,16 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
                         color: Color(0xFF10B981),
                       ),
                       child: SizedBox(
-                        width: 26,
-                        height: 26,
+                        width: AppSize.avatarBadgeMd,
+                        height: AppSize.avatarBadgeMd,
                         child: Icon(
                           Icons.star,
                           color: Colors.white,
-                          size: 15,
+                          size: AppSize.iconXs,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    AppGap.hSm,
                     Flexible(
                       child: Text(
                         loc?.closeFriends ?? 'Close Friends',
@@ -1037,7 +1043,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
 
           // Custom Send Arrow Button (Opens Audience selector Sheet)
           GestureDetector(
@@ -1051,8 +1057,8 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               }
             },
             child: Container(
-              width: 44,
-              height: 44,
+              width: AppSize.buttonHeightMd,
+              height: AppSize.buttonHeightMd,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
@@ -1060,7 +1066,7 @@ class _CreateStoryScreenState extends ConsumerState<CreateStoryScreen> {
               child: const Icon(
                 Icons.chevron_right,
                 color: Colors.black,
-                size: 26,
+                size: AppSize.iconLg,
               ),
             ),
           ),

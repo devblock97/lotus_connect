@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 
 /// Skeleton loader displayed while comments are loading.
 class CommentSkeletonList extends StatefulWidget {
@@ -46,26 +47,28 @@ class _CommentSkeletonListState extends State<CommentSkeletonList>
         return Opacity(
           opacity: _animation.value,
           child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: AppPadding.listTile,
             itemCount: widget.itemCount,
-            separatorBuilder: (_, __) => const SizedBox(height: 20),
+            separatorBuilder: (_, __) => AppGap.vXl,
             itemBuilder: (context, index) {
               final isIndented = index % 3 == 2;
               return Padding(
-                padding: EdgeInsets.only(left: isIndented ? 44.0 : 0.0),
+                padding: EdgeInsets.only(
+                  left: isIndented ? AppSize.buttonHeightMd : AppSize.none,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Avatar placeholder
                     Container(
-                      width: isIndented ? 30 : 38,
-                      height: isIndented ? 30 : 38,
+                      width: isIndented ? AppSize.avatarSm : AppSize.avatarMd,
+                      height: isIndented ? AppSize.avatarSm : AppSize.avatarMd,
                       decoration: BoxDecoration(
                         color: baseColor,
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    AppGap.hMd,
 
                     // Content bubble lines
                     Expanded(
@@ -76,59 +79,59 @@ class _CommentSkeletonListState extends State<CommentSkeletonList>
                             children: [
                               Container(
                                 width: 90,
-                                height: 12,
+                                height: AppSize.skeletonLineSm,
                                 decoration: BoxDecoration(
                                   color: baseColor,
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: AppRadius.sm,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              AppGap.hSm,
                               Container(
                                 width: 35,
-                                height: 10,
+                                height: AppSize.skeletonLineXs,
                                 decoration: BoxDecoration(
                                   color: baseColor,
-                                  borderRadius: BorderRadius.circular(5),
+                                  borderRadius: AppRadius.xs,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          AppGap.vSm,
                           Container(
                             width: double.infinity,
-                            height: 12,
+                            height: AppSize.skeletonLineSm,
                             decoration: BoxDecoration(
                               color: baseColor,
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: AppRadius.sm,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          AppGap.vXs,
                           Container(
                             width: index.isEven ? 180 : 130,
-                            height: 12,
+                            height: AppSize.skeletonLineSm,
                             decoration: BoxDecoration(
                               color: baseColor,
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: AppRadius.sm,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          AppGap.vSm,
                           Row(
                             children: [
                               Container(
-                                width: 40,
-                                height: 10,
+                                width: AppSize.huge,
+                                height: AppSize.skeletonLineXs,
                                 decoration: BoxDecoration(
                                   color: baseColor,
-                                  borderRadius: BorderRadius.circular(5),
+                                  borderRadius: AppRadius.xs,
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              AppGap.hLg,
                               Container(
-                                width: 32,
-                                height: 10,
+                                width: AppSize.xxxl,
+                                height: AppSize.skeletonLineXs,
                                 decoration: BoxDecoration(
                                   color: baseColor,
-                                  borderRadius: BorderRadius.circular(5),
+                                  borderRadius: AppRadius.xs,
                                 ),
                               ),
                             ],
@@ -136,14 +139,14 @@ class _CommentSkeletonListState extends State<CommentSkeletonList>
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    AppGap.hMd,
                     // Like heart placeholder
                     Container(
-                      width: 16,
-                      height: 16,
+                      width: AppSize.iconXs,
+                      height: AppSize.iconXs,
                       decoration: BoxDecoration(
                         color: baseColor,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppRadius.xs,
                       ),
                     ),
                   ],

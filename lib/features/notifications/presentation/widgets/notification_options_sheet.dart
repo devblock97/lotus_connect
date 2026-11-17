@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
 class NotificationOptionsSheet extends StatelessWidget {
@@ -28,7 +29,7 @@ class NotificationOptionsSheet extends StatelessWidget {
       context: context,
       backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       builder: (_) => NotificationOptionsSheet(
         notification: notification,
@@ -56,24 +57,24 @@ class NotificationOptionsSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.only(top: 10, bottom: 12),
+        padding: AppPadding.vMd,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
             Container(
-              width: 40,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 14),
+            AppGap.vMd,
             // Mini notification preview header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: AppPadding.hXl,
               child: Column(
                 children: [
                   Text(
@@ -87,15 +88,15 @@ class NotificationOptionsSheet extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  AppGap.vMd,
                   Divider(
-                    height: 1,
+                    height: AppSize.dividerThickness,
                     color: theme.dividerColor.withValues(alpha: 0.2),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 4),
+            AppGap.vXs,
             _SheetOptionTile(
               icon: notification.isRead
                   ? Icons.mark_chat_unread_outlined
@@ -163,7 +164,7 @@ class NotificationsHeaderMenuSheet extends StatelessWidget {
       context: context,
       backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       builder: (_) => NotificationsHeaderMenuSheet(
         hasUnread: hasUnread,
@@ -185,20 +186,20 @@ class NotificationsHeaderMenuSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.only(top: 10, bottom: 12),
+        padding: AppPadding.vMd,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             if (hasUnread)
               _SheetOptionTile(
                 icon: Icons.done_all_rounded,
@@ -259,23 +260,23 @@ class _SheetOptionTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: AppPadding.listTile,
         child: Row(
           children: [
             Container(
-              width: 42,
-              height: 42,
+              width: AppSize.avatarMd,
+              height: AppSize.avatarMd,
               decoration: BoxDecoration(
                 color: iconBgColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                size: 21,
+                size: AppSize.iconSm,
                 color: theme.colorScheme.onSurface,
               ),
             ),
-            const SizedBox(width: 14),
+            AppGap.hMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,7 +289,7 @@ class _SheetOptionTile extends StatelessWidget {
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  AppGap.vXxs,
                   Text(
                     subtitle,
                     style: TextStyle(

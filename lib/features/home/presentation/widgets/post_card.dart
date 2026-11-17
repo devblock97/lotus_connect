@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
@@ -247,7 +248,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           // Time Ago Timestamp
           _buildTimestamp(secondaryTextColor),
 
-          const SizedBox(height: 12),
+          AppGap.vMd,
         ],
       ),
     );
@@ -264,7 +265,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         : author.username;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: AppPadding.buttonCompact,
       child: Row(
         children: [
           // Story-ring Avatar
@@ -272,7 +273,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
             onTap: widget.onProfileTap,
             child: _buildAvatar(theme),
           ),
-          const SizedBox(width: 10),
+          AppGap.hSm,
 
           // Username and optional subtitle
           Expanded(
@@ -292,7 +293,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                     ),
                   ),
                   if (displayName != author.username) ...[
-                    const SizedBox(height: 1),
+                    AppGap.vXxs,
                     Text(
                       displayName,
                       style: TextStyle(
@@ -310,11 +311,11 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           IconButton(
             icon: Icon(
               Icons.more_vert,
-              size: 20,
+              size: AppSize.iconSm,
               color: primaryColor,
             ),
-            splashRadius: 20,
-            padding: EdgeInsets.zero,
+            splashRadius: AppSize.iconSm,
+            padding: AppPadding.zero,
             constraints: const BoxConstraints(),
             onPressed: widget.onMoreOptionsTap,
           ),
@@ -328,8 +329,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     final avatarUrl = widget.post.userAvatarUrl;
 
     return Container(
-      width: 38,
-      height: 38,
+      width: AppSize.avatarMd,
+      height: AppSize.avatarMd,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: const SweepGradient(
@@ -341,18 +342,18 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           ],
         ),
         border: !hasStory
-            ? Border.all(
-                color: theme.dividerColor.withValues(alpha: 0.2),
+            ? AppBorder.all(
+                theme.dividerColor.withValues(alpha: 0.2),
               )
             : null,
       ),
-      padding: EdgeInsets.all(hasStory ? 2.0 : 0),
+      padding: EdgeInsets.all(hasStory ? AppSize.xxs : AppSize.none),
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: theme.scaffoldBackgroundColor,
         ),
-        padding: EdgeInsets.all(hasStory ? 1.5 : 0),
+        padding: EdgeInsets.all(hasStory ? AppSize.borderMedium : AppSize.none),
         child: ClipOval(
           child: avatarUrl.isNotEmpty
               ? CachedNetworkImage(
@@ -442,13 +443,16 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           // Carousel page count pill badge (e.g. "1/3")
           if (mediaItems.length > 1)
             Positioned(
-              top: 12,
-              right: 12,
+              top: AppSize.md,
+              right: AppSize.md,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.sm,
+                  vertical: AppSize.xs,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.md,
                 ),
                 child: Text(
                   '${_currentCarouselIndex + 1}/${mediaItems.length}',
@@ -466,7 +470,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
             animation: _heartAnimController,
             builder: (context, child) {
               if (_heartAnimController.isDismissed) {
-                return const SizedBox.shrink();
+                return AppGap.shrink;
               }
               return Opacity(
                 opacity: _heartOpacityAnimation.value,
@@ -479,7 +483,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                     shadows: [
                       Shadow(
                         color: Colors.black45,
-                        blurRadius: 24,
+                        blurRadius: AppSize.xxl,
                       ),
                     ],
                   ),
@@ -539,10 +543,13 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
       onTap: widget.onMediaTap,
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSize.md,
+          vertical: AppSize.xs,
+        ),
+        padding: AppPadding.xl,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.card,
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -550,8 +557,8 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                 ? [const Color(0xFF2C2C34), const Color(0xFF1B1B20)]
                 : [const Color(0xFFF4F6F8), const Color(0xFFE5E9EE)],
           ),
-          border: Border.all(
-            color: theme.dividerColor.withValues(alpha: 0.1),
+          border: AppBorder.all(
+            theme.dividerColor.withValues(alpha: 0.1),
           ),
         ),
         child: Column(
@@ -559,10 +566,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           children: [
             Icon(
               CupertinoIcons.quote_bubble_fill,
-              size: 28,
+              size: AppSize.iconLg,
               color: theme.colorScheme.primary.withValues(alpha: 0.7),
             ),
-            const SizedBox(height: 10),
+            AppGap.vSm,
             Text(
               widget.post.content,
               style: TextStyle(
@@ -585,9 +592,9 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           : const Color(0xFFF0F0F0),
       child: const Center(
         child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          width: AppSize.loaderSizeMd,
+          height: AppSize.loaderSizeMd,
+          child: CircularProgressIndicator(strokeWidth: AppSize.borderThick),
         ),
       ),
     );
@@ -608,10 +615,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
           children: [
             Icon(
               item.isVideo ? CupertinoIcons.videocam_fill : Icons.image,
-              size: 54,
+              size: AppSize.iconXxl,
               color: Colors.white70,
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Text(
               item.isVideo
                   ? (AppLocalizations.of(context)?.video ?? 'Video')
@@ -631,7 +638,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     final mediaCount = widget.post.mediaItems.length;
 
     return Padding(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 8),
+      padding: AppPadding.buttonCompact,
       child: Row(
         children: [
           // Like Button
@@ -641,10 +648,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
               onTap: _toggleLike,
               behavior: HitTestBehavior.opaque,
               child: Padding(
-                padding: const EdgeInsets.only(right: 14),
+                padding: const EdgeInsets.only(right: AppSize.lg),
                 child: Icon(
                   _isLiked ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                  size: 26,
+                  size: AppSize.iconMd,
                   color: _isLiked ? const Color(0xFFED4956) : primaryColor,
                 ),
               ),
@@ -657,10 +664,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                 () => PostCommentsSheet.show(context, post: widget.post),
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.only(right: 14),
+              padding: const EdgeInsets.only(right: AppSize.lg),
               child: Icon(
                 CupertinoIcons.chat_bubble,
-                size: 25,
+                size: AppSize.iconMd,
                 color: primaryColor,
               ),
             ),
@@ -671,10 +678,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
             onTap: widget.onShareTap,
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.only(right: 14),
+              padding: const EdgeInsets.only(right: AppSize.lg),
               child: Icon(
                 CupertinoIcons.paperplane,
-                size: 24,
+                size: AppSize.iconMd,
                 color: primaryColor,
               ),
             ),
@@ -689,9 +696,9 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
               children: List.generate(mediaCount, (index) {
                 final isCurrent = index == _currentCarouselIndex;
                 return Container(
-                  width: isCurrent ? 6 : 4.5,
-                  height: isCurrent ? 6 : 4.5,
-                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  width: isCurrent ? AppSize.sm : AppSize.xs,
+                  height: isCurrent ? AppSize.sm : AppSize.xs,
+                  margin: const EdgeInsets.symmetric(horizontal: AppSize.xxs),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isCurrent
@@ -714,7 +721,7 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
                 _isSaved
                     ? CupertinoIcons.bookmark_fill
                     : CupertinoIcons.bookmark,
-                size: 24,
+                size: AppSize.iconMd,
                 color: primaryColor,
               ),
             ),
@@ -730,7 +737,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
     final loc = AppLocalizations.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.xxs,
+      ),
       child: _likesCount == 0
           ? Text(
               loc?.beTheFirstToLike ?? 'Be the first to like this',
@@ -786,14 +796,17 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
   ) {
     // If text-only, content is already presented inside the card above
     if (widget.post.mediaItems.isEmpty) {
-      return const SizedBox.shrink();
+      return AppGap.shrink;
     }
 
     final caption = widget.post.caption;
     final isLong = caption.length > 70;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.xxs,
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final displayText = (!_isCaptionExpanded && isLong)
@@ -889,7 +902,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
         ? (loc?.viewAllComments(count) ?? 'View all $count comments')
         : (loc?.addCommentHint ?? 'Add a comment...');
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.xxs,
+      ),
       child: GestureDetector(
         onTap: widget.onViewCommentsTap ??
             () => PostCommentsSheet.show(context, post: widget.post),
@@ -907,7 +923,10 @@ class _PostCardState extends State<PostCard> with TickerProviderStateMixin {
 
   Widget _buildTimestamp(Color secondaryColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.md,
+        vertical: AppSize.xxs,
+      ),
       child: Text(
         timeAgo(widget.post.createdAt),
         style: TextStyle(

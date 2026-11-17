@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/home/application/create_post_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
@@ -224,9 +225,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
               const Icon(
                 Icons.check_circle_rounded,
                 color: Colors.white,
-                size: 20,
+                size: AppSize.iconSm,
               ),
-              const SizedBox(width: 10),
+              AppGap.hSm,
               Text(
                 isEditing
                     ? (loc?.postUpdatedSuccess ?? 'Post updated successfully!')
@@ -236,9 +237,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           ),
           backgroundColor: const Color(0xFF2E7D32),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+          shape: AppBorder.rounded(radius: AppSize.radiusMd),
         ),
       );
       Navigator.of(context).pop(true);
@@ -280,8 +279,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: theme.scaffoldBackgroundColor,
-          elevation: 0,
-          scrolledUnderElevation: 0,
+          elevation: AppSize.elevationNone,
+          scrolledUnderElevation: AppSize.elevationNone,
           leading: IconButton(
             icon: Icon(Icons.close_rounded, color: primaryTextColor),
             onPressed: () async {
@@ -305,7 +304,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           centerTitle: true,
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 14, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                right: AppSize.lg,
+                top: AppSize.sm,
+                bottom: AppSize.sm,
+              ),
               child: AnimatedOpacity(
                 opacity: state.canSubmit ? 1.0 : 0.45,
                 duration: const Duration(milliseconds: 200),
@@ -316,18 +319,16 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   style: FilledButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 0,
+                    padding: AppPadding.hXl,
+                    shape: AppBorder.rounded(radius: AppSize.radiusXl),
+                    elevation: AppSize.elevationNone,
                   ),
                   child: state.isSubmitting
                       ? const SizedBox(
-                          width: 16,
-                          height: 16,
+                          width: AppSize.loaderSizeSm,
+                          height: AppSize.loaderSizeSm,
                           child: CircularProgressIndicator(
-                            strokeWidth: 2,
+                            strokeWidth: AppSize.borderThick,
                             color: Colors.white,
                           ),
                         )
@@ -352,11 +353,11 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: AppPadding.hLg,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 12),
+                        AppGap.vMd,
                         // Author header row with Privacy Selector
                         _buildAuthorHeader(
                           context,
@@ -369,21 +370,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           loc,
                         ),
 
-                        const SizedBox(height: 16),
+                        AppGap.vLg,
 
                         // Error Banner if present
                         if (state.errorMessage != null)
                           Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
+                            margin: const EdgeInsets.only(bottom: AppSize.md),
+                            padding: AppPadding.buttonCompact,
                             decoration: BoxDecoration(
                               color: Colors.redAccent.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.redAccent.withValues(alpha: 0.3),
+                              borderRadius: AppRadius.md,
+                              border: AppBorder.all(
+                                Colors.redAccent.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -391,9 +389,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                                 const Icon(
                                   Icons.error_outline_rounded,
                                   color: Colors.redAccent,
-                                  size: 20,
+                                  size: AppSize.iconSm,
                                 ),
-                                const SizedBox(width: 10),
+                                AppGap.hSm,
                                 Expanded(
                                   child: Text(
                                     state.errorMessage!,
@@ -424,7 +422,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             loc,
                           ),
 
-                        const SizedBox(height: 16),
+                        AppGap.vLg,
 
                         // Media items gallery if any attached
                         if (state.mediaPaths.isNotEmpty ||
@@ -457,12 +455,12 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 alignment: Alignment.center,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 20,
+                    horizontal: AppSize.xxl,
+                    vertical: AppSize.xl,
                   ),
                   decoration: BoxDecoration(
                     color: theme.scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: AppRadius.card,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.25),
@@ -478,7 +476,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           theme.colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      AppGap.vLg,
                       Text(
                         state.mediaPaths.isNotEmpty
                             ? (loc?.uploadingMediaAndPublishing ??
@@ -518,7 +516,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       children: [
         // Avatar
         CircleAvatar(
-          radius: 24,
+          radius: AppSize.avatarLg / 2,
           backgroundColor: theme.colorScheme.primaryContainer,
           backgroundImage: avatarUrl.isNotEmpty
               ? CachedNetworkImageProvider(avatarUrl)
@@ -534,7 +532,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 )
               : null,
         ),
-        const SizedBox(width: 12),
+        AppGap.hMd,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -589,7 +587,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 ),
               ),
 
-              const SizedBox(height: 6),
+              AppGap.vXs,
 
               // Privacy Selector Button
               GestureDetector(
@@ -606,14 +604,14 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
+                    horizontal: AppSize.md,
+                    vertical: AppSize.xs,
                   ),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: theme.dividerColor.withValues(alpha: 0.15),
+                    borderRadius: AppRadius.lg,
+                    border: AppBorder.all(
+                      theme.dividerColor.withValues(alpha: 0.15),
                     ),
                   ),
                   child: Row(
@@ -621,10 +619,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     children: [
                       Icon(
                         _getVisibilityIcon(state.visibility),
-                        size: 13,
+                        size: AppSize.iconXxs,
                         color: subtextColor,
                       ),
-                      const SizedBox(width: 5),
+                      AppGap.hXs,
                       Text(
                         _getVisibilityLabel(state.visibility, loc),
                         style: TextStyle(
@@ -633,10 +631,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                           color: subtextColor,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      AppGap.hXs,
                       Icon(
                         Icons.arrow_drop_down,
-                        size: 16,
+                        size: AppSize.iconXs,
                         color: subtextColor,
                       ),
                     ],
@@ -697,7 +695,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           color: primaryTextColor.withValues(alpha: 0.45),
         ),
         border: InputBorder.none,
-        contentPadding: EdgeInsets.zero,
+        contentPadding: AppPadding.zero,
       ),
     );
   }
@@ -710,9 +708,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     final firstName = displayName.split(' ').first;
     return Container(
       constraints: const BoxConstraints(minHeight: 180),
-      padding: const EdgeInsets.all(24),
+      padding: AppPadding.xxl,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.card,
         gradient: LinearGradient(
           colors: preset.colors,
           begin: Alignment.topLeft,
@@ -721,7 +719,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         boxShadow: [
           BoxShadow(
             color: preset.colors.first.withValues(alpha: 0.3),
-            blurRadius: 16,
+            blurRadius: AppSize.lg,
             offset: const Offset(0, 6),
           ),
         ],
@@ -754,13 +752,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
   Widget _buildColorSwatches(ThemeData theme) {
     return Container(
-      height: 48,
-      margin: const EdgeInsets.only(top: 12),
+      height: AppSize.massive,
+      margin: const EdgeInsets.only(top: AppSize.md),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: kColorPresets.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, __) => AppGap.hSm,
         itemBuilder: (context, index) {
           final preset = kColorPresets[index];
           final isSelected = preset.id == _selectedPresetId;
@@ -769,19 +767,20 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             return GestureDetector(
               onTap: () => setState(() => _selectedPresetId = 'none'),
               child: Container(
-                width: 36,
-                height: 36,
+                width: AppSize.buttonHeightSm,
+                height: AppSize.buttonHeightSm,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: theme.cardColor,
-                  border: Border.all(
-                    color: isSelected
+                  border: AppBorder.all(
+                    isSelected
                         ? theme.colorScheme.primary
                         : theme.dividerColor.withValues(alpha: 0.2),
-                    width: isSelected ? 2.5 : 1,
+                    width:
+                        isSelected ? AppSize.borderThick : AppSize.borderThin,
                   ),
                 ),
-                child: const Icon(Icons.block, size: 18),
+                child: const Icon(Icons.block, size: AppSize.iconSm),
               ),
             );
           }
@@ -789,8 +788,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
           return GestureDetector(
             onTap: () => setState(() => _selectedPresetId = preset.id),
             child: Container(
-              width: 36,
-              height: 36,
+              width: AppSize.buttonHeightSm,
+              height: AppSize.buttonHeightSm,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -798,15 +797,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                border: Border.all(
-                  color: isSelected ? Colors.white : Colors.transparent,
-                  width: isSelected ? 3 : 0,
+                border: AppBorder.all(
+                  isSelected ? Colors.white : Colors.transparent,
+                  width: isSelected ? AppSize.borderHeavy : AppSize.borderNone,
                 ),
                 boxShadow: [
                   if (isSelected)
                     BoxShadow(
                       color: preset.colors.first.withValues(alpha: 0.5),
-                      blurRadius: 8,
+                      blurRadius: AppSize.sm,
                     ),
                 ],
               ),
@@ -841,7 +840,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             const Spacer(),
             TextButton.icon(
               onPressed: _handlePickGallery,
-              icon: const Icon(Icons.add_photo_alternate_outlined, size: 16),
+              icon: const Icon(
+                Icons.add_photo_alternate_outlined,
+                size: AppSize.iconXs,
+              ),
               label: Text(
                 loc?.addMore ?? 'Add more',
                 style: const TextStyle(fontSize: 12.5),
@@ -849,19 +851,18 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        AppGap.vXs,
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.5,
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
               childAspectRatio: 0.85,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
+              mainAxisSpacing: AppSize.xxs,
+              crossAxisSpacing: AppSize.xxs,
             ),
             physics: const BouncingScrollPhysics(),
             itemCount: totalCount,
-            // separatorBuilder: (_, __) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
               final isExisting = index < existingItems.length;
 
@@ -873,7 +874,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                   clipBehavior: Clip.none,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadius.md,
                       child: Container(
                         width: 140,
                         height: 180,
@@ -904,23 +905,23 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                                   child: CupertinoActivityIndicator(),
                                 ),
                                 errorWidget: (_, __, ___) => const Center(
-                                  child: Icon(Icons.broken_image, size: 40),
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: AppSize.iconXl,
+                                  ),
                                 ),
                               ),
                       ),
                     ),
                     if (isVideo)
                       Positioned(
-                        bottom: 8,
-                        left: 8,
+                        bottom: AppSize.sm,
+                        left: AppSize.sm,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 3,
-                          ),
+                          padding: AppPadding.badge,
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: AppRadius.xs,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -928,9 +929,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                               const Icon(
                                 Icons.videocam_rounded,
                                 color: Colors.white,
-                                size: 14,
+                                size: AppSize.iconXxs,
                               ),
-                              const SizedBox(width: 4),
+                              AppGap.hXs,
                               Text(
                                 loc?.video ?? 'Video',
                                 style: const TextStyle(
@@ -944,8 +945,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                         ),
                       ),
                     Positioned(
-                      top: 6,
-                      right: 6,
+                      top: AppSize.xs,
+                      right: AppSize.xs,
                       child: GestureDetector(
                         onTap: () {
                           ref
@@ -953,15 +954,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                               .removeExistingMediaAt(index);
                         },
                         child: Container(
-                          width: 26,
-                          height: 26,
+                          width: AppSize.avatarBadgeMd,
+                          height: AppSize.avatarBadgeMd,
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.close,
-                            size: 16,
+                            size: AppSize.iconXs,
                             color: Colors.white,
                           ),
                         ),
@@ -984,7 +985,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 clipBehavior: Clip.none,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: AppRadius.md,
                     child: Container(
                       width: 140,
                       height: 180,
@@ -998,23 +999,23 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                               File(path),
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(Icons.broken_image, size: 40),
+                                child: Icon(
+                                  Icons.broken_image,
+                                  size: AppSize.iconXl,
+                                ),
                               ),
                             ),
                     ),
                   ),
                   if (isVideo)
                     Positioned(
-                      bottom: 8,
-                      left: 8,
+                      bottom: AppSize.sm,
+                      left: AppSize.sm,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 3,
-                        ),
+                        padding: AppPadding.badge,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: AppRadius.xs,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1022,9 +1023,9 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             const Icon(
                               Icons.videocam_rounded,
                               color: Colors.white,
-                              size: 14,
+                              size: AppSize.iconXxs,
                             ),
-                            const SizedBox(width: 4),
+                            AppGap.hXs,
                             Text(
                               loc?.video ?? 'Video',
                               style: const TextStyle(
@@ -1038,8 +1039,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                       ),
                     ),
                   Positioned(
-                    top: 6,
-                    right: 6,
+                    top: AppSize.xs,
+                    right: AppSize.xs,
                     child: GestureDetector(
                       onTap: () {
                         ref
@@ -1047,15 +1048,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                             .removeMediaPathAt(localIndex);
                       },
                       child: Container(
-                        width: 26,
-                        height: 26,
+                        width: AppSize.avatarBadgeMd,
+                        height: AppSize.avatarBadgeMd,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.7),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.close,
-                          size: 16,
+                          size: AppSize.iconXs,
                           color: Colors.white,
                         ),
                       ),
@@ -1080,25 +1081,27 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         border: Border(
-          top: BorderSide(
-            color: theme.dividerColor.withValues(alpha: 0.15),
-            width: 0.5,
+          top: AppBorder.hairline(
+            theme.dividerColor.withValues(alpha: 0.15),
           ),
         ),
       ),
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 8,
-        bottom: MediaQuery.of(context).padding.bottom + 8,
+        left: AppSize.md,
+        right: AppSize.md,
+        top: AppSize.sm,
+        bottom: MediaQuery.of(context).padding.bottom + AppSize.sm,
       ),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.md,
+          vertical: AppSize.xs,
+        ),
         decoration: BoxDecoration(
           color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.dividerColor.withValues(alpha: 0.15),
+          borderRadius: AppRadius.card,
+          border: AppBorder.all(
+            theme.dividerColor.withValues(alpha: 0.15),
           ),
         ),
         child: Row(
@@ -1115,50 +1118,50 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            AppGap.hXs,
 
             // Photo / Video
             IconButton(
               tooltip: loc?.photoVideoTooltip ?? 'Photo / Video',
-              padding: const EdgeInsets.all(6),
+              padding: AppPadding.xs,
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.photo_library_rounded,
                 color: Color(0xFF4CAF50),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              splashRadius: 18,
+              splashRadius: AppSize.iconSm,
               onPressed: _handlePickGallery,
             ),
 
             // Camera
             IconButton(
               tooltip: loc?.camera ?? 'Camera',
-              padding: const EdgeInsets.all(6),
+              padding: AppPadding.xs,
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.camera_alt_rounded,
                 color: Color(0xFF2196F3),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              splashRadius: 18,
+              splashRadius: AppSize.iconSm,
               onPressed: _handlePickCamera,
             ),
 
             // Feeling
             IconButton(
               tooltip: loc?.feelingActivityTooltip ?? 'Feeling / Activity',
-              padding: const EdgeInsets.all(6),
+              padding: AppPadding.xs,
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.emoji_emotions_rounded,
                 color: Color(0xFFFFB300),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              splashRadius: 18,
+              splashRadius: AppSize.iconSm,
               onPressed: () async {
                 final item = await PostFeelingSheet.show(
                   context,
@@ -1175,15 +1178,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             // Location
             IconButton(
               tooltip: loc?.locationTooltip ?? 'Location',
-              padding: const EdgeInsets.all(6),
+              padding: AppPadding.xs,
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.location_on_rounded,
                 color: Color(0xFFE91E63),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              splashRadius: 18,
+              splashRadius: AppSize.iconSm,
               onPressed: () async {
                 final selectedLocation = await PostLocationSheet.show(
                   context,
@@ -1200,15 +1203,15 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
             // Facebook Color Palette
             IconButton(
               tooltip: loc?.backgroundColorTooltip ?? 'Background Color',
-              padding: const EdgeInsets.all(6),
+              padding: AppPadding.xs,
               constraints: const BoxConstraints(),
               visualDensity: VisualDensity.compact,
               icon: const Icon(
                 Icons.palette_rounded,
                 color: Color(0xFF9C27B0),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              splashRadius: 18,
+              splashRadius: AppSize.iconSm,
               onPressed: () {
                 setState(() {
                   _showColorPicker = !_showColorPicker;

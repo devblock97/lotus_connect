@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoryTextEditorResult {
@@ -178,7 +179,10 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
           children: [
             // Top Controls Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.lg,
+                vertical: AppSize.sm,
+              ),
               child: Row(
                 children: [
                   // Alignment Toggle
@@ -191,7 +195,7 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                               ? Icons.format_align_left
                               : Icons.format_align_right,
                       color: Colors.white,
-                      size: 24,
+                      size: AppSize.iconMd,
                     ),
                   ),
 
@@ -201,12 +205,15 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                       setState(() => _hasHighlight = !_hasHighlight);
                     },
                     icon: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: AppPadding.xs,
                       decoration: BoxDecoration(
                         color:
                             _hasHighlight ? Colors.white : Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.white, width: 1.5),
+                        borderRadius: AppRadius.xs,
+                        border: AppBorder.all(
+                          Colors.white,
+                          width: AppSize.borderMedium,
+                        ),
                       ),
                       child: Text(
                         'A*',
@@ -228,12 +235,10 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 8,
+                        horizontal: AppSize.xl,
+                        vertical: AppSize.sm,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      shape: AppBorder.rounded(radius: AppSize.radiusXl),
                     ),
                     child: Text(
                       loc?.done ?? 'Done',
@@ -251,21 +256,17 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
             Expanded(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: AppPadding.hXxl,
                   child: IntrinsicWidth(
                     child: Container(
-                      padding: _hasHighlight
-                          ? const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            )
-                          : EdgeInsets.zero,
+                      padding:
+                          _hasHighlight ? AppPadding.chip : AppPadding.zero,
                       decoration: _hasHighlight
                           ? BoxDecoration(
                               color: _textColor == Colors.white
                                   ? Colors.white
                                   : Colors.black.withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: AppRadius.md,
                             )
                           : null,
                       child: TextField(
@@ -281,7 +282,7 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                             color: Colors.white.withValues(alpha: 0.4),
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
+                          contentPadding: AppPadding.zero,
                         ),
                       ),
                     ),
@@ -292,12 +293,12 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
 
             // Bottom Font Selection Bar
             SizedBox(
-              height: 40,
+              height: AppSize.huge,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: AppPadding.hLg,
                 itemCount: _kFonts.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                separatorBuilder: (_, __) => AppGap.hSm,
                 itemBuilder: (context, index) {
                   final font = _kFonts[index];
                   final isSelected = font['key'] == _fontFamily;
@@ -315,45 +316,45 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                           isSelected ? FontWeight.w700 : FontWeight.w500,
                       fontSize: 12,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    side: BorderSide.none,
+                    shape: AppBorder.rounded(),
+                    side: AppBorder.none,
                   );
                 },
               ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             // Bottom Color Palette Swatches
             SizedBox(
-              height: 38,
+              height: AppSize.huge,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: AppPadding.hLg,
                 itemCount: _kColors.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, __) => AppGap.hSm,
                 itemBuilder: (context, index) {
                   final color = _kColors[index];
                   final isSelected = color == _textColor;
                   return GestureDetector(
                     onTap: () => setState(() => _textColor = color),
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: AppSize.xxxl,
+                      height: AppSize.xxxl,
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected ? Colors.white : Colors.white24,
-                          width: isSelected ? 3 : 1.5,
+                        border: AppBorder.all(
+                          isSelected ? Colors.white : Colors.white24,
+                          width: isSelected
+                              ? AppSize.borderHeavy
+                              : AppSize.borderMedium,
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
                                   color: color.withValues(alpha: 0.6),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
+                                  blurRadius: AppSize.sm,
+                                  spreadRadius: AppSize.xxs,
                                 ),
                               ]
                             : null,
@@ -363,7 +364,7 @@ class _StoryTextEditorModalState extends State<StoryTextEditorModal> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
           ],
         ),
       ),

@@ -86,7 +86,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       decoration: BoxDecoration(
         color: containerBg,
         borderRadius: AppRadius.md,
-        border: Border.all(color: borderColor),
+        border: AppBorder.all(borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

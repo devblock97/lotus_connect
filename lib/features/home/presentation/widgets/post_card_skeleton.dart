@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/stories_tray.dart';
 
 class _SlidingGradientTransform extends GradientTransform {
@@ -101,7 +102,7 @@ class ShimmerBox extends StatelessWidget {
     super.key,
     this.width,
     this.height,
-    this.borderRadius = 4,
+    this.borderRadius = AppSize.radiusXs,
     this.shape = BoxShape.rectangle,
   });
 
@@ -145,26 +146,35 @@ class PostCardSkeleton extends StatelessWidget {
       children: [
         // Header
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: AppPadding.buttonCompact,
           child: Row(
             children: [
               ShimmerBox(
-                width: 38,
-                height: 38,
+                width: AppSize.avatarMd,
+                height: AppSize.avatarMd,
                 shape: BoxShape.circle,
               ),
-              SizedBox(width: 10),
+              AppGap.hSm,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ShimmerBox(width: 120, height: 12, borderRadius: 3),
-                  SizedBox(height: 5),
-                  ShimmerBox(width: 70, height: 9, borderRadius: 3),
+                  ShimmerBox(
+                    width: 120,
+                    height: AppSize.skeletonLineSm,
+                  ),
+                  AppGap.vXs,
+                  ShimmerBox(
+                    width: 70,
+                    height: AppSize.skeletonLineXs,
+                  ),
                 ],
               ),
               Spacer(),
-              ShimmerBox(width: 16, height: 16),
+              ShimmerBox(
+                width: AppSize.iconXs,
+                height: AppSize.iconXs,
+              ),
             ],
           ),
         ),
@@ -175,59 +185,103 @@ class PostCardSkeleton extends StatelessWidget {
           child: ShimmerBox(
             width: double.infinity,
             height: double.infinity,
-            borderRadius: 0,
+            borderRadius: AppSize.radiusNone,
           ),
         ),
 
         // Action Bar (Heart, Comment, Share, Bookmark)
         Padding(
-          padding: EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 8),
+          padding: EdgeInsets.only(
+            left: AppSize.md,
+            right: AppSize.md,
+            top: AppSize.sm,
+            bottom: AppSize.sm,
+          ),
           child: Row(
             children: [
-              ShimmerBox(width: 22, height: 22, borderRadius: 5),
-              SizedBox(width: 14),
-              ShimmerBox(width: 22, height: 22, borderRadius: 5),
-              SizedBox(width: 14),
-              ShimmerBox(width: 22, height: 22, borderRadius: 5),
+              ShimmerBox(
+                width: AppSize.iconMd,
+                height: AppSize.iconMd,
+              ),
+              AppGap.hMd,
+              ShimmerBox(
+                width: AppSize.iconMd,
+                height: AppSize.iconMd,
+              ),
+              AppGap.hMd,
+              ShimmerBox(
+                width: AppSize.iconMd,
+                height: AppSize.iconMd,
+              ),
               Spacer(),
-              ShimmerBox(width: 20, height: 22),
+              ShimmerBox(
+                width: AppSize.iconSm,
+                height: AppSize.iconMd,
+              ),
             ],
           ),
         ),
 
         // Likes section
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: ShimmerBox(width: 130, height: 11, borderRadius: 3),
+          padding: AppPadding.hMd,
+          child: ShimmerBox(
+            width: 130,
+            height: AppSize.skeletonLineXs,
+          ),
         ),
 
         // Caption lines
         Padding(
-          padding: EdgeInsets.only(left: 12, right: 12, top: 8),
+          padding: EdgeInsets.only(
+            left: AppSize.md,
+            right: AppSize.md,
+            top: AppSize.sm,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              ShimmerBox(width: 250, height: 11, borderRadius: 3),
-              SizedBox(height: 5),
-              ShimmerBox(width: 170, height: 11, borderRadius: 3),
+              ShimmerBox(
+                width: 250,
+                height: AppSize.skeletonLineXs,
+              ),
+              AppGap.vXs,
+              ShimmerBox(
+                width: 170,
+                height: AppSize.skeletonLineXs,
+              ),
             ],
           ),
         ),
 
         // Comments prompt
         Padding(
-          padding: EdgeInsets.only(left: 12, right: 12, top: 8),
-          child: ShimmerBox(width: 115, height: 10, borderRadius: 3),
+          padding: EdgeInsets.only(
+            left: AppSize.md,
+            right: AppSize.md,
+            top: AppSize.sm,
+          ),
+          child: ShimmerBox(
+            width: 115,
+            height: AppSize.skeletonLineXs,
+          ),
         ),
 
         // Timestamp
         Padding(
-          padding: EdgeInsets.only(left: 12, right: 12, top: 6),
-          child: ShimmerBox(width: 60, height: 8, borderRadius: 3),
+          padding: EdgeInsets.only(
+            left: AppSize.md,
+            right: AppSize.md,
+            top: AppSize.xs,
+          ),
+          child: ShimmerBox(
+            width: 60,
+            height: AppSize.sm,
+          ),
         ),
 
-        SizedBox(height: 14),
+        AppGap.vMd,
       ],
     );
   }
@@ -247,7 +301,7 @@ class PostListSkeleton extends StatelessWidget {
 
     return Shimmer(
       child: ListView.builder(
-        padding: EdgeInsets.zero,
+        padding: AppPadding.zero,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: itemCount + 1,
         itemBuilder: (context, index) {
@@ -257,8 +311,8 @@ class PostListSkeleton extends StatelessWidget {
               children: [
                 const StoriesTray(),
                 Divider(
-                  height: 1,
-                  thickness: 0.5,
+                  height: AppSize.dividerThickness,
+                  thickness: AppSize.borderHairline,
                   color: theme.dividerColor.withValues(alpha: 0.15),
                 ),
               ],
@@ -272,8 +326,8 @@ class PostListSkeleton extends StatelessWidget {
               const PostCardSkeleton(),
               if (postIndex < itemCount - 1)
                 Divider(
-                  height: 1,
-                  thickness: 0.5,
+                  height: AppSize.dividerThickness,
+                  thickness: AppSize.borderHairline,
                   color: theme.dividerColor.withValues(alpha: 0.1),
                 ),
             ],
@@ -308,8 +362,8 @@ class SliverPostListSkeleton extends StatelessWidget {
                 const PostCardSkeleton(),
                 if (index < itemCount - 1)
                   Divider(
-                    height: 1,
-                    thickness: 0.5,
+                    height: AppSize.dividerThickness,
+                    thickness: AppSize.borderHairline,
                     color: theme.dividerColor.withValues(alpha: 0.1),
                   ),
               ],

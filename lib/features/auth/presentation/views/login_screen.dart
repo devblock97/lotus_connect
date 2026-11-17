@@ -490,7 +490,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
                                 padding: AppPadding.vMd,
-                                side: BorderSide(color: dividerColor),
+                                side: AppBorder.thin(dividerColor),
                                 shape: AppBorder.rounded(
                                   radius: AppSize.radiusButton,
                                 ),
@@ -527,7 +527,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
                                 padding: AppPadding.vMd,
-                                side: BorderSide(color: dividerColor),
+                                side: AppBorder.thin(dividerColor),
                                 shape: AppBorder.rounded(
                                   radius: AppSize.radiusButton,
                                 ),

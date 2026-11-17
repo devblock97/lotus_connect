@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
@@ -55,7 +56,12 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            padding: const EdgeInsets.fromLTRB(
+              AppSize.screenPadding,
+              AppSize.md,
+              AppSize.screenPadding,
+              AppSize.chipVertical,
+            ),
             child: Container(
               decoration: BoxDecoration(
                 boxShadow: [
@@ -64,8 +70,8 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                           alpha:
                               theme.brightness == Brightness.dark ? 0.2 : 0.03,
                         ),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    blurRadius: AppSize.sm,
+                    offset: const Offset(0, AppSize.xxs),
                   ),
                 ],
               ),
@@ -88,11 +94,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     Icons.search_rounded,
                     color: theme.colorScheme.onSurfaceVariant
                         .withValues(alpha: 0.7),
-                    size: 22,
+                    size: AppSize.iconMd,
                   ),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear_rounded, size: 20),
+                          icon: const Icon(
+                            Icons.clear_rounded,
+                            size: AppSize.iconSm,
+                          ),
                           tooltip: loc.clearSearch,
                           onPressed: () {
                             _searchController.clear();
@@ -107,28 +116,22 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                   fillColor: theme.brightness == Brightness.dark
                       ? theme.colorScheme.surfaceContainer
                       : AppColor.surfaceCard.of(context),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: AppPadding.input,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.45),
+                    borderRadius: AppRadius.input,
+                    borderSide: AppBorder.thin(
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.45),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.45),
+                    borderRadius: AppRadius.input,
+                    borderSide: AppBorder.thin(
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.45),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.primary,
-                      width: 1.5,
-                    ),
+                    borderRadius: AppRadius.input,
+                    borderSide: AppBorder.medium(theme.colorScheme.primary),
                   ),
                 ),
               ),
@@ -144,18 +147,18 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                     : ListView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: AppSize.screenPadding,
+                          vertical: AppSize.sm,
                         ),
                         children: [
                           if (_searchQuery.isNotEmpty &&
                               filteredFriends.isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.only(
-                                left: 4,
-                                right: 4,
-                                top: 8,
-                                bottom: 4,
+                                left: AppSize.xs,
+                                right: AppSize.xs,
+                                top: AppSize.sm,
+                                bottom: AppSize.xs,
                               ),
                               child: Row(
                                 children: [
@@ -168,16 +171,13 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                       letterSpacing: 0.8,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 7,
-                                      vertical: 1.5,
-                                    ),
+                                    padding: AppPadding.badge,
                                     decoration: BoxDecoration(
                                       color: theme.colorScheme.primary
                                           .withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: AppRadius.md,
                                     ),
                                     child: Text(
                                       '${filteredFriends.length}',
@@ -192,14 +192,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                               ),
                             ),
                             ...filteredFriends.map(_buildFriendCard),
-                            const SizedBox(height: 16),
+                            AppGap.vLg,
                           ] else if (_searchQuery.isEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.only(
-                                left: 4,
-                                right: 4,
-                                top: 8,
-                                bottom: 4,
+                                left: AppSize.xs,
+                                right: AppSize.xs,
+                                top: AppSize.sm,
+                                bottom: AppSize.xs,
                               ),
                               child: Row(
                                 children: [
@@ -213,17 +213,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                       letterSpacing: 0.8,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 7,
-                                      vertical: 1.5,
-                                    ),
+                                    padding: AppPadding.badge,
                                     decoration: BoxDecoration(
                                       color: theme
                                           .colorScheme.surfaceContainerHighest
                                           .withValues(alpha: 0.6),
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: AppRadius.md,
                                     ),
                                     child: Text(
                                       '${filteredFriends.length}',
@@ -243,10 +240,10 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                               globalResults.isNotEmpty) ...[
                             Padding(
                               padding: const EdgeInsets.only(
-                                left: 4,
-                                right: 4,
-                                top: 12,
-                                bottom: 4,
+                                left: AppSize.xs,
+                                right: AppSize.xs,
+                                top: AppSize.md,
+                                bottom: AppSize.xs,
                               ),
                               child: Row(
                                 children: [
@@ -260,17 +257,14 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                                       letterSpacing: 0.8,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 7,
-                                      vertical: 1.5,
-                                    ),
+                                    padding: AppPadding.badge,
                                     decoration: BoxDecoration(
                                       color: theme
                                           .colorScheme.surfaceContainerHighest
                                           .withValues(alpha: 0.6),
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: AppRadius.md,
                                     ),
                                     child: Text(
                                       '${globalResults.length}',
@@ -292,7 +286,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                               filteredFriends.isEmpty &&
                               globalResults.isEmpty)
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 40),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSize.huge,
+                              ),
                               child: _buildEmptyState(theme, loc),
                             ),
                         ],
@@ -380,11 +376,11 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
     if (user.friendshipStatus == 'pending') {
       if (user.friendshipSenderId == currentUserId) {
         trailingWidget = Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: AppPadding.chip,
           decoration: BoxDecoration(
             color: AppColor.warningSoft.of(context),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColor.warningBorder.of(context)),
+            borderRadius: AppRadius.chip,
+            border: AppBorder.all(AppColor.warningBorder.of(context)),
           ),
           child: Text(
             loc.requested,
@@ -472,33 +468,31 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             ),
           );
         },
-        icon: const Icon(Icons.person_add_alt_1, size: 16),
+        icon: const Icon(Icons.person_add_alt_1, size: AppSize.iconXs),
         label: Text(loc.add, style: const TextStyle(fontSize: 12)),
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: AppPadding.buttonCompact,
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          elevation: AppSize.elevationNone,
+          shape: AppBorder.rounded(radius: AppSize.radiusChip),
         ),
       );
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        borderRadius: AppRadius.card,
+        border: AppBorder.all(borderColor),
         boxShadow: [
           BoxShadow(
             color: AppColor.black
                 .of(context)
                 .withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppSize.sm,
+            offset: const Offset(0, AppSize.xxs),
           ),
         ],
       ),
@@ -514,9 +508,12 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             ),
           );
         },
-        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: AppSize.xs,
+          horizontal: AppSize.md,
+        ),
         leading: CircleAvatar(
-          radius: 22,
+          radius: AppSize.avatarMd / 2,
           backgroundColor: avatarColor.withValues(alpha: 0.15),
           child: Text(
             initials,
@@ -546,15 +543,15 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
         children: [
           Icon(
             Icons.people_outline_rounded,
-            size: 64,
+            size: AppSize.iconHero,
             color: AppColor.inkSubtle.of(context),
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
           Text(
             loc.noContactsFound,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 8),
+          AppGap.vSm,
           Text(
             _searchQuery.isNotEmpty
                 ? loc.noMatchingResults
@@ -562,7 +559,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
             style: TextStyle(color: AppColor.inkMuted.of(context)),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          AppGap.vLg,
           ElevatedButton.icon(
             onPressed: () => _showAddFriendDialog(context),
             icon: const Icon(Icons.person_add_alt_1),
@@ -601,7 +598,7 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
                   color: AppColor.inkMuted.of(context),
                 ),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               TextField(
                 controller: _addFriendController,
                 decoration: InputDecoration(

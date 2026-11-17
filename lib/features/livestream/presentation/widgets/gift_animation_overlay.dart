@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_gift.dart';
 
 /// Full-screen animated celebration banner when a virtual gift is sent
@@ -79,13 +80,16 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(left: 16, top: 120),
+        margin: const EdgeInsets.only(left: AppSize.lg, top: 120),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Celebratory banner pill
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.md,
+                vertical: AppSize.chipVertical,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -93,17 +97,17 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
                     giftDef.gradientColors.last.withValues(alpha: 0.75),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: AppRadius.full,
                 boxShadow: [
                   BoxShadow(
                     color: giftDef.gradientColors.first.withValues(alpha: 0.4),
-                    blurRadius: 16,
-                    spreadRadius: 2,
+                    blurRadius: AppSize.lg,
+                    spreadRadius: AppSize.xxs,
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  width: 1.5,
+                border: AppBorder.all(
+                  Colors.white.withValues(alpha: 0.6),
+                  width: AppSize.borderMedium,
                 ),
               ),
               child: Row(
@@ -111,8 +115,8 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
                 children: [
                   // Sender avatar
                   Container(
-                    width: 38,
-                    height: 38,
+                    width: AppSize.avatarMd,
+                    height: AppSize.avatarMd,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.black26,
@@ -136,7 +140,7 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
                                 ),
                               ),
                   ),
-                  const SizedBox(width: 8),
+                  AppGap.hSm,
 
                   // Sender info & gift details
                   Column(
@@ -166,7 +170,7 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
                       ),
                     ],
                   ),
-                  const SizedBox(width: 12),
+                  AppGap.hMd,
 
                   // Gift animated Icon
                   ScaleTransition(
@@ -182,19 +186,22 @@ class _GiftAnimationOverlayState extends State<GiftAnimationOverlay>
 
             // Animated Combo multiplier (e.g. x5 COMBO!)
             if (combo > 1) ...[
-              const SizedBox(width: 10),
+              AppGap.hSm,
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.sm,
+                  vertical: AppSize.xs,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.md,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.orange.withValues(alpha: 0.6),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+                      blurRadius: AppSize.md,
+                      spreadRadius: AppSize.xxs,
                     ),
                   ],
                 ),

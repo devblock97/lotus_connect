@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 import 'package:lotus_connect/features/chill/application/chill_provider.dart';
 import 'package:lotus_connect/features/chill/domain/entities/chill_item.dart';
@@ -252,7 +253,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                       child: CachedNetworkImage(
                         imageUrl: thumbUrl,
                         fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                        errorWidget: (_, __, ___) => AppGap.shrink,
                       ),
                     ),
                   ),
@@ -273,9 +274,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         Icon(
                           CupertinoIcons.exclamationmark_triangle,
                           color: AppColor.onMedia54.of(context),
-                          size: 40,
+                          size: AppSize.iconXl,
                         ),
-                        const SizedBox(height: 8),
+                        AppGap.vSm,
                         Text(
                           loc.unableToPlayVideo,
                           style: TextStyle(
@@ -290,7 +291,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   Center(
                     child: CircularProgressIndicator(
                       color: AppColor.onMedia.of(context),
-                      strokeWidth: 2,
+                      strokeWidth: AppSize.borderThick,
                     ),
                   ),
               ],
@@ -326,7 +327,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
           IgnorePointer(
             child: Center(
               child: Container(
-                padding: const EdgeInsets.all(18),
+                padding: AppPadding.lg,
                 decoration: BoxDecoration(
                   color: AppColor.mediaBackdrop
                       .of(context)
@@ -336,7 +337,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 child: Icon(
                   CupertinoIcons.play_fill,
                   color: AppColor.onMedia.of(context),
-                  size: 42,
+                  size: AppSize.iconXxl,
                 ),
               ),
             ),
@@ -359,7 +360,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 child: Icon(
                   CupertinoIcons.heart_fill,
                   color: AppColor.dangerAccent.of(context),
-                  size: 96,
+                  size: AppSize.avatarProfile,
                 ),
               ),
             ),
@@ -367,8 +368,8 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
         // 5. Right Action Column (Like, Comment, Share, Save, Options, Audio Disc)
         Positioned(
-          right: 12,
-          bottom: MediaQuery.of(context).padding.bottom + 28,
+          right: AppSize.md,
+          bottom: MediaQuery.of(context).padding.bottom + AppSize.xxl,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -382,21 +383,21 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 label: _formatCount(chill.likeCount),
                 onPressed: _toggleLike,
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               _buildActionButton(
                 icon: CupertinoIcons.chat_bubble_fill,
                 color: AppColor.onMedia.of(context),
                 label: _formatCount(chill.commentCount),
                 onPressed: () => _openComments(context),
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               _buildActionButton(
                 icon: CupertinoIcons.arrowshape_turn_up_right_fill,
                 color: AppColor.onMedia.of(context),
                 label: _formatCount(chill.shareCount),
                 onPressed: () => _handleShare(context),
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               _buildActionButton(
                 icon: chill.userHasSaved
                     ? CupertinoIcons.bookmark_fill
@@ -407,27 +408,27 @@ class _VideoItemState extends ConsumerState<VideoItem>
                 label: chill.userHasSaved ? loc.saved : loc.save,
                 onPressed: _toggleSave,
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               _buildActionButton(
                 icon: CupertinoIcons.ellipsis,
                 color: AppColor.onMedia.of(context),
                 label: '',
                 onPressed: () => _openOptions(context, isAuthor: isAuthor),
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               // Rotating Audio Disc
               RotationTransition(
                 turns: _discAnimController,
                 child: Container(
-                  width: 38,
-                  height: 38,
-                  padding: const EdgeInsets.all(6),
+                  width: AppSize.avatarMd,
+                  height: AppSize.avatarMd,
+                  padding: const EdgeInsets.all(AppSize.chipVertical),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColor.mediaLoaderBg.of(context),
-                    border: Border.all(
-                      color: AppColor.onMedia38.of(context),
-                      width: 1.5,
+                    border: AppBorder.all(
+                      AppColor.onMedia38.of(context),
+                      width: AppSize.borderMedium,
                     ),
                   ),
                   child: CircleAvatar(
@@ -439,7 +440,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         ? Icon(
                             CupertinoIcons.music_note,
                             color: AppColor.onMedia.of(context),
-                            size: 14,
+                            size: AppSize.iconXs,
                           )
                         : null,
                   ),
@@ -451,9 +452,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
         // 6. Bottom Author, Caption, Tags & Audio Metadata
         Positioned(
-          left: 14,
-          right: 76,
-          bottom: MediaQuery.of(context).padding.bottom + 20,
+          left: AppSize.md,
+          right: AppSize.giant + AppSize.md,
+          bottom: MediaQuery.of(context).padding.bottom + AppSize.xl,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -475,7 +476,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircleAvatar(
-                      radius: 18,
+                      radius: AppSize.avatarMd / 2,
                       backgroundColor: AppColor.onMedia24.of(context),
                       backgroundImage: avatarUrl != null
                           ? CachedNetworkImageProvider(avatarUrl)
@@ -491,7 +492,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                             )
                           : null,
                     ),
-                    const SizedBox(width: 10),
+                    AppGap.hSm,
                     Flexible(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -516,19 +517,19 @@ class _VideoItemState extends ConsumerState<VideoItem>
                         ],
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    AppGap.hSm,
                     // View count pill
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
+                        horizontal: AppSize.sm,
+                        vertical: AppSize.xxs,
                       ),
                       decoration: BoxDecoration(
                         color: AppColor.mediaScrim45.of(context),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: AppColor.onMedia24.of(context),
-                          width: 0.5,
+                        borderRadius: AppRadius.md,
+                        border: AppBorder.all(
+                          AppColor.onMedia24.of(context),
+                          width: AppSize.borderHairline,
                         ),
                       ),
                       child: Row(
@@ -537,9 +538,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                           Icon(
                             CupertinoIcons.eye_fill,
                             color: AppColor.onMedia70.of(context),
-                            size: 12,
+                            size: AppSize.iconXxs,
                           ),
-                          const SizedBox(width: 4),
+                          AppGap.hXs,
                           Text(
                             _formatCount(chill.viewCount),
                             style: TextStyle(
@@ -554,7 +555,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
+              AppGap.vMd,
 
               // Caption
               if (chill.caption.isNotEmpty) ...[
@@ -579,7 +580,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                       ),
                       if (chill.caption.length > 70)
                         Padding(
-                          padding: const EdgeInsets.only(top: 2),
+                          padding: const EdgeInsets.only(top: AppSize.xxs),
                           child: Text(
                             _isExpandCaption ? loc.showLess : loc.showMore,
                             style: TextStyle(
@@ -592,14 +593,14 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                AppGap.vSm,
               ],
 
               // Clickable #tags
               if (chill.tags.isNotEmpty) ...[
                 Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
+                  spacing: AppSize.sm,
+                  runSpacing: AppSize.xs,
                   children: chill.tags.map((tag) {
                     final cleanTag = tag.replaceFirst('#', '');
                     return GestureDetector(
@@ -620,7 +621,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 8),
+                AppGap.vSm,
               ],
 
               // Audio Track Info Row
@@ -629,9 +630,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
                   Icon(
                     CupertinoIcons.music_note_2,
                     color: AppColor.onMedia.of(context),
-                    size: 14,
+                    size: AppSize.iconXs,
                   ),
-                  const SizedBox(width: 6),
+                  AppGap.hSm,
                   Expanded(
                     child: Text(
                       chill.audioTitle ??
@@ -649,15 +650,12 @@ class _VideoItemState extends ConsumerState<VideoItem>
                     ),
                   ),
                   if (chill.isRemix) ...[
-                    const SizedBox(width: 8),
+                    AppGap.hSm,
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
+                      padding: AppPadding.badge,
                       decoration: BoxDecoration(
                         color: AppColor.onMedia24.of(context),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: AppRadius.sm,
                       ),
                       child: Text(
                         loc.remix,
@@ -810,7 +808,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(9),
+            padding: AppPadding.sm,
             decoration: BoxDecoration(
               color: AppColor.mediaBackdrop.of(context).withValues(alpha: 0.4),
               shape: BoxShape.circle,
@@ -818,11 +816,11 @@ class _VideoItemState extends ConsumerState<VideoItem>
             child: Icon(
               icon,
               color: color,
-              size: 26,
+              size: AppSize.iconLg,
             ),
           ),
           if (label.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            AppGap.vXs,
             Text(
               label,
               style: TextStyle(

@@ -606,8 +606,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           padding: AppPadding.md,
           decoration: BoxDecoration(
             color: AppColor.mediaBackdrop.of(context),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColor.onMedia10.of(context)),
+            borderRadius: AppRadius.md,
+            border: AppBorder.all(AppColor.onMedia10.of(context)),
           ),
           child: _consoleLogs.isEmpty
               ? Center(
@@ -799,7 +799,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
               height: AppSize.tabBarHeight,
               decoration: BoxDecoration(
                 color: AppColor.surfaceTrack.of(context),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: AppRadius.xxl,
               ),
               child: Padding(
                 padding: AppPadding.xs,
@@ -817,7 +817,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             color: _showFriendsTab
                                 ? AppColor.surfaceElevated.of(context)
                                 : AppColor.transparent.of(context),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.xl,
                             boxShadow: _showFriendsTab
                                 ? [
                                     BoxShadow(
@@ -857,7 +857,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                             color: !_showFriendsTab
                                 ? AppColor.surfaceElevated.of(context)
                                 : AppColor.transparent.of(context),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.xl,
                             boxShadow: !_showFriendsTab
                                 ? [
                                     BoxShadow(
@@ -919,10 +919,10 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                     : null,
                 filled: true,
                 fillColor: AppColor.surfaceTrack.of(context),
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+                contentPadding: AppPadding.zero,
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.lg,
+                  borderSide: AppBorder.none,
                 ),
               ),
             ),
@@ -1107,9 +1107,8 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     return Card(
       elevation: AppSize.elevationNone,
       margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppColor.surfaceTrack.of(context)),
+      shape: AppBorder.rounded(
+        color: AppColor.surfaceTrack.of(context),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -1829,7 +1828,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       backgroundColor: _isMuted
                           ? AppColor.onMedia24.of(context)
                           : AppColor.transparent.of(context),
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -1857,7 +1856,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                         backgroundColor: _isVideoOff
                             ? AppColor.onMedia24.of(context)
                             : AppColor.transparent.of(context),
-                        padding: const EdgeInsets.all(12),
+                        padding: AppPadding.md,
                       ),
                     ),
 
@@ -1894,7 +1893,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
                       backgroundColor: _isSpeakerOn
                           ? AppColor.onMedia24.of(context)
                           : AppColor.transparent.of(context),
-                      padding: const EdgeInsets.all(12),
+                      padding: AppPadding.md,
                     ),
                   ),
 
@@ -1925,11 +1924,15 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           decoration: BoxDecoration(
             color: AppColor.onMedia.of(context).withValues(alpha: 0.6),
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColor.black.of(context).withValues(alpha: 0.05),
+            border: AppBorder.all(
+              AppColor.black.of(context).withValues(alpha: 0.05),
             ),
           ),
-          child: Icon(icon, color: AppColor.inkPrimary.of(context), size: 22),
+          child: Icon(
+            icon,
+            color: AppColor.inkPrimary.of(context),
+            size: AppSize.iconMd,
+          ),
         ),
         AppGap.vSm,
         Text(

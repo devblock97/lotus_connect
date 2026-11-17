@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -40,25 +41,28 @@ class RequestCard extends ConsumerWidget {
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        borderRadius: AppRadius.card,
+        border: AppBorder.all(borderColor),
         boxShadow: [
           BoxShadow(
             color: AppColor.black
                 .of(context)
                 .withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, AppSize.xxs),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSize.bubbleHorizontal,
+          vertical: AppSize.chipVertical,
+        ),
         leading: CircleAvatar(
-          radius: 22,
+          radius: AppSize.avatarMd / 2,
           backgroundColor: avatarColor.withValues(alpha: 0.15),
           backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
               ? NetworkImage(user.avatarUrl!)
@@ -97,19 +101,22 @@ class RequestCard extends ConsumerWidget {
                 icon: Icon(
                   Icons.chat_bubble_outline_rounded,
                   color: theme.colorScheme.primary,
-                  size: 21,
+                  size: AppSize.iconSm,
                 ),
                 onPressed: startChat,
                 tooltip: loc.chat,
                 visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.all(6),
-                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+                padding: const EdgeInsets.all(AppSize.chipVertical),
+                constraints: const BoxConstraints(
+                  minWidth: AppSize.iconButtonSm,
+                  minHeight: AppSize.iconButtonSm,
+                ),
               ),
             IconButton(
               icon: Icon(
                 Icons.check_circle_rounded,
                 color: AppColor.successGreen.of(context),
-                size: 24,
+                size: AppSize.iconMd,
               ),
               onPressed: () async {
                 final success = await ref
@@ -132,14 +139,17 @@ class RequestCard extends ConsumerWidget {
               },
               tooltip: loc.accept,
               visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.all(6),
-              constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+              padding: const EdgeInsets.all(AppSize.chipVertical),
+              constraints: const BoxConstraints(
+                minWidth: AppSize.iconButtonSm,
+                minHeight: AppSize.iconButtonSm,
+              ),
             ),
             IconButton(
               icon: Icon(
                 Icons.cancel_rounded,
                 color: AppColor.dangerAccent.of(context),
-                size: 24,
+                size: AppSize.iconMd,
               ),
               onPressed: () async {
                 final success = await ref
@@ -162,8 +172,11 @@ class RequestCard extends ConsumerWidget {
               },
               tooltip: loc.reject,
               visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.all(6),
-              constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+              padding: const EdgeInsets.all(AppSize.chipVertical),
+              constraints: const BoxConstraints(
+                minWidth: AppSize.iconButtonSm,
+                minHeight: AppSize.iconButtonSm,
+              ),
             ),
           ],
         ),

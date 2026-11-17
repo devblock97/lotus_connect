@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/livestream/data/datasources/livestream_ws_service.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -50,18 +51,18 @@ class LiveStreamEndedDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      insetPadding: AppPadding.hXxl,
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: AppPadding.dialog,
         decoration: BoxDecoration(
           color: const Color(0xFF161823),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white12),
+          borderRadius: AppRadius.xxl,
+          border: AppBorder.all(Colors.white12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.6),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
+              blurRadius: AppSize.xxl,
+              offset: const Offset(0, AppSize.sm),
             ),
           ],
         ),
@@ -70,11 +71,14 @@ class LiveStreamEndedDialog extends StatelessWidget {
           children: [
             // Host Avatar
             Container(
-              width: 72,
-              height: 72,
+              width: AppSize.avatarXxl,
+              height: AppSize.avatarXxl,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFFF0844), width: 2),
+                border: AppBorder.all(
+                  const Color(0xFFFF0844),
+                  width: AppSize.borderThick,
+                ),
               ),
               clipBehavior: Clip.antiAlias,
               child: host.avatarUrl != null && host.avatarUrl!.isNotEmpty
@@ -95,7 +99,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
                       ),
                     ),
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
 
             Text(
               loc?.liveStreamEndedTitle ?? 'Live Stream Ended',
@@ -105,7 +109,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            AppGap.vXs,
             Text(
               stream.title,
               textAlign: TextAlign.center,
@@ -116,7 +120,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
                 fontSize: 13,
               ),
             ),
-            const SizedBox(height: 24),
+            AppGap.vXxl,
 
             // Statistics Grid
             Row(
@@ -144,7 +148,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 28),
+            AppGap.vXxxl,
 
             // Done Button
             SizedBox(
@@ -153,10 +157,8 @@ class LiveStreamEndedDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFF0844),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  padding: AppPadding.vMd,
+                  shape: AppBorder.rounded(),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop(); // Dismiss dialog
@@ -181,8 +183,8 @@ class LiveStreamEndedDialog extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white60, size: 20),
-        const SizedBox(height: 6),
+        Icon(icon, color: Colors.white60, size: AppSize.iconSm),
+        AppGap.vXs,
         Text(
           value,
           style: const TextStyle(
@@ -191,7 +193,7 @@ class LiveStreamEndedDialog extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 2),
+        AppGap.vXxs,
         Text(
           label,
           style: const TextStyle(

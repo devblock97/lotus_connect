@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/chill/presentation/widgets/video_item.dart';
 import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
@@ -154,7 +155,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
       return Center(
         child: CircularProgressIndicator(
           color: AppColor.onMedia.of(context),
-          strokeWidth: 2.5,
+          strokeWidth: AppSize.loaderStrokeWidth,
         ),
       );
     }
@@ -162,16 +163,16 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
     if (chillState.status == ChillStatus.failure && chillState.chills.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: AppPadding.hXxl,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 CupertinoIcons.exclamationmark_circle,
                 color: AppColor.onMedia60.of(context),
-                size: 48,
+                size: AppSize.iconXxl,
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               Text(
                 chillState.message ?? loc.unableToLoadChills,
                 textAlign: TextAlign.center,
@@ -180,14 +181,14 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               FilledButton.icon(
                 onPressed: () {
                   ref.read(chillNotifierProvider.notifier).getChill(
                         tag: chillState.activeTag,
                       );
                 },
-                icon: const Icon(Icons.refresh_rounded, size: 18),
+                icon: const Icon(Icons.refresh_rounded, size: AppSize.iconSm),
                 label: Text(loc.retry),
               ),
             ],
@@ -204,9 +205,9 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
             Icon(
               CupertinoIcons.film,
               color: AppColor.onMedia54.of(context),
-              size: 52,
+              size: AppSize.iconXxl,
             ),
-            const SizedBox(height: 12),
+            AppGap.vMd,
             Text(
               chillState.activeTag != null
                   ? loc.noChillsFoundForTag(chillState.activeTag!)
@@ -218,7 +219,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
               ),
             ),
             if (chillState.activeTag != null) ...[
-              const SizedBox(height: 12),
+              AppGap.vMd,
               TextButton(
                 onPressed: () {
                   ref.read(chillNotifierProvider.notifier).setTagFilter(null);
@@ -276,10 +277,10 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
         ),
         child: Padding(
           padding: EdgeInsets.only(
-            top: topPadding + 8,
-            left: 12,
-            right: 12,
-            bottom: 16,
+            top: topPadding + AppSize.sm,
+            left: AppSize.md,
+            right: AppSize.md,
+            bottom: AppSize.lg,
           ),
           child: Row(
             children: [
@@ -289,12 +290,12 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                   icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     color: AppColor.onMedia.of(context),
-                    size: 20,
+                    size: AppSize.iconSm,
                   ),
                 ),
-                const SizedBox(width: 4),
+                AppGap.hXs,
               ] else
-                const SizedBox(width: 4),
+                AppGap.hXs,
               Text(
                 loc.chillsTitle,
                 style: TextStyle(
@@ -305,21 +306,21 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                 ),
               ),
               if (chillState.activeTag != null) ...[
-                const SizedBox(width: 10),
+                AppGap.hSm,
                 GestureDetector(
                   onTap: () {
                     ref.read(chillNotifierProvider.notifier).setTagFilter(null);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+                      horizontal: AppSize.md,
+                      vertical: AppSize.xs,
                     ),
                     decoration: BoxDecoration(
                       color: AppColor.dangerAccent
                           .of(context)
                           .withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppRadius.lg,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -332,11 +333,11 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        AppGap.hXs,
                         Icon(
                           Icons.close_rounded,
                           color: AppColor.onMedia.of(context),
-                          size: 14,
+                          size: AppSize.iconXs,
                         ),
                       ],
                     ),
@@ -351,7 +352,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                   ref.read(chillNotifierProvider.notifier).toggleMute();
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: AppPadding.sm,
                   decoration: BoxDecoration(
                     color: AppColor.mediaBackdrop
                         .of(context)
@@ -363,11 +364,11 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                         ? CupertinoIcons.volume_off
                         : CupertinoIcons.volume_up,
                     color: AppColor.onMedia.of(context),
-                    size: 20,
+                    size: AppSize.iconSm,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
               // Refresh button
               GestureDetector(
                 onTap: () {
@@ -375,7 +376,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                   ref.read(chillNotifierProvider.notifier).refresh();
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: AppPadding.sm,
                   decoration: BoxDecoration(
                     color: AppColor.mediaBackdrop
                         .of(context)
@@ -385,7 +386,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
                   child: Icon(
                     CupertinoIcons.refresh,
                     color: AppColor.onMedia.of(context),
-                    size: 20,
+                    size: AppSize.iconSm,
                   ),
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -88,15 +89,15 @@ class PostOptionsSheet extends StatelessWidget {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.link, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+            const Icon(Icons.link, color: Colors.white, size: AppSize.iconSm),
+            AppGap.hSm,
             Text(loc?.linkCopiedToClipboard ?? 'Link copied to clipboard'),
           ],
         ),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadius.md,
         ),
       ),
     );
@@ -126,29 +127,29 @@ class PostOptionsSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       padding: EdgeInsets.only(
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
+        top: AppSize.md,
+        bottom: MediaQuery.of(context).padding.bottom + AppSize.lg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
           Container(
-            width: 40,
-            height: 4,
+            width: AppSize.sheetHandleWidth,
+            height: AppSize.sheetHandleHeight,
             decoration: BoxDecoration(
               color: theme.dividerColor.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: AppRadius.full,
             ),
           ),
-          const SizedBox(height: 14),
+          AppGap.vMd,
 
           // Author / Post snippet header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: AppPadding.hXl,
             child: Row(
               children: [
                 Expanded(
@@ -163,7 +164,7 @@ class PostOptionsSheet extends StatelessWidget {
                           color: primaryTextColor,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      AppGap.vXxs,
                       Text(
                         post.content.isNotEmpty
                             ? (post.content.length > 35
@@ -182,21 +183,21 @@ class PostOptionsSheet extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  splashRadius: 18,
+                  icon: const Icon(Icons.close, size: AppSize.iconSm),
+                  splashRadius: AppSize.iconSm,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 8),
+          AppGap.vSm,
           Divider(
-            height: 1,
-            thickness: 0.5,
+            height: AppSize.dividerThickness,
+            thickness: AppSize.borderHairline,
             color: theme.dividerColor.withValues(alpha: 0.15),
           ),
-          const SizedBox(height: 6),
+          AppGap.vXs,
 
           // Action Items
           if (isAuthor) ...[
@@ -316,11 +317,14 @@ class _OptionTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.xl,
+          vertical: AppSize.md,
+        ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(width: 16),
+            Icon(icon, color: color, size: AppSize.iconMd),
+            AppGap.hLg,
             Expanded(
               child: Text(
                 label,
