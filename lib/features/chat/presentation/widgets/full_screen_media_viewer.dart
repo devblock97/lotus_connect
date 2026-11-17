@@ -609,7 +609,7 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
             decoration: BoxDecoration(
               color: AppColor.mediaScrim54.of(context),
               borderRadius: AppRadius.xxl,
-              border: Border.all(color: AppColor.onMedia12.of(context)),
+              border: AppBorder.all(AppColor.onMedia12.of(context)),
             ),
             child: Row(
               children: [

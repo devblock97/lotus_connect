@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/user_story.dart';
@@ -35,7 +36,7 @@ class StoriesTray extends ConsumerWidget {
     }
 
     if (groups.isEmpty && liveStreams.isEmpty) {
-      return const SizedBox.shrink();
+      return AppGap.shrink;
     }
 
     final totalCount = liveStreams.length + groups.length;
@@ -45,13 +46,13 @@ class StoriesTray extends ConsumerWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: AppPadding.sm,
         itemCount: totalCount,
         itemBuilder: (context, index) {
           if (index < liveStreams.length) {
             final liveStream = liveStreams[index];
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
+              padding: AppPadding.hSm,
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context)
@@ -69,7 +70,7 @@ class StoriesTray extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildLiveAvatar(liveStream, theme),
-                    const SizedBox(height: 5),
+                    AppGap.vXs,
                     SizedBox(
                       width: 68,
                       child: Text(
@@ -95,7 +96,7 @@ class StoriesTray extends ConsumerWidget {
           final isMe = userStory.isSelf;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: AppPadding.hSm,
             child: GestureDetector(
               onTap: () => _onStoryTap(context, ref, groups, index),
               onLongPress: isMe ? () => _openCreateStory(context) : null,
@@ -108,7 +109,7 @@ class StoriesTray extends ConsumerWidget {
                     isMe,
                     onPlusTap: () => _openCreateStory(context),
                   ),
-                  const SizedBox(height: 5),
+                  AppGap.vXs,
                   SizedBox(
                     width: 68,
                     child: Text(
@@ -183,8 +184,8 @@ class StoriesTray extends ConsumerWidget {
       children: [
         // Glowing Neon Gradient Ring
         Container(
-          width: 64,
-          height: 64,
+          width: AppSize.giant,
+          height: AppSize.giant,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: SweepGradient(
@@ -198,18 +199,18 @@ class StoriesTray extends ConsumerWidget {
             boxShadow: [
               BoxShadow(
                 color: Color(0x66FF0844),
-                blurRadius: 8,
+                blurRadius: AppSize.sm,
                 spreadRadius: 1,
               ),
             ],
           ),
-          padding: const EdgeInsets.all(2.5),
+          padding: const EdgeInsets.all(AppSize.storyRingPadding),
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: theme.scaffoldBackgroundColor,
             ),
-            padding: const EdgeInsets.all(2),
+            padding: AppPadding.xxs,
             child: ClipOval(
               child: host.avatarUrl != null && host.avatarUrl!.isNotEmpty
                   ? CachedNetworkImage(
@@ -226,7 +227,7 @@ class StoriesTray extends ConsumerWidget {
 
         // Overlapping Pulsing LIVE badge at bottom center
         const Positioned(
-          bottom: -4,
+          bottom: -AppSize.xs,
           child: LiveBadge(isCompact: true),
         ),
       ],
@@ -271,27 +272,31 @@ class StoriesTray extends ConsumerWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: 62,
-          height: 62,
+          width: AppSize.giant,
+          height: AppSize.giant,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: ringGradient,
             border: !hasRing
-                ? Border.all(
-                    color: hasStories
+                ? AppBorder.all(
+                    hasStories
                         ? theme.dividerColor.withValues(alpha: 0.35)
                         : Colors.transparent,
-                    width: 1.5,
+                    width: AppSize.borderMedium,
                   )
                 : null,
           ),
-          padding: EdgeInsets.all(hasRing ? 2.5 : (hasStories ? 1.5 : 0)),
+          padding: EdgeInsets.all(
+            hasRing
+                ? AppSize.storyRingPadding
+                : (hasStories ? AppSize.borderMedium : AppSize.none),
+          ),
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: theme.scaffoldBackgroundColor,
             ),
-            padding: EdgeInsets.all(hasStories ? 2.0 : 0),
+            padding: EdgeInsets.all(hasStories ? AppSize.xxs : AppSize.none),
             child: ClipOval(
               child:
                   userStory.avatarUrl != null && userStory.avatarUrl!.isNotEmpty
@@ -311,24 +316,24 @@ class StoriesTray extends ConsumerWidget {
         // Plus icon overlay for logged-in user
         if (isMe)
           Positioned(
-            right: 0,
-            bottom: 0,
+            right: AppSize.none,
+            bottom: AppSize.none,
             child: GestureDetector(
               onTap: onPlusTap,
               child: Container(
-                width: 20,
-                height: 20,
+                width: AppSize.iconSm,
+                height: AppSize.iconSm,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0095F6),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: theme.scaffoldBackgroundColor,
-                    width: 2,
+                  border: AppBorder.all(
+                    theme.scaffoldBackgroundColor,
+                    width: AppSize.borderThick,
                   ),
                 ),
                 child: const Icon(
                   Icons.add,
-                  size: 14,
+                  size: AppSize.iconXxs,
                   color: Colors.white,
                 ),
               ),
@@ -359,28 +364,28 @@ class StoriesTray extends ConsumerWidget {
       height: 104,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: AppPadding.sm,
         itemCount: 6,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: AppPadding.hSm,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 62,
-                  height: 62,
+                  width: AppSize.giant,
+                  height: AppSize.giant,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: theme.dividerColor.withValues(alpha: 0.1),
                   ),
                 ),
-                const SizedBox(height: 6),
+                AppGap.vXs,
                 Container(
-                  width: 52,
-                  height: 10,
+                  width: AppSize.buttonHeightLg,
+                  height: AppSize.skeletonLineXs,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: AppRadius.full,
                     color: theme.dividerColor.withValues(alpha: 0.1),
                   ),
                 ),

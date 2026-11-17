@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class StoryAudienceSheet extends StatelessWidget {
@@ -25,28 +26,28 @@ class StoryAudienceSheet extends StatelessWidget {
 
     return Material(
       color: isDark ? const Color(0xFF1E1E24) : Colors.white,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      borderRadius: AppRadius.bottomSheetTop,
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
+          padding: AppPadding.vXl,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
-                  width: 38,
-                  height: 4.5,
+                  width: AppSize.sheetHandleWidth,
+                  height: AppSize.sheetHandleHeight,
                   decoration: BoxDecoration(
                     color: Colors.grey.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2.5),
+                    borderRadius: AppRadius.full,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              AppGap.vLg,
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: AppPadding.hXl,
                 child: Text(
                   loc?.storyAudience ?? 'Story Audience',
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -54,7 +55,7 @@ class StoryAudienceSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               _buildOption(
                 context: context,
                 value: 'public',
@@ -82,7 +83,7 @@ class StoryAudienceSheet extends StatelessWidget {
                 icon: Icons.group,
                 iconColor: const Color(0xFFA855F7),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
             ],
           ),
         ),
@@ -101,12 +102,12 @@ class StoryAudienceSheet extends StatelessWidget {
     final isSelected = currentVisibility == value;
     return ListTile(
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: AppPadding.sm,
         decoration: BoxDecoration(
           color: iconColor.withValues(alpha: 0.15),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: iconColor, size: 22),
+        child: Icon(icon, color: iconColor, size: AppSize.iconMd),
       ),
       title: Text(
         title,
@@ -117,8 +118,16 @@ class StoryAudienceSheet extends StatelessWidget {
         style: const TextStyle(fontSize: 12.5, color: Colors.grey),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_circle, color: Color(0xFF0095F6), size: 22)
-          : const Icon(Icons.circle_outlined, color: Colors.grey, size: 22),
+          ? const Icon(
+              Icons.check_circle,
+              color: Color(0xFF0095F6),
+              size: AppSize.iconMd,
+            )
+          : const Icon(
+              Icons.circle_outlined,
+              color: Colors.grey,
+              size: AppSize.iconMd,
+            ),
       onTap: () => Navigator.of(context).pop(value),
     );
   }

@@ -62,8 +62,8 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
                       height: 130,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColor.onMedia.of(context),
+                        border: AppBorder.all(
+                          AppColor.onMedia.of(context),
                           width: AppSize.xs,
                         ),
                         boxShadow: [

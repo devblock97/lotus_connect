@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lotus_connect/app/router/app_router.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
@@ -118,7 +119,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   : AppColor.socialBlue.of(context),
               onTap: notifier.markAllRead,
             ),
-            const SizedBox(width: 8),
+            AppGap.hSm,
           ],
           _HeaderCircleIconButton(
             icon: Icons.more_horiz_rounded,
@@ -134,7 +135,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           _HeaderCircleIconButton(
             icon: _isSearching ? Icons.close_rounded : CupertinoIcons.search,
             tooltip: _isSearching ? 'Close search' : 'Search notifications',
@@ -185,14 +186,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   curve: Curves.easeOutCubic,
                   child: _isSearching
                       ? _buildSearchField(context, notifier)
-                      : const SizedBox.shrink(),
+                      : AppGap.shrink,
                 ),
               ),
 
               SliverToBoxAdapter(
                 child: Divider(
-                  height: 1,
-                  thickness: 0.5,
+                  height: AppSize.dividerThickness,
+                  thickness: AppSize.borderHairline,
                   color: theme.dividerColor.withValues(alpha: 0.16),
                 ),
               ),
@@ -281,18 +282,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   if (state.isLoadingMore)
                     const SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: AppPadding.vLg,
                         child: Center(
                           child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                            width: AppSize.loaderSizeMd,
+                            height: AppSize.loaderSizeMd,
+                            child: CircularProgressIndicator(
+                              strokeWidth: AppSize.loaderStrokeWidth,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   const SliverToBoxAdapter(
-                    child: SizedBox(height: 24),
+                    child: AppGap.vXxl,
                   ),
                 ],
               ],
@@ -315,7 +318,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.65);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 12, 6),
+      padding: const EdgeInsets.fromLTRB(
+        AppSize.lg,
+        AppSize.bubbleVertical,
+        AppSize.md,
+        AppSize.chipVertical,
+      ),
       child: Row(
         children: [
           const Expanded(
@@ -338,7 +346,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   : AppColor.socialBlue.of(context),
               onTap: notifier.markAllRead,
             ),
-            const SizedBox(width: 8),
+            AppGap.hSm,
           ],
           _HeaderCircleIconButton(
             icon: Icons.more_horiz_rounded,
@@ -354,7 +362,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
           _HeaderCircleIconButton(
             icon: _isSearching ? Icons.close_rounded : CupertinoIcons.search,
             tooltip: _isSearching ? 'Close search' : 'Search notifications',
@@ -387,9 +395,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.55);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSize.lg,
+        AppSize.xs,
+        AppSize.lg,
+        AppSize.sm,
+      ),
       child: SizedBox(
-        height: 40,
+        height: AppSize.inputHeightSm,
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
@@ -403,12 +416,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             ),
             prefixIcon: Icon(
               CupertinoIcons.search,
-              size: 18,
+              size: AppSize.iconSm,
               color: theme.colorScheme.onSurfaceVariant,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.cancel_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.cancel_rounded,
+                      size: AppSize.iconSm,
+                    ),
                     onPressed: () {
                       _searchController.clear();
                       notifier.setSearchQuery('');
@@ -418,10 +434,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 : null,
             filled: true,
             fillColor: fillColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSize.bubbleHorizontal,
+            ),
+            border: const OutlineInputBorder(
+              borderRadius: AppRadius.xl,
+              borderSide: AppBorder.none,
             ),
           ),
         ),
@@ -468,12 +486,15 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     ];
 
     return SizedBox(
-      height: 48,
+      height: AppSize.tabBarHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.lg,
+          vertical: AppSize.chipVertical,
+        ),
         itemCount: filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 4),
+        separatorBuilder: (_, __) => AppGap.hXs,
         itemBuilder: (context, index) {
           final item = filters[index];
           final isSelected = state.activeFilter == item.filter;
@@ -500,7 +521,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         isDark ? theme.colorScheme.primary : AppColor.socialBlue.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 12, 6),
+      padding: const EdgeInsets.fromLTRB(
+        AppSize.lg,
+        AppSize.md,
+        AppSize.md,
+        AppSize.xs,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -518,7 +544,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               onPressed: onTrailingTap,
               style: TextButton.styleFrom(
                 foregroundColor: actionColor,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.sm,
+                  vertical: AppSize.xs,
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
@@ -608,10 +637,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSize.lg,
+            vertical: AppSize.xs,
+          ),
           child: Divider(
-            height: 1,
-            thickness: 0.5,
+            height: AppSize.dividerThickness,
+            thickness: AppSize.borderHairline,
             color: theme.dividerColor.withValues(alpha: 0.2),
           ),
         ),
@@ -810,13 +842,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.xxxl,
+          vertical: AppSize.massive,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 84,
-              height: 84,
+              width: AppSize.avatarXxl,
+              height: AppSize.avatarXxl,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDark
@@ -826,12 +861,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               ),
               child: Icon(
                 icon,
-                size: 42,
+                size: AppSize.iconXxl,
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
               ),
             ),
-            const SizedBox(height: 18),
+            AppGap.vLg,
             Text(
               title,
               textAlign: TextAlign.center,
@@ -842,7 +877,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 color: theme.colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Text(
               subtitle,
               textAlign: TextAlign.center,
@@ -853,7 +888,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
               ),
             ),
             if (hasActiveFilter) ...[
-              const SizedBox(height: 20),
+              AppGap.vXl,
               FilledButton.tonal(
                 onPressed: () {
                   _searchController.clear();
@@ -862,9 +897,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     ..setFilter(NotificationFilter.all);
                 },
                 style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  shape: AppBorder.rounded(radius: AppSize.radiusXl),
                 ),
                 child: const Text('See all notifications'),
               ),
@@ -946,11 +979,11 @@ class _HeaderCircleIconButton extends StatelessWidget {
         child: Tooltip(
           message: tooltip,
           child: SizedBox(
-            width: 38,
-            height: 38,
+            width: AppSize.iconButtonMd,
+            height: AppSize.iconButtonMd,
             child: Icon(
               icon,
-              size: 21,
+              size: AppSize.iconSm,
               color: iconColor ?? theme.colorScheme.onSurface,
             ),
           ),
@@ -991,12 +1024,15 @@ class _FilterPill extends StatelessWidget {
 
     return Material(
       color: bgColor,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: AppRadius.xl,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSize.bubbleHorizontal,
+            vertical: AppSize.chipVertical,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1009,17 +1045,14 @@ class _FilterPill extends StatelessWidget {
                 ),
               ),
               if (badgeCount > 0) ...[
-                const SizedBox(width: 6),
+                AppGap.hSm,
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1.5,
-                  ),
+                  padding: AppPadding.badge,
                   decoration: BoxDecoration(
                     color: isSelected
                         ? activeAccent
                         : AppColor.badgeRed.of(context),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppRadius.md,
                   ),
                   child: Text(
                     badgeCount > 99 ? '99+' : '$badgeCount',
@@ -1073,19 +1106,19 @@ class _FriendRequestNotificationRow extends StatelessWidget {
     return InkWell(
       onTap: onTapProfile,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: AppPadding.listTile,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 56x56 Avatar + Friend Request Badge
             SizedBox(
-              width: 58,
-              height: 58,
+              width: AppSize.avatarXl + AppSize.xxs,
+              height: AppSize.avatarXl + AppSize.xxs,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   CircleAvatar(
-                    radius: 28,
+                    radius: AppSize.avatarXl / 2,
                     backgroundColor: socialBlue.withValues(alpha: 0.15),
                     backgroundImage:
                         user.avatarUrl != null && user.avatarUrl!.isNotEmpty
@@ -1106,9 +1139,9 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                     right: -1,
                     bottom: -1,
                     child: Container(
-                      width: 26,
-                      height: 26,
-                      padding: const EdgeInsets.all(2),
+                      width: AppSize.avatarBadgeMd,
+                      height: AppSize.avatarBadgeMd,
+                      padding: AppPadding.xxs,
                       decoration: BoxDecoration(
                         color: theme.scaffoldBackgroundColor,
                         shape: BoxShape.circle,
@@ -1120,7 +1153,7 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                         ),
                         child: Icon(
                           Icons.person_add_alt_1_rounded,
-                          size: 13,
+                          size: AppSize.iconXxs,
                           color: AppColor.onMedia.of(context),
                         ),
                       ),
@@ -1129,7 +1162,7 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            AppGap.hMd,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1153,7 +1186,7 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  AppGap.vXxs,
                   Text(
                     '@${user.username}',
                     style: TextStyle(
@@ -1161,12 +1194,12 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  AppGap.vMd,
                   Row(
                     children: [
                       Expanded(
                         child: SizedBox(
-                          height: 36,
+                          height: AppSize.buttonHeightSm,
                           child: FilledButton(
                             onPressed: onAccept,
                             style: FilledButton.styleFrom(
@@ -1176,8 +1209,8 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                               foregroundColor: isDark
                                   ? theme.colorScheme.onPrimary
                                   : AppColor.onMedia.of(context),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              shape: AppBorder.rounded(
+                                radius: AppSize.radiusChip,
                               ),
                               textStyle: const TextStyle(
                                 fontSize: 14,
@@ -1188,17 +1221,17 @@ class _FriendRequestNotificationRow extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      AppGap.hSm,
                       Expanded(
                         child: SizedBox(
-                          height: 36,
+                          height: AppSize.buttonHeightSm,
                           child: TextButton(
                             onPressed: onDecline,
                             style: TextButton.styleFrom(
                               backgroundColor: secondaryBtnBg,
                               foregroundColor: theme.colorScheme.onSurface,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                              shape: AppBorder.rounded(
+                                radius: AppSize.radiusChip,
                               ),
                               textStyle: const TextStyle(
                                 fontSize: 14,

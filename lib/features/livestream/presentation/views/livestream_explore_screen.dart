@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_stream.dart';
@@ -25,7 +26,7 @@ class LiveStreamExploreScreen extends ConsumerWidget {
         title: Row(
           children: [
             const LiveBadge(),
-            const SizedBox(width: 8),
+            AppGap.hSm,
             Text(
               loc?.liveStreams ?? 'Live Streams',
               style: const TextStyle(
@@ -40,7 +41,7 @@ class LiveStreamExploreScreen extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFFF0844),
             ),
-            icon: const Icon(Icons.sensors, size: 18),
+            icon: const Icon(Icons.sensors, size: AppSize.iconSm),
             label: Text(
               loc?.goLive ?? 'Go Live',
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -53,12 +54,15 @@ class LiveStreamExploreScreen extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(width: 8),
+          AppGap.hSm,
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.screenPadding,
+              vertical: AppSize.sm,
+            ),
             child: Row(
               children: [
                 _buildFilterChip(
@@ -68,7 +72,7 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                   currentFilter: feedState.statusFilter,
                   onSelect: feedNotifier.changeStatusFilter,
                 ),
-                const SizedBox(width: 8),
+                AppGap.hSm,
                 _buildFilterChip(
                   context,
                   label: '🔴 ${loc?.liveNow ?? 'Live Now'}',
@@ -76,7 +80,7 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                   currentFilter: feedState.statusFilter,
                   onSelect: feedNotifier.changeStatusFilter,
                 ),
-                const SizedBox(width: 8),
+                AppGap.hSm,
                 _buildFilterChip(
                   context,
                   label: loc?.endedReplays ?? 'Ended Replays',
@@ -108,10 +112,10 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.sensors_off_rounded,
-                        size: 64,
+                        size: AppSize.iconHero,
                         color: theme.dividerColor.withValues(alpha: 0.6),
                       ),
-                      const SizedBox(height: 16),
+                      AppGap.vLg,
                       Text(
                         loc?.noLiveStreams ?? 'No live streams right now',
                         style: const TextStyle(
@@ -119,9 +123,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      AppGap.vXs,
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        padding: AppPadding.hXxl,
                         child: Text(
                           loc?.noLiveStreamsPrompt ??
                               'Be the first to start a live stream '
@@ -134,20 +138,15 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      AppGap.vXl,
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF0844),
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
+                          padding: AppPadding.button,
+                          shape: AppBorder.rounded(radius: AppSize.radiusXl),
                         ),
-                        icon: const Icon(Icons.sensors, size: 18),
+                        icon: const Icon(Icons.sensors, size: AppSize.iconSm),
                         label: Text(
                           loc?.startStreamingNow ?? 'Start Streaming Now',
                         ),
@@ -165,12 +164,12 @@ class LiveStreamExploreScreen extends ConsumerWidget {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.all(12),
+                padding: AppPadding.md,
                 sliver: SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
+                    mainAxisSpacing: AppSize.md,
+                    crossAxisSpacing: AppSize.md,
                     childAspectRatio: 0.72,
                   ),
                   delegate: SliverChildBuilderDelegate(
@@ -218,12 +217,15 @@ class LiveStreamExploreScreen extends ConsumerWidget {
       onTap: () => onSelect(filterValue),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.bubbleHorizontal,
+          vertical: AppSize.chipVertical,
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFFFF0844)
               : theme.dividerColor.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.xl,
         ),
         child: Text(
           label,
@@ -251,12 +253,12 @@ class LiveStreamExploreScreen extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1E2238),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.card,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              blurRadius: AppSize.sm,
+              offset: const Offset(0, AppSize.xs),
             ),
           ],
         ),
@@ -309,18 +311,15 @@ class LiveStreamExploreScreen extends ConsumerWidget {
 
             // Top-left: LIVE Badge
             Positioned(
-              top: 8,
-              left: 8,
+              top: AppSize.sm,
+              left: AppSize.sm,
               child: stream.isLive
                   ? const LiveBadge(isCompact: true)
                   : Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
+                      padding: AppPadding.badge,
+                      decoration: const BoxDecoration(
                         color: Colors.black54,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: AppRadius.xs,
                       ),
                       child: Text(
                         loc?.streamEnded ?? 'ENDED',
@@ -335,13 +334,13 @@ class LiveStreamExploreScreen extends ConsumerWidget {
 
             // Top-right: Viewers count badge
             Positioned(
-              top: 8,
-              right: 8,
+              top: AppSize.sm,
+              right: AppSize.sm,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
+                padding: AppPadding.badge,
+                decoration: const BoxDecoration(
                   color: Colors.black54,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppRadius.md,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -349,9 +348,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                     const Icon(
                       Icons.remove_red_eye_rounded,
                       color: Colors.white70,
-                      size: 11,
+                      size: AppSize.iconXxs,
                     ),
-                    const SizedBox(width: 3),
+                    AppGap.hXxs,
                     Text(
                       '${stream.viewerCount}',
                       style: const TextStyle(
@@ -367,9 +366,9 @@ class LiveStreamExploreScreen extends ConsumerWidget {
 
             // Bottom info (Title, Host Avatar, Username)
             Positioned(
-              bottom: 8,
-              left: 8,
-              right: 8,
+              bottom: AppSize.sm,
+              left: AppSize.sm,
+              right: AppSize.sm,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -385,11 +384,11 @@ class LiveStreamExploreScreen extends ConsumerWidget {
                       shadows: [Shadow(blurRadius: 2)],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  AppGap.vXs,
                   Row(
                     children: [
                       _buildSmallAvatar(stream.host),
-                      const SizedBox(width: 6),
+                      AppGap.hXs,
                       Expanded(
                         child: Text(
                           (stream.host.fullName?.isNotEmpty ?? false)
@@ -429,8 +428,8 @@ class LiveStreamExploreScreen extends ConsumerWidget {
       ),
       child: Center(
         child: Container(
-          width: 54,
-          height: 54,
+          width: AppSize.avatarXl,
+          height: AppSize.avatarXl,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white12,
@@ -461,8 +460,8 @@ class LiveStreamExploreScreen extends ConsumerWidget {
 
   Widget _buildSmallAvatar(PostAuthor user) {
     return Container(
-      width: 18,
-      height: 18,
+      width: AppSize.avatarXs,
+      height: AppSize.avatarXs,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white24,

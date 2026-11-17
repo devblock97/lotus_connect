@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_sync_coordinator.dart';
@@ -153,13 +154,17 @@ class PlaceholderTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 64, color: AppColor.inkMuted.of(context)),
-            const SizedBox(height: 16),
+            Icon(
+              icon,
+              size: AppSize.iconHero,
+              color: AppColor.inkMuted.of(context),
+            ),
+            AppGap.vLg,
             Text(
               '$title Feature',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            AppGap.vSm,
             Text(
               'This feature will be implemented in future',
               style: TextStyle(color: AppColor.inkMuted.of(context)),

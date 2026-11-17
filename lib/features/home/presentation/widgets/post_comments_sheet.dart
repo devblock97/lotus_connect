@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/application/comment_notifier.dart';
 import 'package:lotus_connect/features/home/application/comment_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
@@ -179,7 +180,7 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
         return Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: AppRadius.bottomSheetTop,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.3),
@@ -191,20 +192,20 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
           child: Column(
             children: [
               // Drag Handle
-              const SizedBox(height: 10),
+              AppGap.vSm,
               Container(
-                width: 38,
-                height: 4.5,
+                width: AppSize.sheetHandleWidth,
+                height: AppSize.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: theme.dividerColor.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: AppRadius.full,
                 ),
               ),
-              const SizedBox(height: 10),
+              AppGap.vSm,
 
               // Sheet Header: Title, Count, Sort Selector, Close
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: AppPadding.hLg,
                 child: Row(
                   children: [
                     // Title and Count
@@ -216,15 +217,15 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                         color: primaryTextColor,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    AppGap.hXs,
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 2,
+                        horizontal: AppSize.sm,
+                        vertical: AppSize.xxs,
                       ),
                       decoration: BoxDecoration(
                         color: theme.primaryColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadius.md,
                       ),
                       child: Text(
                         '$totalCommentsCount',
@@ -241,13 +242,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                     PopupMenuButton<CommentSortOrder>(
                       initialValue: currentSort,
                       onSelected: _setSortOrder,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                      shape: AppBorder.rounded(radius: AppSize.radiusMd),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: AppSize.sm,
+                          vertical: AppSize.xs,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -260,10 +259,10 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                                 color: subtextColor,
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            AppGap.hXs,
                             Icon(
                               CupertinoIcons.chevron_down,
-                              size: 13,
+                              size: AppSize.iconXxs,
                               color: subtextColor,
                             ),
                           ],
@@ -274,8 +273,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                           value: CommentSortOrder.popular,
                           child: Row(
                             children: [
-                              const Icon(Icons.whatshot, size: 18),
-                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.whatshot,
+                                size: AppSize.iconSm,
+                              ),
+                              AppGap.hMd,
                               Text(loc?.topComments ?? 'Top comments'),
                             ],
                           ),
@@ -284,8 +286,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                           value: CommentSortOrder.newest,
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time_rounded, size: 18),
-                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.access_time_rounded,
+                                size: AppSize.iconSm,
+                              ),
+                              AppGap.hMd,
                               Text(loc?.newestFirst ?? 'Newest first'),
                             ],
                           ),
@@ -294,8 +299,11 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                           value: CommentSortOrder.oldest,
                           child: Row(
                             children: [
-                              const Icon(Icons.history_rounded, size: 18),
-                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.history_rounded,
+                                size: AppSize.iconSm,
+                              ),
+                              AppGap.hMd,
                               Text(loc?.oldestFirst ?? 'Oldest first'),
                             ],
                           ),
@@ -305,8 +313,8 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
 
                     // Close Button
                     IconButton(
-                      icon: const Icon(Icons.close, size: 20),
-                      splashRadius: 18,
+                      icon: const Icon(Icons.close, size: AppSize.iconSm),
+                      splashRadius: AppSize.iconSm,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -314,8 +322,8 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
               ),
 
               Divider(
-                height: 1,
-                thickness: 0.5,
+                height: AppSize.dividerThickness,
+                thickness: AppSize.borderHairline,
                 color: theme.dividerColor.withValues(alpha: 0.15),
               ),
 
@@ -336,21 +344,21 @@ class _PostCommentsSheetState extends ConsumerState<PostCommentsSheet> {
                                 parent: BouncingScrollPhysics(),
                               ),
                               padding: const EdgeInsets.only(
-                                top: 8,
-                                bottom: 20,
+                                top: AppSize.sm,
+                                bottom: AppSize.xl,
                               ),
                               itemCount:
                                   comments.length + (isLoadingMore ? 1 : 0),
                               itemBuilder: (context, index) {
                                 if (index >= comments.length) {
                                   return const Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    padding: AppPadding.vMd,
                                     child: Center(
                                       child: SizedBox(
-                                        width: 20,
-                                        height: 20,
+                                        width: AppSize.iconSm,
+                                        height: AppSize.iconSm,
                                         child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                          strokeWidth: AppSize.borderThick,
                                         ),
                                       ),
                                     ),

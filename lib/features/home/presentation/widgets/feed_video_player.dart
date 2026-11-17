@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/core/logging/app_logger.dart';
 import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
@@ -286,8 +287,8 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                 if (!_isPlaying || _hasError)
                   Center(
                     child: Container(
-                      width: 56,
-                      height: 56,
+                      width: AppSize.fabSizeMd,
+                      height: AppSize.fabSizeMd,
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.55),
                         shape: BoxShape.circle,
@@ -297,7 +298,7 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                             ? CupertinoIcons.videocam_fill
                             : CupertinoIcons.play_fill,
                         color: Colors.white,
-                        size: 28,
+                        size: AppSize.iconLg,
                       ),
                     ),
                   ),
@@ -308,7 +309,7 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                   builder: (context, child) {
                     if (_indicatorAnimController.isDismissed ||
                         _indicatorAnimController.isCompleted) {
-                      return const SizedBox.shrink();
+                      return AppGap.shrink;
                     }
                     return Center(
                       child: Opacity(
@@ -316,7 +317,7 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                         child: Transform.scale(
                           scale: _indicatorScaleAnimation.value,
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: AppPadding.lg,
                             decoration: BoxDecoration(
                               color: Colors.black.withValues(alpha: 0.6),
                               shape: BoxShape.circle,
@@ -324,7 +325,7 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                             child: const Icon(
                               CupertinoIcons.play_fill,
                               color: Colors.white,
-                              size: 36,
+                              size: AppSize.loaderSizeLg,
                             ),
                           ),
                         ),
@@ -338,9 +339,9 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                     _controller!.value.isInitialized &&
                     _isPlaying)
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    left: AppSize.none,
+                    right: AppSize.none,
+                    bottom: AppSize.none,
                     child: VideoProgressIndicator(
                       _controller!,
                       allowScrubbing: false,
@@ -353,10 +354,10 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                   ),
 
                 Positioned(
-                  top: 12,
-                  right: 12,
+                  top: AppSize.md,
+                  right: AppSize.md,
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: AppPadding.xs,
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.55),
                       shape: BoxShape.circle,
@@ -364,20 +365,20 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                     child: const Icon(
                       CupertinoIcons.videocam_fill,
                       color: Colors.white,
-                      size: 14,
+                      size: AppSize.iconXs,
                     ),
                   ),
                 ),
 
                 if (!_hasError)
                   Positioned(
-                    bottom: 12,
-                    right: 12,
+                    bottom: AppSize.md,
+                    right: AppSize.md,
                     child: GestureDetector(
                       onTap: _handleToggleMute,
                       behavior: HitTestBehavior.opaque,
                       child: Container(
-                        padding: const EdgeInsets.all(7),
+                        padding: AppPadding.sm,
                         decoration: BoxDecoration(
                           color: Colors.black.withValues(alpha: 0.6),
                           shape: BoxShape.circle,
@@ -387,7 +388,7 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                               ? CupertinoIcons.volume_off
                               : CupertinoIcons.volume_up,
                           color: Colors.white,
-                          size: 16,
+                          size: AppSize.iconXs,
                         ),
                       ),
                     ),
@@ -396,13 +397,10 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                 if (_showMuteFeedback)
                   Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
+                      padding: AppPadding.chatBubble,
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.75),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: AppRadius.xxl,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -412,9 +410,9 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
                                 ? CupertinoIcons.volume_off
                                 : CupertinoIcons.volume_up,
                             color: Colors.white,
-                            size: 18,
+                            size: AppSize.iconSm,
                           ),
-                          const SizedBox(width: 8),
+                          AppGap.hSm,
                           Text(
                             isGloballyMuted ? 'Muted' : 'Unmuted',
                             style: const TextStyle(
@@ -484,9 +482,9 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
           : const Color(0xFFF0F0F0),
       child: const Center(
         child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
+          width: AppSize.loaderSizeMd,
+          height: AppSize.loaderSizeMd,
+          child: CircularProgressIndicator(strokeWidth: AppSize.borderThick),
         ),
       ),
     );
@@ -507,19 +505,19 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
           children: [
             const Icon(
               CupertinoIcons.videocam_circle_fill,
-              size: 52,
+              size: AppSize.iconXxl,
               color: Colors.white54,
             ),
-            const SizedBox(height: 6),
+            AppGap.vSm,
             if (widget.media.duration != null)
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
+                  horizontal: AppSize.sm,
+                  vertical: AppSize.xxs,
                 ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.black45,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: AppRadius.xs,
                 ),
                 child: Text(
                   '0:${widget.media.duration}',

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
@@ -203,9 +204,8 @@ class _CommentInputBarState extends State<CommentInputBar> {
       decoration: BoxDecoration(
         color: surfaceColor,
         border: Border(
-          top: BorderSide(
-            color: theme.dividerColor.withValues(alpha: 0.15),
-            width: 0.8,
+          top: AppBorder.hairline(
+            theme.dividerColor.withValues(alpha: 0.15),
           ),
         ),
         boxShadow: [
@@ -217,13 +217,13 @@ class _CommentInputBarState extends State<CommentInputBar> {
         ],
       ),
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 6,
+        left: AppSize.md,
+        right: AppSize.md,
+        top: AppSize.sm,
         bottom: MediaQuery.of(context).viewInsets.bottom +
             (MediaQuery.of(context).padding.bottom > 0
                 ? MediaQuery.of(context).padding.bottom
-                : 8),
+                : AppSize.sm),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -233,24 +233,24 @@ class _CommentInputBarState extends State<CommentInputBar> {
           if (widget.replyingTo != null)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              margin: const EdgeInsets.only(bottom: AppSize.sm),
+              padding: AppPadding.chip,
               decoration: BoxDecoration(
                 color: theme.primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.primaryColor.withValues(alpha: 0.25),
-                  width: 0.8,
+                borderRadius: AppRadius.md,
+                border: AppBorder.all(
+                  theme.primaryColor.withValues(alpha: 0.25),
+                  width: AppSize.borderHairline,
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
                     CupertinoIcons.reply,
-                    size: 14,
+                    size: AppSize.iconXxs,
                     color: theme.primaryColor,
                   ),
-                  const SizedBox(width: 8),
+                  AppGap.hSm,
                   Expanded(
                     child: RichText(
                       text: TextSpan(
@@ -282,10 +282,10 @@ class _CommentInputBarState extends State<CommentInputBar> {
                       widget.onCancelReply?.call();
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(4),
+                      padding: AppPadding.xs,
                       child: Icon(
                         Icons.close,
-                        size: 16,
+                        size: AppSize.iconXs,
                         color: subtextColor,
                       ),
                     ),
@@ -297,15 +297,15 @@ class _CommentInputBarState extends State<CommentInputBar> {
           // Media attachment preview thumbnail (if attached)
           if (_selectedMediaUrl != null)
             Container(
-              margin: const EdgeInsets.only(bottom: 8),
+              margin: const EdgeInsets.only(bottom: AppSize.sm),
               alignment: Alignment.centerLeft,
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadius.md,
                     child: Container(
-                      width: 72,
-                      height: 72,
+                      width: AppSize.giant,
+                      height: AppSize.giant,
                       decoration: BoxDecoration(
                         color: isDark ? Colors.grey[850] : Colors.grey[200],
                       ),
@@ -325,8 +325,8 @@ class _CommentInputBarState extends State<CommentInputBar> {
                     ),
                   ),
                   Positioned(
-                    top: 4,
-                    right: 4,
+                    top: AppSize.xs,
+                    right: AppSize.xs,
                     child: GestureDetector(
                       onTap: () {
                         HapticFeedback.lightImpact();
@@ -334,14 +334,14 @@ class _CommentInputBarState extends State<CommentInputBar> {
                         _onTextChanged();
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(3),
+                        padding: AppPadding.xxs,
                         decoration: const BoxDecoration(
                           color: Colors.black87,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.close,
-                          size: 18,
+                          size: AppSize.iconSm,
                           color: Colors.white,
                         ),
                       ),
@@ -353,23 +353,25 @@ class _CommentInputBarState extends State<CommentInputBar> {
 
           // Quick emojis horizontal strip
           SizedBox(
-            height: 32,
+            height: AppSize.chipHeight,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: kQuickCommentEmojis.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, __) => AppGap.hSm,
               itemBuilder: (context, index) {
                 final emoji = kQuickCommentEmojis[index];
                 return GestureDetector(
                   onTap: () => _insertEmoji(emoji),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSize.sm,
+                      vertical: AppSize.xxs,
+                    ),
                     decoration: BoxDecoration(
                       color: isDark
                           ? Colors.white.withValues(alpha: 0.06)
                           : Colors.black.withValues(alpha: 0.04),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: AppRadius.lg,
                     ),
                     child: Center(
                       child: Text(
@@ -382,7 +384,7 @@ class _CommentInputBarState extends State<CommentInputBar> {
               },
             ),
           ),
-          const SizedBox(height: 6),
+          AppGap.vXs,
 
           // Main input row: [Avatar] [TextField] [MediaButton] [SendButton]
           Row(
@@ -390,14 +392,14 @@ class _CommentInputBarState extends State<CommentInputBar> {
             children: [
               // User avatar
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.only(bottom: AppSize.xs),
                 child: SizedBox(
-                  width: 34,
-                  height: 34,
+                  width: AppSize.avatarSm,
+                  height: AppSize.avatarSm,
                   child: ClipOval(child: _buildAvatar(theme)),
                 ),
               ),
-              const SizedBox(width: 10),
+              AppGap.hSm,
 
               // Expandable Text input
               Expanded(
@@ -407,9 +409,9 @@ class _CommentInputBarState extends State<CommentInputBar> {
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.08)
                         : const Color(0xFFF1F3F5),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: AppRadius.xxl,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  padding: AppPadding.hLg,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -440,15 +442,14 @@ class _CommentInputBarState extends State<CommentInputBar> {
                               color: subtextColor,
                             ),
                             border: InputBorder.none,
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 10),
+                            contentPadding: AppPadding.vSm,
                           ),
                           onSubmitted: (_) => _handleSend(),
                         ),
                       ),
                       // Media / Sticker button
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.only(bottom: AppSize.sm),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -461,18 +462,18 @@ class _CommentInputBarState extends State<CommentInputBar> {
                               },
                               child: Icon(
                                 Icons.sentiment_satisfied_alt_outlined,
-                                size: 21,
+                                size: AppSize.iconSm,
                                 color: _showStickerTray
                                     ? theme.primaryColor
                                     : subtextColor,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            AppGap.hSm,
                             GestureDetector(
                               onTap: _pickImage,
                               child: Icon(
                                 CupertinoIcons.photo,
-                                size: 21,
+                                size: AppSize.iconSm,
                                 color: _selectedMediaUrl != null
                                     ? theme.primaryColor
                                     : subtextColor,
@@ -485,11 +486,11 @@ class _CommentInputBarState extends State<CommentInputBar> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
 
               // Send button
               Padding(
-                padding: const EdgeInsets.only(bottom: 3),
+                padding: const EdgeInsets.only(bottom: AppSize.xs),
                 child: AnimatedScale(
                   scale: _canSubmit ? 1.05 : 1.0,
                   duration: const Duration(milliseconds: 150),
@@ -498,23 +499,23 @@ class _CommentInputBarState extends State<CommentInputBar> {
                         _canSubmit && !widget.isSubmitting ? _handleSend : null,
                     icon: widget.isSubmitting
                         ? SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: AppSize.iconSm,
+                            height: AppSize.iconSm,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                              strokeWidth: AppSize.borderThick,
                               color: theme.primaryColor,
                             ),
                           )
                         : Icon(
                             CupertinoIcons.arrow_up_circle_fill,
-                            size: 34,
+                            size: AppSize.iconXl,
                             color: _canSubmit
                                 ? theme.primaryColor
                                 : (isDark
                                     ? Colors.white.withValues(alpha: 0.2)
                                     : Colors.black.withValues(alpha: 0.2)),
                           ),
-                    padding: EdgeInsets.zero,
+                    padding: AppPadding.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ),

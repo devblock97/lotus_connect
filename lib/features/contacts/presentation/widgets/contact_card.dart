@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/chat/application/presence_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -46,29 +47,29 @@ class ContactCard extends ConsumerWidget {
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        borderRadius: AppRadius.card,
+        border: AppBorder.all(borderColor),
         boxShadow: [
           BoxShadow(
             color: AppColor.black
                 .of(context)
                 .withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, AppSize.xxs),
           ),
         ],
       ),
       child: Material(
         color: AppColor.transparent.of(context),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.card,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.card,
           onTap: startChat,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: AppPadding.chatBubble,
             child: Row(
               children: [
                 // Avatar with Presence Indicator
@@ -78,7 +79,7 @@ class ContactCard extends ConsumerWidget {
                     clipBehavior: Clip.none,
                     children: [
                       CircleAvatar(
-                        radius: 23,
+                        radius: AppSize.avatarLg / 2,
                         backgroundColor: theme.colorScheme.primaryContainer,
                         backgroundImage: friend.avatarUrl != null &&
                                 friend.avatarUrl!.isNotEmpty
@@ -97,17 +98,17 @@ class ContactCard extends ConsumerWidget {
                             : null,
                       ),
                       Positioned(
-                        bottom: 0,
-                        right: 0,
+                        bottom: AppSize.none,
+                        right: AppSize.none,
                         child: Container(
-                          width: 13,
-                          height: 13,
+                          width: AppSize.statusDotMd,
+                          height: AppSize.statusDotMd,
                           decoration: BoxDecoration(
                             color: presenceColor,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: cardColor,
-                              width: 2.2,
+                            border: AppBorder.all(
+                              cardColor,
+                              width: AppSize.borderThick,
                             ),
                           ),
                         ),
@@ -115,7 +116,7 @@ class ContactCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 14),
+                AppGap.hMd,
 
                 // Name & Presence status
                 Expanded(
@@ -133,14 +134,14 @@ class ContactCard extends ConsumerWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 3),
+                      AppGap.vXxs,
                       Row(
                         children: [
                           if (isOnline) ...[
                             Container(
-                              width: 6,
-                              height: 6,
-                              margin: const EdgeInsets.only(right: 5),
+                              width: AppSize.statusDotSm,
+                              height: AppSize.statusDotSm,
+                              margin: const EdgeInsets.only(right: AppSize.xs),
                               decoration: BoxDecoration(
                                 color: AppColor.onlineGreen.of(context),
                                 shape: BoxShape.circle,
@@ -202,13 +203,11 @@ class ContactCard extends ConsumerWidget {
                           Icons.more_vert_rounded,
                           color: theme.colorScheme.onSurfaceVariant
                               .withValues(alpha: 0.7),
-                          size: 20,
+                          size: AppSize.iconSm,
                         ),
-                        padding: EdgeInsets.zero,
+                        padding: AppPadding.zero,
                         constraints: const BoxConstraints(),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: AppBorder.rounded(radius: AppSize.radiusMd),
                         onSelected: (value) {
                           if (value == 'profile') {
                             onProfileTap?.call();
@@ -224,9 +223,9 @@ class ContactCard extends ConsumerWidget {
                                 children: [
                                   const Icon(
                                     Icons.person_outline_rounded,
-                                    size: 20,
+                                    size: AppSize.iconSm,
                                   ),
-                                  const SizedBox(width: 8),
+                                  AppGap.hSm,
                                   Text(loc.viewProfile),
                                 ],
                               ),
@@ -238,9 +237,9 @@ class ContactCard extends ConsumerWidget {
                                 Icon(
                                   Icons.person_remove_outlined,
                                   color: AppColor.danger.of(context),
-                                  size: 20,
+                                  size: AppSize.iconSm,
                                 ),
-                                const SizedBox(width: 8),
+                                AppGap.hSm,
                                 Text(
                                   loc.unfriend,
                                   style: TextStyle(
@@ -270,13 +269,16 @@ class ContactCard extends ConsumerWidget {
     required VoidCallback? onPressed,
   }) {
     return IconButton(
-      icon: Icon(icon, color: color, size: 21),
+      icon: Icon(icon, color: color, size: AppSize.iconSm),
       tooltip: tooltip,
       onPressed: onPressed,
       visualDensity: VisualDensity.compact,
-      padding: const EdgeInsets.all(6),
-      constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-      splashRadius: 18,
+      padding: const EdgeInsets.all(AppSize.chipVertical),
+      constraints: const BoxConstraints(
+        minWidth: AppSize.iconButtonSm,
+        minHeight: AppSize.iconButtonSm,
+      ),
+      splashRadius: AppSize.xl,
     );
   }
 

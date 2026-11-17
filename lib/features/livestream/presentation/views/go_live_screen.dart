@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/livestream/application/go_live_notifier.dart';
 import 'package:lotus_connect/features/livestream/application/livestream_feed_notifier.dart';
 import 'package:lotus_connect/features/livestream/presentation/views/livestream_player_screen.dart';
@@ -196,10 +197,10 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                             _isCameraFront
                                 ? Icons.camera_front
                                 : Icons.camera_rear,
-                            size: 64,
+                            size: AppSize.iconHero,
                             color: Colors.white24,
                           ),
-                          const SizedBox(height: 12),
+                          AppGap.vMd,
                           Text(
                             loc?.cameraInitializing ?? 'Camera initializing...',
                             style: const TextStyle(
@@ -219,8 +220,10 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
               children: [
                 // Top header bar
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSize.lg,
+                    vertical: AppSize.sm,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
@@ -244,17 +247,17 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
 
                 // Setup Card at Bottom
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(20),
+                  margin: AppPadding.hLg,
+                  padding: AppPadding.xl,
                   decoration: BoxDecoration(
                     color: const Color(0xFF161823).withValues(alpha: 0.95),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white12),
+                    borderRadius: AppRadius.xxl,
+                    border: AppBorder.all(Colors.white12),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.5),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        blurRadius: AppSize.xl,
+                        offset: const Offset(0, AppSize.sm),
                       ),
                     ],
                   ),
@@ -279,17 +282,17 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                           prefixIcon: const Icon(
                             CupertinoIcons.pencil,
                             color: Color(0xFFFF0844),
-                            size: 20,
+                            size: AppSize.iconSm,
                           ),
                           filled: true,
                           fillColor: Colors.white.withValues(alpha: 0.05),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
+                          border: const OutlineInputBorder(
+                            borderRadius: AppRadius.lg,
+                            borderSide: AppBorder.none,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      AppGap.vMd,
 
                       Row(
                         children: [
@@ -301,40 +304,40 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          AppGap.hSm,
                           _buildPrivacyChip(
                             'public',
                             '🌍 ${loc?.visibilityPublic ?? 'Public'}',
                           ),
-                          const SizedBox(width: 6),
+                          AppGap.hXs,
                           _buildPrivacyChip(
                             'friends',
                             '👥 ${loc?.visibilityFriends ?? 'Friends'}',
                           ),
-                          const SizedBox(width: 6),
+                          AppGap.hXs,
                           _buildPrivacyChip(
                             'private',
                             '🔒 ${loc?.privacyPrivate ?? 'Private'}',
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      AppGap.vLg,
 
                       // Ingest RTMP tip for OBS creators
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: AppPadding.md,
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.04),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadius.md,
                         ),
                         child: Row(
                           children: [
                             const Icon(
                               Icons.cast_connected,
                               color: Color(0xFF64D2FF),
-                              size: 18,
+                              size: AppSize.iconSm,
                             ),
-                            const SizedBox(width: 8),
+                            AppGap.hSm,
                             Expanded(
                               child: Text(
                                 loc?.rtmpIngestTip ??
@@ -348,19 +351,19 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      AppGap.vXl,
 
                       // GO LIVE vibrant button
                       SizedBox(
-                        height: 52,
+                        height: AppSize.buttonHeightLg,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(26),
+                            shape: AppBorder.rounded(
+                              radius: AppSize.radiusXxxl,
                             ),
-                            padding: EdgeInsets.zero,
+                            padding: AppPadding.zero,
                           ),
                           onPressed: isCreating ? null : _startLiveStream,
                           child: Ink(
@@ -368,13 +371,13 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                               gradient: const LinearGradient(
                                 colors: [Color(0xFFFF0844), Color(0xFFFF4E50)],
                               ),
-                              borderRadius: BorderRadius.circular(26),
+                              borderRadius: AppRadius.xxxl,
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFFFF0844)
                                       .withValues(alpha: 0.4),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 4),
+                                  blurRadius: AppSize.lg,
+                                  offset: const Offset(0, AppSize.xs),
                                 ),
                               ],
                             ),
@@ -382,11 +385,11 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                               alignment: Alignment.center,
                               child: isCreating
                                   ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
+                                      width: AppSize.loaderSizeMd,
+                                      height: AppSize.loaderSizeMd,
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
-                                        strokeWidth: 2.5,
+                                        strokeWidth: AppSize.loaderStrokeWidth,
                                       ),
                                     )
                                   : Row(
@@ -397,7 +400,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                                           Icons.sensors,
                                           color: Colors.white,
                                         ),
-                                        const SizedBox(width: 8),
+                                        AppGap.hSm,
                                         Text(
                                           loc?.goLiveNow ?? 'GO LIVE NOW',
                                           style: const TextStyle(
@@ -416,7 +419,7 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                AppGap.vXl,
               ],
             ),
           ),
@@ -431,14 +434,14 @@ class _GoLiveScreenState extends ConsumerState<GoLiveScreen> {
       onTap: () => setState(() => _privacy = key),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: AppPadding.chip,
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFFFF0844).withValues(alpha: 0.2)
               : Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFFF0844) : Colors.transparent,
+          borderRadius: AppRadius.lg,
+          border: AppBorder.all(
+            isSelected ? const Color(0xFFFF0844) : Colors.transparent,
           ),
         ),
         child: Text(

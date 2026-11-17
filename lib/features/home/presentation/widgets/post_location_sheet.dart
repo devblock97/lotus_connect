@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 const List<String> kPopularLocations = [
@@ -70,21 +71,21 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
       height: MediaQuery.of(context).size.height * 0.65,
       child: Material(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.bottomSheetTop,
         child: Column(
           children: [
-            const SizedBox(height: 12),
+            AppGap.vMd,
             Container(
-              width: 40,
-              height: 4,
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
               decoration: BoxDecoration(
                 color: theme.dividerColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: AppPadding.hXl,
               child: Row(
                 children: [
                   Text(
@@ -97,41 +98,45 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close, size: 20),
-                    splashRadius: 18,
+                    icon: const Icon(Icons.close, size: AppSize.iconSm),
+                    splashRadius: AppSize.iconSm,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              padding: const EdgeInsets.fromLTRB(
+                AppSize.lg,
+                AppSize.sm,
+                AppSize.lg,
+                AppSize.md,
+              ),
               child: TextField(
                 controller: _controller,
                 onChanged: (val) => setState(() => _searchQuery = val),
                 decoration: InputDecoration(
                   hintText: loc?.whereAreYou ?? 'Where are you?',
                   hintStyle: TextStyle(color: subtextColor, fontSize: 14),
-                  prefixIcon:
-                      const Icon(CupertinoIcons.location_solid, size: 20),
+                  prefixIcon: const Icon(
+                    CupertinoIcons.location_solid,
+                    size: AppSize.iconSm,
+                  ),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
+                          icon: const Icon(Icons.clear, size: AppSize.iconSm),
                           onPressed: () {
                             _controller.clear();
                             setState(() => _searchQuery = '');
                           },
                         )
                       : null,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
+                  contentPadding: AppPadding.input,
                   filled: true,
                   fillColor: theme.cardColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                  border: const OutlineInputBorder(
+                    borderRadius: AppRadius.input,
+                    borderSide: AppBorder.none,
                   ),
                 ),
               ),
@@ -139,8 +144,8 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
             if (_searchQuery.isNotEmpty && !filtered.contains(_searchQuery))
               ListTile(
                 leading: Container(
-                  width: 36,
-                  height: 36,
+                  width: AppSize.buttonHeightSm,
+                  height: AppSize.buttonHeightSm,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
@@ -148,7 +153,7 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
                   child: Icon(
                     Icons.add_location_alt_outlined,
                     color: theme.colorScheme.primary,
-                    size: 20,
+                    size: AppSize.iconSm,
                   ),
                 ),
                 title: Text(
@@ -162,12 +167,14 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
               ),
             Expanded(
               child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSize.lg,
+                  vertical: AppSize.xs,
+                ),
                 itemCount: filtered.length,
                 separatorBuilder: (_, __) => Divider(
-                  height: 1,
-                  thickness: 0.5,
+                  height: AppSize.dividerThickness,
+                  thickness: AppSize.borderHairline,
                   color: theme.dividerColor.withValues(alpha: 0.1),
                 ),
                 itemBuilder: (context, index) {
@@ -176,12 +183,12 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
 
                   return ListTile(
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
+                      horizontal: AppSize.sm,
+                      vertical: AppSize.xxs,
                     ),
                     leading: Container(
-                      width: 38,
-                      height: 38,
+                      width: AppSize.avatarMd,
+                      height: AppSize.avatarMd,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE91E63).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
@@ -189,7 +196,7 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
                       child: const Icon(
                         Icons.place,
                         color: Color(0xFFE91E63),
-                        size: 20,
+                        size: AppSize.iconSm,
                       ),
                     ),
                     title: Text(
@@ -205,7 +212,7 @@ class _PostLocationSheetState extends State<PostLocationSheet> {
                         ? Icon(
                             Icons.check_circle,
                             color: theme.colorScheme.primary,
-                            size: 20,
+                            size: AppSize.iconSm,
                           )
                         : null,
                     onTap: () => widget.onSelect(loc),

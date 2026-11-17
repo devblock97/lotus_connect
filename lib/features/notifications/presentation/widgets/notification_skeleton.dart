@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card_skeleton.dart';
 
 class NotificationTileSkeleton extends StatelessWidget {
@@ -7,34 +8,34 @@ class NotificationTileSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: AppPadding.listTile,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 56x56 Avatar + overlapping badge placeholder
           SizedBox(
-            width: 58,
-            height: 58,
+            width: AppSize.avatarXl + AppSize.xxs,
+            height: AppSize.avatarXl + AppSize.xxs,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 const ShimmerBox(
-                  width: 56,
-                  height: 56,
+                  width: AppSize.avatarXl,
+                  height: AppSize.avatarXl,
                   shape: BoxShape.circle,
                 ),
                 Positioned(
-                  right: 0,
-                  bottom: 0,
+                  right: AppSize.none,
+                  bottom: AppSize.none,
                   child: Container(
-                    padding: const EdgeInsets.all(2),
+                    padding: AppPadding.xxs,
                     decoration: BoxDecoration(
                       color: Theme.of(context).scaffoldBackgroundColor,
                       shape: BoxShape.circle,
                     ),
                     child: const ShimmerBox(
-                      width: 22,
-                      height: 22,
+                      width: AppSize.avatarBadgeMd,
+                      height: AppSize.avatarBadgeMd,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -42,38 +43,38 @@ class NotificationTileSkeleton extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          AppGap.hMd,
           // Text lines + timestamp
           const Expanded(
             child: Padding(
-              padding: EdgeInsets.only(top: 4),
+              padding: EdgeInsets.only(top: AppSize.xs),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ShimmerBox(
                     width: double.infinity,
-                    height: 13,
+                    height: AppSize.skeletonLineMd,
                   ),
-                  SizedBox(height: 7),
+                  AppGap.vSm,
                   ShimmerBox(
                     width: 210,
-                    height: 13,
+                    height: AppSize.skeletonLineMd,
                   ),
-                  SizedBox(height: 8),
+                  AppGap.vSm,
                   ShimmerBox(
-                    width: 64,
-                    height: 10,
+                    width: AppSize.giant,
+                    height: AppSize.skeletonLineXs,
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          AppGap.hMd,
           const Padding(
-            padding: EdgeInsets.only(top: 18),
+            padding: EdgeInsets.only(top: AppSize.xl),
             child: ShimmerBox(
-              width: 20,
-              height: 8,
+              width: AppSize.xl,
+              height: AppSize.statusDotSm,
             ),
           ),
         ],
@@ -99,10 +100,15 @@ class SliverNotificationListSkeleton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding: EdgeInsets.fromLTRB(16, 14, 16, 6),
+              padding: EdgeInsets.fromLTRB(
+                AppSize.lg,
+                AppSize.md,
+                AppSize.lg,
+                AppSize.xs,
+              ),
               child: ShimmerBox(
                 width: 72,
-                height: 16,
+                height: AppSize.lg,
               ),
             ),
             ...List.generate(

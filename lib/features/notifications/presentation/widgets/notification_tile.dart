@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/notifications/domain/entities/app_notification.dart';
 
 class NotificationTile extends StatelessWidget {
@@ -42,13 +43,13 @@ class NotificationTile extends StatelessWidget {
     final timeString = formatRelativeTime(notification.createdAt);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 2),
+      margin: const EdgeInsets.only(bottom: AppSize.xxs),
       child: Dismissible(
         key: ValueKey('notif_${notification.id}'),
         background: Container(
           color: unreadDotColor.withValues(alpha: 0.85),
           alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: AppPadding.hXl,
           child: Row(
             children: [
               Icon(
@@ -56,9 +57,9 @@ class NotificationTile extends StatelessWidget {
                     ? Icons.mark_chat_unread_rounded
                     : Icons.done_all_rounded,
                 color: AppColor.onMedia.of(context),
-                size: 22,
+                size: AppSize.iconMd,
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
               Text(
                 notification.isRead ? 'Unread' : 'Read',
                 style: TextStyle(
@@ -73,7 +74,7 @@ class NotificationTile extends StatelessWidget {
         secondaryBackground: Container(
           color: AppColor.badgeRed.of(context),
           alignment: Alignment.centerRight,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: AppPadding.hXl,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -85,11 +86,11 @@ class NotificationTile extends StatelessWidget {
                   fontSize: 13,
                 ),
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
               Icon(
                 Icons.delete_outline_rounded,
                 color: AppColor.onMedia.of(context),
-                size: 22,
+                size: AppSize.iconMd,
               ),
             ],
           ),
@@ -108,7 +109,12 @@ class NotificationTile extends StatelessWidget {
             onTap: onTap,
             onLongPress: onMoreTap,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+              padding: const EdgeInsets.fromLTRB(
+                AppSize.lg,
+                AppSize.md,
+                AppSize.sm,
+                AppSize.md,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -122,16 +128,16 @@ class NotificationTile extends StatelessWidget {
                             theme.scaffoldBackgroundColor,
                           ),
                   ),
-                  const SizedBox(width: 12),
+                  AppGap.hMd,
                   // Rich Text + Timestamp + Inline Action Buttons
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.only(top: AppSize.xxs),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildRichMessage(context),
-                          const SizedBox(height: 4),
+                          AppGap.vXs,
                           Row(
                             children: [
                               Flexible(
@@ -165,7 +171,7 @@ class NotificationTile extends StatelessWidget {
                             ],
                           ),
                           if (_hasInlineActions) ...[
-                            const SizedBox(height: 10),
+                            AppGap.vMd,
                             _buildInlineActions(context),
                           ],
                         ],
@@ -174,32 +180,35 @@ class NotificationTile extends StatelessWidget {
                   ),
                   // Optional post/story media preview thumbnail
                   if (notification.previewImageUrl != null) ...[
-                    const SizedBox(width: 8),
+                    AppGap.hSm,
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.only(top: AppSize.xs),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppRadius.sm,
                         child: CachedNetworkImage(
                           imageUrl: notification.previewImageUrl!,
-                          width: 48,
-                          height: 48,
+                          width: AppSize.avatarLg,
+                          height: AppSize.avatarLg,
                           fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                          errorWidget: (_, __, ___) => AppGap.shrink,
                         ),
                       ),
                     ),
                   ],
                   // Trailing Unread Dot + `...` More Menu Button
                   Padding(
-                    padding: const EdgeInsets.only(left: 4, top: 6),
+                    padding: const EdgeInsets.only(
+                      left: AppSize.xs,
+                      top: AppSize.xs,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (!notification.isRead)
                           Container(
-                            width: 10,
-                            height: 10,
-                            margin: const EdgeInsets.only(right: 2),
+                            width: AppSize.statusDotSm,
+                            height: AppSize.statusDotSm,
+                            margin: const EdgeInsets.only(right: AppSize.xxs),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: unreadDotColor,
@@ -208,12 +217,12 @@ class NotificationTile extends StatelessWidget {
                         IconButton(
                           icon: Icon(
                             Icons.more_horiz_rounded,
-                            size: 20,
+                            size: AppSize.iconSm,
                             color: theme.colorScheme.onSurfaceVariant
                                 .withValues(alpha: 0.8),
                           ),
                           visualDensity: VisualDensity.compact,
-                          splashRadius: 18,
+                          splashRadius: AppSize.xl,
                           tooltip: 'More options',
                           onPressed: onMoreTap,
                         ),
@@ -392,7 +401,7 @@ class NotificationTile extends StatelessWidget {
           if (onAcceptRequest != null)
             Expanded(
               child: SizedBox(
-                height: 36,
+                height: AppSize.buttonHeightSm,
                 child: FilledButton(
                   onPressed: onAcceptRequest,
                   style: FilledButton.styleFrom(
@@ -402,10 +411,8 @@ class NotificationTile extends StatelessWidget {
                     foregroundColor: isDark
                         ? theme.colorScheme.onPrimary
                         : AppColor.onMedia.of(context),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    padding: AppPadding.hMd,
+                    shape: AppBorder.rounded(radius: AppSize.radiusChip),
                     textStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -415,21 +422,18 @@ class NotificationTile extends StatelessWidget {
                 ),
               ),
             ),
-          if (onAcceptRequest != null && onDeclineRequest != null)
-            const SizedBox(width: 8),
+          if (onAcceptRequest != null && onDeclineRequest != null) AppGap.hSm,
           if (onDeclineRequest != null)
             Expanded(
               child: SizedBox(
-                height: 36,
+                height: AppSize.buttonHeightSm,
                 child: TextButton(
                   onPressed: onDeclineRequest,
                   style: TextButton.styleFrom(
                     backgroundColor: secondaryBtnBg,
                     foregroundColor: theme.colorScheme.onSurface,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    padding: AppPadding.hMd,
+                    shape: AppBorder.rounded(radius: AppSize.radiusChip),
                     textStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -446,22 +450,22 @@ class NotificationTile extends StatelessWidget {
     if (notification.kind == NotificationKind.missedCall &&
         onPrimaryAction != null) {
       return SizedBox(
-        height: 34,
+        height: AppSize.buttonHeightSm,
         child: TextButton.icon(
           onPressed: onPrimaryAction,
           icon: Icon(
             Icons.phone_callback_rounded,
-            size: 16,
+            size: AppSize.iconXs,
             color: theme.colorScheme.onSurface,
           ),
           label: const Text('View in Calls'),
           style: TextButton.styleFrom(
             backgroundColor: secondaryBtnBg,
             foregroundColor: theme.colorScheme.onSurface,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSize.bubbleHorizontal,
             ),
+            shape: AppBorder.rounded(radius: AppSize.radiusChip),
             textStyle: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -471,7 +475,7 @@ class NotificationTile extends StatelessWidget {
       );
     }
 
-    return const SizedBox.shrink();
+    return AppGap.shrink;
   }
 
   static String? _categoryLabel(NotificationKind kind) {
@@ -555,15 +559,15 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
     );
 
     return SizedBox(
-      width: 58,
-      height: 58,
+      width: AppSize.avatarXl + AppSize.xxs,
+      height: AppSize.avatarXl + AppSize.xxs,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           // 56x56 Main Circular Avatar
           Container(
-            width: 56,
-            height: 56,
+            width: AppSize.avatarXl,
+            height: AppSize.avatarXl,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
@@ -574,8 +578,8 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
                   avatarColor.withValues(alpha: 0.10),
                 ],
               ),
-              border: Border.all(
-                color: avatarColor.withValues(alpha: 0.2),
+              border: AppBorder.all(
+                avatarColor.withValues(alpha: 0.2),
               ),
             ),
             child: ClipOval(
@@ -606,9 +610,9 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
             right: -1,
             bottom: -1,
             child: Container(
-              width: 26,
-              height: 26,
-              padding: const EdgeInsets.all(2),
+              width: AppSize.avatarBadgeMd,
+              height: AppSize.avatarBadgeMd,
+              padding: AppPadding.xxs,
               decoration: BoxDecoration(
                 color: surfaceColor,
                 shape: BoxShape.circle,
@@ -624,14 +628,14 @@ class _NotificationAvatarWithBadge extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: badgeSpec.colors.first.withValues(alpha: 0.35),
-                      blurRadius: 4,
+                      blurRadius: AppSize.xs,
                       offset: const Offset(0, 1),
                     ),
                   ],
                 ),
                 child: Icon(
                   badgeSpec.icon,
-                  size: 13,
+                  size: AppSize.iconXxs,
                   color: AppColor.onMedia.of(context),
                 ),
               ),
@@ -678,7 +682,7 @@ class _InitialsFallback extends StatelessWidget {
         child: Icon(
           fallbackIcon,
           color: color,
-          size: 24,
+          size: AppSize.iconMd,
         ),
       );
     }

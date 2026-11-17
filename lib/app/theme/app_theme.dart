@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/app/theme/app_theme_mode.dart';
 import 'package:lotus_connect/app/theme/theme_extensions.dart';
 export 'package:lotus_connect/app/theme/app_theme_mode.dart';
@@ -143,7 +144,7 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
-        elevation: 0,
+        elevation: AppSize.elevationNone,
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
@@ -153,11 +154,11 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: scheme.surface,
-        elevation: 1,
+        elevation: AppSize.elevationXs,
       ),
       dividerTheme: DividerThemeData(
         color: scheme.outlineVariant,
-        space: 1,
+        space: AppSize.dividerThickness,
       ),
       textTheme: _buildTextTheme(baseTextTheme, textColor),
       extensions: <ThemeExtension<dynamic>>[

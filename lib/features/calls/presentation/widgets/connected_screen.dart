@@ -88,8 +88,8 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColor.onMedia24.of(context),
+                        border: AppBorder.all(
+                          AppColor.onMedia24.of(context),
                           width: AppSize.borderThick,
                         ),
                       ),
@@ -240,8 +240,8 @@ class _ConnectedScreenState extends ConsumerState<ConnectedScreen> {
                 height: 155,
                 decoration: BoxDecoration(
                   borderRadius: AppRadius.lg,
-                  border: Border.all(
-                    color: AppColor.onMedia24.of(context),
+                  border: AppBorder.all(
+                    AppColor.onMedia24.of(context),
                     width: AppSize.borderMedium,
                   ),
                   boxShadow: [

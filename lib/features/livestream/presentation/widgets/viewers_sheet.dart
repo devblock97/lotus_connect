@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/livestream/domain/entities/live_viewer.dart';
 
@@ -35,9 +36,14 @@ class ViewersSheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFF161823),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
-      padding: const EdgeInsets.only(top: 12, left: 16, right: 16, bottom: 24),
+      padding: const EdgeInsets.only(
+        top: AppSize.md,
+        left: AppSize.lg,
+        right: AppSize.lg,
+        bottom: AppSize.xxl,
+      ),
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.6,
       ),
@@ -46,15 +52,15 @@ class ViewersSheet extends StatelessWidget {
         children: [
           Center(
             child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
+              width: AppSize.sheetHandleWidth,
+              height: AppSize.sheetHandleHeight,
+              decoration: const BoxDecoration(
                 color: Colors.white24,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: AppRadius.full,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -67,12 +73,16 @@ class ViewersSheet extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.close, color: Colors.white60, size: 20),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white60,
+                  size: AppSize.iconSm,
+                ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
           Expanded(
             child: viewers.isEmpty
                 ? const Center(
@@ -85,14 +95,14 @@ class ViewersSheet extends StatelessWidget {
                     itemCount: viewers.length,
                     separatorBuilder: (_, __) => const Divider(
                       color: Colors.white12,
-                      height: 1,
+                      height: AppSize.dividerThickness,
                     ),
                     itemBuilder: (context, index) {
                       final viewer = viewers[index];
                       final user = viewer.user;
 
                       return ListTile(
-                        contentPadding: EdgeInsets.zero,
+                        contentPadding: AppPadding.zero,
                         leading: _buildAvatar(user),
                         title: Text(
                           (user.fullName?.isNotEmpty ?? false)
@@ -114,13 +124,11 @@ class ViewersSheet extends StatelessWidget {
                         trailing: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFFFF2D55),
-                            side: const BorderSide(color: Color(0xFFFF2D55)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                            side: AppBorder.thin(const Color(0xFFFF2D55)),
+                            shape: AppBorder.rounded(),
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 4,
+                              horizontal: AppSize.bubbleHorizontal,
+                              vertical: AppSize.xs,
                             ),
                           ),
                           onPressed: () {},
@@ -140,8 +148,8 @@ class ViewersSheet extends StatelessWidget {
 
   Widget _buildAvatar(PostAuthor user) {
     return Container(
-      width: 42,
-      height: 42,
+      width: AppSize.avatarMd,
+      height: AppSize.avatarMd,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         color: Colors.white24,

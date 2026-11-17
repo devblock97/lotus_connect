@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
@@ -46,10 +47,10 @@ class HistoryScreen extends ConsumerWidget {
           children: [
             Icon(
               Icons.call_missed_outgoing,
-              size: 64,
+              size: AppSize.iconHero,
               color: AppColor.inkSubtle.of(context),
             ),
-            const SizedBox(height: 16),
+            AppGap.vLg,
             Text(
               loc.noCallHistoryLogs,
               style: TextStyle(
@@ -64,7 +65,10 @@ class HistoryScreen extends ConsumerWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSize.screenPadding,
+        vertical: AppSize.sm,
+      ),
       children: [
         if (todayLogs.isNotEmpty) ...[
           _buildHistorySectionHeader(context, loc.today),
@@ -74,7 +78,7 @@ class HistoryScreen extends ConsumerWidget {
               friends: friendsState.friends,
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
         ],
         if (yesterdayLogs.isNotEmpty) ...[
           _buildHistorySectionHeader(context, loc.yesterday),
@@ -84,7 +88,7 @@ class HistoryScreen extends ConsumerWidget {
               friends: friendsState.friends,
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
         ],
         if (olderLogs.isNotEmpty) ...[
           _buildHistorySectionHeader(context, loc.older),
@@ -101,7 +105,10 @@ class HistoryScreen extends ConsumerWidget {
 
   Widget _buildHistorySectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSize.sm,
+        horizontal: AppSize.xs,
+      ),
       child: Text(
         title,
         style: TextStyle(

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/comments/comment_reactions_overlay.dart';
@@ -257,24 +258,26 @@ class _CommentNodeState extends State<_CommentNode> {
         return Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppSize.radiusXl),
+            ),
           ),
           padding: EdgeInsets.only(
-            top: 12,
-            bottom: MediaQuery.of(ctx).padding.bottom + 16,
+            top: AppSize.md,
+            bottom: MediaQuery.of(ctx).padding.bottom + AppSize.lg,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 38,
-                height: 4,
+                width: AppSize.sheetHandleWidth,
+                height: AppSize.sheetHandleHeight,
                 decoration: BoxDecoration(
                   color: theme.dividerColor.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppRadius.full,
                 ),
               ),
-              const SizedBox(height: 12),
+              AppGap.vMd,
               if (_isPostAuthor && widget.comment.isRoot)
                 ListTile(
                   leading: Icon(
@@ -418,10 +421,12 @@ class _CommentNodeState extends State<_CommentNode> {
     final isDark = theme.brightness == Brightness.dark;
     final replies = widget.comment.replies;
     final hasReplies = widget.comment.hasReplies;
-    final avatarRadius = widget.depth == 0 ? 18.0 : 14.0;
+    final avatarRadius =
+        widget.depth == 0 ? AppSize.avatarSm / 2 : AppSize.avatarXs / 2;
     final isDepthCapped = widget.depth >= 2;
-    final childIndent =
-        isDepthCapped ? 16.0 : (widget.depth == 0 ? 38.0 : 28.0);
+    final childIndent = isDepthCapped
+        ? AppSize.lg
+        : (widget.depth == 0 ? AppSize.huge : AppSize.iconLg);
 
     final lineColor = isDark
         ? Colors.white.withValues(alpha: 0.16)
@@ -451,10 +456,10 @@ class _CommentNodeState extends State<_CommentNode> {
               ),
             Padding(
               padding: EdgeInsets.only(
-                left: widget.depth == 0 ? 16.0 : 0.0,
-                right: widget.depth == 0 ? 16.0 : 0.0,
-                top: 4,
-                bottom: 4,
+                left: widget.depth == 0 ? AppSize.lg : AppSize.none,
+                right: widget.depth == 0 ? AppSize.lg : AppSize.none,
+                top: AppSize.xs,
+                bottom: AppSize.xs,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +474,7 @@ class _CommentNodeState extends State<_CommentNode> {
                         onTap: () =>
                             widget.onAuthorTap?.call(widget.comment.author),
                       ),
-                      const SizedBox(width: 8),
+                      AppGap.hSm,
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,7 +486,7 @@ class _CommentNodeState extends State<_CommentNode> {
                               onAuthorTap: widget.onAuthorTap,
                               onOptionsTap: _showOptionsMenu,
                             ),
-                            const SizedBox(height: 3),
+                            AppGap.vXxs,
                             _CommentMeta(
                               comment: widget.comment,
                               onReply: () =>
@@ -502,9 +507,9 @@ class _CommentNodeState extends State<_CommentNode> {
                   if (hasReplies && !_expanded)
                     Padding(
                       padding: EdgeInsetsDirectional.only(
-                        start: avatarRadius * 2 + 12.0,
-                        top: 4,
-                        bottom: 4,
+                        start: avatarRadius * 2 + AppSize.md,
+                        top: AppSize.xs,
+                        bottom: AppSize.xs,
                       ),
                       child: _ViewRepliesButton(
                         key: _viewRepliesKey,
@@ -518,23 +523,24 @@ class _CommentNodeState extends State<_CommentNode> {
                     Padding(
                       padding: EdgeInsetsDirectional.only(
                         start: childIndent,
-                        top: 6,
+                        top: AppSize.xs,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.comment.isLoadingReplies)
                             const Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 16,
+                              padding: AppPadding.listTile,
+                              child: CupertinoActivityIndicator(
+                                radius: AppSize.sm,
                               ),
-                              child: CupertinoActivityIndicator(radius: 8),
                             )
                           else ...[
                             for (final reply in replies)
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSize.xs,
+                                ),
                                 child: _CommentNode(
                                   key: ValueKey(reply.id),
                                   comment: reply,
@@ -559,9 +565,9 @@ class _CommentNodeState extends State<_CommentNode> {
                             if (replies.length < widget.comment.replyCount)
                               Padding(
                                 padding: const EdgeInsets.only(
-                                  left: 16,
-                                  top: 2,
-                                  bottom: 4,
+                                  left: AppSize.lg,
+                                  top: AppSize.xxs,
+                                  bottom: AppSize.xs,
                                 ),
                                 child: GestureDetector(
                                   onTap: () => widget.onLoadMoreReplies
@@ -579,9 +585,9 @@ class _CommentNodeState extends State<_CommentNode> {
                               ),
                             Padding(
                               padding: const EdgeInsets.only(
-                                left: 16,
-                                top: 2,
-                                bottom: 4,
+                                left: AppSize.lg,
+                                top: AppSize.xxs,
+                                bottom: AppSize.xs,
                               ),
                               child: GestureDetector(
                                 onTap: _toggleExpanded,
@@ -759,12 +765,12 @@ class _CommentBubbleState extends State<_CommentBubble> {
       context: context,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(16),
+        insetPadding: AppPadding.lg,
         child: Stack(
           alignment: Alignment.center,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppRadius.card,
               child: isNetwork
                   ? CachedNetworkImage(
                       imageUrl: url,
@@ -776,15 +782,19 @@ class _CommentBubbleState extends State<_CommentBubble> {
                       errorBuilder: (_, __, dynamic ___) => const Icon(
                         Icons.broken_image_outlined,
                         color: Colors.white70,
-                        size: 48,
+                        size: AppSize.iconXxl,
                       ),
                     ),
             ),
             Positioned(
-              top: 8,
-              right: 8,
+              top: AppSize.sm,
+              right: AppSize.sm,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: AppSize.iconLg,
+                ),
                 onPressed: () => Navigator.of(ctx).pop(),
               ),
             ),
@@ -854,7 +864,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
           GestureDetector(
             onTap: () => setState(() => _isTextExpanded = !_isTextExpanded),
             child: Padding(
-              padding: const EdgeInsets.only(top: 2),
+              padding: const EdgeInsets.only(top: AppSize.xxs),
               child: Text(
                 _isTextExpanded
                     ? (AppLocalizations.of(context)?.seeLess ?? 'See less')
@@ -889,11 +899,13 @@ class _CommentBubbleState extends State<_CommentBubble> {
           onLongPress: widget.onOptionsTap,
           behavior: HitTestBehavior.opaque,
           child: Container(
-            margin: EdgeInsets.only(bottom: hasReactions ? 6.0 : 0.0),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            margin: EdgeInsets.only(
+              bottom: hasReactions ? AppSize.xs : AppSize.none,
+            ),
+            padding: AppPadding.buttonCompact,
             decoration: BoxDecoration(
               color: bubbleColor,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: AppRadius.lg,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -901,8 +913,8 @@ class _CommentBubbleState extends State<_CommentBubble> {
               children: [
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 6,
-                  runSpacing: 2,
+                  spacing: AppSize.xs,
+                  runSpacing: AppSize.xxs,
                   children: [
                     GestureDetector(
                       onTap: () =>
@@ -920,14 +932,11 @@ class _CommentBubbleState extends State<_CommentBubble> {
                     ),
                     if (_isCommenterPostAuthor)
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
+                        padding: AppPadding.badge,
                         decoration: BoxDecoration(
                           color:
                               theme.colorScheme.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: AppRadius.xs,
                         ),
                         child: Text(
                           loc?.authorBadge ?? 'Author',
@@ -940,23 +949,20 @@ class _CommentBubbleState extends State<_CommentBubble> {
                       ),
                     if (widget.comment.isPinned)
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1.5,
-                        ),
+                        padding: AppPadding.badge,
                         decoration: BoxDecoration(
                           color: Colors.amber.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: AppRadius.xs,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
                               CupertinoIcons.pin_fill,
-                              size: 10,
+                              size: AppSize.iconXxs,
                               color: Colors.amber,
                             ),
-                            const SizedBox(width: 3),
+                            AppGap.hXxs,
                             Text(
                               loc?.pinnedBadge ?? 'Pinned',
                               style: const TextStyle(
@@ -971,7 +977,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
                   ],
                 ),
                 if (widget.comment.content.trim().isNotEmpty) ...[
-                  const SizedBox(height: 3),
+                  AppGap.vXxs,
                   _buildContentText(
                     widget.comment.content,
                     primaryTextColor,
@@ -979,11 +985,11 @@ class _CommentBubbleState extends State<_CommentBubble> {
                   ),
                 ],
                 if (widget.comment.hasMedia) ...[
-                  const SizedBox(height: 6),
+                  AppGap.vXs,
                   GestureDetector(
                     onTap: () => _showMediaPreview(widget.comment.mediaUrl!),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadius.md,
                       child: Container(
                         constraints: const BoxConstraints(
                           maxHeight: 180,
@@ -1001,7 +1007,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
                             ),
                           ),
                           errorWidget: (_, __, dynamic ___) => const Padding(
-                            padding: EdgeInsets.all(12),
+                            padding: AppPadding.md,
                             child: Icon(Icons.broken_image_outlined),
                           ),
                         ),
@@ -1017,8 +1023,8 @@ class _CommentBubbleState extends State<_CommentBubble> {
         // Facebook reaction pill anchored at bottom right of bubble
         if (hasReactions)
           Positioned(
-            right: 8,
-            bottom: -6,
+            right: AppSize.sm,
+            bottom: -AppSize.xs,
             child: GestureDetector(
               onTap: () => CommentReactionsSheet.show(
                 context,
@@ -1026,22 +1032,22 @@ class _CommentBubbleState extends State<_CommentBubble> {
               ),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
+                  horizontal: AppSize.sm,
+                  vertical: AppSize.xxs,
                 ),
                 decoration: BoxDecoration(
                   color: isDark ? const Color(0xFF242526) : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.md,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.12),
-                      blurRadius: 4,
+                      blurRadius: AppSize.xs,
                       offset: const Offset(0, 1),
                     ),
                   ],
-                  border: Border.all(
-                    color: isDark ? Colors.white12 : Colors.black12,
-                    width: 0.5,
+                  border: AppBorder.all(
+                    isDark ? Colors.white12 : Colors.black12,
+                    width: AppSize.borderHairline,
                   ),
                 ),
                 child: Row(
@@ -1054,7 +1060,7 @@ class _CommentBubbleState extends State<_CommentBubble> {
                       style: const TextStyle(fontSize: 12),
                     ),
                     if (widget.comment.likeCount > 1) ...[
-                      const SizedBox(width: 3),
+                      AppGap.hXxs,
                       Text(
                         '${widget.comment.likeCount}',
                         style: TextStyle(
@@ -1147,10 +1153,10 @@ class _CommentMeta extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 8),
+      padding: const EdgeInsetsDirectional.only(start: AppSize.sm),
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 12,
+        spacing: AppSize.md,
         children: [
           Text(comment.timeAgo, style: metaStyle),
           GestureDetector(
@@ -1159,7 +1165,7 @@ class _CommentMeta extends StatelessWidget {
             onLongPress: () => _showReactionPicker(context),
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
+              padding: const EdgeInsets.symmetric(vertical: AppSize.xxs),
               child: Text(
                 likeText,
                 style: metaStyle?.copyWith(
@@ -1173,7 +1179,7 @@ class _CommentMeta extends StatelessWidget {
             onTap: onReply,
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
+              padding: const EdgeInsets.symmetric(vertical: AppSize.xxs),
               child: Text(
                 loc?.replyAction ?? 'Reply',
                 style: metaStyle?.copyWith(
@@ -1195,7 +1201,7 @@ class _CommentMeta extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Icon(
               Icons.more_horiz,
-              size: 16,
+              size: AppSize.iconXs,
               color: subtextColor,
             ),
           ),

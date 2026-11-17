@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/presentation/models/comment_ui_model.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -114,26 +115,26 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.bottomSheetTop,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
-          const SizedBox(height: 12),
+          AppGap.vMd,
           Container(
-            width: 38,
-            height: 4,
+            width: AppSize.sheetHandleWidth,
+            height: AppSize.sheetHandleHeight,
             decoration: BoxDecoration(
               color: theme.dividerColor.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: AppRadius.full,
             ),
           ),
-          const SizedBox(height: 12),
+          AppGap.vMd,
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: AppPadding.hXl,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -147,8 +148,8 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  splashRadius: 18,
+                  icon: const Icon(Icons.close, size: AppSize.iconSm),
+                  splashRadius: AppSize.iconSm,
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -159,7 +160,10 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
           if (tabs.length > 2) ...[
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSize.lg,
+                vertical: AppSize.xs,
+              ),
               child: Row(
                 children: tabs.map((tab) {
                   final isSelected = _selectedTab == tab;
@@ -168,7 +172,7 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                       ? (loc?.allReactionsCount(count) ?? 'All ($count)')
                       : '$tab $count';
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: AppSize.sm),
                     child: ChoiceChip(
                       label: Text(label),
                       selected: isSelected,
@@ -185,17 +189,15 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                       backgroundColor: isDark
                           ? Colors.white.withValues(alpha: 0.08)
                           : Colors.black.withValues(alpha: 0.05),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: AppBorder.rounded(),
                     ),
                   );
                 }).toList(),
               ),
             ),
             Divider(
-              height: 1,
-              thickness: 0.5,
+              height: AppSize.dividerThickness,
+              thickness: AppSize.borderHairline,
               color: theme.dividerColor.withValues(alpha: 0.15),
             ),
           ],
@@ -204,7 +206,7 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
           Flexible(
             child: _filteredReactions.isEmpty
                 ? Padding(
-                    padding: const EdgeInsets.all(32),
+                    padding: AppPadding.xxxl,
                     child: Text(
                       loc?.noReactionsInCategory ??
                           'No reactions in this category',
@@ -215,13 +217,13 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                     itemCount: _filteredReactions.length,
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: AppSize.lg,
+                      vertical: AppSize.sm,
                     ),
                     itemBuilder: (context, index) {
                       final item = _filteredReactions[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: AppPadding.vSm,
                         child: Row(
                           children: [
                             // Avatar with reaction badge
@@ -229,17 +231,17 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                               clipBehavior: Clip.none,
                               children: [
                                 SizedBox(
-                                  width: 42,
-                                  height: 42,
+                                  width: AppSize.avatarMd,
+                                  height: AppSize.avatarMd,
                                   child: ClipOval(
                                     child: _buildAvatar(item.user),
                                   ),
                                 ),
                                 Positioned(
-                                  right: -2,
-                                  bottom: -2,
+                                  right: -AppSize.xxs,
+                                  bottom: -AppSize.xxs,
                                   child: Container(
-                                    padding: const EdgeInsets.all(2),
+                                    padding: AppPadding.xxs,
                                     decoration: BoxDecoration(
                                       color: theme.scaffoldBackgroundColor,
                                       shape: BoxShape.circle,
@@ -252,7 +254,7 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 14),
+                            AppGap.hMd,
 
                             // Name & Username
                             Expanded(
@@ -283,12 +285,9 @@ class _CommentReactionsSheetState extends State<CommentReactionsSheet> {
                               onPressed: () {},
                               style: OutlinedButton.styleFrom(
                                 visualDensity: VisualDensity.compact,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                side: BorderSide(
-                                  color:
-                                      theme.dividerColor.withValues(alpha: 0.3),
+                                shape: AppBorder.rounded(),
+                                side: AppBorder.thin(
+                                  theme.dividerColor.withValues(alpha: 0.3),
                                 ),
                               ),
                               child: const Text(

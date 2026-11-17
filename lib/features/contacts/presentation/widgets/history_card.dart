@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
+import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -54,27 +55,30 @@ class HistoryCard extends ConsumerWidget {
         : theme.colorScheme.outlineVariant.withValues(alpha: 0.45);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: AppSize.xs),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        borderRadius: AppRadius.card,
+        border: AppBorder.all(borderColor),
         boxShadow: [
           BoxShadow(
             color: AppColor.black
                 .of(context)
                 .withValues(alpha: isDark ? 0.25 : 0.04),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, AppSize.xxs),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSize.bubbleHorizontal,
+          vertical: AppSize.chipVertical,
+        ),
         leading: Stack(
           children: [
             CircleAvatar(
-              radius: 22,
+              radius: AppSize.avatarMd / 2,
               backgroundColor: isMissed
                   ? AppColor.danger.of(context).withValues(alpha: 0.12)
                   : theme.colorScheme.primaryContainer,
@@ -90,19 +94,22 @@ class HistoryCard extends ConsumerWidget {
               ),
             ),
             Positioned(
-              bottom: 0,
-              right: 0,
+              bottom: AppSize.none,
+              right: AppSize.none,
               child: Container(
-                width: 16,
-                height: 16,
+                width: AppSize.avatarBadgeSm,
+                height: AppSize.avatarBadgeSm,
                 decoration: BoxDecoration(
                   color: badgeColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: cardColor, width: 2),
+                  border: AppBorder.all(
+                    cardColor,
+                    width: AppSize.borderThick,
+                  ),
                 ),
                 child: Icon(
                   badgeIcon,
-                  size: 10,
+                  size: AppSize.iconXxs,
                   color: AppColor.onMedia.of(context),
                 ),
               ),
@@ -121,12 +128,12 @@ class HistoryCard extends ConsumerWidget {
           children: [
             Icon(
               log.isVideo ? Icons.videocam_outlined : Icons.phone_outlined,
-              size: 14,
+              size: AppSize.iconXs,
               color: isMissed
                   ? AppColor.dangerAccent.of(context)
                   : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
             ),
-            const SizedBox(width: 4),
+            AppGap.hXs,
             Text(
               log.isVideo ? loc.videoCall : loc.voiceCall,
               style: TextStyle(
@@ -138,14 +145,14 @@ class HistoryCard extends ConsumerWidget {
               ),
             ),
             if (isMissed || log.durationSeconds > 0) ...[
-              const SizedBox(width: 8),
+              AppGap.hSm,
               Icon(
                 Icons.circle,
-                size: 4,
+                size: AppSize.xs,
                 color:
                     theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
-              const SizedBox(width: 8),
+              AppGap.hSm,
               Text(
                 _formatDurationText(loc, log.durationSeconds),
                 style: TextStyle(
@@ -170,15 +177,15 @@ class HistoryCard extends ConsumerWidget {
                 fontSize: 12,
               ),
             ),
-            const SizedBox(width: 10),
+            AppGap.hMd,
             CircleAvatar(
-              radius: 18,
+              radius: AppSize.avatarMd / 2,
               backgroundColor: theme.colorScheme.surfaceContainerHighest
                   .withValues(alpha: 0.7),
               child: IconButton(
                 icon: Icon(
                   log.isVideo ? Icons.videocam_rounded : Icons.phone_rounded,
-                  size: 16,
+                  size: AppSize.iconXs,
                   color: theme.colorScheme.onSurface,
                 ),
                 tooltip: log.isVideo ? loc.videoCall : loc.voiceCall,
