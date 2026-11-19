@@ -12,6 +12,7 @@ class WebSocketService {
   WebSocket? _socket;
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
+  Future<void>? _connectFuture;
   bool _isDisposed = false;
   int _reconnectDelaySeconds = 2;
 
@@ -31,7 +32,29 @@ class WebSocketService {
 
   /// Initiates connection using credentials from settings.
   Future<void> connect() async {
-    if (isConnected) return;
+    if (_isDisposed || isConnected) return;
+    if (_connectFuture != null) {
+      await _connectFuture;
+      return;
+    }
+
+    _connectFuture = _performConnect();
+    try {
+      await _connectFuture;
+    } finally {
+      _connectFuture = null;
+    }
+  }
+
+  /// Ensures the WebSocket connection is open before sending signaling frames.
+  Future<bool> ensureConnected() async {
+    if (isConnected) return true;
+    await connect();
+    return isConnected;
+  }
+
+  Future<void> _performConnect() async {
+    if (_isDisposed || isConnected) return;
     _cancelReconnect();
 
     final notifier = _ref.read(settingsNotifierProvider);
@@ -54,6 +77,9 @@ class WebSocketService {
           .timeout(const Duration(seconds: 10));
       _reconnectDelaySeconds = 2;
       AppLogger.info('WS Connected successfully');
+      if (!_connectionStateController.isClosed) {
+        _connectionStateController.add(true);
+      }
 
       // Start listening and heartbeat loop
       _socket!.listen(
@@ -66,6 +92,9 @@ class WebSocketService {
       _startHeartbeat();
     } on Object catch (e) {
       AppLogger.error('WS Connection failed: $e');
+      if (!_connectionStateController.isClosed) {
+        _connectionStateController.add(false);
+      }
       _scheduleReconnect();
     }
   }
@@ -75,6 +104,9 @@ class WebSocketService {
     _socket = null;
     _stopHeartbeat();
     _cancelReconnect();
+    if (!_connectionStateController.isClosed) {
+      _connectionStateController.add(false);
+    }
     AppLogger.info('WS Disconnected');
   }
 
@@ -133,6 +165,9 @@ class WebSocketService {
 
   void _onConnectionError(dynamic error) {
     AppLogger.error('WS Socket error encountered: $error');
+    if (!_connectionStateController.isClosed) {
+      _connectionStateController.add(false);
+    }
     _scheduleReconnect();
   }
 
@@ -140,6 +175,9 @@ class WebSocketService {
     AppLogger.warning('WS Connection closed by host');
     _socket = null;
     _stopHeartbeat();
+    if (!_connectionStateController.isClosed) {
+      _connectionStateController.add(false);
+    }
     _scheduleReconnect();
   }
 
@@ -189,6 +227,7 @@ class WebSocketService {
     _isDisposed = true;
     disconnect();
     _eventStreamController.close();
+    _connectionStateController.close();
   }
 }
 

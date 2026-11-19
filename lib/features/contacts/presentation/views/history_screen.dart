@@ -41,65 +41,81 @@ class HistoryScreen extends ConsumerWidget {
 
     final loc = AppLocalizations.of(context)!;
     if (todayLogs.isEmpty && yesterdayLogs.isEmpty && olderLogs.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.call_missed_outgoing,
-              size: AppSize.iconHero,
-              color: AppColor.inkSubtle.of(context),
-            ),
-            AppGap.vLg,
-            Text(
-              loc.noCallHistoryLogs,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColor.inkMutedDark.of(context),
+      return RefreshIndicator(
+        onRefresh: () =>
+            ref.read(callHistoryProvider.notifier).loadCallHistory(),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.call_missed_outgoing,
+                      size: AppSize.iconHero,
+                      color: AppColor.inkSubtle.of(context),
+                    ),
+                    AppGap.vLg,
+                    Text(
+                      loc.noCallHistoryLogs,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColor.inkMutedDark.of(context),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
       );
     }
 
-    return ListView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSize.screenPadding,
-        vertical: AppSize.sm,
+    return RefreshIndicator(
+      onRefresh: () => ref.read(callHistoryProvider.notifier).loadCallHistory(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSize.screenPadding,
+          vertical: AppSize.sm,
+        ),
+        children: [
+          if (todayLogs.isNotEmpty) ...[
+            _buildHistorySectionHeader(context, loc.today),
+            ...todayLogs.map(
+              (log) => HistoryCard(
+                log: log,
+                friends: friendsState.friends,
+              ),
+            ),
+            AppGap.vMd,
+          ],
+          if (yesterdayLogs.isNotEmpty) ...[
+            _buildHistorySectionHeader(context, loc.yesterday),
+            ...yesterdayLogs.map(
+              (log) => HistoryCard(
+                log: log,
+                friends: friendsState.friends,
+              ),
+            ),
+            AppGap.vMd,
+          ],
+          if (olderLogs.isNotEmpty) ...[
+            _buildHistorySectionHeader(context, loc.older),
+            ...olderLogs.map(
+              (log) => HistoryCard(
+                log: log,
+                friends: friendsState.friends,
+              ),
+            ),
+          ],
+        ],
       ),
-      children: [
-        if (todayLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(context, loc.today),
-          ...todayLogs.map(
-            (log) => HistoryCard(
-              log: log,
-              friends: friendsState.friends,
-            ),
-          ),
-          AppGap.vMd,
-        ],
-        if (yesterdayLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(context, loc.yesterday),
-          ...yesterdayLogs.map(
-            (log) => HistoryCard(
-              log: log,
-              friends: friendsState.friends,
-            ),
-          ),
-          AppGap.vMd,
-        ],
-        if (olderLogs.isNotEmpty) ...[
-          _buildHistorySectionHeader(context, loc.older),
-          ...olderLogs.map(
-            (log) => HistoryCard(
-              log: log,
-              friends: friendsState.friends,
-            ),
-          ),
-        ],
-      ],
     );
   }
 

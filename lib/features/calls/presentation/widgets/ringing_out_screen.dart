@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/features/calls/presentation/utils/call_peer_display.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -26,15 +27,13 @@ class _RingingOutScreenState extends ConsumerState<RingingOutScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
-    final friend = ref
-        .read(contactsProvider)
-        .friends
-        .where((f) => f.id == widget.activePeerId)
-        .firstOrNull;
-    final displayName = friend != null
-        ? (friend.fullName ?? friend.username)
-        : (widget.activePeerId.substring(0, 8));
-    final initialName = displayName.substring(0, 1);
+    final friends = ref.watch(contactsProvider).friends;
+    final peer = resolveCallPeerDisplay(
+      friends: friends,
+      peerId: widget.activePeerId,
+    );
+    final displayName = peer.displayName;
+    final initialName = peer.initial;
 
     return Scaffold(
       body: Container(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
@@ -6,6 +8,7 @@ import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_service.dart';
 import 'package:lotus_connect/core/services/websocket/websocket_sync_coordinator.dart';
 import 'package:lotus_connect/features/calls/application/calls_providers.dart';
+import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chill/presentation/view/chill_viewer_screen.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/contacts_screen.dart';
 import 'package:lotus_connect/features/home/presentation/view/home_screen.dart';
@@ -16,13 +19,21 @@ import 'package:lotus_connect/features/settings/application/settings_notifier.da
 import 'package:lotus_connect/l10n/app_localizations.dart';
 
 class MainShellScreen extends ConsumerStatefulWidget {
-  const MainShellScreen({super.key});
+  const MainShellScreen({
+    this.pages,
+    super.key,
+  });
+
+  @visibleForTesting
+  final List<Widget>? pages;
 
   @override
   ConsumerState<MainShellScreen> createState() => _MainShellScreenState();
 }
 
 class _MainShellScreenState extends ConsumerState<MainShellScreen> {
+  String? _lastHandledCallId;
+
   @override
   void initState() {
     super.initState();
@@ -57,13 +68,25 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
           }
         },
       )
-      // Automatically switch to Calls tab (index 2) on incoming call
+      // Open CallsScreen on incoming call when no call UI is already active
       ..listen<AsyncValue<WebRTCCallInvitation>>(
         incomingCallProvider,
         (prev, next) {
-          if (next.hasValue) {
-            ref.read(shellIndexProvider.notifier).state = 2;
+          final invite = next.valueOrNull;
+          if (invite == null || !mounted || CallsScreen.isCurrentlyOpen) {
+            return;
           }
+          if (invite.callId.isNotEmpty && invite.callId == _lastHandledCallId) {
+            return;
+          }
+          _lastHandledCallId = invite.callId;
+          unawaited(
+            Navigator.of(context, rootNavigator: true).push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => CallsScreen(incomingInvitation: invite),
+              ),
+            ),
+          );
         },
       );
 
@@ -72,13 +95,14 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
       notificationsProvider.select((s) => s.unreadCount),
     );
 
-    final pages = [
-      const HomeScreen(),
-      const ChillViewerScreen(),
-      const ContactsScreen(),
-      const NotificationsScreen(),
-      const ProfileScreen(),
-    ];
+    final pages = widget.pages ??
+        const [
+          HomeScreen(),
+          ChillViewerScreen(),
+          ContactsScreen(),
+          NotificationsScreen(),
+          ProfileScreen(),
+        ];
 
     return Scaffold(
       body: IndexedStack(

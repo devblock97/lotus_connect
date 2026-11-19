@@ -4,7 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
 import 'package:lotus_connect/features/auth/domain/entities/user.dart';
+import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
+import 'package:lotus_connect/features/calls/presentation/utils/call_peer_display.dart';
+import 'package:lotus_connect/features/calls/presentation/views/calls_screen.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
 import 'package:lotus_connect/features/settings/application/settings_notifier.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
@@ -13,19 +16,25 @@ class HistoryCard extends ConsumerWidget {
   const HistoryCard({
     required this.log,
     this.friends = const [],
+    this.onCall,
     super.key,
   });
 
   final CallLog log;
   final List<User> friends;
+  final void Function(String peerId, {required bool isVideo})? onCall;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final peerName = log.hostName ??
-        log.username ??
-        _resolvePeerName(loc, log, friends, ref);
+    final rawHostName = log.hostName?.trim();
+    final rawUsername = log.username?.trim();
+    final peerName = (rawHostName != null && rawHostName.isNotEmpty)
+        ? rawHostName
+        : (rawUsername != null && rawUsername.isNotEmpty)
+            ? rawUsername
+            : _resolvePeerName(loc, log, friends, ref);
     final initials =
         peerName.isNotEmpty ? peerName.substring(0, 1).toUpperCase() : '?';
 
@@ -189,11 +198,35 @@ class HistoryCard extends ConsumerWidget {
                   color: theme.colorScheme.onSurface,
                 ),
                 tooltip: log.isVideo ? loc.videoCall : loc.voiceCall,
-                onPressed: () {
-                  final targetPeerId = _resolvePeerId(log, ref);
+                onPressed: () async {
+                  var targetPeerId = _resolvePeerId(log, ref);
+                  if (targetPeerId.isEmpty && log.conversationId != null) {
+                    await ref
+                        .read(privateConversationListProvider.notifier)
+                        .loadRemoteConversations();
+                    targetPeerId = _resolvePeerId(log, ref);
+                  }
+                  if (!context.mounted) return;
                   if (targetPeerId.isNotEmpty) {
-                    // _peerIdController.text = targetPeerId;
-                    // _startCall(isVideo: log.isVideo);
+                    if (onCall != null) {
+                      onCall!(targetPeerId, isVideo: log.isVideo);
+                    } else {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => CallsScreen(
+                            callRequest: CallRequest(
+                              recipientId: targetPeerId,
+                              isVideo: log.isVideo,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(loc.unknownUser)),
+                    );
                   }
                 },
               ),
@@ -205,20 +238,18 @@ class HistoryCard extends ConsumerWidget {
   }
 
   String _resolvePeerId(CallLog log, WidgetRef ref) {
-    final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
-    if (log.hostId != currentUserId) {
-      return log.hostId;
-    }
-    if (log.conversationId != null) {
-      final conversations =
-          ref.read(privateConversationListProvider).conversations;
-      for (final c in conversations) {
-        if (c.id == log.conversationId && c.isUserToUser) {
-          return c.peerId;
-        }
-      }
-    }
-    return '';
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final conversations = log.conversationId != null
+        ? ref.read(privateConversationListProvider).conversations
+        : null;
+    return resolveCallLogPeerId(
+      log: log,
+      currentUserId: settings.userId,
+      friends: friends,
+      conversations: conversations,
+      currentUsername: settings.username,
+      currentFullName: settings.fullName,
+    );
   }
 
   String _formatDurationText(AppLocalizations loc, int seconds) {

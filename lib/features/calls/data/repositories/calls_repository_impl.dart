@@ -45,6 +45,8 @@ class CallsRepositoryImpl implements CallsRepository {
         channelId: channelId,
       );
       return const Right(null);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
     } on Object catch (e) {
       return Left(ServerFailure('Failed to initiate call: $e', e));
     }
@@ -61,6 +63,8 @@ class CallsRepositoryImpl implements CallsRepository {
         targetUserId: recipientId,
       );
       return const Right(null);
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message, e));
     } on Object catch (e) {
       return Left(ServerFailure('Failed to accept call: $e', e));
     }

@@ -9,6 +9,7 @@ class CallLog extends Equatable {
     required this.isVideo,
     required this.status,
     required this.createdAt,
+    this.peerId,
     this.conversationId,
     this.endedAt,
     this.hostName,
@@ -17,6 +18,7 @@ class CallLog extends Equatable {
 
   final String id;
   final String hostId;
+  final String? peerId;
   final String? conversationId;
   final String channelId;
   final bool isVideo;
@@ -36,6 +38,7 @@ class CallLog extends Equatable {
   List<Object?> get props => [
         id,
         hostId,
+        peerId,
         conversationId,
         channelId,
         isVideo,

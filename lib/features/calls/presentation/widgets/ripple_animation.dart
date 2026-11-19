@@ -34,24 +34,34 @@ class _RippleAnimationState extends State<RippleAnimation>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            ...List.generate(3, (index) {
-              final progress = (_controller.value + index / 3) % 1.0;
-              return Container(
-                width: 140 + progress * 180,
-                height: 140 + progress * 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColor.callRipple
-                      .of(context)
-                      .withValues(alpha: (1.0 - progress) * 0.15),
-                ),
-              );
-            }),
-            widget.child,
-          ],
+        return SizedBox(
+          width: 200,
+          height: 200,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              ...List.generate(3, (index) {
+                final progress = (_controller.value + index / 3) % 1.0;
+                final size = 140 + progress * 140;
+                return Positioned(
+                  child: IgnorePointer(
+                    child: Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.callRipple
+                            .of(context)
+                            .withValues(alpha: (1.0 - progress) * 0.15),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+              widget.child,
+            ],
+          ),
         );
       },
     );
