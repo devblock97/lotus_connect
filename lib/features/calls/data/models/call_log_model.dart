@@ -9,6 +9,7 @@ class CallLogModel extends CallLog {
     required super.isVideo,
     required super.status,
     required super.createdAt,
+    super.peerId,
     super.conversationId,
     super.endedAt,
     super.hostName,
@@ -19,6 +20,12 @@ class CallLogModel extends CallLog {
     return CallLogModel(
       id: json['id'] as String? ?? '',
       hostId: json['hostId'] as String? ?? json['host_id'] as String? ?? '',
+      peerId: json['peerId'] as String? ??
+          json['peer_id'] as String? ??
+          json['recipientId'] as String? ??
+          json['recipient_id'] as String? ??
+          json['calleeId'] as String? ??
+          json['callee_id'] as String?,
       hostName: json['hostName'] as String? ?? json['host_name'] as String?,
       username: json['username'] as String?,
       conversationId: json['conversationId'] as String? ??
@@ -45,6 +52,7 @@ class CallLogModel extends CallLog {
     return {
       'id': id,
       'hostId': hostId,
+      if (peerId != null) 'peerId': peerId,
       if (hostName != null) 'hostName': hostName,
       if (username != null) 'username': username,
       if (conversationId != null) 'conversationId': conversationId,

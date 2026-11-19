@@ -47,6 +47,10 @@ class WebRTCSignalingService {
   Stream<Map<String, dynamic>> get inviteAckStream =>
       _inviteAckController.stream;
 
+  bool get isConnected => webSocketService.isConnected;
+
+  Future<bool> ensureConnected() => webSocketService.ensureConnected();
+
   void _subscribeToWebSocket() {
     _subscription = webSocketService.eventStream.listen((eventFrame) {
       final event = eventFrame['event'] as String?;

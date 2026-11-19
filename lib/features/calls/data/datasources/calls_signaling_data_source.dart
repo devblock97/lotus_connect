@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:lotus_connect/core/errors/exception.dart';
 import 'package:lotus_connect/core/services/webrtc/signaling_service.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_session.dart';
 
@@ -39,8 +40,8 @@ class CallsSignalingDataSourceImpl implements CallsSignalingDataSource {
   final StreamController<CallSession> _sessionController =
       StreamController<CallSession>.broadcast();
   CallSession _currentSession = const CallSession();
-  StreamSubscription? _invitationSub;
-  StreamSubscription? _endSub;
+  StreamSubscription<WebRTCCallInvitation>? _invitationSub;
+  StreamSubscription<Map<String, dynamic>>? _endSub;
 
   void _initListeners() {
     _invitationSub = _signalingService.invitationStream.listen((invitation) {
@@ -67,7 +68,15 @@ class CallsSignalingDataSourceImpl implements CallsSignalingDataSource {
     required bool isVideo,
     required String channelId,
   }) async {
+    final connected = await _signalingService.ensureConnected();
+    if (!connected) {
+      throw const NetworkException(
+        'Unable to connect to signaling server. Please check your connection.',
+      );
+    }
+
     final callId = DateTime.now().millisecondsSinceEpoch.toString();
+    final resolvedChannelId = channelId.isNotEmpty ? channelId : callId;
     _currentSession = CallSession(
       callId: callId,
       peerId: targetUserId,
@@ -78,7 +87,7 @@ class CallsSignalingDataSourceImpl implements CallsSignalingDataSource {
 
     _signalingService.sendInvite(
       recipientId: targetUserId,
-      channelId: callId,
+      channelId: resolvedChannelId,
       isVideo: isVideo,
     );
   }
@@ -88,6 +97,13 @@ class CallsSignalingDataSourceImpl implements CallsSignalingDataSource {
     required String callId,
     required String targetUserId,
   }) async {
+    final connected = await _signalingService.ensureConnected();
+    if (!connected) {
+      throw const NetworkException(
+        'Unable to connect to signaling server. Please check your connection.',
+      );
+    }
+
     _currentSession = _currentSession.copyWith(state: CallState.connected);
     _sessionController.add(_currentSession);
 

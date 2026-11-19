@@ -13,6 +13,8 @@ import 'package:lotus_connect/features/calls/application/active_call_notifier.da
 import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/calls/data/models/call_request.dart';
 import 'package:lotus_connect/features/calls/domain/entities/call_log.dart';
+import 'package:lotus_connect/features/calls/domain/entities/call_session.dart';
+import 'package:lotus_connect/features/calls/presentation/utils/call_peer_display.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/connected_screen.dart';
 import 'package:lotus_connect/features/calls/presentation/widgets/ripple_animation.dart';
 import 'package:lotus_connect/features/chat/application/conversation_list_notifier.dart';
@@ -30,9 +32,19 @@ enum CallStatus {
 }
 
 class CallsScreen extends ConsumerStatefulWidget {
-  const CallsScreen({required this.callRequest, super.key});
+  const CallsScreen({
+    this.callRequest = const CallRequest(recipientId: '', isVideo: false),
+    this.incomingInvitation,
+    super.key,
+  });
 
   final CallRequest callRequest;
+  final WebRTCCallInvitation? incomingInvitation;
+
+  static int _openInstances = 0;
+
+  /// Whether at least one [CallsScreen] instance is currently mounted.
+  static bool get isCurrentlyOpen => _openInstances > 0;
 
   @override
   ConsumerState<CallsScreen> createState() => _CallsScreenState();
@@ -48,6 +60,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   bool _isMuted = false;
   bool _isVideoOff = false;
   bool _isSpeakerOn = false;
+  bool _isPopping = false;
 
   bool _showFriendsTab = true;
   String _searchQuery = '';
@@ -56,12 +69,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   Timer? _callTimer;
   int _secondsElapsed = 0;
 
-  StreamSubscription? _inviteSub;
-  StreamSubscription? _acceptSub;
-  StreamSubscription? _endSub;
-  StreamSubscription? _sdpSub;
-  StreamSubscription? _iceSub;
-  StreamSubscription? _inviteAckSub;
+  StreamSubscription<WebRTCCallInvitation>? _inviteSub;
+  StreamSubscription<Map<String, dynamic>>? _acceptSub;
+  StreamSubscription<Map<String, dynamic>>? _endSub;
+  StreamSubscription<Map<String, dynamic>>? _sdpSub;
+  StreamSubscription<Map<String, dynamic>>? _iceSub;
+  StreamSubscription<Map<String, dynamic>>? _inviteAckSub;
 
   // WebRTC components
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
@@ -74,30 +87,52 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   @override
   void initState() {
     super.initState();
+    CallsScreen._openInstances++;
+    final incoming = widget.incomingInvitation;
+    if (incoming != null) {
+      _activeCallId = incoming.callId;
+      _activePeerId = incoming.senderId;
+      _isVideo = incoming.isVideo;
+      _status = CallStatus.ringingIn;
+    } else if (widget.callRequest.recipientId.isNotEmpty) {
+      _peerIdController.text = widget.callRequest.recipientId;
+      _activePeerId = widget.callRequest.recipientId;
+      _activeCallId = 'call-${DateTime.now().millisecondsSinceEpoch}';
+      _isVideo = widget.callRequest.isVideo;
+      _status = CallStatus.ringingOut;
+    }
     _initRenderers();
     _subscribeSignaling();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref.read(contactsProvider.notifier).loadFriends();
       ref.read(callHistoryProvider.notifier).loadCallHistory();
-      if (widget.callRequest.recipientId.isNotEmpty) {
-        _peerIdController.text = widget.callRequest.recipientId;
-        _isVideo = widget.callRequest.isVideo;
+      if (widget.incomingInvitation != null) {
+        _log(
+          'Incoming call invite! ID: ${widget.incomingInvitation!.callId} '
+          'from Peer: ${widget.incomingInvitation!.senderId}',
+        );
+        _startRingtone();
+      } else if (widget.callRequest.recipientId.isNotEmpty) {
         _startCall(isVideo: widget.callRequest.isVideo);
       }
     });
   }
 
   Future<void> _initRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+    try {
+      await _localRenderer.initialize();
+      await _remoteRenderer.initialize();
+    } on Object catch (e) {
+      _log('Renderer initialization note: $e');
+    }
   }
 
   @override
   void dispose() {
+    CallsScreen._openInstances = (CallsScreen._openInstances - 1).clamp(0, 999);
     _stopTimer();
-    try {
-      FlutterRingtonePlayer().stop();
-    } on Object catch (_) {}
+    _stopRingtone();
     _inviteSub?.cancel();
     _acceptSub?.cancel();
     _endSub?.cancel();
@@ -106,9 +141,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _inviteAckSub?.cancel();
     _peerIdController.dispose();
     _searchController.dispose();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
     _cleanWebRTC();
+    try {
+      _localRenderer.dispose();
+      _remoteRenderer.dispose();
+    } on Object catch (_) {}
     super.dispose();
   }
 
@@ -123,6 +160,21 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
   }
 
+  void _startRingtone() {
+    _log('Starting incoming call ringtone...');
+    try {
+      FlutterRingtonePlayer().playRingtone();
+    } on Object catch (e) {
+      _log('Error playing ringtone: $e');
+    }
+  }
+
+  void _stopRingtone() {
+    try {
+      FlutterRingtonePlayer().stop();
+    } on Object catch (_) {}
+  }
+
   void _updateStatus(CallStatus newStatus) {
     if (!mounted) return;
     setState(() {
@@ -130,16 +182,9 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     });
 
     if (newStatus == CallStatus.ringingIn) {
-      _log('Starting incoming call ringtone...');
-      try {
-        FlutterRingtonePlayer().playRingtone();
-      } on Object catch (e) {
-        _log('Error playing ringtone: $e');
-      }
+      _startRingtone();
     } else {
-      try {
-        FlutterRingtonePlayer().stop();
-      } on Object catch (_) {}
+      _stopRingtone();
     }
   }
 
@@ -170,6 +215,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     final signaling = ref.read(webrtcSignalingServiceProvider);
 
     _inviteSub = signaling.invitationStream.listen((invite) {
+      if (!mounted || _status != CallStatus.idle) return;
       _log(
         'Incoming call invite! ID: ${invite.callId} '
         'from Peer: ${invite.senderId}',
@@ -183,28 +229,44 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     });
 
     _acceptSub = signaling.acceptStream.listen((payload) async {
-      _log('Call accepted by peer: ${payload['senderId']}');
+      if (!mounted || _status == CallStatus.idle) return;
+      final senderId = payload['senderId'] as String?;
+      if (senderId != null &&
+          _activePeerId != null &&
+          senderId != _activePeerId) {
+        return;
+      }
+
+      _log('Call accepted by peer: $senderId');
       _updateStatus(CallStatus.connected);
       _startTimer();
 
       // We are the caller (host).
       // Let's establish peer connection and send offer.
       await _createPeerConnection();
-      if (_peerConnection != null) {
-        final offer = await _peerConnection!.createOffer({
-          'offerToReceiveAudio': true,
-          'offerToReceiveVideo': _isVideo,
-        });
-        await _peerConnection!.setLocalDescription(offer);
-        signaling.sendSdp(
-          recipientId: _activePeerId!,
-          sdpType: 'offer',
-          sdpDescription: offer.sdp!,
-        );
+      final peerId = _activePeerId;
+      if (!mounted ||
+          peerId == null ||
+          _status != CallStatus.connected ||
+          _peerConnection == null) {
+        return;
       }
+
+      final offer = await _peerConnection!.createOffer({
+        'offerToReceiveAudio': true,
+        'offerToReceiveVideo': _isVideo,
+      });
+      if (!mounted || _peerConnection == null) return;
+      await _peerConnection!.setLocalDescription(offer);
+      signaling.sendSdp(
+        recipientId: peerId,
+        sdpType: 'offer',
+        sdpDescription: offer.sdp!,
+      );
     });
 
     _endSub = signaling.endStream.listen((payload) {
+      if (!mounted || _status == CallStatus.idle) return;
       _log('Call ended/rejected by peer');
       _resetCallState();
     });
@@ -238,20 +300,26 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           if (_status == CallStatus.connected && _peerConnection != null) {
             final currentRemoteDesc =
                 await _peerConnection!.getRemoteDescription();
+            if (!mounted || _peerConnection == null) return;
             if (currentRemoteDesc == null) {
               await _peerConnection!
                   .setRemoteDescription(_remoteOfferDescription!);
+              if (!mounted || _peerConnection == null) return;
               final answer = await _peerConnection!.createAnswer({
                 'offerToReceiveAudio': true,
                 'offerToReceiveVideo': _isVideo,
               });
+              if (!mounted || _peerConnection == null) return;
               await _peerConnection!.setLocalDescription(answer);
 
-              signaling.sendSdp(
-                recipientId: _activePeerId!,
-                sdpType: 'answer',
-                sdpDescription: answer.sdp!,
-              );
+              final peerId = _activePeerId;
+              if (peerId != null) {
+                signaling.sendSdp(
+                  recipientId: peerId,
+                  sdpType: 'answer',
+                  sdpDescription: answer.sdp!,
+                );
+              }
 
               // Drain ice candidates queue
               for (final cand in _remoteIceCandidatesQueue) {
@@ -264,6 +332,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           if (_peerConnection != null) {
             final currentRemoteDesc =
                 await _peerConnection!.getRemoteDescription();
+            if (!mounted || _peerConnection == null) return;
             if (currentRemoteDesc == null) {
               await _peerConnection!
                   .setRemoteDescription(RTCSessionDescription(sdp, type));
@@ -275,23 +344,25 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
             }
           }
         }
-      } catch (e) {
+      } on Object catch (e) {
         _log('Error in _sdpSub: $e');
       }
     });
 
     _iceSub = signaling.iceStream.listen((payload) async {
-      final candidateData = payload['candidate'];
-      if (candidateData != null) {
+      final rawCandidate = payload['candidate'];
+      if (rawCandidate is Map) {
+        final candidateData = Map<String, dynamic>.from(rawCandidate);
         final cand = RTCIceCandidate(
           candidateData['candidate'] as String? ?? '',
           candidateData['sdpMid'] as String? ?? '0',
-          candidateData['sdpMLineIndex'] as int? ?? 0,
+          (candidateData['sdpMLineIndex'] as num?)?.toInt() ?? 0,
         );
         _log('ICE Candidate received: ...${cand.candidate?.split(' ').first}');
 
         if (_peerConnection != null &&
             await _peerConnection!.getRemoteDescription() != null) {
+          if (!mounted || _peerConnection == null) return;
           await _peerConnection!.addCandidate(cand);
         } else {
           _remoteIceCandidatesQueue.add(cand);
@@ -353,6 +424,12 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       ],
     });
 
+    if (!mounted) {
+      await pc.close();
+      await pc.dispose();
+      return;
+    }
+
     pc
       ..onIceConnectionState = (state) {
         _log('ICE Connection State: $state');
@@ -372,7 +449,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       }
       ..onTrack = (event) {
         _log('Remote track received');
-        if (event.streams.isNotEmpty) {
+        if (event.streams.isNotEmpty && mounted) {
           setState(() {
             _remoteRenderer.srcObject = event.streams[0];
           });
@@ -380,9 +457,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       }
       ..onAddStream = (stream) {
         _log('Remote stream received (legacy)');
-        setState(() {
-          _remoteRenderer.srcObject = stream;
-        });
+        if (mounted) {
+          setState(() {
+            _remoteRenderer.srcObject = stream;
+          });
+        }
       };
 
     final constraints = {
@@ -399,6 +478,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     try {
       _log('Accessing user media devices...');
       final stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (!mounted) {
+        stream.getTracks().forEach((track) => track.stop());
+        await stream.dispose();
+        await pc.close();
+        await pc.dispose();
+        return;
+      }
       _localStream = stream;
       setState(() {
         _localRenderer.srcObject = stream;
@@ -414,14 +500,27 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _peerConnection = pc;
   }
 
-  void _resetCallState() {
+  void _resetCallState({bool popIfLaunchedForCall = true}) {
     _stopTimer();
+    _stopRingtone();
     _cleanWebRTC();
+    if (!mounted) return;
+    unawaited(ref.read(callHistoryProvider.notifier).loadCallHistory());
     setState(() {
       _activeCallId = null;
       _activePeerId = null;
     });
     _updateStatus(CallStatus.idle);
+
+    final launchedForSingleCall = widget.callRequest.recipientId.isNotEmpty ||
+        widget.incomingInvitation != null;
+    if (popIfLaunchedForCall &&
+        launchedForSingleCall &&
+        !_isPopping &&
+        Navigator.of(context).canPop()) {
+      _isPopping = true;
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _startCall({required bool isVideo}) async {
@@ -444,11 +543,20 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     });
     _updateStatus(CallStatus.ringingOut);
 
-    ref.read(activeCallProvider.notifier).startCall(
+    await ref.read(activeCallProvider.notifier).startCall(
           peerId: peerId,
           channelId: channelId,
           isVideo: isVideo,
         );
+    if (!mounted) return;
+    final session = ref.read(activeCallProvider);
+    if (session.state == CallState.ended && session.errorMessage != null) {
+      _log('Failed to initiate call: ${session.errorMessage}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(session.errorMessage!)),
+      );
+      _resetCallState();
+    }
   }
 
   Future<void> _acceptIncomingCall() async {
@@ -457,26 +565,37 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     _updateStatus(CallStatus.connected);
     _startTimer();
 
-    ref
-        .read(activeCallProvider.notifier)
-        .acceptCall(_activeCallId!, _activePeerId!);
+    unawaited(
+      ref
+          .read(activeCallProvider.notifier)
+          .acceptCall(_activeCallId!, _activePeerId!),
+    );
 
     try {
       await _createPeerConnection();
+      if (!mounted || _peerConnection == null) return;
 
-      if (_remoteOfferDescription != null && _peerConnection != null) {
+      if (_remoteOfferDescription != null) {
         final currentRemoteDesc = await _peerConnection!.getRemoteDescription();
+        if (!mounted || _peerConnection == null) return;
         if (currentRemoteDesc == null) {
           await _peerConnection!.setRemoteDescription(_remoteOfferDescription!);
+          if (!mounted || _peerConnection == null) return;
           final answer = await _peerConnection!.createAnswer({
             'offerToReceiveAudio': true,
             'offerToReceiveVideo': _isVideo,
           });
+          if (!mounted || _peerConnection == null) return;
           await _peerConnection!.setLocalDescription(answer);
 
-          ref
-              .read(activeCallProvider.notifier)
-              .sendSdp(_activePeerId!, 'answer', answer.sdp!);
+          final peerId = _activePeerId;
+          if (peerId != null) {
+            unawaited(
+              ref
+                  .read(activeCallProvider.notifier)
+                  .sendSdp(peerId, 'answer', answer.sdp!),
+            );
+          }
 
           // Drain ice candidates queue
           for (final cand in _remoteIceCandidatesQueue) {
@@ -494,9 +613,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (_activeCallId == null || _activePeerId == null) return;
     _log('Declining call: $_activeCallId');
 
-    ref
-        .read(activeCallProvider.notifier)
-        .endCall(_activeCallId!, _activePeerId!);
+    unawaited(
+      ref
+          .read(activeCallProvider.notifier)
+          .endCall(_activeCallId!, _activePeerId!),
+    );
 
     _resetCallState();
   }
@@ -505,9 +626,11 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (_activeCallId == null || _activePeerId == null) return;
     _log('Hanging up call');
 
-    ref
-        .read(activeCallProvider.notifier)
-        .endCall(_activeCallId!, _activePeerId!);
+    unawaited(
+      ref
+          .read(activeCallProvider.notifier)
+          .endCall(_activeCallId!, _activePeerId!),
+    );
 
     _resetCallState();
   }
@@ -518,6 +641,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
       if (next != null) {
         _peerIdController.text = next.recipientId;
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
           ref.read(callRequestProvider.notifier).state = null;
         });
         _startCall(isVideo: next.isVideo);
@@ -532,7 +656,7 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     }
     if (_status == CallStatus.connected) {
       return ConnectedScreen(
-        activePeerId: _activePeerId!,
+        activePeerId: _activePeerId ?? '',
         isVideo: _isVideo,
         remoteRenderer: _remoteRenderer,
         localRenderer: _localRenderer,
@@ -546,20 +670,19 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   }
 
   String _resolvePeerId(CallLog log) {
-    final currentUserId = ref.read(settingsNotifierProvider).settings.userId;
-    if (log.hostId != currentUserId) {
-      return log.hostId;
-    }
-    if (log.conversationId != null) {
-      final conversations =
-          ref.read(privateConversationListProvider).conversations;
-      for (final c in conversations) {
-        if (c.id == log.conversationId && c.isUserToUser) {
-          return c.peerId;
-        }
-      }
-    }
-    return '';
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final friends = ref.read(contactsProvider).friends;
+    final conversations = log.conversationId != null
+        ? ref.read(privateConversationListProvider).conversations
+        : null;
+    return resolveCallLogPeerId(
+      log: log,
+      currentUserId: settings.userId,
+      friends: friends,
+      conversations: conversations,
+      currentUsername: settings.username,
+      currentFullName: settings.fullName,
+    );
   }
 
   String _resolvePeerName(CallLog log, List<User> friends) {
@@ -567,10 +690,14 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
     if (targetId.isNotEmpty) {
       for (final f in friends) {
         if (f.id == targetId) {
-          return f.fullName ?? f.username;
+          final fullName = f.fullName?.trim();
+          return (fullName != null && fullName.isNotEmpty)
+              ? fullName
+              : f.username;
         }
       }
-      return 'User ${targetId.substring(0, 8)}';
+      final shortId = targetId.length > 8 ? targetId.substring(0, 8) : targetId;
+      return 'User $shortId';
     }
     return 'Unknown User';
   }
@@ -1237,15 +1364,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Widget _buildRingingInUI() {
     final loc = AppLocalizations.of(context)!;
-    final friend = ref
-        .read(contactsProvider)
-        .friends
-        .where((f) => f.id == _activePeerId)
-        .firstOrNull;
-    final displayName = friend != null
-        ? (friend.fullName ?? friend.username)
-        : (_activePeerId?.substring(0, 8) ?? 'User');
-    final initialName = displayName.substring(0, 1);
+    final friends = ref.watch(contactsProvider).friends;
+    final peer = resolveCallPeerDisplay(
+      friends: friends,
+      peerId: _activePeerId,
+    );
+    final displayName = peer.displayName;
+    final initialName = peer.initial;
 
     return Scaffold(
       body: Container(
@@ -1260,155 +1385,169 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AppGap.vXxxl,
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppGap.vXxxl,
 
-              Column(
-                children: [
-                  RippleAnimation(
-                    child: Container(
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: AppBorder.all(
-                          Colors.white,
-                          width: AppSize.xs,
+                    Column(
+                      children: [
+                        RippleAnimation(
+                          child: Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: AppBorder.all(
+                                Colors.white,
+                                width: AppSize.xs,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.15),
+                                  blurRadius: AppSize.xl,
+                                  offset: const Offset(0, AppSize.sm),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: AppColor.inkMuted
+                                  .of(context)
+                                  .withValues(alpha: 0.1),
+                              child: Text(
+                                initialName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineLarge!
+                                    .copyWith(
+                                      fontSize: 45,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: AppSize.xl,
-                            offset: const Offset(0, AppSize.sm),
+                        AppGap.vXxxl,
+                        Text(
+                          displayName,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColor.inkPrimary.of(context),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        AppGap.vSm,
+                        Text(
+                          _isVideo
+                              ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
+                              : '${loc.incomingCall.toUpperCase()} (${loc.voice.toUpperCase()})',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.inkSecondary.of(context),
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Option Buttons (Remind Me / Message)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSize.huge,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildTextActionButton(Icons.alarm, loc.remindMe),
+                          _buildTextActionButton(
+                            Icons.chat_bubble,
+                            loc.message,
                           ),
                         ],
                       ),
-                      child: CircleAvatar(
-                        backgroundColor: AppColor.inkMuted
-                            .of(context)
-                            .withValues(alpha: 0.1),
-                        child: Text(
-                          initialName,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineLarge!
-                              .copyWith(
-                                fontSize: 45,
-                                fontWeight: FontWeight.bold,
+                    ),
+
+                    // Decline / Accept Buttons
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: AppSize.massive,
+                        left: AppSize.huge,
+                        right: AppSize.huge,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // Decline
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: _declineCall,
+                                iconSize: AppSize.iconXl,
+                                padding: AppPadding.xl,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColor.callDeclineRed.of(
+                                    context,
+                                  ),
+                                  foregroundColor: AppColor.onMedia.of(context),
+                                  shape: const CircleBorder(),
+                                  elevation: AppSize.elevationMd,
+                                ),
+                                icon: const Icon(Icons.call_end),
                               ),
-                        ),
+                              AppGap.vMd,
+                              Text(
+                                loc.decline,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColor.inkPrimary.of(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Accept
+                          Column(
+                            children: [
+                              IconButton(
+                                onPressed: _acceptIncomingCall,
+                                iconSize: AppSize.iconXl,
+                                padding: AppPadding.xl,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColor.callAcceptGreen.of(
+                                    context,
+                                  ),
+                                  foregroundColor: AppColor.onMedia.of(context),
+                                  shape: const CircleBorder(),
+                                  elevation: AppSize.elevationMd,
+                                ),
+                                icon: Icon(
+                                  _isVideo ? Icons.videocam : Icons.call,
+                                ),
+                              ),
+                              AppGap.vMd,
+                              Text(
+                                loc.accept,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColor.inkPrimary.of(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  AppGap.vXxxl,
-                  Text(
-                    displayName,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.inkPrimary.of(context),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  AppGap.vSm,
-                  Text(
-                    _isVideo
-                        ? '${loc.incomingCall.toUpperCase()} (${loc.video.toUpperCase()})'
-                        : '${loc.incomingCall.toUpperCase()} (${loc.voice.toUpperCase()})',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.inkSecondary.of(context),
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
-              ),
-
-              // Option Buttons (Remind Me / Message)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSize.huge),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildTextActionButton(Icons.alarm, loc.remindMe),
-                    _buildTextActionButton(Icons.chat_bubble, loc.message),
                   ],
                 ),
               ),
-
-              // Decline / Accept Buttons
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: AppSize.massive,
-                  left: AppSize.huge,
-                  right: AppSize.huge,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    // Decline
-                    Column(
-                      children: [
-                        IconButton(
-                          onPressed: _declineCall,
-                          iconSize: AppSize.iconXl,
-                          padding: AppPadding.xl,
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColor.callDeclineRed.of(
-                              context,
-                            ),
-                            foregroundColor: AppColor.onMedia.of(context),
-                            shape: const CircleBorder(),
-                            elevation: AppSize.elevationMd,
-                          ),
-                          icon: const Icon(Icons.call_end),
-                        ),
-                        AppGap.vMd,
-                        Text(
-                          loc.decline,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.inkPrimary.of(context),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Accept
-                    Column(
-                      children: [
-                        IconButton(
-                          onPressed: _acceptIncomingCall,
-                          iconSize: AppSize.iconXl,
-                          padding: AppPadding.xl,
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColor.callAcceptGreen.of(
-                              context,
-                            ),
-                            foregroundColor: AppColor.onMedia.of(context),
-                            shape: const CircleBorder(),
-                            elevation: AppSize.elevationMd,
-                          ),
-                          icon: Icon(_isVideo ? Icons.videocam : Icons.call),
-                        ),
-                        AppGap.vMd,
-                        Text(
-                          loc.accept,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.inkPrimary.of(context),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -1417,15 +1556,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
 
   Widget _buildRingingOutUI() {
     final loc = AppLocalizations.of(context)!;
-    final friend = ref
-        .read(contactsProvider)
-        .friends
-        .where((f) => f.id == _activePeerId)
-        .firstOrNull;
-    final displayName = friend != null
-        ? (friend.fullName ?? friend.username)
-        : (_activePeerId?.substring(0, 8) ?? 'User');
-    final initialName = displayName.substring(0, 1);
+    final friends = ref.watch(contactsProvider).friends;
+    final peer = resolveCallPeerDisplay(
+      friends: friends,
+      peerId: _activePeerId,
+    );
+    final displayName = peer.displayName;
+    final initialName = peer.initial;
 
     return Scaffold(
       body: Container(
@@ -1441,100 +1578,109 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AppGap.vXxxl,
-              Column(
-                children: [
-                  RippleAnimation(
-                    child: Container(
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: AppBorder.all(
-                          Colors.white,
-                          width: AppSize.xs,
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppGap.vXxxl,
+                    Column(
+                      children: [
+                        RippleAnimation(
+                          child: Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: AppBorder.all(
+                                Colors.white,
+                                width: AppSize.xs,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.15),
+                                  blurRadius: AppSize.xl,
+                                  offset: const Offset(0, AppSize.sm),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: AppColor.inkMuted
+                                  .of(context)
+                                  .withValues(alpha: 0.1),
+                              child: Text(
+                                initialName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineLarge!
+                                    .copyWith(
+                                      fontSize: 45,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: AppSize.xl,
-                            offset: const Offset(0, AppSize.sm),
+                        AppGap.vXxxl,
+                        Text(
+                          displayName,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: AppColor.inkPrimary.of(context),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        AppGap.vSm,
+                        Text(
+                          _isVideo
+                              ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
+                              : '${loc.calling.toUpperCase()} (${loc.voice.toUpperCase()})',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.inkSecondary.of(context),
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: AppSize.giant),
+                      child: Column(
+                        children: [
+                          IconButton(
+                            onPressed: _hangUp,
+                            iconSize: AppSize.iconXl,
+                            padding: AppPadding.xl,
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColor.callDeclineRed.of(
+                                context,
+                              ),
+                              foregroundColor: AppColor.onMedia.of(context),
+                              shape: const CircleBorder(),
+                              elevation: AppSize.elevationMd,
+                            ),
+                            icon: const Icon(Icons.call_end),
+                          ),
+                          AppGap.vMd,
+                          Text(
+                            loc.cancel,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColor.inkPrimary.of(context),
+                            ),
                           ),
                         ],
-                      ),
-                      child: CircleAvatar(
-                        backgroundColor: AppColor.inkMuted
-                            .of(context)
-                            .withValues(alpha: 0.1),
-                        child: Text(
-                          initialName,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineLarge!
-                              .copyWith(
-                                fontSize: 45,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  AppGap.vXxxl,
-                  Text(
-                    displayName,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.inkPrimary.of(context),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  AppGap.vSm,
-                  Text(
-                    _isVideo
-                        ? '${loc.calling.toUpperCase()} (${loc.video.toUpperCase()})'
-                        : '${loc.calling.toUpperCase()} (${loc.voice.toUpperCase()})',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.inkSecondary.of(context),
-                      letterSpacing: 2,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSize.giant),
-                child: Column(
-                  children: [
-                    IconButton(
-                      onPressed: _hangUp,
-                      iconSize: AppSize.iconXl,
-                      padding: AppPadding.xl,
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColor.callDeclineRed.of(context),
-                        foregroundColor: AppColor.onMedia.of(context),
-                        shape: const CircleBorder(),
-                        elevation: AppSize.elevationMd,
-                      ),
-                      icon: const Icon(Icons.call_end),
-                    ),
-                    AppGap.vMd,
-                    Text(
-                      loc.cancel,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColor.inkPrimary.of(context),
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -1544,15 +1690,13 @@ class _CallsScreenState extends ConsumerState<CallsScreen> {
   Widget _buildConnectedUI() {
     final loc = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
-    final friend = ref
-        .read(contactsProvider)
-        .friends
-        .where((f) => f.id == _activePeerId)
-        .firstOrNull;
-    final displayName = friend != null
-        ? (friend.fullName ?? friend.username)
-        : (_activePeerId?.substring(0, 8) ?? 'User');
-    final initialName = displayName.substring(0, 1);
+    final friends = ref.watch(contactsProvider).friends;
+    final peer = resolveCallPeerDisplay(
+      friends: friends,
+      peerId: _activePeerId,
+    );
+    final displayName = peer.displayName;
+    final initialName = peer.initial;
 
     return Scaffold(
       body: Stack(

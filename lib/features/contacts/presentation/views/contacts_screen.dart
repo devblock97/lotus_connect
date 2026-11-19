@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/features/calls/application/call_history_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/contacts_notifier.dart';
 import 'package:lotus_connect/features/contacts/application/friend_request_notifier.dart';
 import 'package:lotus_connect/features/contacts/presentation/views/friend_screen.dart';
@@ -77,6 +78,7 @@ class _ContactsScreenState extends ConsumerState<ContactsScreen> {
               onPressed: () {
                 ref.read(contactsProvider.notifier).loadFriends();
                 ref.read(friendRequestProvider.notifier).loadFriendRequests();
+                ref.read(callHistoryProvider.notifier).loadCallHistory();
               },
               tooltip: loc.refreshContacts,
             ),

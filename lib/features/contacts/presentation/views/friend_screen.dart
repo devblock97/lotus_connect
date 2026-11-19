@@ -571,7 +571,9 @@ class _FriendScreenState extends ConsumerState<FriendScreen> {
   }
 
   void _startCall({required String recipientId, required bool isVideo}) {
-    final callRequest = CallRequest(recipientId: recipientId, isVideo: isVideo);
+    final trimmedId = recipientId.trim();
+    if (trimmedId.isEmpty) return;
+    final callRequest = CallRequest(recipientId: trimmedId, isVideo: isVideo);
     Navigator.push(
       context,
       MaterialPageRoute<void>(
