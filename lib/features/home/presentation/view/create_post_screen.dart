@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
 import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/home/application/create_post_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
@@ -816,6 +818,130 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
     );
   }
 
+  bool _isVideoPath(String path) {
+    final lowerPath = path.toLowerCase();
+    return lowerPath.endsWith('.mp4') ||
+        lowerPath.endsWith('.mov') ||
+        lowerPath.endsWith('.m4v') ||
+        lowerPath.endsWith('.webm') ||
+        lowerPath.endsWith('.avi') ||
+        lowerPath.endsWith('.mkv') ||
+        lowerPath.endsWith('.3gp');
+  }
+
+  void _openFullScreenMedia({
+    required List<PostMediaItem> existingItems,
+    required List<String> paths,
+    required int initialIndex,
+  }) {
+    _focusNode.unfocus();
+
+    final medias = <MediaEntity>[
+      ...existingItems.map(
+        (m) => MediaEntity(
+          url: m.url,
+          thumbnailUrl: m.thumbnailUrl,
+          fileName: m.fileName,
+          fileSize: m.fileSize,
+          mimeType: (m.mimeType != null && m.mimeType!.isNotEmpty)
+              ? m.mimeType
+              : (m.isVideo ? 'video/mp4' : 'image/jpeg'),
+        ),
+      ),
+      ...paths.map(
+        (p) => MediaEntity(
+          url: p,
+          mimeType: _isVideoPath(p) ? 'video/mp4' : 'image/jpeg',
+        ),
+      ),
+    ];
+
+    FullScreenMediaViewer.show(
+      context,
+      medias: medias,
+      initialIndex: initialIndex,
+    );
+  }
+
+  Widget _buildMediaTile({
+    required Widget child,
+    required bool isVideo,
+    required VoidCallback onTap,
+    required VoidCallback onRemove,
+    required AppLocalizations? loc,
+  }) {
+    return Stack(
+      fit: StackFit.expand,
+      clipBehavior: Clip.none,
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: AppRadius.md,
+            child: ColoredBox(
+              color: Colors.black12,
+              child: child,
+            ),
+          ),
+        ),
+        if (isVideo)
+          Positioned(
+            bottom: AppSize.sm,
+            left: AppSize.sm,
+            child: IgnorePointer(
+              child: Container(
+                padding: AppPadding.badge,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.7),
+                  borderRadius: AppRadius.xs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.videocam_rounded,
+                      color: Colors.white,
+                      size: AppSize.iconXxs,
+                    ),
+                    AppGap.hXs,
+                    Text(
+                      loc?.video ?? 'Video',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        Positioned(
+          top: AppSize.xs,
+          right: AppSize.xs,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              width: AppSize.avatarBadgeMd,
+              height: AppSize.avatarBadgeMd,
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.close,
+                size: AppSize.iconXs,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildMediaGallery(
     ThemeData theme,
     List<PostMediaItem> existingItems,
@@ -870,199 +996,85 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                 final media = existingItems[index];
                 final isVideo = media.isVideo;
 
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    ClipRRect(
-                      borderRadius: AppRadius.md,
-                      child: Container(
-                        width: 140,
-                        height: 180,
-                        color: Colors.black12,
-                        child: isVideo
-                            ? (media.thumbnailUrl != null &&
-                                    media.thumbnailUrl!.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: media.thumbnailUrl!,
-                                    fit: BoxFit.cover,
-                                    placeholder: (_, __) => const Center(
-                                      child: CupertinoActivityIndicator(),
-                                    ),
-                                    errorWidget: (_, __, ___) =>
-                                        MediaVideoThumbnail(
-                                      key: ValueKey(media.url),
-                                      url: media.url,
-                                    ),
-                                  )
-                                : MediaVideoThumbnail(
-                                    key: ValueKey(media.url),
-                                    url: media.url,
-                                  ))
-                            : CachedNetworkImage(
-                                imageUrl: media.url,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => const Center(
-                                  child: CupertinoActivityIndicator(),
-                                ),
-                                errorWidget: (_, __, ___) => const Center(
-                                  child: Icon(
-                                    Icons.broken_image,
-                                    size: AppSize.iconXl,
-                                  ),
-                                ),
+                return _buildMediaTile(
+                  isVideo: isVideo,
+                  loc: loc,
+                  onTap: () => _openFullScreenMedia(
+                    existingItems: existingItems,
+                    paths: paths,
+                    initialIndex: index,
+                  ),
+                  onRemove: () {
+                    ref
+                        .read(createPostNotifierProvider.notifier)
+                        .removeExistingMediaAt(index);
+                  },
+                  child: isVideo
+                      ? (media.thumbnailUrl != null &&
+                              media.thumbnailUrl!.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: media.thumbnailUrl!,
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => const Center(
+                                child: CupertinoActivityIndicator(),
                               ),
-                      ),
-                    ),
-                    if (isVideo)
-                      Positioned(
-                        bottom: AppSize.sm,
-                        left: AppSize.sm,
-                        child: Container(
-                          padding: AppPadding.badge,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.7),
-                            borderRadius: AppRadius.xs,
+                              errorWidget: (_, __, ___) => MediaVideoThumbnail(
+                                key: ValueKey(media.url),
+                                url: media.url,
+                              ),
+                            )
+                          : MediaVideoThumbnail(
+                              key: ValueKey(media.url),
+                              url: media.url,
+                            ))
+                      : CachedNetworkImage(
+                          imageUrl: media.url,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => const Center(
+                            child: CupertinoActivityIndicator(),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.videocam_rounded,
-                                color: Colors.white,
-                                size: AppSize.iconXxs,
-                              ),
-                              AppGap.hXs,
-                              Text(
-                                loc?.video ?? 'Video',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                          errorWidget: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: AppSize.iconXl,
+                            ),
                           ),
                         ),
-                      ),
-                    Positioned(
-                      top: AppSize.xs,
-                      right: AppSize.xs,
-                      child: GestureDetector(
-                        onTap: () {
-                          ref
-                              .read(createPostNotifierProvider.notifier)
-                              .removeExistingMediaAt(index);
-                        },
-                        child: Container(
-                          width: AppSize.avatarBadgeMd,
-                          height: AppSize.avatarBadgeMd,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.7),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            size: AppSize.iconXs,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 );
               }
 
               final localIndex = index - existingItems.length;
               final path = paths[localIndex];
-              final lowerPath = path.toLowerCase();
-              final isVideo = lowerPath.endsWith('.mp4') ||
-                  lowerPath.endsWith('.mov') ||
-                  lowerPath.endsWith('.m4v') ||
-                  lowerPath.endsWith('.webm') ||
-                  lowerPath.endsWith('.avi');
+              final isVideo = _isVideoPath(path);
 
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  ClipRRect(
-                    borderRadius: AppRadius.md,
-                    child: Container(
-                      width: 140,
-                      height: 180,
-                      color: Colors.black12,
-                      child: isVideo
-                          ? MediaVideoThumbnail(
-                              key: ValueKey(path),
-                              url: path,
-                            )
-                          : Image.file(
-                              File(path),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: AppSize.iconXl,
-                                ),
-                              ),
-                            ),
-                    ),
-                  ),
-                  if (isVideo)
-                    Positioned(
-                      bottom: AppSize.sm,
-                      left: AppSize.sm,
-                      child: Container(
-                        padding: AppPadding.badge,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.7),
-                          borderRadius: AppRadius.xs,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.videocam_rounded,
-                              color: Colors.white,
-                              size: AppSize.iconXxs,
-                            ),
-                            AppGap.hXs,
-                            Text(
-                              loc?.video ?? 'Video',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+              return _buildMediaTile(
+                isVideo: isVideo,
+                loc: loc,
+                onTap: () => _openFullScreenMedia(
+                  existingItems: existingItems,
+                  paths: paths,
+                  initialIndex: index,
+                ),
+                onRemove: () {
+                  ref
+                      .read(createPostNotifierProvider.notifier)
+                      .removeMediaPathAt(localIndex);
+                },
+                child: isVideo
+                    ? MediaVideoThumbnail(
+                        key: ValueKey(path),
+                        url: path,
+                      )
+                    : Image.file(
+                        File(path),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: AppSize.iconXl,
+                          ),
                         ),
                       ),
-                    ),
-                  Positioned(
-                    top: AppSize.xs,
-                    right: AppSize.xs,
-                    child: GestureDetector(
-                      onTap: () {
-                        ref
-                            .read(createPostNotifierProvider.notifier)
-                            .removeMediaPathAt(localIndex);
-                      },
-                      child: Container(
-                        width: AppSize.avatarBadgeMd,
-                        height: AppSize.avatarBadgeMd,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.7),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          size: AppSize.iconXs,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               );
             },
           ),

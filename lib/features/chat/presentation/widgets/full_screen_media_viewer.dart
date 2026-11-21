@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/core/utils/utils.dart';
 import 'package:lotus_connect/features/chat/domain/entities/media_entity.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
@@ -20,15 +21,12 @@ class FullScreenMediaViewer extends StatefulWidget {
   /// Helper to open the full screen viewer.
   static void show(
     BuildContext context, {
-    List<MediaEntity>? medias,
-    String? imageUrl,
+    required List<MediaEntity> medias,
     int initialIndex = 0,
   }) {
-    final mediaList = medias ??
-        (imageUrl != null ? [MediaEntity(url: imageUrl)] : <MediaEntity>[]);
-    if (mediaList.isEmpty) return;
+    if (medias.isEmpty) return;
 
-    final safeInitialIndex = initialIndex.clamp(0, mediaList.length - 1);
+    final safeInitialIndex = initialIndex.clamp(0, medias.length - 1);
 
     Navigator.push<void>(
       context,
@@ -37,7 +35,7 @@ class FullScreenMediaViewer extends StatefulWidget {
         barrierDismissible: true,
         barrierColor: AppColor.transparent.of(context),
         pageBuilder: (_, __, ___) => FullScreenMediaViewer(
-          medias: mediaList,
+          medias: medias,
           initialIndex: safeInitialIndex,
         ),
         transitionsBuilder: (_, animation, __, child) {
@@ -171,9 +169,7 @@ class _FullScreenMediaViewerState extends State<FullScreenMediaViewer>
                   },
                   itemBuilder: (context, index) {
                     final media = widget.medias[index];
-                    final isVideo =
-                        media.mimeType?.toLowerCase().contains('video') ??
-                            media.url.toLowerCase().endsWith('.mp4');
+                    final isVideo = isVideoMedia(media);
 
                     if (isVideo) {
                       return _VideoMediaItem(
@@ -369,6 +365,64 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
     _zoomAnimationController.forward(from: 0);
   }
 
+  Widget _buildErrorWidget(BuildContext context, AppLocalizations? loc) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.broken_image_rounded,
+            color: AppColor.onMedia54.of(context),
+            size: AppSize.iconXxl,
+          ),
+          AppGap.vSm,
+          Text(
+            loc?.failedToLoadImage ?? 'Failed to load image',
+            style: TextStyle(
+              color: AppColor.onMedia54.of(context),
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage(BuildContext context, AppLocalizations? loc) {
+    if (!isNetworkUrl(widget.media.url)) {
+      return Image.file(
+        resolveLocalFile(widget.media.url),
+        fit: BoxFit.contain,
+        errorBuilder: (context, _, __) => _buildErrorWidget(context, loc),
+      );
+    }
+
+    final thumbnailUrl = widget.media.thumbnailUrl;
+    return CachedNetworkImage(
+      imageUrl: widget.media.url,
+      fit: BoxFit.contain,
+      placeholder: (context, _) => Center(
+        child: thumbnailUrl != null &&
+                thumbnailUrl.isNotEmpty &&
+                isNetworkUrl(thumbnailUrl)
+            ? CachedNetworkImage(
+                imageUrl: thumbnailUrl,
+                fit: BoxFit.contain,
+              )
+            : SizedBox(
+                width: AppSize.loaderSizeLg,
+                height: AppSize.loaderSizeLg,
+                child: CircularProgressIndicator(
+                  color: AppColor.onMedia70.of(context),
+                  strokeWidth: AppSize.loaderStrokeWidth,
+                ),
+              ),
+      ),
+      errorWidget: (context, __, dynamic ___) =>
+          _buildErrorWidget(context, loc),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -384,45 +438,7 @@ class _ImageMediaItemState extends State<_ImageMediaItem>
           clipBehavior: Clip.none,
           child: Hero(
             tag: widget.media.url,
-            child: CachedNetworkImage(
-              imageUrl: widget.media.url,
-              fit: BoxFit.contain,
-              placeholder: (context, _) => Center(
-                child: widget.media.thumbnailUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: widget.media.thumbnailUrl!,
-                        fit: BoxFit.contain,
-                      )
-                    : SizedBox(
-                        width: AppSize.loaderSizeLg,
-                        height: AppSize.loaderSizeLg,
-                        child: CircularProgressIndicator(
-                          color: AppColor.onMedia70.of(context),
-                          strokeWidth: AppSize.loaderStrokeWidth,
-                        ),
-                      ),
-              ),
-              errorWidget: (_, __, dynamic ___) => Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.broken_image_rounded,
-                      color: AppColor.onMedia54.of(context),
-                      size: AppSize.iconXxl,
-                    ),
-                    AppGap.vSm,
-                    Text(
-                      loc?.failedToLoadImage ?? 'Failed to load image',
-                      style: TextStyle(
-                        color: AppColor.onMedia54.of(context),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: _buildImage(context, loc),
           ),
         ),
       ),
@@ -454,29 +470,34 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.media.url))
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _isInitialized = true;
-          });
-          if (widget.isActive) {
-            _controller.play();
-          }
-        }
-      }).catchError((Object _) {
-        if (mounted) {
-          setState(() {
-            _hasError = true;
-          });
-        }
-      });
+    _controller = isNetworkUrl(widget.media.url)
+        ? VideoPlayerController.networkUrl(Uri.parse(widget.media.url))
+        : VideoPlayerController.file(resolveLocalFile(widget.media.url));
 
-    _controller.addListener(() {
+    _controller.initialize().then((_) {
       if (mounted) {
-        setState(() {});
+        setState(() {
+          _isInitialized = true;
+        });
+        if (widget.isActive) {
+          _controller.play();
+        }
+      }
+    }).catchError((Object _) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+        });
       }
     });
+
+    _controller.addListener(_onControllerUpdated);
+  }
+
+  void _onControllerUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -493,7 +514,9 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller
+      ..removeListener(_onControllerUpdated)
+      ..dispose();
     super.dispose();
   }
 
@@ -502,6 +525,10 @@ class _VideoMediaItemState extends State<_VideoMediaItem> {
     if (_controller.value.isPlaying) {
       _controller.pause();
     } else {
+      if (_controller.value.position >= _controller.value.duration &&
+          _controller.value.duration > Duration.zero) {
+        _controller.seekTo(Duration.zero);
+      }
       _controller.play();
     }
   }

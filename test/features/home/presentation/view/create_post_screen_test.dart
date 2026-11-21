@@ -1,13 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lotus_connect/core/usecases/usecase.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/full_screen_media_viewer.dart';
+import 'package:lotus_connect/features/chat/presentation/widgets/video_thumbnail.dart';
 import 'package:lotus_connect/features/home/application/feed_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/domain/entities/create_post_params.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_author.dart';
 import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
+import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
 import 'package:lotus_connect/features/home/domain/usecases/create_post_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/get_feed_usecase.dart';
 import 'package:lotus_connect/features/home/domain/usecases/update_post_usecase.dart';
@@ -16,6 +20,7 @@ import 'package:lotus_connect/features/settings/application/settings_notifier.da
 import 'package:lotus_connect/features/settings/domain/entities/app_settings.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 class MockCreatePostUseCase extends Mock implements CreatePostUseCase {}
 
@@ -30,6 +35,70 @@ class FakeSettingsNotifier extends StateNotifier<SettingsState>
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeVideoPlayerPlatform extends VideoPlayerPlatform {
+  final List<DataSource> createdDataSources = [];
+  int _nextPlayerId = 1;
+
+  @override
+  Future<void> init() async {}
+
+  @override
+  Future<int?> create(DataSource dataSource) async {
+    createdDataSources.add(dataSource);
+    return _nextPlayerId++;
+  }
+
+  @override
+  Future<int?> createWithOptions(VideoCreationOptions options) async {
+    createdDataSources.add(options.dataSource);
+    return _nextPlayerId++;
+  }
+
+  @override
+  Future<void> dispose(int playerId) async {}
+
+  @override
+  Future<void> setLooping(int playerId, bool looping) async {}
+
+  @override
+  Future<void> play(int playerId) async {}
+
+  @override
+  Future<void> pause(int playerId) async {}
+
+  @override
+  Future<void> setVolume(int playerId, double volume) async {}
+
+  @override
+  Future<void> setPlaybackSpeed(int playerId, double speed) async {}
+
+  @override
+  Future<void> setMixWithOthers(bool mixWithOthers) async {}
+
+  @override
+  Future<void> seekTo(int playerId, Duration position) async {}
+
+  @override
+  Future<Duration> getPosition(int playerId) async => Duration.zero;
+
+  @override
+  Stream<VideoEvent> videoEventsFor(int playerId) {
+    return Stream.value(
+      VideoEvent(
+        eventType: VideoEventType.initialized,
+        duration: const Duration(seconds: 5),
+        size: const Size(1280, 720),
+      ),
+    );
+  }
+
+  @override
+  Widget buildView(int playerId) => const SizedBox();
+
+  @override
+  Widget buildViewWithOptions(VideoViewOptions options) => const SizedBox();
 }
 
 void main() {
@@ -57,6 +126,7 @@ void main() {
 
   Widget buildTestWidget({
     Locale locale = const Locale('en'),
+    List<String> initialMediaPaths = const [],
     PostItem? postToEdit,
     String fullName = 'Alice Smith',
     String username = 'alice',
@@ -79,6 +149,7 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: CreatePostScreen(
+          initialMediaPaths: initialMediaPaths,
           postToEdit: postToEdit,
         ),
       ),
@@ -391,6 +462,130 @@ void main() {
 
       expect(find.text('Thêm vị trí'), findsOneWidget);
       expect(find.text('Bạn đang ở đâu?'), findsOneWidget);
+    });
+  });
+
+  group('CreatePostScreen Full Screen Media Preview', () {
+    testWidgets(
+        'tapping a local image thumbnail opens FullScreenMediaViewer at index',
+        (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          initialMediaPaths: const [
+            '/tmp/photo_1.jpg',
+            '/tmp/photo_2.jpg',
+          ],
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('2 items selected'), findsOneWidget);
+
+      await tester.tap(find.byType(Image).at(1));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      final viewerFinder = find.byType(FullScreenMediaViewer);
+      expect(viewerFinder, findsOneWidget);
+      final viewer = tester.widget<FullScreenMediaViewer>(viewerFinder);
+      expect(viewer.initialIndex, 1);
+      expect(
+        viewer.medias.map((m) => m.url).toList(),
+        ['/tmp/photo_1.jpg', '/tmp/photo_2.jpg'],
+      );
+      expect(find.text('2 / 2'), findsOneWidget);
+    });
+
+    testWidgets(
+        'tapping an existing media thumbnail opens FullScreenMediaViewer',
+        (tester) async {
+      const postToEdit = PostItem(
+        id: 'p_300',
+        author: PostAuthor(id: 'a_1', username: 'alice'),
+        content: 'Post with media',
+        mediaItems: [
+          PostMediaItem(
+            url: 'https://example.com/photo1.jpg',
+            mimeType: 'image/jpeg',
+          ),
+          PostMediaItem(
+            url: 'https://example.com/video1.mp4',
+            thumbnailUrl: 'https://example.com/video1_thumb.jpg',
+            mimeType: 'video/mp4',
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(buildTestWidget(postToEdit: postToEdit));
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('2 items selected'), findsOneWidget);
+
+      await tester.tap(find.byType(CachedNetworkImage).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      final viewerFinder = find.byType(FullScreenMediaViewer);
+      expect(viewerFinder, findsOneWidget);
+      final viewer = tester.widget<FullScreenMediaViewer>(viewerFinder);
+      expect(viewer.initialIndex, 0);
+      expect(viewer.medias, hasLength(2));
+      expect(viewer.medias[0].url, 'https://example.com/photo1.jpg');
+      expect(viewer.medias[1].url, 'https://example.com/video1.mp4');
+      expect(find.text('1 / 2'), findsOneWidget);
+    });
+
+    testWidgets('tapping a local video thumbnail opens FullScreenMediaViewer',
+        (tester) async {
+      final fakePlatform = _FakeVideoPlayerPlatform();
+      final previousPlatform = VideoPlayerPlatform.instance;
+      VideoPlayerPlatform.instance = fakePlatform;
+      addTearDown(() => VideoPlayerPlatform.instance = previousPlatform);
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          initialMediaPaths: const ['/tmp/sample_clip.mov'],
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(MediaVideoThumbnail), findsOneWidget);
+
+      await tester.tap(find.byType(MediaVideoThumbnail));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.byType(FullScreenMediaViewer), findsOneWidget);
+      // 1 from MediaVideoThumbnail + 1 from FullScreenMediaViewer
+      expect(fakePlatform.createdDataSources, hasLength(2));
+      expect(
+        fakePlatform.createdDataSources.last.sourceType,
+        DataSourceType.file,
+      );
+    });
+
+    testWidgets(
+        'tapping remove button deletes thumbnail without opening viewer',
+        (tester) async {
+      await tester.pumpWidget(
+        buildTestWidget(
+          initialMediaPaths: const ['/tmp/photo_1.jpg'],
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('1 item selected'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.byType(FullScreenMediaViewer), findsNothing);
+      expect(find.text('1 item selected'), findsNothing);
     });
   });
 }
