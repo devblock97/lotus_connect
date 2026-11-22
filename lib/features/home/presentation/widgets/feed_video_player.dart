@@ -127,7 +127,8 @@ class _FeedVideoPlayerState extends ConsumerState<FeedVideoPlayer>
       widget.media.url,
       serverHost: settings.serverHost,
     );
-    final playableUrl = preCache.getPlayableUrl(normalizedUrl);
+    final playableUrl = await preCache.getPlayableUrlAsync(normalizedUrl);
+    if (!mounted) return;
 
     try {
       final controller = await pool.acquireController(

@@ -1,17 +1,20 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_color.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/chill/presentation/widgets/video_item.dart';
 import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
-import 'package:lotus_connect/features/home/domain/entities/post_media_item.dart';
+import 'package:lotus_connect/features/settings/application/settings_providers.dart';
 import 'package:lotus_connect/l10n/app_localizations.dart';
 import 'package:lotus_connect/main_shell_screen.dart';
+import 'package:video_player/video_player.dart';
 
 class ChillViewerScreen extends ConsumerStatefulWidget {
   const ChillViewerScreen({
@@ -53,9 +56,25 @@ class ChillViewerScreen extends ConsumerStatefulWidget {
   ConsumerState<ChillViewerScreen> createState() => _ChillViewerScreenState();
 }
 
+class _ChillVideoEntry {
+  _ChillVideoEntry({required this.controller});
+
+  final VideoPlayerController controller;
+  bool isInitialized = false;
+  bool hasError = false;
+  bool isDisposed = false;
+}
+
 class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
   late final PageController _pageController;
   late int _currentIndex;
+
+  // Sliding-window controller pool (max 3: current - 1, current, current + 1)
+  final Map<String, _ChillVideoEntry> _videoPool = {};
+  final Set<String> _pendingInits = {};
+  final Set<String> _queuedPreCacheUrls = {};
+  VideoPreCacheManager? _preCacheManager;
+  bool _appliedInitialPosition = false;
 
   @override
   void initState() {
@@ -68,7 +87,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
       final notifier = ref.read(chillNotifierProvider.notifier);
       if (widget.initialChills != null && widget.initialChills!.isNotEmpty) {
         notifier.setInitialChills(widget.initialChills!);
-        _preCacheAround(_currentIndex, widget.initialChills!);
+        _syncChillWindow(_currentIndex, widget.initialChills!);
       } else {
         notifier.getChill();
       }
@@ -77,27 +96,233 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
 
   @override
   void dispose() {
+    final preCache = _preCacheManager;
+    if (preCache != null) {
+      for (final url in _queuedPreCacheUrls) {
+        preCache.cancelPreCache(url);
+      }
+    }
+    _queuedPreCacheUrls.clear();
+    _pendingInits.clear();
+
+    for (final entry in _videoPool.values) {
+      _disposeEntry(entry);
+    }
+    _videoPool.clear();
+
     _pageController.dispose();
     super.dispose();
   }
 
-  void _preCacheAround(int index, List<ChillItem> chills) {
-    if (chills.isEmpty) return;
-    final preCache = ref.read(videoPreCacheManagerProvider);
-    final end = (index + 2).clamp(0, chills.length - 1);
-    for (var i = index + 1; i <= end; i++) {
-      final chill = chills[i];
-      if (chill.videoUrl.isNotEmpty) {
+  void _disposeEntry(_ChillVideoEntry entry) {
+    if (entry.isDisposed) return;
+    entry.isDisposed = true;
+    unawaited(entry.controller.dispose().catchError((Object _) {}));
+  }
+
+  Set<String> _windowIds(int index, List<ChillItem> chills) {
+    final keep = <String>{};
+    for (final i in [index, index + 1, index - 1]) {
+      if (i >= 0 && i < chills.length && chills[i].videoUrl.isNotEmpty) {
+        keep.add(chills[i].id);
+      }
+    }
+    return keep;
+  }
+
+  bool _isCurrentlyScreenVisible() {
+    return widget.isModal || ref.read(shellIndexProvider) == 1;
+  }
+
+  void _precacheThumbnails(int index, List<ChillItem> chills) {
+    final serverHost = ref.read(settingsNotifierProvider).settings.serverHost;
+    for (final i in [index, index + 1, index - 1]) {
+      if (i < 0 || i >= chills.length) continue;
+      final thumb = chills[i].thumbnailUrl;
+      if (thumb == null || thumb.isEmpty) continue;
+      final normalized = normalizeMediaUrl(thumb, serverHost: serverHost);
+      if (normalized.startsWith('http')) {
         unawaited(
-          preCache.preCacheMedia(
-            PostMediaItem(
-              url: chill.videoUrl,
-              thumbnailUrl: chill.thumbnailUrl,
-              mimeType: 'video/mp4',
-            ),
+          precacheImage(
+            CachedNetworkImageProvider(normalized),
+            context,
+            onError: (_, __) {},
           ),
         );
       }
+    }
+  }
+
+  void _syncChillWindow(int index, List<ChillItem> chills) {
+    if (chills.isEmpty || index < 0 || index >= chills.length) return;
+    if (!_isCurrentlyScreenVisible()) return;
+
+    final keepIds = _windowIds(index, chills);
+
+    // 1. Evict controllers outside [index - 1, index, index + 1]
+    final toEvict =
+        _videoPool.keys.where((id) => !keepIds.contains(id)).toList();
+    for (final id in toEvict) {
+      final entry = _videoPool.remove(id);
+      if (entry != null) _disposeEntry(entry);
+    }
+    _pendingInits.removeWhere((id) => !keepIds.contains(id));
+
+    // 2. Warm poster thumbnails around active index
+    _precacheThumbnails(index, chills);
+
+    // 3. Prioritize active video first; pre-warm neighbors once active is ready
+    final activeChill = chills[index];
+    if (activeChill.videoUrl.isEmpty) {
+      _warmNeighborsAndBytes(index, chills);
+      return;
+    }
+
+    final existing = _videoPool[activeChill.id];
+    if (existing != null && existing.isInitialized && !existing.hasError) {
+      _warmNeighborsAndBytes(index, chills);
+    } else {
+      unawaited(
+        _ensureChillEntry(
+          activeChill,
+          isInitialItem: index == widget.initialIndex,
+          onFinished: () {
+            if (mounted && _currentIndex == index) {
+              final latestChills = ref.read(chillNotifierProvider).chills;
+              _warmNeighborsAndBytes(index, latestChills);
+            }
+          },
+        ),
+      );
+    }
+  }
+
+  void _warmNeighborsAndBytes(int index, List<ChillItem> chills) {
+    if (chills.isEmpty) return;
+    final preCache = ref.read(videoPreCacheManagerProvider);
+    _preCacheManager = preCache;
+
+    // Collect URLs in [index - 1 .. index + 2] and cancel stale downloads
+    final windowUrls = <String>{};
+    for (final delta in [0, 1, -1, 2]) {
+      final i = index + delta;
+      if (i >= 0 && i < chills.length && chills[i].videoUrl.isNotEmpty) {
+        windowUrls.add(chills[i].videoUrl);
+      }
+    }
+
+    final stale =
+        _queuedPreCacheUrls.where((url) => !windowUrls.contains(url)).toList();
+    for (final url in stale) {
+      preCache.cancelPreCache(url);
+      _queuedPreCacheUrls.remove(url);
+    }
+
+    // Immediate neighbors (+1 first, then -1): pre-cache bytes then warm
+    // controller decoder paused at frame 0.
+    for (final i in [index + 1, index - 1]) {
+      if (i < 0 || i >= chills.length) continue;
+      final chill = chills[i];
+      if (chill.videoUrl.isEmpty) continue;
+
+      _queuedPreCacheUrls.add(chill.videoUrl);
+      unawaited(
+        preCache
+            .preCacheUrl(
+          chill.videoUrl,
+          highPriority: i == index + 1,
+        )
+            .whenComplete(() {
+          if (!mounted || !_isCurrentlyScreenVisible()) return;
+          final latest = ref.read(chillNotifierProvider).chills;
+          if (_windowIds(_currentIndex, latest).contains(chill.id)) {
+            unawaited(_ensureChillEntry(chill, isInitialItem: false));
+          }
+        }),
+      );
+    }
+
+    // Disk-only byte pre-cache for N+2 (no decoder allocated yet)
+    final lookAheadIndex = index + 2;
+    if (lookAheadIndex >= 0 && lookAheadIndex < chills.length) {
+      final chill = chills[lookAheadIndex];
+      if (chill.videoUrl.isNotEmpty) {
+        _queuedPreCacheUrls.add(chill.videoUrl);
+        unawaited(preCache.preCacheUrl(chill.videoUrl));
+      }
+    }
+  }
+
+  Future<void> _ensureChillEntry(
+    ChillItem chill, {
+    required bool isInitialItem,
+    VoidCallback? onFinished,
+  }) async {
+    if (chill.videoUrl.isEmpty) {
+      onFinished?.call();
+      return;
+    }
+
+    final existing = _videoPool[chill.id];
+    if (existing != null) {
+      onFinished?.call();
+      return;
+    }
+    if (_pendingInits.contains(chill.id)) return;
+
+    _pendingInits.add(chill.id);
+    final settings = ref.read(settingsNotifierProvider).settings;
+    final preCache = ref.read(videoPreCacheManagerProvider);
+    _preCacheManager = preCache;
+
+    final normalizedUrl = normalizeMediaUrl(
+      chill.videoUrl,
+      serverHost: settings.serverHost,
+    );
+    final playableUrl = await preCache.getPlayableUrlAsync(normalizedUrl);
+    _pendingInits.remove(chill.id);
+
+    if (!mounted) return;
+    final latestChills = ref.read(chillNotifierProvider).chills;
+    if (!_windowIds(_currentIndex, latestChills).contains(chill.id)) return;
+
+    final controller = VideoPlayerController.networkUrl(Uri.parse(playableUrl));
+    final entry = _ChillVideoEntry(controller: controller);
+    _videoPool[chill.id] = entry;
+
+    try {
+      await controller.initialize();
+      if (entry.isDisposed || !mounted) return;
+
+      final isMuted = ref.read(chillNotifierProvider).isMuted;
+      await controller.setLooping(true);
+      await controller.setVolume(isMuted ? 0.0 : 1.0);
+
+      if (isInitialItem &&
+          !_appliedInitialPosition &&
+          widget.initialPosition > Duration.zero) {
+        _appliedInitialPosition = true;
+        await controller.seekTo(widget.initialPosition);
+      }
+
+      if (entry.isDisposed || !mounted) return;
+      entry.isInitialized = true;
+      setState(() {});
+      onFinished?.call();
+    } on Object catch (_) {
+      if (entry.isDisposed || !mounted) return;
+
+      final activeId = _currentIndex >= 0 && _currentIndex < latestChills.length
+          ? latestChills[_currentIndex].id
+          : null;
+      if (chill.id != activeId) {
+        _videoPool.remove(chill.id);
+        _disposeEntry(entry);
+      } else {
+        entry.hasError = true;
+        setState(() {});
+      }
+      onFinished?.call();
     }
   }
 
@@ -105,7 +330,7 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
     setState(() {
       _currentIndex = index;
     });
-    _preCacheAround(index, chills);
+    _syncChillWindow(index, chills);
 
     // Trigger infinite scroll pagination when within 3 items of the end
     if (index >= chills.length - 3) {
@@ -122,15 +347,38 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
     // pause playback when another tab is selected
     final isScreenVisible = widget.isModal || shellIndex == 1;
 
-    // Pre-cache initial items once loaded
-    ref.listen<List<ChillItem>>(
-      chillNotifierProvider.select((s) => s.chills),
-      (previous, next) {
-        if ((previous == null || previous.isEmpty) && next.isNotEmpty) {
-          _preCacheAround(_currentIndex, next);
+    // Sync sliding window once chills load
+    ref
+      ..listen<List<ChillItem>>(
+        chillNotifierProvider.select((s) => s.chills),
+        (previous, next) {
+          if ((previous == null || previous.isEmpty) && next.isNotEmpty) {
+            _syncChillWindow(_currentIndex, next);
+          }
+        },
+      )
+      // Keep global mute synced across all pooled controllers (active + warm)
+      ..listen<bool>(
+        chillNotifierProvider.select((s) => s.isMuted),
+        (previous, next) {
+          for (final entry in _videoPool.values) {
+            if (entry.isInitialized && !entry.isDisposed) {
+              unawaited(
+                entry.controller
+                    .setVolume(next ? 0.0 : 1.0)
+                    .catchError((Object _) {}),
+              );
+            }
+          }
+        },
+      )
+      // Trigger window warming when switching back to the Chills tab
+      ..listen<int>(shellIndexProvider, (previous, next) {
+        if (!widget.isModal && next == 1 && previous != 1) {
+          final chills = ref.read(chillNotifierProvider).chills;
+          _syncChillWindow(_currentIndex, chills);
         }
-      },
-    );
+      });
 
     return Scaffold(
       backgroundColor: AppColor.mediaBackdrop.of(context),
@@ -244,11 +492,16 @@ class _ChillViewerScreenState extends ConsumerState<ChillViewerScreen> {
         itemBuilder: (context, index) {
           final chill = chillState.chills[index];
           final isInitial = index == widget.initialIndex;
+          final entry = _videoPool[chill.id];
           return VideoItem(
             key: ValueKey('chill_item_${chill.id}'),
             chill: chill,
             isActive: isScreenVisible && index == _currentIndex,
             initialPosition: isInitial ? widget.initialPosition : Duration.zero,
+            usesExternalController: true,
+            externalController: entry?.controller,
+            isExternalInitialized: entry?.isInitialized ?? false,
+            hasExternalError: entry?.hasError ?? false,
           );
         },
       ),
