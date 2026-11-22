@@ -76,7 +76,10 @@ class AppSettings extends Equatable {
         host == 'http://10.0.2.2:8080/api/v1' ||
         host.contains('localhost') ||
         host.contains('10.0.2.2') ||
-        host.contains('ngrok-free.app')) {
+        host.contains('ngrok-free.app') ||
+        host.contains('ngrok.app') ||
+        host.contains('ngrok.io') ||
+        host.contains('trycloudflare.com')) {
       host = AppConfig.defaultServerHost;
     }
     return AppConfig.normalizeHostForPlatform(host);
@@ -137,7 +140,7 @@ class AppSettings extends Equatable {
       systemPrompt: systemPrompt ?? this.systemPrompt,
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
-      serverHost: serverHost ?? this.serverHost,
+      serverHost: serverHost ?? _serverHost,
       userId: userId ?? this.userId,
       username: username ?? this.username,
       email: email ?? this.email,

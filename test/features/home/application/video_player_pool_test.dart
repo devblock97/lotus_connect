@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotus_connect/features/home/application/video_player_pool.dart';
 import 'package:mocktail/mocktail.dart';
@@ -179,6 +181,110 @@ void main() {
       await pool.disposeAll();
       expect(pool.pooledCount, equals(0));
       verify(mockController1.dispose).called(1);
+    });
+
+    test('preWarmController initializes paused and reuses on acquireController',
+        () async {
+      final pool = VideoPlayerPool(
+        controllerFactory: (uri) => mockController1,
+      );
+
+      await pool.preWarmController(
+        postId: 'post_next',
+        videoUrl: 'http://example.com/next.mp4',
+        isMuted: true,
+      );
+
+      verify(mockController1.initialize).called(1);
+      verifyNever(mockController1.play);
+      expect(pool.pooledCount, equals(1));
+
+      final acquired = await pool.acquireController(
+        postId: 'post_next',
+        videoUrl: 'http://example.com/next.mp4',
+        isMuted: false,
+      );
+
+      expect(acquired, equals(mockController1));
+      verifyNever(mockController1.initialize);
+      verify(() => mockController1.setVolume(1)).called(1);
+    });
+
+    test('deduplicates concurrent preWarmController and acquireController',
+        () async {
+      final initCompleter = Completer<void>();
+      when(mockController1.initialize).thenAnswer((_) => initCompleter.future);
+
+      final pool = VideoPlayerPool(
+        controllerFactory: (uri) => mockController1,
+      );
+
+      final warmFuture = pool.preWarmController(
+        postId: 'post_1',
+        videoUrl: 'http://example.com/video1.mp4',
+        isMuted: true,
+      );
+      final acquireFuture = pool.acquireController(
+        postId: 'post_1',
+        videoUrl: 'http://example.com/video1.mp4',
+        isMuted: false,
+      );
+
+      initCompleter.complete();
+      await warmFuture;
+      final acquired = await acquireFuture;
+
+      expect(acquired, equals(mockController1));
+      verify(mockController1.initialize).called(1);
+      verify(() => mockController1.setVolume(1)).called(1);
+    });
+
+    test('evicts paused controller before currently playing controller',
+        () async {
+      when(() => mockController1.value).thenReturn(
+        const VideoPlayerValue(
+          duration: Duration(seconds: 30),
+          isPlaying: true,
+        ),
+      );
+      when(() => mockController2.value).thenReturn(
+        const VideoPlayerValue(
+          duration: Duration(seconds: 30),
+        ),
+      );
+
+      final controllers = [mockController1, mockController2, mockController3];
+      var index = 0;
+
+      final pool = VideoPlayerPool(
+        controllerFactory: (uri) => controllers[index++],
+      );
+
+      await pool.acquireController(
+        postId: 'post_playing',
+        videoUrl: 'http://example.com/playing.mp4',
+        isMuted: true,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      await pool.acquireController(
+        postId: 'post_paused',
+        videoUrl: 'http://example.com/paused.mp4',
+        isMuted: true,
+      );
+
+      // Even though post_playing was acquired earlier, post_paused is idle
+      // so pre-warming post_next must evict post_paused and keep post_playing.
+      await pool.preWarmController(
+        postId: 'post_next',
+        videoUrl: 'http://example.com/next.mp4',
+        isMuted: true,
+      );
+
+      expect(pool.getController('post_playing'), equals(mockController1));
+      expect(pool.getController('post_paused'), isNull);
+      expect(pool.getController('post_next'), equals(mockController3));
+      verify(mockController2.dispose).called(1);
+      verifyNever(mockController1.dispose);
     });
   });
 }

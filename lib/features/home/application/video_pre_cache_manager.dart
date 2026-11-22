@@ -22,25 +22,32 @@ class VideoCacheProxyServer {
   final Future<Directory> Function() cacheDirGetter;
   final String Function() _serverHostGetter;
   HttpServer? _server;
+  Future<void>? _startFuture;
   final HttpClient _httpClient = HttpClient()
     ..badCertificateCallback = (cert, host, port) => true;
 
   int? get port => _server?.port;
   bool get isRunning => _server != null;
 
-  /// Starts the loopback HTTP server.
-  Future<void> start() async {
-    if (_server != null) return;
+  /// Starts the loopback HTTP server (idempotent and safely awaitable).
+  Future<void> start() {
+    if (_server != null) return Future.value();
+    return _startFuture ??= _bindServer();
+  }
+
+  Future<void> _bindServer() async {
     try {
-      _server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-      _server!.listen(
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      _server = server;
+      server.listen(
         _handleRequest,
         onError: (Object e) {
           AppLogger.error('VideoCacheProxyServer error: $e');
         },
       );
-      AppLogger.info('VideoCacheProxyServer started on port ${_server!.port}');
+      AppLogger.info('VideoCacheProxyServer started on port ${server.port}');
     } on Object catch (e) {
+      _startFuture = null;
       AppLogger.error('VideoCacheProxyServer failed to start: $e');
     }
   }
@@ -551,6 +558,7 @@ class VideoCacheProxyServer {
 
   /// Stops the server.
   Future<void> stop() async {
+    _startFuture = null;
     await _server?.close(force: true);
     _server = null;
     _httpClient.close(force: true);
@@ -564,13 +572,42 @@ class _ByteRange {
   final int? end;
 }
 
-/// Manages predictive pre-caching for upcoming feed video posts (posts
-/// N+1 and N+2). Pre-caches master playlist, primary rendition, and Chunk 0.
+class _PreCacheRequest {
+  const _PreCacheRequest({
+    required this.url,
+    required this.isHls,
+  });
+
+  final String url;
+  final bool isHls;
+}
+
+class _DiskCacheEntry {
+  const _DiskCacheEntry({
+    required this.directory,
+    required this.hash,
+    required this.sizeBytes,
+    required this.lastModified,
+  });
+
+  final Directory directory;
+  final String hash;
+  final int sizeBytes;
+  final DateTime lastModified;
+}
+
+/// Manages predictive pre-caching for upcoming videos (feeds, chills, full
+/// screen viewer). Pre-caches HLS manifests + Chunk 0 or initial MP4 range,
+/// serves them through an embedded loopback proxy, limits concurrent
+/// downloads, supports cancelling stale requests, and enforces a bounded
+/// LRU disk cache.
 class VideoPreCacheManager {
   VideoPreCacheManager({
     Dio? dio,
     Future<Directory> Function()? cacheDirGetter,
     String Function()? serverHostGetter,
+    this.maxConcurrentPreCaches = 2,
+    this.maxDiskCacheBytes = 150 * 1024 * 1024,
   })  : _dio = dio ?? Dio(),
         _serverHostGetter = serverHostGetter ?? (() => ''),
         _cacheDirGetter = cacheDirGetter ??
@@ -586,32 +623,53 @@ class VideoPreCacheManager {
       cacheDirGetter: _cacheDirGetter,
       serverHostGetter: _serverHostGetter,
     );
-    _proxyServer.start();
+    unawaited(_proxyServer.start());
   }
 
   final Dio _dio;
   final Future<Directory> Function() _cacheDirGetter;
   final String Function() _serverHostGetter;
+  final int maxConcurrentPreCaches;
+  final int maxDiskCacheBytes;
   late final VideoCacheProxyServer _proxyServer;
 
-  final Set<String> _inFlightUrls = {};
   final Set<String> _preCachedUrls = {};
+  final Map<String, String> _hashToUrl = {};
+  final Map<String, CancelToken> _cancelTokens = {};
+  final Map<String, Completer<void>> _completers = {};
+  final List<_PreCacheRequest> _pendingQueue = [];
+  int _activeDownloads = 0;
+  bool _isEvicting = false;
+  bool _isDisposed = false;
 
   String _hashUrl(String url) {
     return base64Url.encode(utf8.encode(url)).replaceAll('=', '');
   }
 
-  bool isPreCached(String videoUrl) {
+  String _normalize(String rawUrl) {
     final activeHost = _serverHostGetter();
-    final normalized = normalizeMediaUrl(videoUrl, serverHost: activeHost);
+    return normalizeMediaUrl(rawUrl, serverHost: activeHost);
+  }
+
+  bool _detectIsHls(String url) {
+    final uri = Uri.tryParse(url);
+    final path = (uri?.path ?? url).toLowerCase();
+    return path.endsWith('.m3u8');
+  }
+
+  /// Ensures the local loopback proxy server has bound to a port.
+  Future<void> ensureStarted() => _proxyServer.start();
+
+  bool isPreCached(String videoUrl) {
+    final normalized = _normalize(videoUrl);
     return _preCachedUrls.contains(normalized);
   }
 
   /// Returns playable URL (served through 0ms local loopback proxy, which
-  /// caches chunks, rewrites HLS, and seamlessly bypasses native TLS/cert issues).
+  /// caches chunks, rewrites HLS, and seamlessly bypasses native TLS/cert
+  /// issues).
   String getPlayableUrl(String remoteUrl) {
-    final activeHost = _serverHostGetter();
-    final normalized = normalizeMediaUrl(remoteUrl, serverHost: activeHost);
+    final normalized = _normalize(remoteUrl);
     if (_proxyServer.isRunning && _proxyServer.port != null) {
       final encoded = Uri.encodeComponent(normalized);
       return 'http://127.0.0.1:${_proxyServer.port}/video?url=$encoded';
@@ -619,7 +677,15 @@ class VideoPreCacheManager {
     return normalized;
   }
 
-  /// Predictively pre-caches upcoming feed video posts (N+1 and N+2).
+  /// Awaits proxy startup before returning the playable loopback URL so the
+  /// very first video never misses the proxy while it is binding.
+  Future<String> getPlayableUrlAsync(String remoteUrl) async {
+    await ensureStarted();
+    return getPlayableUrl(remoteUrl);
+  }
+
+  /// Predictively pre-caches upcoming feed video posts (N+1 and N+2) and
+  /// cancels stale pre-caches outside the active window.
   void preCacheUpcoming({
     required List<PostItem> posts,
     required int currentIndex,
@@ -629,43 +695,177 @@ class VideoPreCacheManager {
       return;
     }
 
+    final keepUrls = <String>{};
+    final currentMedia = posts[currentIndex].primaryMedia;
+    if (currentMedia != null && currentMedia.isVideo) {
+      keepUrls.add(currentMedia.url);
+    }
+
     final startIndex = currentIndex + 1;
     final endIndex = (currentIndex + lookAhead).clamp(0, posts.length - 1);
 
+    final toPreCache = <PostMediaItem>[];
     for (var i = startIndex; i <= endIndex; i++) {
-      final post = posts[i];
-      final primaryMedia = post.primaryMedia;
+      final primaryMedia = posts[i].primaryMedia;
       if (primaryMedia != null && primaryMedia.isVideo) {
-        unawaited(preCacheMedia(primaryMedia));
+        keepUrls.add(primaryMedia.url);
+        toPreCache.add(primaryMedia);
       }
+    }
+
+    cancelPreCachesExcept(keepUrls);
+
+    for (final media in toPreCache) {
+      unawaited(preCacheMedia(media));
     }
   }
 
   /// Pre-caches a specific post's media item (manifest + Chunk 0).
-  Future<void> preCacheMedia(PostMediaItem media) async {
-    final activeHost = _serverHostGetter();
-    final url = normalizeMediaUrl(media.url, serverHost: activeHost);
-    if (url.isEmpty || !url.startsWith('http')) return;
-    if (_preCachedUrls.contains(url) || _inFlightUrls.contains(url)) return;
+  Future<void> preCacheMedia(PostMediaItem media) {
+    return preCacheUrl(media.url, isHls: media.isHls);
+  }
 
-    _inFlightUrls.add(url);
+  /// Pre-caches a video URL (HLS manifest + Chunk 0, or first 1 MB of MP4)
+  /// with concurrency throttling, deduplication, and cancellation support.
+  Future<void> preCacheUrl(
+    String rawUrl, {
+    bool? isHls,
+    bool highPriority = false,
+  }) {
+    if (_isDisposed) return Future.value();
+    final url = _normalize(rawUrl);
+    if (url.isEmpty || !url.startsWith('http')) return Future.value();
+    if (_preCachedUrls.contains(url)) return Future.value();
+
+    final existingCompleter = _completers[url];
+    if (existingCompleter != null) {
+      if (highPriority) {
+        final idx = _pendingQueue.indexWhere((r) => r.url == url);
+        if (idx > 0) {
+          final item = _pendingQueue.removeAt(idx);
+          _pendingQueue.insert(0, item);
+        }
+      }
+      return existingCompleter.future;
+    }
+
+    final completer = Completer<void>();
+    _completers[url] = completer;
+
+    final request = _PreCacheRequest(
+      url: url,
+      isHls: isHls ?? _detectIsHls(url),
+    );
+    if (highPriority) {
+      _pendingQueue.insert(0, request);
+    } else {
+      _pendingQueue.add(request);
+    }
+
+    _drainQueue();
+    return completer.future;
+  }
+
+  /// Cancels an in-flight or queued pre-cache request for [rawUrl].
+  void cancelPreCache(String rawUrl) {
+    final url = _normalize(rawUrl);
+    _pendingQueue.removeWhere((req) => req.url == url);
+
+    final token = _cancelTokens.remove(url);
+    if (token != null && !token.isCancelled) {
+      token.cancel('Cancelled stale video pre-cache');
+    }
+
+    final completer = _completers.remove(url);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
+  }
+
+  /// Cancels any queued or in-flight pre-cache requests not in [keepRawUrls].
+  void cancelPreCachesExcept(Iterable<String> keepRawUrls) {
+    final keepNormalized = keepRawUrls.map(_normalize).toSet();
+
+    final removedQueued = <String>[];
+    _pendingQueue.removeWhere((req) {
+      final shouldRemove = !keepNormalized.contains(req.url);
+      if (shouldRemove) removedQueued.add(req.url);
+      return shouldRemove;
+    });
+    for (final url in removedQueued) {
+      final completer = _completers.remove(url);
+      if (completer != null && !completer.isCompleted) {
+        completer.complete();
+      }
+    }
+
+    final activeToCancel = _cancelTokens.keys
+        .where((url) => !keepNormalized.contains(url))
+        .toList();
+    for (final url in activeToCancel) {
+      final token = _cancelTokens.remove(url);
+      if (token != null && !token.isCancelled) {
+        token.cancel('Evicted from pre-cache window');
+      }
+    }
+  }
+
+  void _drainQueue() {
+    while (!_isDisposed &&
+        _activeDownloads < maxConcurrentPreCaches &&
+        _pendingQueue.isNotEmpty) {
+      final next = _pendingQueue.removeAt(0);
+      _activeDownloads++;
+      unawaited(_executePreCache(next));
+    }
+  }
+
+  Future<void> _executePreCache(_PreCacheRequest request) async {
+    final url = request.url;
+    final cancelToken = CancelToken();
+    _cancelTokens[url] = cancelToken;
 
     try {
       final cacheDir = await _cacheDirGetter();
+      if (_isDisposed || cancelToken.isCancelled) return;
+
       final urlHash = _hashUrl(url);
       final postDir = Directory('${cacheDir.path}/$urlHash');
+
+      // Hydrate from existing on-disk cache (e.g. across app restarts)
+      if (_hasValidDiskCache(postDir, isHls: request.isHls)) {
+        _preCachedUrls.add(url);
+        _hashToUrl[urlHash] = url;
+        _touchDiskCache(postDir, isHls: request.isHls);
+        return;
+      }
+
       if (!postDir.existsSync()) {
         postDir.createSync(recursive: true);
       }
-      AppLogger.info('Check video type: ${media.isHls}');
-      if (media.isHls) {
-        await _preCacheHls(url, postDir, cacheDir);
+
+      if (request.isHls) {
+        await _preCacheHls(url, postDir, cacheDir, cancelToken: cancelToken);
       } else {
-        await _preCacheStandardVideo(url, postDir);
+        await _preCacheStandardVideo(url, postDir, cancelToken: cancelToken);
       }
 
+      if (_isDisposed || cancelToken.isCancelled) return;
+
       _preCachedUrls.add(url);
+      _hashToUrl[urlHash] = url;
       AppLogger.info('Successfully pre-cached Chunk 0 for video: $url');
+      await _evictDiskCacheIfNeeded();
+    } on DioException catch (e, st) {
+      if (e.type == DioExceptionType.cancel) {
+        AppLogger.debug('VideoPreCacheManager cancelled pre-cache for $url');
+      } else {
+        AppLogger.error(
+          'VideoPreCacheManager failed to pre-cache $url: $e',
+          e,
+          st,
+        );
+      }
     } on Object catch (e, st) {
       AppLogger.error(
         'VideoPreCacheManager failed to pre-cache $url: $e',
@@ -673,22 +873,58 @@ class VideoPreCacheManager {
         st,
       );
     } finally {
-      _inFlightUrls.remove(url);
+      _cancelTokens.remove(url);
+      _activeDownloads =
+          (_activeDownloads - 1).clamp(0, maxConcurrentPreCaches);
+      final completer = _completers.remove(url);
+      if (completer != null && !completer.isCompleted) {
+        completer.complete();
+      }
+      _drainQueue();
     }
+  }
+
+  bool _hasValidDiskCache(Directory postDir, {required bool isHls}) {
+    if (!postDir.existsSync()) return false;
+    if (isHls) {
+      final master = File('${postDir.path}/master.m3u8');
+      final chunk = File('${postDir.path}/chunk_0.ts');
+      return master.existsSync() &&
+          master.lengthSync() > 0 &&
+          chunk.existsSync() &&
+          chunk.lengthSync() > 0;
+    }
+    final chunk = File('${postDir.path}/chunk_0.bin');
+    return chunk.existsSync() && chunk.lengthSync() > 0;
+  }
+
+  void _touchDiskCache(Directory postDir, {required bool isHls}) {
+    try {
+      final target = File(
+        '${postDir.path}/${isHls ? 'master.m3u8' : 'chunk_0.bin'}',
+      );
+      if (target.existsSync()) {
+        target.setLastModifiedSync(DateTime.now());
+      }
+    } on Object catch (_) {}
   }
 
   /// Pre-caches HLS master playlist, primary rendition, and first 2s segment.
   Future<void> _preCacheHls(
     String masterUrl,
     Directory postDir,
-    Directory cacheDir,
-  ) async {
+    Directory cacheDir, {
+    required CancelToken cancelToken,
+  }) async {
     final activeHost = _serverHostGetter();
     // Fetch master playlist
     final masterRes = await _dio.get<String>(
       masterUrl,
       options: Options(responseType: ResponseType.plain),
+      cancelToken: cancelToken,
     );
+    if (cancelToken.isCancelled) return;
+
     final masterContent = masterRes.data ?? '';
     final masterFile = File('${postDir.path}/master.m3u8');
     await masterFile.writeAsString(masterContent);
@@ -708,7 +944,10 @@ class VideoPreCacheManager {
     final mediaRes = await _dio.get<String>(
       mediaPlaylistUrl,
       options: Options(responseType: ResponseType.plain),
+      cancelToken: cancelToken,
     );
+    if (cancelToken.isCancelled) return;
+
     final mediaContent = mediaRes.data ?? '';
     final mediaFile = File('${postDir.path}/media.m3u8');
     await mediaFile.writeAsString(mediaContent);
@@ -716,12 +955,13 @@ class VideoPreCacheManager {
     // Also index media playlist under its own URL hash so proxy requests hit
     // cache with 0ms latency
     if (mediaPlaylistUrl != masterUrl) {
-      final mediaDir =
-          Directory('${cacheDir.path}/${_hashUrl(mediaPlaylistUrl)}');
+      final mediaHash = _hashUrl(mediaPlaylistUrl);
+      final mediaDir = Directory('${cacheDir.path}/$mediaHash');
       if (!mediaDir.existsSync()) {
         mediaDir.createSync(recursive: true);
       }
       await File('${mediaDir.path}/master.m3u8').writeAsString(mediaContent);
+      _hashToUrl[mediaHash] = mediaPlaylistUrl;
     }
 
     // Parse Chunk 0 (first .ts or .mp4 segment)
@@ -739,7 +979,10 @@ class VideoPreCacheManager {
     final chunkRes = await _dio.get<List<int>>(
       chunk0Url,
       options: Options(responseType: ResponseType.bytes),
+      cancelToken: cancelToken,
     );
+    if (cancelToken.isCancelled) return;
+
     final chunkBytes = chunkRes.data;
     if (chunkBytes != null) {
       final chunkFile = File('${postDir.path}/chunk_0.ts');
@@ -747,29 +990,37 @@ class VideoPreCacheManager {
 
       // Also index Chunk 0 under its own URL hash so segment proxy requests
       // hit disk cache directly
-      final chunkDir = Directory('${cacheDir.path}/${_hashUrl(chunk0Url)}');
+      final chunkHash = _hashUrl(chunk0Url);
+      final chunkDir = Directory('${cacheDir.path}/$chunkHash');
       if (!chunkDir.existsSync()) {
         chunkDir.createSync(recursive: true);
       }
       await File('${chunkDir.path}/chunk_0.ts').writeAsBytes(chunkBytes);
+      _hashToUrl[chunkHash] = chunk0Url;
     }
   }
 
   /// Pre-caches initial chunk (first 1MB / ~2s) of direct MP4/video file.
   Future<void> _preCacheStandardVideo(
     String videoUrl,
-    Directory postDir,
-  ) async {
+    Directory postDir, {
+    required CancelToken cancelToken,
+  }) async {
     final response = await _dio.get<List<int>>(
       videoUrl,
       options: Options(
         responseType: ResponseType.bytes,
         headers: {'Range': 'bytes=0-1048575'},
       ),
+      cancelToken: cancelToken,
     );
+    if (cancelToken.isCancelled) return;
+
     final bytes = response.data;
     if (bytes != null) {
-      AppLogger.info('check pre cache standard video: $bytes');
+      AppLogger.debug(
+        'Pre-cached ${bytes.length} bytes for standard video: $videoUrl',
+      );
       final chunkFile = File('${postDir.path}/chunk_0.bin');
       await chunkFile.writeAsBytes(bytes);
 
@@ -784,6 +1035,69 @@ class VideoPreCacheManager {
           'contentType': contentType,
         }),
       );
+    }
+  }
+
+  Future<void> _evictDiskCacheIfNeeded() async {
+    if (_isEvicting || _isDisposed || maxDiskCacheBytes <= 0) return;
+    _isEvicting = true;
+    try {
+      final cacheDir = await _cacheDirGetter();
+      if (!cacheDir.existsSync()) return;
+
+      final entries = <_DiskCacheEntry>[];
+      var totalBytes = 0;
+
+      for (final entity in cacheDir.listSync()) {
+        if (entity is! Directory) continue;
+        var dirBytes = 0;
+        var latestModified = DateTime.fromMillisecondsSinceEpoch(0);
+
+        for (final child in entity.listSync(recursive: true)) {
+          if (child is File) {
+            final stat = child.statSync();
+            dirBytes += stat.size;
+            if (stat.modified.isAfter(latestModified)) {
+              latestModified = stat.modified;
+            }
+          }
+        }
+
+        totalBytes += dirBytes;
+        final segments =
+            entity.uri.pathSegments.where((s) => s.isNotEmpty).toList();
+        final name = segments.isEmpty ? '' : segments.last;
+        entries.add(
+          _DiskCacheEntry(
+            directory: entity,
+            hash: name,
+            sizeBytes: dirBytes,
+            lastModified: latestModified,
+          ),
+        );
+      }
+
+      if (totalBytes <= maxDiskCacheBytes) return;
+
+      final inFlightHashes = _cancelTokens.keys.map(_hashUrl).toSet();
+      entries.sort((a, b) => a.lastModified.compareTo(b.lastModified));
+
+      for (final entry in entries) {
+        if (totalBytes <= maxDiskCacheBytes) break;
+        if (inFlightHashes.contains(entry.hash)) continue;
+        try {
+          await entry.directory.delete(recursive: true);
+          totalBytes -= entry.sizeBytes;
+          final url = _hashToUrl.remove(entry.hash);
+          if (url != null) {
+            _preCachedUrls.remove(url);
+          }
+        } on Object catch (_) {}
+      }
+    } on Object catch (e) {
+      AppLogger.error('VideoPreCacheManager disk eviction failed: $e');
+    } finally {
+      _isEvicting = false;
     }
   }
 
@@ -859,18 +1173,27 @@ class VideoPreCacheManager {
 
   Future<void> clearCache() async {
     try {
+      cancelPreCachesExcept(const []);
       final cacheDir = await _cacheDirGetter();
       if (cacheDir.existsSync()) {
         await cacheDir.delete(recursive: true);
       }
       _preCachedUrls.clear();
-      _inFlightUrls.clear();
+      _hashToUrl.clear();
     } on Object catch (e) {
       AppLogger.error('Failed to clear video pre-cache: $e');
     }
   }
 
   Future<void> dispose() async {
+    _isDisposed = true;
+    cancelPreCachesExcept(const []);
+    for (final completer in _completers.values) {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    }
+    _completers.clear();
     await _proxyServer.stop();
   }
 }

@@ -31,5 +31,23 @@ void main() {
 
       expect(settings.serverHost, 'https://custom.backend.com/api/v1');
     });
+
+    test(
+      'overrides cached trycloudflare or ngrok tunnel host with '
+      'defaultServerHost',
+      () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        const settings = AppSettings(
+          serverHost: 'https://susan-founded-establishing-talking'
+              '.trycloudflare.com/api/v1',
+        );
+
+        expect(
+          settings.serverHost,
+          isNot(contains('trycloudflare.com')),
+        );
+        expect(settings.serverHost, contains('10.0.2.2'));
+      },
+    );
   });
 }

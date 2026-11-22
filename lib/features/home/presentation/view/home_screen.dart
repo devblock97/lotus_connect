@@ -1,14 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotus_connect/app/theme/app_size.dart';
+import 'package:lotus_connect/core/utils/media_url_normalizer.dart';
 import 'package:lotus_connect/features/chat/presentation/views/conversation_list_view.dart';
 import 'package:lotus_connect/features/chill/chill.dart';
 import 'package:lotus_connect/features/home/application/feed_notifier.dart';
 import 'package:lotus_connect/features/home/application/feed_playback_coordinator.dart';
 import 'package:lotus_connect/features/home/application/feed_provider.dart';
 import 'package:lotus_connect/features/home/application/story_provider.dart';
+import 'package:lotus_connect/features/home/application/video_player_pool.dart';
 import 'package:lotus_connect/features/home/application/video_pre_cache_manager.dart';
+import 'package:lotus_connect/features/home/domain/entities/post_item.dart';
 import 'package:lotus_connect/features/home/presentation/view/create_post_screen.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/create_post_bar.dart';
 import 'package:lotus_connect/features/home/presentation/widgets/post_card.dart';
@@ -69,9 +74,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
   }
 
+  Future<void> _preWarmNextFeedVideo(
+    List<PostItem> posts,
+    int activeIndex,
+    String expectedActivePostId,
+  ) async {
+    final preCache = ref.read(videoPreCacheManagerProvider);
+    final pool = ref.read(videoPlayerPoolProvider);
+    final isMuted = ref.read(feedPlaybackCoordinatorProvider).isGloballyMuted;
+    final serverHost = ref.read(settingsNotifierProvider).settings.serverHost;
+
+    final endIndex = (activeIndex + 2).clamp(0, posts.length - 1);
+    for (var i = activeIndex + 1; i <= endIndex; i++) {
+      final post = posts[i];
+      final primaryMedia = post.primaryMedia;
+      if (primaryMedia == null || !primaryMedia.isVideo) continue;
+
+      final normalizedUrl = normalizeMediaUrl(
+        primaryMedia.url,
+        serverHost: serverHost,
+      );
+      if (!normalizedUrl.startsWith('http')) break;
+
+      await preCache.preCacheMedia(primaryMedia);
+      if (!mounted) return;
+
+      // Skip pre-warming if user has already scrolled away from this post
+      if (ref.read(feedPlaybackCoordinatorProvider).activePostId !=
+          expectedActivePostId) {
+        return;
+      }
+
+      final playableUrl = await preCache.getPlayableUrlAsync(normalizedUrl);
+      if (!mounted) return;
+
+      final effectivePostId =
+          post.mediaItems.length > 1 ? '${post.id}_0' : post.id;
+      await pool.preWarmController(
+        postId: effectivePostId,
+        videoUrl: playableUrl,
+        isMuted: isMuted,
+      );
+      break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Predictive pre-caching for upcoming posts (N+1, N+2) when post N plays
+    // Predictive pre-caching + controller pre-warming for upcoming posts
     ref.listen(
       feedPlaybackCoordinatorProvider.select((s) => s.activePostId),
       (previous, activePostId) {
@@ -85,6 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   posts: posts,
                   currentIndex: activeIndex,
                 );
+            unawaited(_preWarmNextFeedVideo(posts, activeIndex, activePostId));
           }
         }
       },

@@ -23,12 +23,20 @@ class VideoItem extends ConsumerStatefulWidget {
     required this.chill,
     required this.isActive,
     required this.initialPosition,
+    this.externalController,
+    this.isExternalInitialized = false,
+    this.hasExternalError = false,
+    this.usesExternalController = false,
     super.key,
   });
 
   final ChillItem chill;
   final bool isActive;
   final Duration initialPosition;
+  final VideoPlayerController? externalController;
+  final bool isExternalInitialized;
+  final bool hasExternalError;
+  final bool usesExternalController;
 
   @override
   ConsumerState<VideoItem> createState() => _VideoItemState();
@@ -36,10 +44,10 @@ class VideoItem extends ConsumerStatefulWidget {
 
 class _VideoItemState extends ConsumerState<VideoItem>
     with TickerProviderStateMixin {
-  VideoPlayerController? _controller;
-  bool _isInitialized = false;
+  VideoPlayerController? _ownedController;
+  bool _ownedInitialized = false;
   bool _isPlaying = false;
-  bool _hasError = false;
+  bool _ownedError = false;
   bool _isExpandCaption = false;
   bool _showHeartAnimation = false;
   bool _hasRecordedCompletion = false;
@@ -48,6 +56,18 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
   late final AnimationController _heartAnimController;
   late final AnimationController _discAnimController;
+
+  VideoPlayerController? get _controller => widget.usesExternalController
+      ? widget.externalController
+      : _ownedController;
+
+  bool get _isInitialized => widget.usesExternalController
+      ? (widget.isExternalInitialized && widget.externalController != null)
+      : _ownedInitialized;
+
+  bool get _hasError =>
+      widget.chill.videoUrl.isEmpty ||
+      (widget.usesExternalController ? widget.hasExternalError : _ownedError);
 
   @override
   void initState() {
@@ -61,7 +81,12 @@ class _VideoItemState extends ConsumerState<VideoItem>
       duration: const Duration(seconds: 5),
     );
 
-    if (widget.isActive) {
+    if (widget.usesExternalController) {
+      _attachExternalController(widget.externalController);
+      if (widget.isActive && _isInitialized) {
+        _startActivePlayback();
+      }
+    } else if (widget.isActive) {
       _initVideo();
     }
   }
@@ -71,33 +96,76 @@ class _VideoItemState extends ConsumerState<VideoItem>
     _reportWatchTimeIfNeeded();
     _heartAnimController.dispose();
     _discAnimController.dispose();
-    _controller?.removeListener(_videoListener);
-    _controller?.dispose();
+    if (widget.usesExternalController) {
+      widget.externalController?.removeListener(_videoListener);
+    } else {
+      _ownedController?.removeListener(_videoListener);
+      _ownedController?.dispose();
+    }
     super.dispose();
+  }
+
+  void _attachExternalController(VideoPlayerController? controller) {
+    controller?.addListener(_videoListener);
+  }
+
+  void _startActivePlayback() {
+    final controller = _controller;
+    if (controller == null || !_isInitialized) return;
+    unawaited(controller.play().catchError((Object _) {}));
+    _watchStopwatch.start();
+    unawaited(_discAnimController.repeat());
+    _isPlaying = true;
+  }
+
+  void _pauseActivePlayback() {
+    unawaited(_controller?.pause().catchError((Object _) {}));
+    _watchStopwatch.stop();
+    _discAnimController.stop();
+    _reportWatchTimeIfNeeded();
+    _isPlaying = false;
   }
 
   @override
   void didUpdateWidget(covariant VideoItem oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.usesExternalController) {
+      if (oldWidget.externalController != widget.externalController) {
+        oldWidget.externalController?.removeListener(_videoListener);
+        _attachExternalController(widget.externalController);
+      }
+
+      final becameReadyWhileActive = widget.isActive &&
+          _isInitialized &&
+          (!oldWidget.isExternalInitialized ||
+              oldWidget.externalController != widget.externalController);
+
+      if (widget.isActive && !oldWidget.isActive) {
+        if (_isInitialized) {
+          _startActivePlayback();
+          setState(() {});
+        }
+      } else if (!widget.isActive && oldWidget.isActive) {
+        _pauseActivePlayback();
+        setState(() {});
+      } else if (becameReadyWhileActive) {
+        _startActivePlayback();
+        setState(() {});
+      }
+      return;
+    }
+
     if (widget.isActive && !oldWidget.isActive) {
-      if (_controller == null) {
+      if (_ownedController == null) {
         _initVideo();
-      } else if (_isInitialized) {
-        _controller?.play();
-        _watchStopwatch.start();
-        _discAnimController.repeat();
-        setState(() {
-          _isPlaying = true;
-        });
+      } else if (_ownedInitialized) {
+        _startActivePlayback();
+        setState(() {});
       }
     } else if (!widget.isActive && oldWidget.isActive) {
-      _controller?.pause();
-      _watchStopwatch.stop();
-      _discAnimController.stop();
-      _reportWatchTimeIfNeeded();
-      setState(() {
-        _isPlaying = false;
-      });
+      _pauseActivePlayback();
+      setState(() {});
     }
   }
 
@@ -139,7 +207,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
   Future<void> _initVideo() async {
     final rawUrl = widget.chill.videoUrl;
     if (rawUrl.isEmpty) {
-      setState(() => _hasError = true);
+      setState(() => _ownedError = true);
       return;
     }
 
@@ -151,12 +219,13 @@ class _VideoItemState extends ConsumerState<VideoItem>
       rawUrl,
       serverHost: settings.serverHost,
     );
-    final playableUrl = preCache.getPlayableUrl(normalizedUrl);
+    final playableUrl = await preCache.getPlayableUrlAsync(normalizedUrl);
+    if (!mounted) return;
 
     final controller = VideoPlayerController.networkUrl(
       Uri.parse(playableUrl),
     );
-    _controller = controller;
+    _ownedController = controller;
 
     try {
       await controller.initialize();
@@ -171,9 +240,9 @@ class _VideoItemState extends ConsumerState<VideoItem>
 
       if (mounted && widget.isActive) {
         setState(() {
-          _isInitialized = true;
+          _ownedInitialized = true;
           _isPlaying = true;
-          _hasError = false;
+          _ownedError = false;
         });
         _watchStopwatch.start();
         unawaited(_discAnimController.repeat());
@@ -182,7 +251,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
     } on Object catch (_) {
       if (mounted) {
         setState(() {
-          _hasError = true;
+          _ownedError = true;
         });
       }
     }
@@ -366,7 +435,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
             ),
           ),
 
-        // 5. Right Action Column (Like, Comment, Share, Save, Options, Audio Disc)
+        // 5. Right Action Column (Like, Comment, Share, Save, Options, Disc)
         Positioned(
           right: AppSize.md,
           bottom: MediaQuery.of(context).padding.bottom + AppSize.xxl,
@@ -694,7 +763,7 @@ class _VideoItemState extends ConsumerState<VideoItem>
   }
 
   Future<void> _togglePlayPause() async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     if (_controller != null && _isInitialized) {
       if (_isPlaying) {
         await _controller!.pause();
