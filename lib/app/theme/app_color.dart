@@ -44,81 +44,81 @@ class AppColor {
   // ---------------------------------------------------------------------------
 
   static const AppModeColor primary = AppModeColor(
-    light: Color(0xFF6F5B40),
-    dark: Color(0xFFDEC08F),
-    sepia: Color(0xFF8A5A2B),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFFF4A3B8),
+    sepia: Color(0xFFA86454),
   );
 
   static const AppModeColor onPrimary = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF3D2E15),
+    dark: Color(0xFF4A1C2A),
     sepia: Color(0xFFFFFFFF),
   );
 
   static const AppModeColor primaryContainer = AppModeColor(
-    light: Color(0xFFFBDEB9),
-    dark: Color(0xFF57432A),
-    sepia: Color(0xFFF0D3A6),
+    light: Color(0xFFFCE7EE),
+    dark: Color(0xFF5C3242),
+    sepia: Color(0xFFF5DDD6),
   );
 
   static const AppModeColor onPrimaryContainer = AppModeColor(
-    light: Color(0xFF271905),
-    dark: Color(0xFFFBDEB9),
-    sepia: Color(0xFF2E1B03),
+    light: Color(0xFF3E1220),
+    dark: Color(0xFFFCE7EE),
+    sepia: Color(0xFF3A1A14),
   );
 
   static const AppModeColor secondary = AppModeColor(
-    light: Color(0xFF6D5D4E),
-    dark: Color(0xFFDAC3AC),
-    sepia: Color(0xFF7A6A50),
+    light: Color(0xFF7C6992),
+    dark: Color(0xFFD5C4E8),
+    sepia: Color(0xFF8C7365),
   );
 
   static const AppModeColor onSecondary = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF3B2E20),
+    dark: Color(0xFF382A4A),
     sepia: Color(0xFFFFFFFF),
   );
 
   static const AppModeColor secondaryContainer = AppModeColor(
-    light: Color(0xFFF7DFC7),
-    dark: Color(0xFF534435),
-    sepia: Color(0xFFE9D9BE),
+    light: Color(0xFFF3ECF9),
+    dark: Color(0xFF4E3F63),
+    sepia: Color(0xFFF2E6D8),
   );
 
   static const AppModeColor onSecondaryContainer = AppModeColor(
-    light: Color(0xFF251A0D),
-    dark: Color(0xFFF7DFC7),
-    sepia: Color(0xFF2A2010),
+    light: Color(0xFF2B1E3D),
+    dark: Color(0xFFF3ECF9),
+    sepia: Color(0xFF33261E),
   );
 
   static const AppModeColor tertiary = AppModeColor(
-    light: Color(0xFF51643F),
-    dark: Color(0xFFB7CEA0),
-    sepia: Color(0xFF6B7A4F),
+    light: Color(0xFF4E8774),
+    dark: Color(0xFFA8DEC9),
+    sepia: Color(0xFF6E8562),
   );
 
   static const AppModeColor onTertiary = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF243516),
+    dark: Color(0xFF1A3D31),
     sepia: Color(0xFFFFFFFF),
   );
 
   static const AppModeColor tertiaryContainer = AppModeColor(
-    light: Color(0xFFD3EABB),
-    dark: Color(0xFF3A4C2B),
-    sepia: Color(0xFFDCE7C4),
+    light: Color(0xFFDDF5EC),
+    dark: Color(0xFF2F5648),
+    sepia: Color(0xFFE5EFE0),
   );
 
   static const AppModeColor onTertiaryContainer = AppModeColor(
-    light: Color(0xFF101F03),
-    dark: Color(0xFFD3EABB),
-    sepia: Color(0xFF1D2809),
+    light: Color(0xFF0E2920),
+    dark: Color(0xFFDDF5EC),
+    sepia: Color(0xFF212E1A),
   );
 
   static const AppModeColor error = AppModeColor(
-    light: Color(0xFFBA1A1A),
+    light: Color(0xFFD32F2F),
     dark: Color(0xFFFFB4AB),
-    sepia: Color(0xFF9A3412),
+    sepia: Color(0xFFB43E2B),
   );
 
   static const AppModeColor onError = AppModeColor(
@@ -128,39 +128,39 @@ class AppColor {
   );
 
   static const AppModeColor surface = AppModeColor(
-    light: Color(0xFFFFF8F3),
-    dark: Color(0xFF17130E),
-    sepia: Color(0xFFF4ECD8),
+    light: Color(0xFFFFFFFF),
+    dark: Color(0xFF1E222B),
+    sepia: Color(0xFFFAF6EE),
   );
 
   static const AppModeColor onSurface = AppModeColor(
-    light: Color(0xFF1F1B16),
-    dark: Color(0xFFEAE1D9),
-    sepia: Color(0xFF3B2F1E),
+    light: Color(0xFF1E2028),
+    dark: Color(0xFFF1F3F9),
+    sepia: Color(0xFF3E3227),
   );
 
   static const AppModeColor surfaceContainerHighest = AppModeColor(
-    light: Color(0xFFF0E0CF),
-    dark: Color(0xFF4F4539),
-    sepia: Color(0xFFE6D8BC),
+    light: Color(0xFFF3F4F8),
+    dark: Color(0xFF323846),
+    sepia: Color(0xFFEFE7D6),
   );
 
   static const AppModeColor onSurfaceVariant = AppModeColor(
-    light: Color(0xFF4F4539),
-    dark: Color(0xFFD3C4B4),
-    sepia: Color(0xFF5C4E39),
+    light: Color(0xFF5A5E6B),
+    dark: Color(0xFFC8CDD8),
+    sepia: Color(0xFF685948),
   );
 
   static const AppModeColor outline = AppModeColor(
-    light: Color(0xFF817567),
-    dark: Color(0xFF9C8F80),
-    sepia: Color(0xFF8A7A5F),
+    light: Color(0xFF8E93A2),
+    dark: Color(0xFF949AA8),
+    sepia: Color(0xFF968671),
   );
 
   static const AppModeColor outlineVariant = AppModeColor(
-    light: Color(0xFFD3C4B4),
-    dark: Color(0xFF4F4539),
-    sepia: Color(0xFFD8C7A5),
+    light: Color(0xFFE4E6EE),
+    dark: Color(0xFF383E4C),
+    sepia: Color(0xFFE2D5C1),
   );
 
   // ---------------------------------------------------------------------------
@@ -168,75 +168,75 @@ class AppColor {
   // ---------------------------------------------------------------------------
 
   static const AppModeColor brandAccent = AppModeColor(
-    light: Color(0xFF6200EE),
-    dark: Color(0xFFBB86FC),
-    sepia: Color(0xFF8D6E63),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFFF4A3B8),
+    sepia: Color(0xFFA86454),
   );
 
   static const AppModeColor background = AppModeColor(
-    light: Color(0xFFF8F9FA),
-    dark: Color(0xFF121214),
-    sepia: Color(0xFFF4ECD8),
+    light: Color(0xFFFAFBFD),
+    dark: Color(0xFF181B23),
+    sepia: Color(0xFFFAF6EE),
   );
 
   static const AppModeColor cardSurface = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF1E1E22),
-    sepia: Color(0xFFEAE0C8),
+    dark: Color(0xFF252A34),
+    sepia: Color(0xFFF4EDE0),
   );
 
   static const AppModeColor textPrimary = AppModeColor(
-    light: Color(0xFF1C1B1F),
-    dark: Color(0xFFE6E1E5),
-    sepia: Color(0xFF4A3B32),
+    light: Color(0xFF1E2028),
+    dark: Color(0xFFF1F3F9),
+    sepia: Color(0xFF4A3C31),
   );
 
   static const AppModeColor textSecondary = AppModeColor(
-    light: Color(0xFF757575),
-    dark: Color(0xFFA0A0A5),
-    sepia: Color(0xFF796556),
+    light: Color(0xFF6E7382),
+    dark: Color(0xFFA8B0C0),
+    sepia: Color(0xFF7D6B5D),
   );
 
   static const AppModeColor userBubbleBg = AppModeColor(
-    light: Color(0xFF1C1B1F),
-    dark: Color(0xFF2B2B30),
-    sepia: Color(0xFF5D4037),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFF363C4A),
+    sepia: Color(0xFFA86454),
   );
 
   static const AppModeColor userBubbleFg = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFFE6E1E5),
+    dark: Color(0xFFF1F3F9),
     sepia: Color(0xFFFFFFFF),
   );
 
   static const AppModeColor aiBubbleBg = AppModeColor(
-    light: Color(0xFFF0F4F9),
-    dark: Color(0xFF1A1D24),
-    sepia: Color(0xFFE4D9C0),
+    light: Color(0xFFF4F6FA),
+    dark: Color(0xFF252A34),
+    sepia: Color(0xFFF0E7D5),
   );
 
   static const AppModeColor aiBubbleFg = AppModeColor(
-    light: Color(0xFF1C1B1F),
-    dark: Color(0xFFE6E1E5),
-    sepia: Color(0xFF4A3B32),
+    light: Color(0xFF1E2028),
+    dark: Color(0xFFF1F3F9),
+    sepia: Color(0xFF4A3C31),
   );
 
   static const AppModeColor codeBlockBg = AppModeColor(
-    light: Color(0xFF1E1E2E),
-    dark: Color(0xFF18181E),
-    sepia: Color(0xFF3E2723),
+    light: Color(0xFF262938),
+    dark: Color(0xFF202430),
+    sepia: Color(0xFF46332E),
   );
 
   static const AppModeColor codeBlockHeaderBg = AppModeColor(
-    light: Color(0xFF181825),
-    dark: Color(0xFF121216),
-    sepia: Color(0xFF2C1D18),
+    light: Color(0xFF1F2230),
+    dark: Color(0xFF1A1D27),
+    sepia: Color(0xFF362622),
   );
 
   static const AppModeColor codeBlockCanvas = AppModeColor(
-    light: Color(0xFF11111B),
-    dark: Color(0xFF11111B),
-    sepia: Color(0xFF241713),
+    light: Color(0xFF181A24),
+    dark: Color(0xFF161922),
+    sepia: Color(0xFF2D1F1B),
   );
 
   // ---------------------------------------------------------------------------
@@ -331,139 +331,139 @@ class AppColor {
 
   static const AppModeColor surfaceElevated = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF26262B),
-    sepia: Color(0xFFEFE6D0),
+    dark: Color(0xFF2C323E),
+    sepia: Color(0xFFF7F1E5),
   );
 
   static const AppModeColor surfaceSheet = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF1E1E24),
-    sepia: Color(0xFFF4ECD8),
+    dark: Color(0xFF252A34),
+    sepia: Color(0xFFFAF6EE),
   );
 
   static const AppModeColor surfaceCard = AppModeColor(
     light: Color(0xFFFFFFFF),
-    dark: Color(0xFF242526),
-    sepia: Color(0xFFEAE0C8),
+    dark: Color(0xFF262B36),
+    sepia: Color(0xFFF4EDE0),
   );
 
   static const AppModeColor surfaceMuted = AppModeColor(
-    light: Color(0xFFF1F3F5),
-    dark: Color(0xFF2A2A36),
-    sepia: Color(0xFFE6DAC0),
+    light: Color(0xFFF5F7FA),
+    dark: Color(0xFF303644),
+    sepia: Color(0xFFF0E6D4),
   );
 
   static const AppModeColor surfaceTrack = AppModeColor(
-    light: Color(0xFFF5F5F5),
-    dark: Color(0xFF212121),
-    sepia: Color(0xFFE6D8BC),
+    light: Color(0xFFF7F8FA),
+    dark: Color(0xFF2A2F3B),
+    sepia: Color(0xFFEFE7D6),
   );
 
   static const AppModeColor surfacePill = AppModeColor(
-    light: Color(0xFFEEEEEE),
-    dark: Color(0xFF303030),
-    sepia: Color(0xFFE0D2B5),
+    light: Color(0xFFF2F4F8),
+    dark: Color(0xFF363C4A),
+    sepia: Color(0xFFEBE0CC),
   );
 
   static const AppModeColor feedBackground = AppModeColor(
-    light: Color(0xFFF0F2F5),
-    dark: Color(0xFF18191A),
-    sepia: Color(0xFFEDE3CC),
+    light: Color(0xFFF5F7FA),
+    dark: Color(0xFF1B1F27),
+    sepia: Color(0xFFF5EFE2),
   );
 
   static const AppModeColor secondaryControlBg = AppModeColor(
-    light: Color(0xFFE4E6EB),
-    dark: Color(0xFF3A3B3C),
-    sepia: Color(0xFFE0D2B5),
+    light: Color(0xFFEDF0F5),
+    dark: Color(0xFF3B4252),
+    sepia: Color(0xFFEBE0CC),
   );
 
   static const AppModeColor storyCardEmptyBg = AppModeColor(
-    light: Color(0xFFE2E4E9),
-    dark: Color(0xFF2A2A36),
-    sepia: Color(0xFFE2D6BC),
+    light: Color(0xFFECEFF5),
+    dark: Color(0xFF303644),
+    sepia: Color(0xFFEDE3D0),
   );
 
   static const AppModeColor skeletonBase = AppModeColor(
-    light: Color(0xFFE4E4E8),
-    dark: Color(0xFF1E1E24),
-    sepia: Color(0xFFE2D6BC),
+    light: Color(0xFFECEEF4),
+    dark: Color(0xFF272C37),
+    sepia: Color(0xFFEDE3D0),
   );
 
   static const AppModeColor skeletonHighlight = AppModeColor(
-    light: Color(0xFFF4F4F8),
-    dark: Color(0xFF2E2E38),
-    sepia: Color(0xFFEDE3CC),
+    light: Color(0xFFF7F8FC),
+    dark: Color(0xFF363D4C),
+    sepia: Color(0xFFF6EFE2),
   );
 
   static const AppModeColor mediaPlaceholder = AppModeColor(
-    light: Color(0xFFF0F0F0),
-    dark: Color(0xFF1E1E22),
-    sepia: Color(0xFFE4D9C0),
+    light: Color(0xFFF4F6FA),
+    dark: Color(0xFF262B36),
+    sepia: Color(0xFFEEE5D3),
   );
 
   static const AppModeColor mediaTileBg = AppModeColor(
-    light: Color(0xFFECEEF2),
-    dark: Color(0xFF26262B),
-    sepia: Color(0xFFE4D9C0),
+    light: Color(0xFFF1F4F9),
+    dark: Color(0xFF2C323E),
+    sepia: Color(0xFFEEE5D3),
   );
 
   static const AppModeColor mediaGradientStart = AppModeColor(
-    light: Color(0xFFE2E8F0),
-    dark: Color(0xFF2A2B36),
-    sepia: Color(0xFFE6D8BC),
+    light: Color(0xFFE8EEF5),
+    dark: Color(0xFF303644),
+    sepia: Color(0xFFEFE7D6),
   );
 
   static const AppModeColor mediaGradientEnd = AppModeColor(
-    light: Color(0xFFCBD5E1),
-    dark: Color(0xFF1A1B22),
-    sepia: Color(0xFFD8C7A5),
+    light: Color(0xFFD8E2EE),
+    dark: Color(0xFF222731),
+    sepia: Color(0xFFE2D5C1),
   );
 
   static const AppModeColor postAttachmentGradientStart = AppModeColor(
-    light: Color(0xFFF4F6F8),
-    dark: Color(0xFF2C2C34),
-    sepia: Color(0xFFEDE3CC),
+    light: Color(0xFFF7F9FC),
+    dark: Color(0xFF323846),
+    sepia: Color(0xFFF5EFE2),
   );
 
   static const AppModeColor postAttachmentGradientEnd = AppModeColor(
-    light: Color(0xFFE5E9EE),
-    dark: Color(0xFF1B1B20),
-    sepia: Color(0xFFE2D4B7),
+    light: Color(0xFFEDF1F7),
+    dark: Color(0xFF232832),
+    sepia: Color(0xFFEAE0CE),
   );
 
   static const AppModeColor authBackground = AppModeColor(
-    light: Color(0xFFF9FAFB),
-    dark: Color(0xFF121214),
-    sepia: Color(0xFFF4ECD8),
+    light: Color(0xFFFAFBFD),
+    dark: Color(0xFF181B23),
+    sepia: Color(0xFFFAF6EE),
   );
 
   static const AppModeColor authInk = AppModeColor(
-    light: Color(0xFF222222),
-    dark: Color(0xFFE6E1E5),
-    sepia: Color(0xFF3B2F1E),
+    light: Color(0xFF1E2028),
+    dark: Color(0xFFF1F3F9),
+    sepia: Color(0xFF3E3227),
   );
 
   static const AppModeColor authDivider = AppModeColor(
-    light: Color(0xFFEEEEEE),
-    dark: Color(0xFF2E2E38),
-    sepia: Color(0xFFD8C7A5),
+    light: Color(0xFFF1F3F8),
+    dark: Color(0xFF323846),
+    sepia: Color(0xFFE5D9C5),
   );
 
   static const AppModeColor authBorder = AppModeColor(
-    light: Color(0xFFE0E0E0),
-    dark: Color(0xFF3A3B3C),
-    sepia: Color(0xFFD8C7A5),
+    light: Color(0xFFE5E8F0),
+    dark: Color(0xFF3E4556),
+    sepia: Color(0xFFE2D5C1),
   );
 
   static const AppModeColor authCtaBg = AppModeColor(
-    light: Colors.black,
-    dark: Color(0xFFDEC08F),
-    sepia: Color(0xFF5D4037),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFFF4A3B8),
+    sepia: Color(0xFFA86454),
   );
 
   static const AppModeColor authCtaFg = AppModeColor(
     light: Colors.white,
-    dark: Color(0xFF1F1B16),
+    dark: Color(0xFF3E1220),
     sepia: Colors.white,
   );
 
@@ -915,33 +915,33 @@ class AppColor {
   );
 
   static const AppModeColor contactsBannerStart = AppModeColor(
-    light: Color(0xFF6F5B40),
-    dark: Color(0xFFDEC08F),
-    sepia: Color(0xFF8A5A2B),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFFF4A3B8),
+    sepia: Color(0xFFA86454),
   );
 
   static const AppModeColor contactsBannerMid = AppModeColor(
-    light: Color(0xFFC07F39),
-    dark: Color(0xFFF7D9A4),
-    sepia: Color(0xFFC07F39),
+    light: Color(0xFFE88D96),
+    dark: Color(0xFFF8C0C8),
+    sepia: Color(0xFFC47D68),
   );
 
   static const AppModeColor contactsBannerEnd = AppModeColor(
-    light: Color(0xFFE29F52),
-    dark: Color(0xFFB7CEA0),
-    sepia: Color(0xFFD4A373),
+    light: Color(0xFFF5B097),
+    dark: Color(0xFFA8DEC9),
+    sepia: Color(0xFFDCA382),
   );
 
   static const AppModeColor contactsTabLabel = AppModeColor(
     light: Colors.white,
-    dark: Color(0xFF271905),
+    dark: Color(0xFF3E1220),
     sepia: Colors.white,
   );
 
   static const AppModeColor contactsSelectedTabBg = AppModeColor(
-    light: Color(0xFF6F5B40),
-    dark: Color(0xFFDEC08F),
-    sepia: Color(0xFF8A5A2B),
+    light: Color(0xFFD96B8A),
+    dark: Color(0xFFF4A3B8),
+    sepia: Color(0xFFA86454),
   );
 
   // ---------------------------------------------------------------------------
