@@ -30,6 +30,7 @@ class AppNotification {
     required this.userId,
     required this.title,
     required this.body,
+    required this.avatarUrl,
     required this.isRead,
     required this.createdAt,
     this.data,
@@ -41,6 +42,7 @@ class AppNotification {
       userId: json['userId'] as String? ?? json['user_id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       body: json['body'] as String? ?? '',
+      avatarUrl: json['avatar_url'] as String? ?? '',
       data: json['data'] as Map<String, dynamic>?,
       isRead: json['isRead'] as bool? ?? json['is_read'] as bool? ?? false,
       createdAt: json['createdAt'] != null
@@ -56,6 +58,7 @@ class AppNotification {
   final String userId;
   final String title;
   final String body;
+  final String avatarUrl;
   final Map<String, dynamic>? data;
   final bool isRead;
   final DateTime createdAt;
@@ -224,6 +227,7 @@ class AppNotification {
     String? userId,
     String? title,
     String? body,
+    String? avatarUrl,
     bool? isRead,
     Map<String, dynamic>? data,
     DateTime? createdAt,
@@ -234,6 +238,7 @@ class AppNotification {
       title: title ?? this.title,
       body: body ?? this.body,
       data: data ?? this.data,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
     );
